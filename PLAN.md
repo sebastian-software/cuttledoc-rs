@@ -10,7 +10,8 @@ This is a staged migration, not a line-by-line rewrite. Each phase must produce 
 
 The incubator is ready to become Cuttledoc v3 when all of the following are true:
 
-- The Rust API and native CLI transcribe supported audio/video inputs through at least one selected Apple-local ASR path and OpenAI.
+- The Rust API and native CLI transcribe supported audio/video inputs through at least one selected Apple-local ASR path and OpenAI on the macOS 26+ Apple Silicon baseline (ADR-0007).
+- Streaming transcription updates with volatile/final semantics (ADR-0008) are available through Rust, CLI, and Node for backends that support them; batch results are derived from the same stream model.
 - The Node API covers the stable Cuttledoc 2 use cases without owning product logic.
 - Existing Parakeet and Whisper behavior has measured compatibility evidence; each capability is preserved, deliberately replaced, or explicitly deprecated with a migration path.
 - Selected runtimes and bindings pass ADR-0005 rather than entering the product only because a technical spike works.
@@ -24,7 +25,8 @@ The incubator is ready to become Cuttledoc v3 when all of the following are true
 ## Non-goals for the first release
 
 - Reimplementing CoreML, whisper.cpp, or FFmpeg in pure Rust.
-- Supporting Intel macOS for local CoreML inference.
+- Supporting Intel macOS or macOS releases before 26 at all; Cuttledoc 2 remains the product for those systems (ADR-0007).
+- Capturing microphone or system audio inside the library; callers provide files or PCM feeds and own capture permissions (ADR-0008).
 - Shipping every model or runtime evaluated during the Apple Silicon bakeoff.
 - Supporting every possible audio codec without an FFmpeg fallback.
 - Porting embedded GGUF post-processing before its product value and distribution cost are revalidated.
@@ -42,7 +44,7 @@ Deliverables:
 - Establish reproducible Apple Silicon ASR fixtures and benchmark output.
 - Build a minimal CoreML interop spike from Rust on `darwin-arm64`.
 - Build a time-boxed meaningful MLX inference spike from Rust without assuming its experimental wrapper can ship.
-- Measure Apple SpeechAnalyzer/SpeechTranscriber as a system baseline.
+- Exercise Apple SpeechAnalyzer/SpeechTranscriber as a full bakeoff candidate through a repository-owned Swift shim, including AssetInventory model installation from a CLI context (ADR-0007).
 - Re-evaluate current ASR candidates against the existing Parakeet and Whisper baselines.
 - Decide the first selected local ASR model/runtime and its repository-owned or external interop boundary.
 - Evaluate the local LLM runtime separately from ASR.
@@ -88,7 +90,7 @@ Scope:
 
 - Selected model and runtime lifecycle with immutable model revision.
 - Required preprocessing, decoding, VAD/segmentation, vocabulary/tokenizer, and alignment behavior.
-- Streaming or bounded chunking where the selected model supports or requires it.
+- Streaming transcription updates with volatile/final semantics per ADR-0008; bounded chunking where the selected model requires it.
 - Language, timestamps, confidence, and word-level capabilities according to the selected contract.
 - Structured segments and combined text.
 - Engine reuse and deterministic cleanup.
@@ -168,7 +170,7 @@ Gate:
 Deliverables:
 
 - Rust crate publication plan.
-- Native CLI archives, checksums, signatures, and Homebrew path.
+- Native CLI archives, checksums, signatures, Apple notarization, and Homebrew path.
 - One user-facing `cuttledoc` npm package.
 - Platform-specific npm binary packages only if required as hidden distribution details.
 - Node 22/24 test matrix for ESM and CommonJS.
@@ -250,12 +252,13 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 | Rewrite changes recognition quality unnoticed                                    | Product regression                   | Golden fixtures and benchmark gates from Phase 1        |
 | Incubator and production diverge                                                 | Duplicate maintenance                | Time-box phases and migrate into product repo at parity |
 | A promising but weakly maintained wrapper becomes critical infrastructure       | Forced fork or blocked upgrades      | ADR-0005 disposition before adoption                    |
+| macOS 26+ baseline excludes users on older macOS                                 | Lost or stranded users               | Keep Cuttledoc 2 supported with an explicit window (ADR-0007) |
 
 ## Immediate next actions
 
 1. Complete the initial dependency inventory and runtime decision matrix.
 2. Establish the benchmark fixture/schema and measure current Parakeet, Whisper, and Apple system baselines.
-3. Run the bounded CoreML and MLX Rust spikes without committing either wrapper as a production dependency.
+3. Run the bounded CoreML, MLX, and SpeechAnalyzer-shim Rust spikes without committing any wrapper as a production dependency.
 4. Record the selected first ASR runtime/model and interop boundary in follow-up ADRs.
 5. Scaffold only the crates justified by those decisions.
 6. Produce the first packed npm addon and test ESM/CommonJS loading on Node 22 and 24.

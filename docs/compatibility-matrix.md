@@ -12,12 +12,14 @@ Status values:
 
 ## Platforms
 
-| Platform            | Local Parakeet | Local Whisper | OpenAI | Rust CLI | Node API | Status              |
-| ------------------- | -------------: | ------------: | -----: | -------: | -------: | ------------------- |
-| macOS Apple Silicon |            Yes |           Yes |    Yes |      Yes |      Yes | Required            |
-| macOS Intel         |             No |            No |    Yes |      Yes |      Yes | Cloud-only required |
-| Linux x64/arm64     |             No |            No |    Yes |      Yes |      Yes | Cloud-only required |
-| Windows x64/arm64   |             No |            No |    Yes |      Yes |      Yes | Cloud-only required |
+| Platform                        | Local ASR | OpenAI | Rust CLI | Node API | Status                       |
+| ------------------------------- | --------: | -----: | -------: | -------: | ---------------------------- |
+| macOS Apple Silicon (macOS 26+) |       Yes |    Yes |      Yes |      Yes | Required                     |
+| macOS Intel / macOS < 26        |        No |     No |       No |       No | Dropped in v3 (ADR-0007)     |
+| Linux x64/arm64                 |        No |    Yes |      Yes |      Yes | Cloud-only required          |
+| Windows x64/arm64               |        No |    Yes |      Yes |      Yes | Cloud-only required          |
+
+Local ASR covers the selected Apple-local backends (Parakeet, Whisper, system Speech per the bakeoff). Cuttledoc 2 remains the product for Intel Macs and macOS releases before 26.
 
 Unsupported local inference must be represented as capability absence. Installing the general product on Linux/Windows must not fail merely because Apple-only binaries are unavailable.
 
@@ -36,18 +38,21 @@ Unsupported local inference must be represented as capability absence. Installin
 
 ## Backend behavior
 
-| Capability           |                      Parakeet |                       Whisper |            OpenAI | Status                             |
-| -------------------- | ----------------------------: | ----------------------------: | ----------------: | ---------------------------------- |
-| Explicit selection   |                           Yes |                           Yes |               Yes | Required                           |
-| Automatic selection  |                           Yes |                           Yes |               Yes | Required                           |
-| Reusable engine      |                           Yes |                           Yes |    Service client | Required                           |
-| Structured segments  |                           Yes |                           Yes |   Model-dependent | Required                           |
-| Language detection   |                Model behavior |                           Yes |   Model-dependent | Required where currently available |
-| Confidence           |         Not currently exposed |            Segment confidence |   Model-dependent | Preserve where available           |
-| Arbitrary media path |                Through FFmpeg |                Through FFmpeg |       Upload path | Required                           |
-| Direct PCM input     |                   16 kHz mono |                   16 kHz mono |       Not primary | Required for advanced API          |
-| Cancellation         |                       Limited |                       Limited | HTTP cancellation | New                                |
-| Structured progress  | Download callbacks/CLI output | Download callbacks/CLI output |           Limited | New unified API                    |
+| Capability           |                      Parakeet |                       Whisper |        Speech (system) |            OpenAI | Status                             |
+| -------------------- | ----------------------------: | ----------------------------: | ---------------------: | ----------------: | ---------------------------------- |
+| Explicit selection   |                           Yes |                           Yes |                    Yes |               Yes | Required                           |
+| Automatic selection  |                           Yes |                           Yes |               Evaluate |               Yes | Required                           |
+| Reusable engine      |                           Yes |                           Yes |                    Yes |    Service client | Required                           |
+| Structured segments  |                           Yes |                           Yes |                    Yes |   Model-dependent | Required                           |
+| Language detection   |                Model behavior |                           Yes |               Evaluate |   Model-dependent | Required where currently available |
+| Confidence           |         Not currently exposed |            Segment confidence |                    Yes |   Model-dependent | Preserve where available           |
+| Arbitrary media path |                Through FFmpeg |                Through FFmpeg |         Through FFmpeg |       Upload path | Required                           |
+| Direct PCM input     |                   16 kHz mono |                   16 kHz mono |              Supported |       Not primary | Required for advanced API          |
+| Cancellation         |                       Limited |                       Limited |                    Yes | HTTP cancellation | New                                |
+| Structured progress  | Download callbacks/CLI output | Download callbacks/CLI output |                    New |           Limited | New unified API                    |
+| Streaming results    |  Final segments (VAD-chunked) |       Final segments (chunks) |       Volatile + final |   Model-dependent | New, capability-gated (ADR-0008)   |
+
+The Speech (system) column is a bakeoff candidate under ADR-0006/0007; its rows carry evaluation status, not legacy parity obligations.
 
 ## Parakeet gates
 
@@ -115,6 +120,7 @@ Golden audio vectors should compare sample count, duration, channel fold-down, r
 | Resume               | No                             | Evaluate per host support                | Evaluate |
 | Existing cache reuse | Separate roots                 | Detect and migrate/reuse deliberately    | Required |
 | Removal/verification | Limited                        | First-class API and CLI                  | New      |
+| System-managed Speech assets | N/A                    | AssetInventory install/status surfaced through model API | New      |
 
 ## CLI compatibility
 
@@ -160,6 +166,7 @@ Every release candidate must test the final artifacts rather than workspace link
 | Capability discovery        |               Yes |                Yes |                Yes |
 | Real Parakeet transcription |               Yes |                N/A |                N/A |
 | Real Whisper transcription  |               Yes |                N/A |                N/A |
+| Real system Speech transcription | Yes (macOS 26 runner) |          N/A |                N/A |
 | OpenAI contract test        | Mocked/live-gated |  Mocked/live-gated |  Mocked/live-gated |
 | No local compiler invoked   |               Yes |                Yes |                Yes |
 

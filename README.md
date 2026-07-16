@@ -27,7 +27,7 @@ The existing repositories remain the sources of truth while this incubator is in
 1. **One product API.** Parakeet, Whisper, OpenAI, model management, and audio decoding are capabilities of Cuttledoc, not separate user-facing products.
 2. **Rust owns behavior.** Node.js bindings convert values and surface errors; they do not reimplement orchestration.
 3. **Internal modularity, minimal publishing surface.** Rust workspace crates preserve boundaries without forcing users to coordinate package versions.
-4. **Offline-first on Apple Silicon.** Local CoreML backends remain first-class and private.
+4. **Offline-first on Apple Silicon.** Local Apple backends (CoreML, system Speech, accepted MLX/Metal paths) remain first-class and private. The v3 macOS baseline is Apple Silicon with macOS 26 (ADR-0007).
 5. **Compatibility is measured.** Existing fixtures, timestamps, backend selection, CLI behavior, and benchmarks become migration gates.
 6. **Prebuilt artifacts only.** End users must never need Xcode, Rust, CMake, or `node-gyp` to install the Node package.
 7. **Packed artifacts are the test unit.** CI must test crates, binaries, npm tarballs, ESM, CommonJS, and clean-machine installation.
@@ -38,7 +38,7 @@ The existing repositories remain the sources of truth while this incubator is in
 crates/
 ├── cuttledoc/           # public Rust API and orchestration
 ├── cuttledoc-audio/     # decoding, resampling, normalization
-├── cuttledoc-coreml/    # CoreML lifecycle and backend implementations
+├── cuttledoc-apple/     # Apple runtime adapters (exact crate split decided in Phase 0)
 ├── cuttledoc-models/    # manifests, downloads, validation, cache migration
 ├── cuttledoc-openai/    # cloud transcription backend
 ├── cuttledoc-cli/       # native CLI

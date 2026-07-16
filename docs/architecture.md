@@ -88,7 +88,9 @@ Own selected Apple-local inference behind task contracts:
 
 Phase 0 decides whether these adapters live in one `cuttledoc-apple` crate or smaller runtime-specific crates. No crate is created merely to mirror an old npm package or an experimental dependency.
 
-Platform code is gated to `target_os = "macos"` and `target_arch = "aarch64"`. Other targets expose capability absence at the orchestration layer rather than compiling Apple frameworks.
+Platform code is gated to `target_os = "macos"` and `target_arch = "aarch64"` with a macOS 26 deployment baseline (ADR-0007). Other targets expose capability absence at the orchestration layer rather than compiling Apple frameworks.
+
+Apple SpeechAnalyzer/SpeechTranscriber has no Objective-C or C interface. It is reached through a repository-owned Swift shim exposing a narrow C ABI to Rust, including AssetInventory model installation for CLI and library consumers.
 
 ### `cuttledoc-models`
 
@@ -180,6 +182,8 @@ Long operations emit typed events:
 
 Cancellation is cooperative. Downloads remove or retain resumable partial state according to the model-manager policy. Native inference that cannot be interrupted reports cancellation at the next safe boundary.
 
+Transcription results are delivered as a stream of volatile/final updates per ADR-0008; progress events remain separate and observational.
+
 ## Apple runtime and native interop
 
 Rust remains the owner even when foreign implementations are reused:
@@ -218,10 +222,13 @@ Existing roots:
 
 The model manager should detect complete existing caches and either reuse them read-only, adopt them after verification, or provide an explicit migration. It must not redownload several gigabytes without explanation.
 
+The `~/.cache` root is a deliberate decision: it matches the existing Parakeet/Whisper cache convention and keeps one path scheme across macOS and future cloud-only targets, instead of the macOS-native `~/Library/Caches`. System Speech models are managed by macOS through AssetInventory and never live in this cache.
+
 ## Error model
 
 Internal errors remain rich Rust enums. Public boundaries expose stable categories and codes, for example:
 
+- `INVALID_INPUT`
 - `UNSUPPORTED_PLATFORM`
 - `BACKEND_UNAVAILABLE`
 - `MODEL_MISSING`

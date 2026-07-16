@@ -105,8 +105,8 @@ Current Objective-C++ files:
 | Source                         | Responsibility                               | Initial target                                              |
 | ------------------------------ | -------------------------------------------- | ----------------------------------------------------------- |
 | `src/addon.mm`                 | N-API registration and JS/native conversion  | Retire N-API; preserve native calls behind Rust/C boundary  |
-| `src/asr_engine.mm/.h`         | CoreML model lifecycle and ASR orchestration | `cuttledoc-coreml` interop, then incremental Rust ownership |
-| `src/vad_engine.mm/.h`         | Stateful Silero VAD                          | `cuttledoc-coreml`                                          |
+| `src/asr_engine.mm/.h`         | CoreML model lifecycle and ASR orchestration | Apple runtime adapter interop, then incremental Rust ownership |
+| `src/vad_engine.mm/.h`         | Stateful Silero VAD                          | Apple runtime adapter (crate split per Phase 0)             |
 | `src/mel_spectrogram.mm/.h`    | Fallback mel computation                     | Port/test as pure Rust where practical                      |
 | `src/transducer_decoder.mm/.h` | TDT token prediction/decision                | Strong candidate for safe Rust port with golden tests       |
 
@@ -163,7 +163,7 @@ Target improvements:
 | Source                     | Responsibility                            | Initial target                                         |
 | -------------------------- | ----------------------------------------- | ------------------------------------------------------ |
 | `src/addon.cc`             | N-API registration and conversion         | Retire; replace with Rust binding at product boundary  |
-| `src/whisper_engine.cc/.h` | whisper.cpp context and result conversion | isolated C/C++ sys boundary used by `cuttledoc-coreml` |
+| `src/whisper_engine.cc/.h` | whisper.cpp context and result conversion | isolated C/C++ sys boundary used by the Apple runtime adapter |
 | vendored `whisper.cpp`     | encoder/decoder inference                 | Keep upstream implementation, pin reproducibly         |
 
 Current split:

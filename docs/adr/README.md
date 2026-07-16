@@ -10,5 +10,7 @@ ADRs capture decisions that materially constrain the implementation. Proposed AD
 | [0004](0004-task-oriented-engines-and-runtime-adapters.md)             | Task-oriented engines and internal runtime adapters | Accepted |
 | [0005](0005-third-party-dependency-policy.md)                          | Strict third-party dependency acceptance policy    | Accepted |
 | [0006](0006-apple-runtime-and-model-selection-by-bakeoff.md)           | Apple runtime and model selection by bakeoff        | Accepted |
+| [0007](0007-apple-silicon-macos-26-baseline.md)                        | Apple Silicon and macOS 26 baseline for v3          | Accepted |
+| [0008](0008-streaming-first-transcription-results.md)                  | Streaming-first transcription results               | Accepted |
 
 Status values: proposed, accepted, superseded, rejected.

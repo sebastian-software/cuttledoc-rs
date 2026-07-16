@@ -20,10 +20,12 @@ The `Backend` identifiers below remain provisional compatibility/product choices
 ## Shared domain model
 
 ```rust
+#[non_exhaustive]
 pub enum Backend {
     Auto,
     Parakeet,
     Whisper,
+    Speech, // Apple system SpeechAnalyzer, macOS 26+ (ADR-0007)
     OpenAi,
 }
 
@@ -51,6 +53,8 @@ pub struct TranscriptionSegment {
     pub words: Vec<WordTimestamp>,
 }
 ```
+
+`Backend` is `#[non_exhaustive]`: downstream `match` expressions must carry a wildcard arm, which makes adding backends after 1.0 an additive, non-breaking change. The Node declaration models the same set as a string union that widens additively. Capability discovery, not the enum, is the source of truth for availability.
 
 Time is strongly typed in Rust. Node conversions use seconds consistently at the public boundary rather than mixing Parakeet seconds and Whisper milliseconds.
 
@@ -183,6 +187,36 @@ let result = engine
 
 Progress callbacks are observational: slow callbacks must not block native inference indefinitely. Node callbacks are dispatched through a threadsafe function or equivalent `napi-rs` mechanism.
 
+## Streaming results
+
+Streaming follows ADR-0008: the result contract is a stream of typed updates, each **volatile** (may be revised) or **final** (stable). Batch transcription consumes the same stream and aggregates the final updates.
+
+```rust
+let mut updates = engine.transcribe_stream("meeting.mp4").await?;
+
+while let Some(update) = updates.next().await {
+    match update? {
+        TranscriptionUpdate::Volatile(segment) => { /* may still change */ }
+        TranscriptionUpdate::Final(segment) => { /* stable */ }
+    }
+}
+```
+
+```ts
+for await (const update of engine.transcribeStream("meeting.mp4")) {
+  if (update.isFinal) {
+    render(update.segment);
+  }
+}
+```
+
+Rules:
+
+- Backends report `supportsStreaming` (incremental finals) and `emitsVolatileResults` (revisions before finalization) as capabilities; callers rely on the report, not probing.
+- Finals-only backends emit completed segments as they are produced; they never emit volatile updates.
+- Input sources are files and caller-provided PCM feeds. The library does not capture microphone or system audio.
+- Result updates are distinct from progress events; progress remains observational.
+
 ## Node.js API
 
 The Node API mirrors domain concepts while remaining idiomatic TypeScript:
@@ -241,6 +275,7 @@ The generated declaration should resemble:
 
 ```ts
 type CuttledocErrorCode =
+  | "INVALID_INPUT"
   | "UNSUPPORTED_PLATFORM"
   | "BACKEND_UNAVAILABLE"
   | "MODEL_MISSING"
