@@ -54,6 +54,8 @@ Unsupported local inference must be represented as capability absence. Installin
 
 The Speech (system) column is a bakeoff candidate under ADR-0006/0007; its rows carry evaluation status, not legacy parity obligations.
 
+Streaming contract tests reduce ordered, range-addressed replace/revoke updates into a transcript. They must cover volatile replacement, explicit revocation, finalization, overlap rejection for finalized ranges, and identical Rust/Node results (ADR-0008).
+
 ## Parakeet gates
 
 | Behavior           | Baseline                                                    | v3 gate                                                                                     |

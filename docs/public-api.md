@@ -13,9 +13,56 @@ Cuttledoc exposes two deliberate levels:
 
 Model management and capability discovery are first-class. Backend implementation objects are not exposed.
 
-Speech recognition and text generation are separate task APIs. They may share model management, progress, cancellation, diagnostics, errors, and lifecycle concepts, but they do not share a generic tensor or inference-runtime interface. See ADR-0004.
+Speech recognition, speech synthesis, and text generation are separate task APIs. They may share model management, progress, cancellation, diagnostics, errors, lifecycle concepts, and common audio types where applicable, but they do not share a generic tensor or inference-runtime interface. See ADR-0004.
 
 The `Backend` identifiers below remain provisional compatibility/product choices, not runtime identities. CoreML, MLX, Metal, Apple system APIs, or a native upstream implementation remain internal adapters. If multiple runtimes can execute the same model family, runtime selection does not change `TranscriptionResult`.
+
+## Initial task contracts
+
+The following shapes establish architectural boundaries; exact Rust async syntax and names remain provisional:
+
+```rust
+pub trait SpeechRecognitionEngine {
+    async fn transcribe(
+        &self,
+        audio: AudioSource,
+        options: TranscriptionOptions,
+    ) -> Result<TranscriptionStream>;
+}
+
+pub trait SpeechSynthesisEngine {
+    async fn synthesize(
+        &self,
+        text: TextSource,
+        options: SynthesisOptions,
+    ) -> Result<AudioStream>;
+}
+
+pub trait TextGenerationEngine {
+    async fn generate(
+        &self,
+        request: GenerationRequest,
+    ) -> Result<TextStream>;
+}
+```
+
+Shared audio primitives support file, in-memory PCM, and streaming use cases in both directions:
+
+```rust
+pub struct AudioFormat {
+    pub sample_rate: u32,
+    pub channels: u16,
+    pub sample_format: SampleFormat,
+}
+
+pub struct AudioChunk {
+    pub samples: AudioSamples,
+    pub format: AudioFormat,
+    pub timestamp: Option<Duration>,
+}
+```
+
+Recognition streams partial/final transcript events, generation streams text/token deltas, and synthesis streams `AudioChunk` values. All streams define cancellation and backpressure behavior. TTS model delivery may follow the first ASR release, but the synthesis contract is part of the architecture now.
 
 ## Shared domain model
 
@@ -25,7 +72,7 @@ pub enum Backend {
     Auto,
     Parakeet,
     Whisper,
-    Speech, // Apple system SpeechAnalyzer, macOS 26+ (ADR-0007)
+    AppleSpeech, // Apple SpeechAnalyzer, macOS 26+ (ADR-0007)
     OpenAi,
 }
 
@@ -54,7 +101,14 @@ pub struct TranscriptionSegment {
 }
 ```
 
-`Backend` is `#[non_exhaustive]`: downstream `match` expressions must carry a wildcard arm, which makes adding backends after 1.0 an additive, non-breaking change. The Node declaration models the same set as a string union that widens additively. Capability discovery, not the enum, is the source of truth for availability.
+`Backend` is `#[non_exhaustive]`: downstream Rust `match` expressions must carry a wildcard arm, which permits adding variants after 1.0. TypeScript has no equivalent closed-enum guarantee: a plain string union can break exhaustive consumer switches when widened. The Node surface therefore uses known completions plus an open string escape hatch:
+
+```ts
+type KnownBackend = "auto" | "parakeet" | "whisper" | "apple-speech" | "openai";
+type BackendId = KnownBackend | (string & {});
+```
+
+The exact backend taxonomy is still provisional because the current list mixes legacy model families and providers. Issue #8 must decide the stable identifiers. Capability discovery, not an exhaustive enum or union, is the source of truth for availability.
 
 Time is strongly typed in Rust. Node conversions use seconds consistently at the public boundary rather than mixing Parakeet seconds and Whisper milliseconds.
 
@@ -189,30 +243,61 @@ Progress callbacks are observational: slow callbacks must not block native infer
 
 ## Streaming results
 
-Streaming follows ADR-0008: the result contract is a stream of typed updates, each **volatile** (may be revised) or **final** (stable). Batch transcription consumes the same stream and aggregates the final updates.
+Streaming follows ADR-0008: the result contract is an ordered stream of range-addressed replacement or revocation updates. Replacement content is volatile or final. Batch transcription consumes the same stream and aggregates finalized ranges.
+
+```rust
+pub struct TranscriptionUpdate {
+    pub sequence: u64,
+    pub affected_range: TimeRange,
+    pub kind: TranscriptionUpdateKind,
+}
+
+pub enum TranscriptionUpdateKind {
+    Replace {
+        segments: Vec<TranscriptionSegment>,
+        stability: Stability,
+    },
+    Revoke,
+}
+
+pub enum Stability {
+    Volatile,
+    Final,
+}
+```
 
 ```rust
 let mut updates = engine.transcribe_stream("meeting.mp4").await?;
 
 while let Some(update) = updates.next().await {
-    match update? {
-        TranscriptionUpdate::Volatile(segment) => { /* may still change */ }
-        TranscriptionUpdate::Final(segment) => { /* stable */ }
+    let TranscriptionUpdate {
+        affected_range,
+        kind,
+        ..
+    } = update?;
+
+    match kind {
+        TranscriptionUpdateKind::Replace { segments, stability } => {
+            transcript.replace(affected_range, segments, stability)?;
+        }
+        TranscriptionUpdateKind::Revoke => {
+            transcript.revoke(affected_range)?;
+        }
     }
 }
 ```
 
 ```ts
 for await (const update of engine.transcribeStream("meeting.mp4")) {
-  if (update.isFinal) {
-    render(update.segment);
-  }
+  transcript.apply(update); // sequence + affectedRange + replace/revoke
 }
 ```
 
 Rules:
 
 - Backends report `supportsStreaming` (incremental finals) and `emitsVolatileResults` (revisions before finalization) as capabilities; callers rely on the report, not probing.
+- Consumers apply updates in `sequence` order. `replace` removes prior non-final content in `affectedRange` before inserting the new segments; `revoke` removes it without replacement.
+- Finalized ranges are immutable. Overlap with final content is surfaced as a backend contract error.
 - Finals-only backends emit completed segments as they are produced; they never emit volatile updates.
 - Input sources are files and caller-provided PCM feeds. The library does not capture microphone or system audio.
 - Result updates are distinct from progress events; progress remains observational.

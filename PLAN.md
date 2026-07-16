@@ -13,6 +13,7 @@ The incubator is ready to become Cuttledoc v3 when all of the following are true
 - The Rust API and native CLI transcribe supported audio/video inputs through at least one selected Apple-local ASR path and OpenAI on the macOS 26+ Apple Silicon baseline (ADR-0007).
 - Streaming transcription updates with volatile/final semantics (ADR-0008) are available through Rust, CLI, and Node for backends that support them; batch results are derived from the same stream model.
 - The Node API covers the stable Cuttledoc 2 use cases without owning product logic.
+- Public domain contracts cover speech-to-text, text-to-speech, and text generation as separate composable tasks; the release scope states explicitly which implementations ship initially.
 - Existing Parakeet and Whisper behavior has measured compatibility evidence; each capability is preserved, deliberately replaced, or explicitly deprecated with a migration path.
 - Selected runtimes and bindings pass ADR-0005 rather than entering the product only because a technical spike works.
 - Model downloads are resumable or atomic, validated, observable, configurable, and compatible with existing caches or an explicit migration command.
@@ -28,6 +29,7 @@ The incubator is ready to become Cuttledoc v3 when all of the following are true
 - Supporting Intel macOS or macOS releases before 26 at all; Cuttledoc 2 remains the product for those systems (ADR-0007).
 - Capturing microphone or system audio inside the library; callers provide files or PCM feeds and own capture permissions (ADR-0008).
 - Shipping every model or runtime evaluated during the Apple Silicon bakeoff.
+- Supporting embeddings, vision, image generation, or arbitrary tensor execution in the initial architecture.
 - Supporting every possible audio codec without an FFmpeg fallback.
 - Porting embedded GGUF post-processing before its product value and distribution cost are revalidated.
 - Publishing every workspace crate independently.
@@ -41,10 +43,11 @@ Deliverables:
 
 - Apply the third-party dependency policy and record a disposition for every runtime candidate.
 - Build a task-by-runtime decision matrix for CoreML, MLX, Metal-native paths, Apple system Speech, and remote APIs.
+- Define separate streaming contracts for speech recognition, speech synthesis, and text generation plus the shared audio buffer/format types. Transcription updates include ordered range-based replace/revoke/final semantics per ADR-0008.
 - Establish reproducible Apple Silicon ASR fixtures and benchmark output.
 - Build a minimal CoreML interop spike from Rust on `darwin-arm64`.
-- Build a time-boxed meaningful MLX inference spike from Rust without assuming its experimental wrapper can ship.
-- Exercise Apple SpeechAnalyzer/SpeechTranscriber as a full bakeoff candidate through a repository-owned Swift shim, including AssetInventory model installation from a CLI context (ADR-0007).
+- Build a time-boxed meaningful MLX inference spike from Rust comparing a narrow repository-owned C++ adapter over official `ml-explore/mlx` with official `mlx-c`; community wrappers remain reference-only unless they pass ADR-0005.
+- Exercise Apple SpeechAnalyzer/SpeechTranscriber as a full bakeoff candidate through a repository-owned Swift shim, including AssetInventory model installation and executable-identity behavior from a CLI context (ADR-0007).
 - Re-evaluate current ASR candidates against the existing Parakeet and Whisper baselines.
 - Decide the first selected local ASR model/runtime and its repository-owned or external interop boundary.
 - Evaluate the local LLM runtime separately from ASR.
@@ -144,9 +147,9 @@ Exit criteria:
 - Linux and Windows can build the non-CoreML product and use OpenAI.
 - Credentials never appear in command lines, logs, or persisted configuration.
 
-## Phase 5 — Transcript enhancement decision
+## Phase 5 — Text generation and speech synthesis decisions
 
-**Purpose:** prevent the existing `@cuttledoc/llm` implementation from silently defining the Rust architecture.
+**Purpose:** prevent the existing `@cuttledoc/llm` implementation from silently defining the Rust architecture and decide when the complete STT → LLM → TTS pipeline should ship.
 
 Evaluate independently:
 
@@ -156,12 +159,16 @@ Evaluate independently:
 - MLX, `mistral.rs`, Candle, and a narrow llama.cpp/GGUF path where they pass the dependency gate.
 - Chunking, correction statistics, Markdown formatting, and prompt compatibility.
 - Whether enhancement belongs in the initial v3 or a later minor release.
+- Candidate local and remote TTS runtimes/models for Apple Silicon.
+- Voice/language selection, streaming audio chunks, sample formats, and synthesis cancellation.
+- Whether a TTS implementation belongs in the initial v3 or a later release; the public synthesis contract exists either way.
 
 Gate:
 
 - Keep enhancement only where measured transcript quality, install size, and operational complexity justify it.
 - Do not select an immature runtime merely because its model experiment succeeds.
 - Preserve raw transcription as a complete product regardless of this decision.
+- Keep speech synthesis independently usable rather than coupling it to one LLM or voice-assistant flow.
 
 ## Phase 6 — Distribution and compatibility
 

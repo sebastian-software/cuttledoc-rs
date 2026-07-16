@@ -29,7 +29,7 @@ The target makes Rust the product center while preserving proven native inferenc
               │                         │                         │
     ┌─────────▼─────────┐     ┌─────────▼─────────┐     ┌─────────▼─────────┐
     │ Audio pipeline     │     │ Task engines      │     │ Model manager     │
-    │ probe/decode/PCM   │     │ speech │ text gen │     │ manifest/download │
+    │ probe/decode/PCM   │     │ STT │ TTS │ LLM   │     │ manifest/download │
     │ normalize          │     │ lifecycle/results │     │ validate/migrate  │
     └─────────┬─────────┘     └─────────┬─────────┘     └───────────────────┘
               │                         │
@@ -60,6 +60,18 @@ cuttledoc-models ─────▶ model manifests and storage contracts
 ```
 
 The public `cuttledoc` crate must not depend on Node.js. `cuttledoc-node` depends on the Rust API and contains only conversion, callback bridging, and Node-specific lifecycle handling.
+
+## Initial task scope
+
+The stable product architecture covers exactly three composable AI tasks initially:
+
+1. Speech-to-text through `SpeechRecognitionEngine`-shaped APIs.
+2. Text-to-speech through `SpeechSynthesisEngine`-shaped APIs.
+3. Text generation through `TextGenerationEngine`-shaped APIs.
+
+Speech recognition and synthesis share `AudioFormat`, PCM buffer/chunk, stream timing, cancellation, and backpressure concepts. They remain separate execution contracts because their data flow and model options differ. A complete voice flow composes STT → text generation → TTS; transcript enhancement composes STT → text generation.
+
+Embeddings, vision, image generation, and general tensor execution are outside the initial scope. Runtime adapters may be internally extensible, but no public abstraction is added speculatively for those tasks.
 
 ## Proposed crates
 
@@ -152,7 +164,7 @@ It must not select backends, manage model paths independently, or implement tran
 Engines are explicit, reusable resources:
 
 ```text
-Configured → Loading → Ready → Transcribing → Ready → Closing → Closed
+Configured → Loading → Ready → Running → Ready → Closing → Closed
                  └──────────── failure ───────────────▶ Failed
 ```
 
@@ -178,17 +190,20 @@ Long operations emit typed events:
 - decoding media;
 - loading engine;
 - transcribing segment;
+- generating text;
+- synthesizing audio chunk;
 - enhancing transcript.
 
 Cancellation is cooperative. Downloads remove or retain resumable partial state according to the model-manager policy. Native inference that cannot be interrupted reports cancellation at the next safe boundary.
 
-Transcription results are delivered as a stream of volatile/final updates per ADR-0008; progress events remain separate and observational.
+Transcription results are delivered as an ordered stream of range-addressed replace/revoke updates per ADR-0008. Replacement content is volatile or final; finalized ranges are immutable. Progress events remain separate and observational.
 
 ## Apple runtime and native interop
 
 Rust remains the owner even when foreign implementations are reused:
 
 - Existing Parakeet Objective-C++ and Whisper C++ implementations are compatibility references and may be temporary bridges only when that is the smallest maintainable path.
+- The primary MLX spike uses the official C++ core through the smallest repository-owned task-level adapter; official `mlx-c` is the comparison path. Community bindings remain reference-only unless they pass ADR-0005.
 - Specialized upstream implementations such as whisper.cpp remain candidates rather than automatic dependencies.
 - Unsafe code and foreign pointers remain isolated in sys/interop modules.
 - Public Rust types never expose Objective-C, C++, N-API, CoreML, MLX, Metal, or whisper.cpp handles.
