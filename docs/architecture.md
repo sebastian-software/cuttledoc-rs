@@ -9,7 +9,7 @@ The current system distributes product behavior across a TypeScript monorepo and
 - C++/whisper.cpp inference behind a second N-API addon;
 - separate package installation, model caches, CLIs, tests, and releases.
 
-The target makes Rust the product center while preserving proven native inference implementations where rewriting them would add risk without user value.
+The target makes Rust the product center while preserving proven native inference implementations where rewriting them would add risk without user value. Runtime and model selection remains evidence-driven and must not shape the stable API.
 
 ## System view
 
@@ -28,16 +28,16 @@ The target makes Rust the product center while preserving proven native inferenc
               ┌─────────────────────────┼─────────────────────────┐
               │                         │                         │
     ┌─────────▼─────────┐     ┌─────────▼─────────┐     ┌─────────▼─────────┐
-    │ Audio pipeline     │     │ Backend runtime   │     │ Model manager     │
-    │ probe/decode/PCM   │     │ select/load/cache │     │ manifest/download │
-    │ normalize          │     │ transcribe/dispose│     │ validate/migrate  │
+    │ Audio pipeline     │     │ Task engines      │     │ Model manager     │
+    │ probe/decode/PCM   │     │ speech │ text gen │     │ manifest/download │
+    │ normalize          │     │ lifecycle/results │     │ validate/migrate  │
     └─────────┬─────────┘     └─────────┬─────────┘     └───────────────────┘
               │                         │
               │          ┌──────────────┼──────────────┐
               │          │              │              │
               │  ┌───────▼───────┐ ┌────▼─────┐ ┌──────▼──────┐
-              │  │ Parakeet       │ │ Whisper  │ │ OpenAI      │
-              │  │ CoreML + VAD   │ │ cpp/CoreML│ │ HTTP API    │
+              │  │ Apple-local    │ │ Native   │ │ Remote      │
+              │  │ CoreML/System  │ │ MLX/Metal│ │ HTTP APIs   │
               │  └───────────────┘ └──────────┘ └─────────────┘
               │
               └── managed FFmpeg compatibility path initially
@@ -53,7 +53,7 @@ cuttledoc-node ────┼──▶ cuttledoc ───▶ backend/audio/mod
                    │                         ▲
                    └─────────────────────────┘
 
-cuttledoc-coreml ─────▶ abstractions
+cuttledoc-apple/runtime adapters ─▶ abstractions
 cuttledoc-openai ─────▶ abstractions
 cuttledoc-audio ──────▶ domain audio types
 cuttledoc-models ─────▶ model manifests and storage contracts
@@ -76,17 +76,17 @@ Owns:
 
 It does not own platform FFI or JavaScript types.
 
-### `cuttledoc-coreml`
+### Apple runtime adapters (exact crate split deferred)
 
-Owns Apple-local inference:
+Own selected Apple-local inference behind task contracts:
 
-- Parakeet CoreML model lifecycle;
-- Silero VAD state and segmentation;
-- 15-second Parakeet chunk enforcement;
-- Whisper/whisper.cpp lifecycle with CoreML encoder;
-- CoreML compute-unit configuration;
-- Apple-specific thread-affinity and autorelease behavior;
+- CoreML, Apple system Speech, and any accepted MLX/Metal/native paths;
+- selected ASR model preprocessing, decoding, segmentation, and alignment;
+- runtime-specific compute-unit/device configuration;
+- Apple-specific thread affinity, autorelease behavior, and deterministic cleanup;
 - conversion of native results into shared domain results.
+
+Phase 0 decides whether these adapters live in one `cuttledoc-apple` crate or smaller runtime-specific crates. No crate is created merely to mirror an old npm package or an experimental dependency.
 
 Platform code is gated to `target_os = "macos"` and `target_arch = "aarch64"`. Other targets expose capability absence at the orchestration layer rather than compiling Apple frameworks.
 
@@ -103,7 +103,7 @@ Owns a versioned manifest per model artifact:
 - progress and cancellation;
 - migration from existing cache locations.
 
-Initial model set:
+Compatibility baseline model set (the bakeoff decides what ships initially):
 
 - Parakeet Preprocessor, Encoder, Decoder, JointDecision, vocabulary;
 - Silero VAD `silero-vad-unified-v6.0.0.mlmodelc`;
@@ -162,9 +162,9 @@ Rules:
 - Cleanup is explicit and also guarded by `Drop`/Node finalizers.
 - Errors preserve backend and phase context.
 
-### CoreML execution
+### Apple-local execution
 
-Phase 0 must determine whether CoreML objects need a dedicated thread/run loop. Until proven otherwise, treat each engine as thread-affine and send commands to a dedicated worker. All Objective-C objects must live inside bounded autorelease pools.
+Phase 0 must determine thread affinity, run-loop, executor, and cleanup rules separately for each candidate runtime. Until proven otherwise, treat CoreML engines as thread-affine and send commands to a dedicated worker. All Objective-C objects must live inside bounded autorelease pools. MLX or Metal behavior must be measured rather than assumed equivalent.
 
 ### Progress and cancellation
 
@@ -180,17 +180,21 @@ Long operations emit typed events:
 
 Cancellation is cooperative. Downloads remove or retain resumable partial state according to the model-manager policy. Native inference that cannot be interrupted reports cancellation at the next safe boundary.
 
-## CoreML and native interop
+## Apple runtime and native interop
 
 Rust remains the owner even when foreign implementations are reused:
 
-- Parakeet may initially expose the current Objective-C++ engine through a narrow C ABI.
-- Whisper continues to use whisper.cpp rather than reimplementing Whisper inference.
+- Existing Parakeet Objective-C++ and Whisper C++ implementations are compatibility references and may be temporary bridges only when that is the smallest maintainable path.
+- Specialized upstream implementations such as whisper.cpp remain candidates rather than automatic dependencies.
 - Unsafe code and foreign pointers remain isolated in sys/interop modules.
-- Public Rust types never expose Objective-C, C++, N-API, or whisper.cpp handles.
+- Public Rust types never expose Objective-C, C++, N-API, CoreML, MLX, Metal, or whisper.cpp handles.
 - Ownership, nullability, thread affinity, error transfer, and cleanup are documented at every FFI boundary.
 
-The Phase 0 spike decides whether Parakeet moves directly to Rust CoreML bindings or stages through the C ABI. See ADR-0003.
+The Phase 0 bakeoff selects model/runtime pairs and then records each production interop boundary in a follow-up ADR. See ADR-0003, ADR-0005, and ADR-0006.
+
+## Dependency acceptance
+
+Every material runtime, wrapper, build component, and code generator is classified as an accepted production dependency, repository-owned boundary, reference-only input, or rejected project. A working spike does not bypass this review. Experimental projects may inform tests and implementation without entering Cargo/npm manifests or release artifacts. See ADR-0005.
 
 ## Unified model storage
 

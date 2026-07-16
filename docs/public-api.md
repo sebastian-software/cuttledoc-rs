@@ -13,6 +13,10 @@ Cuttledoc exposes two deliberate levels:
 
 Model management and capability discovery are first-class. Backend implementation objects are not exposed.
 
+Speech recognition and text generation are separate task APIs. They may share model management, progress, cancellation, diagnostics, errors, and lifecycle concepts, but they do not share a generic tensor or inference-runtime interface. See ADR-0004.
+
+The `Backend` identifiers below remain provisional compatibility/product choices, not runtime identities. CoreML, MLX, Metal, Apple system APIs, or a native upstream implementation remain internal adapters. If multiple runtimes can execute the same model family, runtime selection does not change `TranscriptionResult`.
+
 ## Shared domain model
 
 ```rust
@@ -275,6 +279,8 @@ Compatibility aliases from Cuttledoc 2 should be retained where they do not comp
 Expose capabilities rather than implementation classes. The public API may offer PCM input, model paths, VAD tuning, and backend-specific option structs, but it should not expose:
 
 - raw CoreML model handles;
+- MLX arrays or runtime handles;
+- Metal devices or command queues;
 - N-API addon functions;
 - whisper.cpp contexts;
 - Objective-C pointers;

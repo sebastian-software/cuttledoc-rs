@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
@@ -60,4 +60,4 @@ Neither is the complete product or a suitable single ancestor for the combined a
 
 ## Validation
 
-Accept after maintainers agree that the incubator is temporary and that v3 is intended to return to the Cuttledoc product repository.
+The public incubator exists at `sebastian-software/cuttledoc-rs`. It remains temporary by decision: a later ADR must define the exact history/import mechanism and release cutover back into the Cuttledoc product repository once the compatibility gates pass.

@@ -10,10 +10,10 @@ This is a staged migration, not a line-by-line rewrite. Each phase must produce 
 
 The incubator is ready to become Cuttledoc v3 when all of the following are true:
 
-- The Rust API and native CLI transcribe supported audio/video inputs through Parakeet, Whisper, and OpenAI.
+- The Rust API and native CLI transcribe supported audio/video inputs through at least one selected Apple-local ASR path and OpenAI.
 - The Node API covers the stable Cuttledoc 2 use cases without owning product logic.
-- Parakeet retains VAD-based segmentation, timestamps, and the 15-second internal model constraint without exposing that constraint to users.
-- Whisper retains `large-v3-turbo`, language detection, timestamps, the CoreML encoder, and the whisper.cpp decoder.
+- Existing Parakeet and Whisper behavior has measured compatibility evidence; each capability is preserved, deliberately replaced, or explicitly deprecated with a migration path.
+- Selected runtimes and bindings pass ADR-0005 rather than entering the product only because a technical spike works.
 - Model downloads are resumable or atomic, validated, observable, configurable, and compatible with existing caches or an explicit migration command.
 - Apple Silicon accuracy and performance stay within the agreed tolerances in `docs/compatibility-matrix.md`.
 - The npm tarball installs on a clean supported machine without compiling native code.
@@ -25,7 +25,7 @@ The incubator is ready to become Cuttledoc v3 when all of the following are true
 
 - Reimplementing CoreML, whisper.cpp, or FFmpeg in pure Rust.
 - Supporting Intel macOS for local CoreML inference.
-- Adding new ASR models before parity is established.
+- Shipping every model or runtime evaluated during the Apple Silicon bakeoff.
 - Supporting every possible audio codec without an FFmpeg fallback.
 - Porting embedded GGUF post-processing before its product value and distribution cost are revalidated.
 - Publishing every workspace crate independently.
@@ -37,17 +37,25 @@ The incubator is ready to become Cuttledoc v3 when all of the following are true
 
 Deliverables:
 
-- Accept or revise the initial ADRs.
+- Apply the third-party dependency policy and record a disposition for every runtime candidate.
+- Build a task-by-runtime decision matrix for CoreML, MLX, Metal-native paths, Apple system Speech, and remote APIs.
+- Establish reproducible Apple Silicon ASR fixtures and benchmark output.
 - Build a minimal CoreML interop spike from Rust on `darwin-arm64`.
-- Decide the first bridge for the existing Objective-C++ Parakeet code.
-- Decide whether Whisper uses a maintained Rust wrapper or a local `whisper.cpp` sys crate.
+- Build a time-boxed meaningful MLX inference spike from Rust without assuming its experimental wrapper can ship.
+- Measure Apple SpeechAnalyzer/SpeechTranscriber as a system baseline.
+- Re-evaluate current ASR candidates against the existing Parakeet and Whisper baselines.
+- Decide the first selected local ASR model/runtime and its repository-owned or external interop boundary.
+- Evaluate the local LLM runtime separately from ASR.
 - Prove a `napi-rs` addon can load from both ESM and CommonJS.
 - Pack and install a minimal npm tarball in an empty directory.
-- Record binary size, startup time, model load time, and cleanup behavior.
+- Record recognition quality, binary/model size, startup and first-result latency, model load time, memory, energy procedure, and cleanup behavior.
 
 Exit criteria:
 
 - A real CoreML model is loaded and invoked from a Rust-owned lifecycle.
+- A meaningful MLX path is exercised from Rust or rejected with a precise technical blocker.
+- CoreML, MLX, and Apple system Speech have comparable evidence or a recorded reason comparison is impossible.
+- The selected production path passes the dependency policy; reference-only projects are not present in product manifests or release builds.
 - The result crosses Rust → Node without a second orchestration layer.
 - The packed addon loads on Node 22 and Node 24 without `node-gyp`.
 - Interop ownership and thread-affinity rules are documented.
@@ -59,7 +67,7 @@ Exit criteria:
 Deliverables:
 
 - Cargo workspace and pinned stable Rust toolchain.
-- `cuttledoc`, `cuttledoc-coreml`, `cuttledoc-models`, `cuttledoc-cli`, and `cuttledoc-node` starting crates.
+- `cuttledoc`, `cuttledoc-models`, `cuttledoc-cli`, and `cuttledoc-node` starting crates plus only the runtime adapter crates justified by Phase 0.
 - Formatting, Clippy, unit tests, dependency auditing, license checks, and macOS CI.
 - Shared error model with stable error codes.
 - Shared progress-event and cancellation types.
@@ -72,50 +80,44 @@ Exit criteria:
 - Platform-specific code does not prevent non-macOS crates from compiling.
 - Rust and Node APIs are generated or checked from one set of domain types.
 
-## Phase 2 — Parakeet vertical slice
+## Phase 2 — Selected local ASR vertical slice
 
-**Purpose:** validate the complete product path with the faster and structurally richer local backend.
+**Purpose:** validate the complete product path with the best Apple-local foundation selected by the Phase 0 bakeoff.
 
 Scope:
 
-- Parakeet TDT 0.6B v3 model lifecycle.
-- Preprocessor, encoder, decoder, joint decision, and vocabulary handling.
-- Silero VAD v6 lifecycle.
-- 36 ms VAD frames at 16 kHz.
-- Configurable threshold, minimum silence, and minimum speech duration.
-- Automatic handling of the fixed 15-second ASR input.
+- Selected model and runtime lifecycle with immutable model revision.
+- Required preprocessing, decoding, VAD/segmentation, vocabulary/tokenizer, and alignment behavior.
+- Streaming or bounded chunking where the selected model supports or requires it.
+- Language, timestamps, confidence, and word-level capabilities according to the selected contract.
 - Structured segments and combined text.
 - Engine reuse and deterministic cleanup.
-- Existing 25-language capability metadata.
 - Model download, validation, force refresh, and progress.
 - Rust, CLI, and Node surfaces.
 
 Exit criteria:
 
-- Existing Parakeet fixtures pass agreed text and timestamp tolerances.
-- Long audio is segmented without exposing the model's chunk limit.
+- Existing fixtures pass agreed quality and timestamp tolerances against the Phase 0 baseline.
+- Long audio is handled without exposing internal model constraints.
 - A packed npm artifact performs a real transcription on Apple Silicon.
 - Repeated engine creation and disposal does not leak materially.
 
-## Phase 3 — Whisper vertical slice
+## Phase 3 — Compatibility backend and coverage
 
-**Purpose:** bring the quality/coverage backend into the same lifecycle.
+**Purpose:** add the second backend or compatibility path justified by gaps in the first vertical slice.
 
 Scope:
 
-- whisper.cpp pinned initially to the current `v1.8.2` baseline, then deliberately updated.
-- `large-v3-turbo` only for initial parity.
-- GGML model plus CoreML encoder completeness checks.
-- Encoder on CoreML/ANE and decoder through whisper.cpp Metal/CPU behavior.
+- Preserve or deliberately replace the valuable Whisper `large-v3-turbo` baseline capabilities.
+- Pin the selected model, runtime, conversion, and native upstream revisions reproducibly.
 - Automatic language detection and explicit language selection.
 - Segment timestamps and confidence.
-- Thread and GPU configuration where it remains meaningful.
-- Existing 99-language capability metadata.
+- Broader language or runtime coverage missing from the first vertical slice.
 - Model downloads, validation, progress, and atomic installation.
 
 Exit criteria:
 
-- Existing Whisper fixtures pass agreed text, language, and timestamp tolerances.
+- Existing Whisper fixtures pass agreed text, language, and timestamp tolerances or an accepted compatibility report explains the replacement.
 - Model updates are pinned and reproducible rather than implicitly “latest.”
 - Node and CLI artifacts load without bundler-specific native-addon workarounds.
 
@@ -149,12 +151,14 @@ Evaluate independently:
 - OpenAI enhancement through the Rust core.
 - Ollama enhancement through the Rust core.
 - Embedded GGUF inference and its binary/model distribution cost.
+- MLX, `mistral.rs`, Candle, and a narrow llama.cpp/GGUF path where they pass the dependency gate.
 - Chunking, correction statistics, Markdown formatting, and prompt compatibility.
 - Whether enhancement belongs in the initial v3 or a later minor release.
 
 Gate:
 
 - Keep enhancement only where measured transcript quality, install size, and operational complexity justify it.
+- Do not select an immature runtime merely because its model experiment succeeds.
 - Preserve raw transcription as a complete product regardless of this decision.
 
 ## Phase 6 — Distribution and compatibility
@@ -226,6 +230,7 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ### Security and supply chain
 
+- Apply ADR-0005 to runtime, build-time, code-generation, and transitive production dependencies.
 - Pin model manifests with source, revision, expected files, sizes, and digests.
 - Write downloads to temporary paths and commit atomically after validation.
 - Avoid arbitrary lifecycle downloads during package installation.
@@ -244,11 +249,13 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 | “One package” grows too large through embedded LLM inference                     | Slow installs and maintenance burden | Decide enhancement separately in Phase 5                |
 | Rewrite changes recognition quality unnoticed                                    | Product regression                   | Golden fixtures and benchmark gates from Phase 1        |
 | Incubator and production diverge                                                 | Duplicate maintenance                | Time-box phases and migrate into product repo at parity |
+| A promising but weakly maintained wrapper becomes critical infrastructure       | Forced fork or blocked upgrades      | ADR-0005 disposition before adoption                    |
 
 ## Immediate next actions
 
-1. Review and accept ADR-0001 through ADR-0003.
-2. Select the minimal Parakeet model invocation for the CoreML interop spike.
-3. Scaffold only the crates needed by that spike.
-4. Add a macOS Apple Silicon CI or self-hosted test path.
-5. Produce the first packed npm addon and test ESM/CommonJS loading.
+1. Complete the initial dependency inventory and runtime decision matrix.
+2. Establish the benchmark fixture/schema and measure current Parakeet, Whisper, and Apple system baselines.
+3. Run the bounded CoreML and MLX Rust spikes without committing either wrapper as a production dependency.
+4. Record the selected first ASR runtime/model and interop boundary in follow-up ADRs.
+5. Scaffold only the crates justified by those decisions.
+6. Produce the first packed npm addon and test ESM/CommonJS loading on Node 22 and 24.

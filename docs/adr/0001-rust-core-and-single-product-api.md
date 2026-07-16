@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
@@ -79,4 +79,4 @@ This is familiar for Node consumers but makes the Rust CLI or other bindings sec
 
 ## Validation
 
-Accept this ADR after the Phase 0 vertical slice proves that a Rust-owned engine can invoke CoreML, return structured results, and ship through a thin packed Node binding.
+This product boundary is accepted independently of the concrete Apple inference runtime. Phase 0 must still prove that a Rust-owned engine can invoke a selected local runtime, return structured results, and ship through a thin packed Node binding. If that is not feasible, this ADR must be explicitly superseded rather than silently moving orchestration back into Node.js.
