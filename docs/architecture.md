@@ -29,7 +29,7 @@ The target makes Rust the product center while preserving proven native inferenc
               │                         │                         │
     ┌─────────▼─────────┐     ┌─────────▼─────────┐     ┌─────────▼─────────┐
     │ Audio pipeline     │     │ Task engines      │     │ Model manager     │
-    │ probe/decode/PCM   │     │ STT │ TTS │ LLM   │     │ manifest/download │
+    │ probe/decode/PCM   │     │ STT │ text gen    │     │ manifest/download │
     │ normalize          │     │ lifecycle/results │     │ validate/migrate  │
     └─────────┬─────────┘     └─────────┬─────────┘     └───────────────────┘
               │                         │
@@ -61,15 +61,14 @@ cuttledoc-models ─────▶ model manifests and storage contracts
 
 The public `cuttledoc` crate must not depend on Node.js. `cuttledoc-node` depends on the Rust API and contains only conversion, callback bridging, and Node-specific lifecycle handling.
 
-## Initial task scope
+## Task scope
 
-The stable product architecture covers exactly three composable AI tasks initially:
+The stable initial product architecture covers two composable AI tasks:
 
 1. Speech-to-text through `SpeechRecognitionEngine`-shaped APIs.
-2. Text-to-speech through `SpeechSynthesisEngine`-shaped APIs.
-3. Text generation through `TextGenerationEngine`-shaped APIs.
+2. Text generation through `TextGenerationEngine`-shaped APIs.
 
-Speech recognition and synthesis share `AudioFormat`, PCM buffer/chunk, stream timing, cancellation, and backpressure concepts. They remain separate execution contracts because their data flow and model options differ. A complete voice flow composes STT → text generation → TTS; transcript enhancement composes STT → text generation.
+Speech synthesis remains an explicit strategic direction for a complete STT → text generation → TTS flow, but it is not part of the initial release gate. Phase 5 must validate it with a narrow vertical slice before fixing a public `SpeechSynthesisEngine`-shaped contract. It remains a separate task rather than an extension of recognition or generation (ADR-0009). Transcript enhancement composes the two initial tasks.
 
 Embeddings, vision, image generation, and general tensor execution are outside the initial scope. Runtime adapters may be internally extensible, but no public abstraction is added speculatively for those tasks.
 
@@ -178,7 +177,7 @@ Rules:
 
 ### Apple-local execution
 
-Phase 0 must determine thread affinity, run-loop, executor, and cleanup rules separately for each candidate runtime. Until proven otherwise, treat CoreML engines as thread-affine and send commands to a dedicated worker. All Objective-C objects must live inside bounded autorelease pools. MLX or Metal behavior must be measured rather than assumed equivalent.
+Phase 0 must determine thread affinity, run-loop, executor, and cleanup rules separately for each candidate runtime. The CoreML adapter must preserve concurrent async prediction where supported, bound in-flight work to control peak memory, serialize synchronous prediction on a model instance, and serialize predictions that share one `MLState`. All Objective-C objects must live inside bounded autorelease pools. MLX or Metal behavior must be measured rather than assumed equivalent.
 
 ### Progress and cancellation
 
@@ -191,8 +190,9 @@ Long operations emit typed events:
 - loading engine;
 - transcribing segment;
 - generating text;
-- synthesizing audio chunk;
 - enhancing transcript.
+
+Speech-synthesis progress events are added only after the Phase 5 vertical slice validates their meaning (ADR-0009).
 
 Cancellation is cooperative. Downloads remove or retain resumable partial state according to the model-manager policy. Native inference that cannot be interrupted reports cancellation at the next safe boundary.
 

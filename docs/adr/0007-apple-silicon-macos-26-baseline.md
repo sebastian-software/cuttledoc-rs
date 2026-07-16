@@ -10,7 +10,7 @@ Cuttledoc 2 nominally supports Intel macOS, but the core value proposition — l
 
 Apple's SpeechAnalyzer/SpeechTranscriber APIs require macOS 26 (Tahoe) and have no Objective-C or C interface: they are Swift-only. Supporting older macOS versions would force a permanent availability-gated dual path in which the system Speech backend is an optional extra rather than a first-class bakeoff candidate.
 
-CoreML async prediction is available before macOS 26, and stateful models (`MLState`) are available from macOS 15. They are therefore not reasons by themselves to select macOS 26. CoreML model and state use must still be serialized according to Apple's ownership rules even when async APIs are used. The macOS 26 baseline is primarily a product/support decision around SpeechAnalyzer and a deliberately smaller release matrix.
+CoreML async prediction is available before macOS 26, and stateful models (`MLState`) are available from macOS 15. They are therefore not reasons by themselves to select macOS 26. The synchronous prediction API is not thread-safe on one `MLModel`; the async prediction API (macOS 14+) is explicitly designed for concurrent predictions on one instance. Predictions that share one `MLState` must be serialized. The macOS 26 baseline is primarily a product/support decision around SpeechAnalyzer and a deliberately smaller release matrix.
 
 Cuttledoc 2 remains a released, working product for users on older systems.
 
@@ -50,3 +50,7 @@ Pays a permanent target, CI, and support tax for a shrinking platform on which t
 ## Validation
 
 The Phase 0 SpeechAnalyzer spike must prove the Swift shim from a Rust-owned lifecycle, including asset installation and identity behavior for a CLI, timestamps, confidence, and range-based replace/revoke/final result handling. The compatibility matrix and PLAN.md reflect this baseline.
+
+## References
+
+- [WWDC23: Improve Core ML integration with async prediction](https://developer.apple.com/videos/play/wwdc2023/10049/)

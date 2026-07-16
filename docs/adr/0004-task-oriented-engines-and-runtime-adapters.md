@@ -8,17 +8,16 @@ Accepted
 
 CoreML, MLX, Metal-native frameworks, whisper.cpp, Apple Speech APIs, and remote APIs expose materially different execution models. A generic CoreML-to-Rust or universal tensor abstraction would either leak runtime details into Cuttledoc or collapse useful capabilities into a lowest common denominator.
 
-Cuttledoc needs stable product concepts for three initial AI tasks: speech recognition, speech synthesis, and text generation. Together they support transcription, transcript enhancement, and complete speech → text → LLM → speech pipelines. They also need shared model management, capabilities, cancellation, progress, streaming, backpressure, and deterministic resource ownership.
+Cuttledoc initially needs stable product concepts for speech recognition and text generation. They support transcription and transcript enhancement. Speech synthesis is an explicit later product direction, but its contract must be validated by a real vertical slice before becoming part of the stable API (ADR-0009). The tasks need shared model management, capabilities, cancellation, progress, streaming, backpressure, and deterministic resource ownership.
 
 ## Decision
 
 Define stable APIs around tasks and domain results rather than inference runtimes.
 
 - Speech-to-text is exposed through a `SpeechRecognitionEngine`-shaped contract.
-- Text-to-speech is exposed through a separate `SpeechSynthesisEngine`-shaped contract.
 - Transcript enhancement and local text generation use a `TextGenerationEngine`-shaped contract.
-- Speech recognition and synthesis share audio formats, PCM buffers, streaming, and lifecycle vocabulary, but not one execution trait.
-- Streaming is part of all three contracts: partial/final transcript events, generated text deltas, and synthesized audio chunks.
+- Speech synthesis, when validated in Phase 5, receives a separate task contract rather than being forced through recognition or generation.
+- Streaming is part of the initial contracts: partial/final transcript updates and generated text deltas. A synthesis vertical slice must determine audio chunk ownership and backpressure before its public contract is fixed.
 - Embeddings, vision, image generation, and arbitrary tensor execution are out of the initial architecture scope. They receive separate contracts only after a real product requirement exists.
 - Runtime adapters remain internal and may use CoreML, MLX, Metal, C/C++, Apple system APIs, or remote HTTP independently.
 - Model identity and runtime identity remain distinct. Multiple runtimes may execute the same model family without changing transcription result types.
@@ -32,7 +31,7 @@ The public API may support an advanced runtime preference later, but it is a cap
 ### Positive
 
 - Runtime and model choices can evolve without redesigning the product API.
-- STT, TTS, and LLM decisions can be made independently and composed into a voice pipeline.
+- STT and LLM decisions can be made independently; the future TTS decision can later compose with both without changing their contracts.
 - Platform-specific ownership stays behind narrow boundaries.
 - Node remains a mechanical binding over the Rust task API.
 
@@ -48,7 +47,7 @@ The public API may support an advanced runtime preference later, but it is a cap
 
 This would turn Cuttledoc into a machine-learning framework and couple callers to implementation details that do not help the transcription product.
 
-### One engine trait for STT, TTS, and LLMs
+### One engine trait for STT, future TTS, and LLMs
 
 Speech recognition, speech synthesis, and autoregressive text generation have different inputs, outputs, streaming directions, options, and model state. Their shared lifecycle does not justify one execution contract.
 
@@ -58,4 +57,4 @@ This recreates the fragmentation ADR-0001 is intended to remove.
 
 ## Validation
 
-Phase 0 API sketches must define all three contracts and their composition without exposing runtime handles. Runtime spikes must show that distinct local runtimes can map into the speech-recognition contract. LLM evaluation uses the separate generation contract. TTS runtime/model selection may be deferred beyond the first ASR release, but the audio output and synthesis streaming contract must not be retrofitted through the recognition API.
+Phase 0 API sketches define speech-recognition and text-generation contracts without exposing runtime handles. Runtime spikes must show that distinct local runtimes can map into the speech-recognition contract. LLM evaluation uses the separate generation contract. Phase 5 validates speech synthesis through a vertical slice before accepting its contract (ADR-0009); it must not be retrofitted through the recognition API.

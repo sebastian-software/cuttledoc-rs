@@ -19,7 +19,7 @@ Retrofitting a streaming result model onto a batch-only stable API would be a br
 Streaming transcription is part of the v3 scope.
 
 - The core result contract is an ordered stream of typed, range-addressed updates. Each update has a monotonically increasing sequence number and an affected audio time range.
-- An update either **replaces** the current non-final content in its affected range with volatile or final segments, or **revokes** the current non-final content in that range. This represents backends that revise segmentation as well as Apple SpeechTranscriber results that explicitly revoke earlier volatile text.
+- An update either **replaces** the current non-final content in its affected range with volatile or final segments, or **revokes** the current non-final content in that range. Apple documents volatile SpeechTranscriber results being replaced by later results over the same audio range; it does not document a retraction without replacement. `Revoke` remains a backend-neutral robustness mechanism. Whether SpeechTranscriber ever emits an empty or otherwise replacement-free retraction must be verified empirically in spike #11.
 - Final content is immutable. An update that overlaps an already finalized range is a backend contract violation rather than an implicit revision.
 - Batch transcription is the degenerate case of the same contract: only final updates, aggregated into the existing `TranscriptionResult`. One-shot APIs keep returning the aggregated final result.
 - Streaming behavior is capability-reported per backend: `supports_streaming` (emits finalized results incrementally) and `emits_volatile_results` (may revise before finalizing). Callers must be able to rely on the capability report rather than probing behavior.
@@ -52,4 +52,8 @@ Pulls microphone/screen-audio permissions, device handling, and TCC attribution 
 
 ## Validation
 
-Issue #8 (engine/backend boundaries) must incorporate this contract. Phase 0 must map at least one volatile-capable backend (system Speech) and one finals-only backend (existing CoreML path) into the same update stream without leaking runtime handles. A reducer shared by Rust/Node contract tests must deterministically reconstruct the same final transcript from replace, revoke, and volatile-to-final sequences.
+Issue #8 (engine/backend boundaries) must incorporate this contract. Phase 0 must map at least one volatile-capable backend (Apple Speech) and one finals-only backend (existing CoreML path) into the same update stream without leaking runtime handles. A reducer shared by Rust/Node contract tests must deterministically reconstruct the same final transcript from replace, revoke, and volatile-to-final sequences.
+
+## References
+
+- [WWDC25: Bring advanced speech-to-text to your app with SpeechAnalyzer](https://developer.apple.com/videos/play/wwdc2025/277/)

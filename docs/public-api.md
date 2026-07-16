@@ -13,7 +13,7 @@ Cuttledoc exposes two deliberate levels:
 
 Model management and capability discovery are first-class. Backend implementation objects are not exposed.
 
-Speech recognition, speech synthesis, and text generation are separate task APIs. They may share model management, progress, cancellation, diagnostics, errors, lifecycle concepts, and common audio types where applicable, but they do not share a generic tensor or inference-runtime interface. See ADR-0004.
+Speech recognition and text generation are separate initial task APIs. They may share model management, progress, cancellation, diagnostics, errors, and lifecycle concepts, but they do not share a generic tensor or inference-runtime interface. Speech synthesis is a strategic direction whose public contract is deferred until a Phase 5 vertical slice (ADR-0009). See ADR-0004.
 
 The `Backend` identifiers below remain provisional compatibility/product choices, not runtime identities. CoreML, MLX, Metal, Apple system APIs, or a native upstream implementation remain internal adapters. If multiple runtimes can execute the same model family, runtime selection does not change `TranscriptionResult`.
 
@@ -30,14 +30,6 @@ pub trait SpeechRecognitionEngine {
     ) -> Result<TranscriptionStream>;
 }
 
-pub trait SpeechSynthesisEngine {
-    async fn synthesize(
-        &self,
-        text: TextSource,
-        options: SynthesisOptions,
-    ) -> Result<AudioStream>;
-}
-
 pub trait TextGenerationEngine {
     async fn generate(
         &self,
@@ -46,7 +38,7 @@ pub trait TextGenerationEngine {
 }
 ```
 
-Shared audio primitives support file, in-memory PCM, and streaming use cases in both directions:
+Audio input primitives support file, in-memory PCM, and streaming recognition use cases:
 
 ```rust
 pub struct AudioFormat {
@@ -54,15 +46,9 @@ pub struct AudioFormat {
     pub channels: u16,
     pub sample_format: SampleFormat,
 }
-
-pub struct AudioChunk {
-    pub samples: AudioSamples,
-    pub format: AudioFormat,
-    pub timestamp: Option<Duration>,
-}
 ```
 
-Recognition streams partial/final transcript events, generation streams text/token deltas, and synthesis streams `AudioChunk` values. All streams define cancellation and backpressure behavior. TTS model delivery may follow the first ASR release, but the synthesis contract is part of the architecture now.
+Recognition streams transcript updates and generation streams text/token deltas. Both streams define cancellation and backpressure behavior. Phase 5 must use a real TTS runtime to validate output sample ownership, chunk timing, format negotiation, cancellation, and backpressure before adding a `SpeechSynthesisEngine` contract.
 
 ## Shared domain model
 
@@ -378,7 +364,7 @@ type CuttledocErrorCode =
 Proposed commands:
 
 ```text
-cuttledoc <input> [--backend auto|parakeet|whisper|openai]
+cuttledoc <input> [--backend auto|parakeet|whisper|apple-speech|openai]
                   [--language <code>]
                   [--output <path>]
                   [--format text|markdown|json]
