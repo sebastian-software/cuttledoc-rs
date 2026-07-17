@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.parakeet-coreml.fleurs-en-000-1",
+  "captured_at": "2026-07-17T07:08:33.543Z",
+  "source_revision": "54be6a095b8c5920c3d3c7a3ac7d58499b079454",
+  "fixture_id": "fleurs-en-us-test-000",
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "parakeet-tdt-0.6b-v3",
+      "revision": "FluidInference/parakeet-tdt-0.6b-v3-coreml@aed02740059203c4a87495924f685de3722ae9ce",
+      "quantization": "mixed Float16 and 6-bit palettized CoreML encoder",
+      "license": "CC-BY-4.0; Silero VAD artifact MIT"
+    },
+    "runtime": {
+      "id": "legacy-parakeet-coreml",
+      "version": "parakeet-coreml 2.2.0 @ 3a29d6f80bfa5f95e791d21cfa86a0154806ef47",
+      "boundary": "Node.js native addon driving CoreML and Silero VAD"
+    },
+    "options": {
+      "sample_rate_hz": 16000,
+      "auto_download": false,
+      "repetitions": 5
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": 0.3684210526315789,
+      "cer": 0.2716049382716049
+    },
+    "timing": {
+      "audio_duration_ms": 10560,
+      "cold_load_ms": 329.293458,
+      "warm_inference_ms": 223.80809179999997,
+      "real_time_factor": 0.02119394808712121
+    },
+    "resources": {
+      "peak_memory_bytes": 145424384,
+      "model_size_bytes": 1899782094,
+      "binary_size_bytes": 133472
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": 1,
+      "volatile_update_count": 0,
+      "final_update_count": 1,
+      "revoke_count": 0,
+      "timestamps": "segment"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "The repeatable powermetrics procedure is defined, but this baseline did not run with root privileges."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "Existing working CoreML conversion and native decoder were reused; no model conversion was performed in this repository.",
+    "update_cost": "The legacy downloader followed mutable main; the benchmark fetcher now pins and verifies the model and VAD revisions, but decoder compatibility remains repository-owned.",
+    "packaging_cost": "The legacy downloader materializes 1.90 GB because it fetches alternative model variants; the four selected CoreML components are about 483 MB before VAD."
+  },
+  "reproduction": {
+    "command": "node scripts/fetch-parakeet-baseline-models.mjs --model-dir ~/.cache/parakeet-coreml/models --vad-dir ~/.cache/parakeet-coreml/vad && node scripts/run-legacy-asr-baseline.mjs --backend parakeet --fixture ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.ogg --reference ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.txt --module-dir ../parakeet-coreml --model-dir ~/.cache/parakeet-coreml/models --vad-dir ~/.cache/parakeet-coreml/vad --repetitions 5 --output /tmp/parakeet-fleurs-en-000.json",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.parakeet-coreml.fleurs-en-000-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "blocker": null,
+    "observations": [
+      "The transcript was deterministic across all five measured repetitions.",
+      "This legacy API returns final batch segments with time ranges but no confidence values or volatile updates.",
+      "The native decoder prints token-level diagnostics to stdout, so --output is required for an uncontaminated JSON artifact.",
+      "The published ESM bundle fails under Node.js 24 with a dynamic require of bindings error; the runner deliberately loads the CommonJS entry point.",
+      "A single English fixture establishes a runtime baseline but is not sufficient for product selection."
+    ]
+  }
+}

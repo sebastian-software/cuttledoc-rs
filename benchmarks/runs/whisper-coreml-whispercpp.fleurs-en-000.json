@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.whisper-coreml-whispercpp.fleurs-en-000-1",
+  "captured_at": "2026-07-17T07:08:50.878Z",
+  "source_revision": "54be6a095b8c5920c3d3c7a3ac7d58499b079454",
+  "fixture_id": "fleurs-en-us-test-000",
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "whisper-large-v3-turbo",
+      "revision": "ggerganov/whisper.cpp@5359861c739e955e79d9a303bcbc70fb988958b1 + sebastian-software/whisper-coreml-models@dd3515371e6b560b63ec275abf020153a45caa60",
+      "quantization": "upstream GGML F16 model with Float16 CoreML encoder",
+      "license": "MIT for both pinned artifacts"
+    },
+    "runtime": {
+      "id": "legacy-coreml-plus-whisper.cpp",
+      "version": "whisper-coreml 1.1.0 / whisper.cpp v1.8.2 compatibility @ 20f619e02b46e64dc819958d3ab83bd029607f0a",
+      "boundary": "Node.js native addon using CoreML encoder plus whisper.cpp decoder"
+    },
+    "options": {
+      "sample_rate_hz": 16000,
+      "language": "en",
+      "use_gpu": true,
+      "repetitions": 5
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": 0.21052631578947367,
+      "cer": 0.037037037037037035
+    },
+    "timing": {
+      "audio_duration_ms": 10560,
+      "cold_load_ms": 1070.5465,
+      "warm_inference_ms": 657.618917,
+      "real_time_factor": 0.06227451865530303
+    },
+    "resources": {
+      "peak_memory_bytes": 1944092672,
+      "model_size_bytes": 2899675450,
+      "binary_size_bytes": 2172752
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": 1,
+      "volatile_update_count": 0,
+      "final_update_count": 1,
+      "revoke_count": 0,
+      "timestamps": "segment"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "The repeatable powermetrics procedure is defined, but this baseline did not run with root privileges."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "Existing GGML decoder and CoreML encoder conversion were reused; no model conversion was performed in this repository.",
+    "update_cost": "Two independently versioned artifacts and the whisper.cpp compatibility layer must move together; the benchmark fetcher now pins and verifies both trees.",
+    "packaging_cost": "The paired model artifacts occupy 2.90 GB and the measured process peaked near 1.94 GB RSS."
+  },
+  "reproduction": {
+    "command": "node scripts/fetch-whisper-baseline-models.mjs --model-dir ~/.cache/whisper-coreml/models && node scripts/run-legacy-asr-baseline.mjs --backend whisper --fixture ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.ogg --reference ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.txt --module-dir ../whisper-coreml --model-dir ~/.cache/whisper-coreml/models --repetitions 5 --output /tmp/whisper-fleurs-en-000.json",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.whisper-coreml-whispercpp.fleurs-en-000-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "blocker": null,
+    "observations": [
+      "The transcript was deterministic across all five measured repetitions.",
+      "This legacy API returns one final full-file segment with a time range and a constant confidence value; it exposes no volatile updates.",
+      "The first execution after downloading the CoreML bundle spent 121211.85225 ms compiling a new execution plan; the recorded cold load is a fresh process after that system cache existed.",
+      "A single English fixture establishes a runtime baseline but is not sufficient for product selection."
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "backend": "whisper",
+  "captured_at": "2026-07-17T07:08:50.878Z",
+  "fixture": {
+    "source_sha256": "3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c",
+    "pcm_sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+    "reference_sha256": "94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365",
+    "reference": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+    "audio_duration_ms": 10560,
+    "samples": 168960,
+    "sample_rate_hz": 16000
+  },
+  "runtime": {
+    "repository_revision": "20f619e02b46e64dc819958d3ab83bd029607f0a",
+    "version": "whisper-coreml 1.1.0 / whisper.cpp v1.8.2",
+    "ffmpeg": "8.1.2"
+  },
+  "model_artifacts": {
+    "ggml_repository": "ggerganov/whisper.cpp",
+    "ggml_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+    "ggml_license": "MIT",
+    "ggml_bytes": 1624555275,
+    "ggml_sha1": "4af2b29d7ec73d781377bfd1758ca957a807e941",
+    "ggml_sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69",
+    "coreml_repository": "sebastian-software/whisper-coreml-models",
+    "coreml_revision": "dd3515371e6b560b63ec275abf020153a45caa60",
+    "coreml_license": "MIT",
+    "model_tree_bytes": 2899675450,
+    "model_tree_files": 6,
+    "model_tree_sha256": "a4ce8c6307d111df0e08836120f6b14c7852f6ffddcba78f351cbfc436f4d3e0"
+  },
+  "metrics": {
+    "wer": 0.21052631578947367,
+    "cer": 0.037037037037037035,
+    "first_execution_plan_load_ms": 121211.85225,
+    "cached_execution_plan_cold_load_ms": 1070.5465,
+    "warmup_backend_ms": 713.244291,
+    "warm_inference_ms": 657.618917,
+    "real_time_factor": 0.06227451865530303,
+    "max_resident_set_size_bytes": 1944092672,
+    "peak_memory_footprint_bytes": 1889062800,
+    "binary_size_bytes": 2172752
+  },
+  "hypothesis": "However, due to the slow communication channels, styles in the West could lag behind by 25-30 years.",
+  "segments": [
+    {
+      "start_ms": 0,
+      "end_ms": 10560,
+      "text": " However, due to the slow communication channels, styles in the West could lag behind by 25-30 years.",
+      "confidence": 1
+    }
+  ],
+  "repetitions": [
+    { "iteration": 1, "wall_ms": 660.5174590000001, "backend_ms": 660.419917 },
+    { "iteration": 2, "wall_ms": 656.3922090000001, "backend_ms": 656.325166 },
+    { "iteration": 3, "wall_ms": 654.378917, "backend_ms": 654.31475 },
+    { "iteration": 4, "wall_ms": 655.1181250000004, "backend_ms": 655.051541 },
+    { "iteration": 5, "wall_ms": 661.6878749999996, "backend_ms": 661.604667 }
+  ],
+  "process_measurement": "/usr/bin/time -l around one fresh Node.js process; values are bytes on macOS"
+}

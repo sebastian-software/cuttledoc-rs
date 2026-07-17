@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "phase0-bootstrap-1",
+  "revision": "phase0-real-asr-1",
   "fixtures": [
     {
       "id": "apple-say-en-us-smoke",
@@ -23,6 +23,29 @@
         "sample_rate_hz": 22050,
         "channels": 1,
         "sample_format": "s16"
+      }
+    },
+    {
+      "id": "fleurs-en-us-test-000",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "en-US",
+      "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+      "duration_ms": 10560,
+      "sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+      "provenance": {
+        "source": "google/fleurs en_us test split, sample 0; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-en-000.ogg > /tmp/fleurs-en-000.ogg",
+        "notes": "The manifest SHA-256 covers the exact normalized f32le 16 kHz mono PCM consumed by every runner (168960 samples), not the Opus source. Source OGG SHA-256: 3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c. Reference file SHA-256: 94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
       }
     }
   ]

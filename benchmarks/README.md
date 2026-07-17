@@ -11,6 +11,39 @@ Validate all checked-in manifests and run records:
 node scripts/validate-benchmark-data.mjs --self-test
 ```
 
+Materialize the exact legacy model artifacts:
+
+```sh
+node scripts/fetch-parakeet-baseline-models.mjs \
+  --model-dir ~/.cache/parakeet-coreml/models \
+  --vad-dir ~/.cache/parakeet-coreml/vad
+
+node scripts/fetch-whisper-baseline-models.mjs \
+  --model-dir ~/.cache/whisper-coreml/models
+```
+
+Both fetchers use immutable Hugging Face revisions and reject a directory whose
+stable file-tree digest differs from the recorded baseline. They deliberately
+leave multi-gigabyte artifacts outside Git.
+
+Run a compatibility baseline against the sibling legacy implementations:
+
+```sh
+node scripts/run-legacy-asr-baseline.mjs \
+  --backend parakeet \
+  --fixture ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.ogg \
+  --reference ../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.txt \
+  --module-dir ../parakeet-coreml \
+  --model-dir ~/.cache/parakeet-coreml/models \
+  --vad-dir ~/.cache/parakeet-coreml/vad \
+  --repetitions 5 \
+  --output /tmp/parakeet-fleurs-en-000.json
+```
+
+Replace `--backend`, `--module-dir`, and model options with the Whisper values
+from its run record for that baseline. `--output` is important because native
+diagnostics from a legacy addon may otherwise share stdout with the result.
+
 A run is one immutable JSON document. `measured` records require a hashed,
 provenance-audited quality fixture, complete quality/timing/resource metrics,
 host RAM, and at least one raw artifact. Non-redistributable quality fixtures
@@ -26,6 +59,10 @@ invented metrics. Raw tool output belongs below `benchmarks/raw/<run-id>/`; summ
 - A local-required fixture may stay out of Git only after its expected digest
   and acquisition procedure are fixed in the manifest.
 - Use the same normalized audio bytes for every candidate in a comparison.
+
+WER and CER are lowercase, punctuation-insensitive Levenshtein distance divided
+by reference word or character count. CER removes whitespace after the common
+word normalization. Values in JSON are fractions, so `0.2105` is 21.05%.
 
 ## Timing and resource procedure
 

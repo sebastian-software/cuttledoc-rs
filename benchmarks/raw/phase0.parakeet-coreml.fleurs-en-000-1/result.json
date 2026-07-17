@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "backend": "parakeet",
+  "captured_at": "2026-07-17T07:08:33.543Z",
+  "fixture": {
+    "source_sha256": "3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c",
+    "pcm_sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+    "reference_sha256": "94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365",
+    "reference": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+    "audio_duration_ms": 10560,
+    "samples": 168960,
+    "sample_rate_hz": 16000
+  },
+  "runtime": {
+    "repository_revision": "3a29d6f80bfa5f95e791d21cfa86a0154806ef47",
+    "version": "2.2.0",
+    "ffmpeg": "8.1.2"
+  },
+  "model_artifacts": {
+    "model_repository": "FluidInference/parakeet-tdt-0.6b-v3-coreml",
+    "model_revision": "aed02740059203c4a87495924f685de3722ae9ce",
+    "model_license": "CC-BY-4.0",
+    "model_tree_bytes": 1899782094,
+    "model_tree_files": 62,
+    "model_tree_sha256": "586856dc1886f4fe3c9912b05a5db591f5ec3750b8fa90aa7934f5d62bf07b67",
+    "selected_coreml_components_bytes": 482951967,
+    "vad_repository": "FluidInference/silero-vad-coreml",
+    "vad_revision": "b419383c55c110e2c9271fa6ee0ea83d03c70d96",
+    "vad_license": "MIT",
+    "vad_tree_bytes": 911498,
+    "vad_tree_files": 5,
+    "vad_tree_sha256": "e9f462027fc42a88aaa8915d443543759e5f1e670a02ce7cd9737d44131ab66d"
+  },
+  "metrics": {
+    "wer": 0.3684210526315789,
+    "cer": 0.2716049382716049,
+    "cold_load_ms": 329.293458,
+    "warmup_backend_ms": 436.169084,
+    "warm_inference_ms": 223.80809179999997,
+    "real_time_factor": 0.02119394808712121,
+    "max_resident_set_size_bytes": 145424384,
+    "peak_memory_footprint_bytes": 83856120,
+    "binary_size_bytes": 133472
+  },
+  "hypothesis": "However. Did the slow communication channel. Styles in the West could lag behind by twenty five to thirty years.",
+  "segments": [
+    {
+      "start_ms": 1079.9999237060547,
+      "end_ms": 1511.9999647140503,
+      "text": "However.",
+      "confidence": null
+    },
+    {
+      "start_ms": 2087.9998207092285,
+      "end_ms": 3743.99995803833,
+      "text": "Did the slow communication channel.",
+      "confidence": null
+    },
+    {
+      "start_ms": 4463.9997482299805,
+      "end_ms": 8711.999893188477,
+      "text": "Styles in the West could lag behind by twenty five to thirty years.",
+      "confidence": null
+    }
+  ],
+  "repetitions": [
+    { "iteration": 1, "wall_ms": 218.87675000000013, "backend_ms": 218.854375 },
+    { "iteration": 2, "wall_ms": 221.15529199999992, "backend_ms": 221.1317079999999 },
+    { "iteration": 3, "wall_ms": 222.53149999999982, "backend_ms": 222.514459 },
+    { "iteration": 4, "wall_ms": 226.471542, "backend_ms": 226.43995899999982 },
+    { "iteration": 5, "wall_ms": 230.00537499999996, "backend_ms": 229.9748340000001 }
+  ],
+  "process_measurement": "/usr/bin/time -l around one fresh Node.js process; values are bytes on macOS"
+}
