@@ -1,92 +1,123 @@
 # Direct official MLX result (#6)
 
-**Status:** direct official-MLX path technically feasible; third first-class
-inference candidate.
+**Status:** advance as the third first-class inference foundation; complete
+encoder proven, end-to-end ASR still partial.
 
-**Direction reaffirmed:** 2026-07-17.
+**Evidence date:** 2026-07-17.
 
 **Runnable artifact:** [`spikes/mlx-direct`](../../spikes/mlx-direct/).
 
 ## Decision
 
-Cuttledoc will evaluate MLX through a small repository-owned C++ adapter over
-the official MLX C++ core. This is a strategic candidate for local Apple
-Silicon inference beyond the initial STT selection; it is not rejected because
-the Rust boundary is native code.
+Cuttledoc can build directly on the official MLX C++ core through a small
+repository-owned, task-level adapter. The harder native boundary is manageable
+and is not a reason to reject one of the strongest Apple Silicon foundations.
+There is no useful Rust-port moment here: Rust owns the product contract and
+lifecycle, while the adapter owns MLX's model graph and native resources.
 
-`mlx-c` is not the planned product integration path. It remains an optional,
-pinned reference/control only when it answers a named comparison question.
-`mlx-rs`, OminiX-MLX, and `mlx-node` remain implementation references rather
-than dependencies: an additional wrapper would not reduce the ownership,
-packaging, or upgrade responsibility that Cuttledoc needs to retain.
+This result advances MLX rather than adopting it as the production ASR backend
+today. The full real audio encoder is proven; tokenizer, autoregressive decoder,
+timestamp/alignment logic, and transcript-quality evidence remain separate
+work. MLX also stays available for future text generation, TTS, and other model
+families without exposing a generic tensor runtime in the public API.
 
-## Pinned implementation
+`mlx-c` is not the planned product route. The direct model implementation did
+not expose an uncertainty that a second C wrapper would resolve, so it was not
+added. Community Rust and Node wrappers remain reference-only.
 
-| Item | Value |
-| --- | --- |
-| Upstream | [`ml-explore/mlx`](https://github.com/ml-explore/mlx) |
-| Tag | `v0.32.0` |
-| Commit | `7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247` |
-| Boundary | Rust-owned primitive buffers -> owned C ABI -> C++ MLX adapter |
-| Excluded | MLX arrays, streams, operators, model objects, and general runtime APIs |
+## Proven path
 
-The initial adapter performs a dense `[1, 576] x [576, 4]` audio projection
-and `tanh` activation. It copies both caller-owned input buffers before MLX
-captures its lazy graph, explicitly selects CPU or GPU, evaluates the graph,
-and copies four output scores back to Rust. It deliberately does not claim to
-be a transcriber or to define the eventual model ABI.
+The Rust probe passes real 16-kHz f32 PCM through an owned C ABI. The C++
+session:
 
-## Build findings
+1. loads 66 pinned Float16 Whisper Tiny encoder tensors;
+2. computes the official MLX Examples log-Mel frontend with its pinned filter;
+3. runs both convolutions and all four attention/MLP encoder blocks;
+4. explicitly evaluates MLX's lazy graph with the official Whisper compute
+   behavior: Float32 activations on CPU and Float16 on Metal;
+5. materializes the `[1, 1500, 384]` output and returns a Rust-owned summary;
+6. destroys the model arrays and clears the runtime cache.
 
-On the macOS 26.5.2 Apple Silicon evidence host, MLX `v0.32.0` configured
-against Xcode 26.6 and the macOS 26.5 SDK. The initial attempt exposed a local
-toolchain prerequisite: the Xcode Metal Toolchain was absent, so `xcrun metal`
-could not compile MLX kernels. After Xcode's documented first-launch
-initialization and Metal Toolchain installation, MLX configured with Metal
-version 400 and built its static library plus metallib successfully. This is a
-host setup requirement, not an MLX architecture blocker.
+The source model is
+`mlx-community/whisper-tiny@78c52ab98ca87f570bc57ad852e15ef7060f9f76`.
+Its 74,418,182-byte NPZ has SHA-256
+`d5a3b8671ac7aab11a2c9d0f16e7da94bad5500d785856f438c6bd44c3723944`.
+The used encoder tensors plus filter occupy 15,337,664 bytes. The pinned model
+card records conversion from OpenAI Whisper Tiny with the official MIT MLX
+Examples converter. It omits a structured license field, so a production model
+manifest should preserve the MIT source/converter chain explicitly rather than
+inferring metadata from the hosting repository.
 
-The checked-in runner verifies the immutable upstream commit, creates a fresh
-temporary build, builds the direct adapter, colocates `mlx.metallib`, compiles
-the Rust caller, and runs CPU and GPU projections.
+## Measurements
 
-## Execution result
+The evidence host was an M1 Ultra with 64 GB RAM, macOS 26.5.2, Xcode 26.6,
+CMake 4.4.0, and a macOS 14 deployment target. The fixture was the same
+10.56-second FLEURS sample used by the legacy and Apple Speech baselines.
+Each release/device combination ran three create/run/destroy sessions and two
+encoder evaluations per session.
 
-The direct Rust -> C ABI -> C++ -> official MLX path completed on the evidence
-host with the same synthetic input and weights on both devices:
+| MLX | Device | First load | Median second run | Encoder RTF | MLX peak | Process memory |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 0.31.2 | CPU FP32 | 38.9 ms | 119.1 ms | 0.0113 | 132.4 MB | 215.0 MB max RSS |
+| 0.31.2 | GPU FP16 | 47.7 ms | 11.6 ms | 0.00110 | 229.0 MB | 246.8 MB peak footprint |
+| 0.32.0 | CPU FP32 | 36.4 ms | 115.1 ms | 0.0109 | 132.4 MB | 213.7 MB max RSS |
+| 0.32.0 | GPU FP16 | 48.8 ms | 11.8 ms | 0.00111 | 229.0 MB | 246.1 MB peak footprint |
 
-```text
-device=cpu scores=[0.10830319, 0.07250145, 0.03650766, 0.000416309]
-device=gpu scores=[0.10830313, 0.07250141, 0.036507454, 0.0004163026]
-```
+The first GPU inference varied with the process-external Metal kernel cache:
+533.0 ms in the recorded 0.31.2 process and 27.6 ms in the already primed
+0.32.0 process. Later runs were 11.6–16.0 ms. These are not comparable
+clean-system cold-start measurements. Encoder timing is also not
+end-to-end transcription timing and cannot be compared directly with ASR WER,
+first-token latency, or final-result timing.
 
-The small CPU/GPU differences are ordinary `float32` rounding; this is a
-successful execution and output-copy check, not an output-quality benchmark.
-It proves that the narrow adapter can select an MLX device, materialize the
-lazy graph, run a dense audio-model block, release the local graph, and return
-Rust-owned values without exposing an MLX type.
+The timing spread between the two release runs is ordinary single-host noise;
+the upgrade conclusion is source/output compatibility, not a performance win.
 
-The static `libmlx.a` was 31 MiB in this configuration. Its Metal kernel
-library was a separate 162,449,848-byte `mlx.metallib` (about 155 MiB); the
-evidence shim was 18.9 MiB and its Rust caller 521 KiB before release-artifact
-optimization. MLX fails at runtime if the metallib is absent, so the runner now
-colocates it explicitly. A production adapter still needs kernel selection and
-artifact-size work; a successful static link is not a complete distribution
-result.
+All repeated CPU fingerprints were identical, all repeated GPU fingerprints
+were identical, and the fingerprint for each device was unchanged between MLX
+0.31.2 and 0.32.0. The Metal FP16 result exactly matched the pinned official
+MLX Examples Whisper graph used as a test oracle. CPU FP32 matched within
+last-bit reduction differences. The upgrade required zero adapter source
+changes.
 
-## Remaining evidence
+## Concrete integration findings
 
-1. Replace the synthetic dense projection with a real, licensed model block
-   and record its model format/loading path.
-2. Measure repeated load/run/destroy, memory, cold/warm and first-result
-   latency, output quality, binary/metallib packaging, and cancellation.
-3. Verify upgrade effort across two official MLX releases.
-4. Use `mlx-c` only if it resolves a specific unresolved interface/lifecycle
-   question; it is not a mandatory product-path comparison.
-5. Make the adopt/continue/defer decision separately for STT, text generation,
-   and future TTS rather than exposing a generic MLX runtime through the public
-   API.
+- NPY `Load` evaluates only on CPU. A GPU session must materialize each tensor
+  on CPU and explicitly copy it to Metal.
+- The source-built CPU FP16 convolution diverged at the first convolution even
+  though its log-Mel input matched the reference. MLX Whisper's supported FP32
+  CPU path matched the official graph, so the adapter uses CPU FP32 and Metal
+  FP16 rather than pretending the two backends share one compute dtype.
+- MLX's default device is global. Although every substantial operation receives
+  the intended device, operator overloads use the default; the current adapter
+  serializes runtime entry with a mutex. Production concurrency needs either
+  the same bounded rule or an audit that removes all default-device use.
+- Destroying the session releases owned arrays, and `clear_cache()` returns
+  cached allocator buffers. Three repeated lifecycle cycles completed on both
+  devices.
+- The release artifact needs an executable-relative RPATH and a colocated
+  `mlx.metallib`; a successful static link alone is insufficient.
+- With the macOS 14 deployment target, MLX 0.32.0 produced an 18,638,120-byte
+  shim plus a 130,164,152-byte metallib. MLX 0.31.2 produced 18,598,072 and
+  125,268,216 bytes respectively. Kernel/artifact pruning is still meaningful
+  production work.
+- The synchronous encoder cannot be preempted mid-graph. Cancellation is
+  observable at the next chunk or decoder-step boundary.
 
-See [the Apple runtime evaluation](../apple-runtime-evaluation.md) and
-[the dependency policy](../dependency-policy.md) for the cross-candidate
-decision rule.
+## Disposition and next proof
+
+**Technical result:** works.
+
+**Production boundary result:** continue. Keep the task-level C ABI, pinned
+official source, explicit artifact manifest, process-serialized lifecycle, and
+no public MLX types.
+
+**ASR result:** partial. The next MLX-specific proof should add the Whisper
+tokenizer/decoder and timestamp path or select a stronger current ASR model,
+then run the complete quality harness. Do not use the 11.8-ms encoder number as
+an ASR claim.
+
+The machine-readable evidence is in
+[`benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json`](../../benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json)
+and its
+[raw record](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).

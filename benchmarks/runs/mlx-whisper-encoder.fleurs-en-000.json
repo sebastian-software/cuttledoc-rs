@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.mlx-whisper-encoder.fleurs-en-000-1",
+  "captured_at": "2026-07-17T08:42:01Z",
+  "source_revision": "09f8735366cc5287c24a89dd16d81be82570294e",
+  "fixture_id": "fleurs-en-us-test-000",
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "mlx-community/whisper-tiny audio encoder",
+      "revision": "78c52ab98ca87f570bc57ad852e15ef7060f9f76",
+      "quantization": "Float16 encoder weights; Float32 mel filter",
+      "license": "MIT source model and official converter; pinned converted model card has no structured license field"
+    },
+    "runtime": {
+      "id": "official-mlx-cpp",
+      "version": "v0.32.0 (7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247), upgrade-compared with v0.31.2 (68cf2fddd8de5edd8ab3d926391772b2e2cedad8)",
+      "boundary": "Rust f32 PCM and owned JSON through a repository-owned task-level C ABI to the official MLX C++ core"
+    },
+    "options": {
+      "device": "gpu",
+      "deployment_target": "macOS 14.0",
+      "sample_rate_hz": 16000,
+      "chunk_seconds": 30,
+      "lifecycle_count": 3,
+      "runs_per_lifecycle": 2,
+      "encoder_output_shape": [1, 1500, 384]
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": null,
+      "cer": null
+    },
+    "timing": {
+      "audio_duration_ms": 10560,
+      "cold_load_ms": 48.784,
+      "warm_inference_ms": 11.753917,
+      "real_time_factor": 0.001113060321969697
+    },
+    "resources": {
+      "peak_memory_bytes": 246072016,
+      "model_size_bytes": 74418182,
+      "binary_size_bytes": 148802272
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "none"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No alternating powermetrics run was captured for the encoder-only spike."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "The official MLX Examples conversion produced the pinned NPZ. The repository fetcher verifies it and extracts the 66 encoder NPY tensors plus the official mel filter; product inference contains no Python or Node logic.",
+    "update_cost": "The same adapter source compiled and produced identical fingerprints on official MLX v0.31.2 and v0.32.0. The upgrade required zero source edits.",
+    "packaging_cost": "For v0.32.0 the statically linked shim is 18,638,120 bytes and the required macOS-14 metallib is 130,164,152 bytes. Runtime also needs an executable-relative RPATH and CPU materialization before GPU weight copies."
+  },
+  "reproduction": {
+    "command": "CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx-v0.32.0 bash scripts/run-mlx-direct-spike.sh",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "partial",
+    "blocker": "The complete real audio encoder is proven, but tokenizer, autoregressive decoder, timestamps, cancellation between decoder steps, and transcript quality are not implemented; encoder timing must not be presented as end-to-end ASR.",
+    "observations": [
+      "The official MLX core is technically viable as the third first-class inference foundation from Rust.",
+      "Three load/run/destroy cycles completed on both CPU and GPU, with two runs each and stable fingerprints.",
+      "The median second-run GPU encoder time was 11.754 ms for 10.56 seconds of real audio; CPU was 115.136 ms.",
+      "The Metal Float16 fingerprint exactly matched the official MLX Examples oracle; the CPU path uses its supported Float32 behavior after source-built CPU Float16 diverged in the first convolution.",
+      "The v0.31.2 to v0.32.0 upgrade required no adapter changes and preserved output fingerprints.",
+      "mlx-c did not answer an unresolved question in this spike, so it was not added as a second dependency path."
+    ]
+  }
+}

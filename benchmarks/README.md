@@ -26,6 +26,21 @@ Both fetchers use immutable Hugging Face revisions and reject a directory whose
 stable file-tree digest differs from the recorded baseline. They deliberately
 leave multi-gigabyte artifacts outside Git.
 
+Materialize the real Whisper Tiny encoder used by the direct MLX spike:
+
+```sh
+bash scripts/fetch-mlx-whisper-encoder-model.sh
+```
+
+That fetcher pins and verifies the converted NPZ and official MLX Examples mel
+filter, then extracts the 66 encoder tensors outside Git. Run the complete
+frontend/encoder on both CPU and GPU with an exact official MLX checkout:
+
+```sh
+CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx-v0.32.0 \
+  bash scripts/run-mlx-direct-spike.sh
+```
+
 Run a compatibility baseline against the sibling legacy implementations:
 
 ```sh

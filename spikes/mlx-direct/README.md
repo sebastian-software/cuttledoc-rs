@@ -1,50 +1,75 @@
 # Direct official MLX spike (#6)
 
-This spike deliberately uses the official MLX C++ core, not `mlx-c` and not a
-Rust/Node wrapper. It exposes one task-shaped C ABI rather than arrays,
-operators, streams, or model-runtime objects:
+This spike runs the complete Whisper Tiny audio frontend and encoder over the
+official MLX C++ core. Rust owns the input and result; the adapter owns all MLX
+arrays and exposes only a task-level C ABI:
 
 ```c
-int32_t cuttledoc_mlx_project_audio(
-    const float *audio, size_t audio_len,
-    const float *weights, size_t weights_len,
-    float *output, size_t output_len,
-    int32_t device_kind, char **error_out);
+void *cuttledoc_mlx_whisper_encoder_create(
+    const char *model_directory, int32_t device_kind, char **error_out);
+
+int32_t cuttledoc_mlx_whisper_encoder_encode(
+    void *handle, const float *audio, size_t audio_len,
+    char **json_out, char **error_out);
+
+void cuttledoc_mlx_whisper_encoder_destroy(void *handle);
 ```
 
-The Rust example supplies one 576-sample audio frame and a `[576, 4]` float
-projection matrix. The C++ shim copies both caller-owned buffers, asks MLX to
-run `matmul` plus `tanh` on an explicit CPU or GPU device, evaluates the lazy
-graph, and copies four scores back to Rust. This is an execution/lifecycle
-probe for a representative dense audio-model block, **not** a transcription
-model or a production inference API.
+The input is mono f32 PCM at 16 kHz. The adapter pads it to Whisper's 30-second
+window, computes the pinned 80-bin log-Mel frontend, evaluates both
+convolutions and all four self-attention/MLP encoder blocks, and returns an
+owned summary of the `[1, 1500, 384]` encoder output. This is a real model path,
+not yet an end-to-end transcriber. It follows the official Whisper execution
+behavior: Float32 activations on CPU and Float16 on Metal.
 
-## Pinned upstream
+## Pinned inputs
 
-- MLX tag: `v0.32.0`
-- MLX commit: `7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247`
+- MLX `v0.32.0`:
+  `7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247`
+- upgrade control MLX `v0.31.2`:
+  `68cf2fddd8de5edd8ab3d926391772b2e2cedad8`
+- `mlx-community/whisper-tiny`:
+  `78c52ab98ca87f570bc57ad852e15ef7060f9f76`
+- MLX Examples frontend/filter source:
+  `796f5b53cab69a3d48a44233ce21aae889e94a08`
 
-Clone that exact official source outside this repository, then run:
+The model fetcher verifies every downloaded digest and extracts only the 66
+encoder tensors plus `mel_80.npy`:
+
+```sh
+bash scripts/fetch-mlx-whisper-encoder-model.sh
+```
+
+Clone either exact official MLX release outside this repository, then run:
 
 ```sh
 CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx \
   bash scripts/run-mlx-direct-spike.sh
 ```
 
-The script verifies the checkout commit before configuring a fresh temporary
-build. It requires Xcode's Metal Toolchain (`xcrun metal`), CMake, and Rust.
-It builds MLX from the supplied source with Metal enabled, builds the owned
-shim, builds the Rust caller, and runs the same projection on CPU and GPU.
+The runner requires Xcode's Metal Toolchain, CMake, Rust, FFmpeg, `curl`, and
+`unzip`. It builds for macOS 14, statically links MLX into the shim, colocates
+`mlx.metallib`, adds an executable-relative RPATH to the probe, normalizes the
+real FLEURS fixture, and runs repeated CPU and GPU lifecycles. Set
+`CUTTLEDOC_MLX_BUILD_DIR` to preserve the build cache.
 
-## Boundary rules
+## Boundary and lifecycle rules
 
-- The repository does not vendor MLX or add a Cargo MLX dependency.
-- The ABI has Rust-owned primitive buffers and an owned error string only; no
-  MLX object crosses it.
-- Input/weights are copied before MLX's lazy graph can outlive the call.
-- `mlx-c` can be used later only to answer a named comparison question. It is
-  not this spike's integration path.
+- The repository neither vendors MLX nor adds an MLX Cargo dependency.
+- No MLX array, operator, stream, model, or device handle crosses the C ABI.
+- Model tensors are loaded from NPY on CPU because MLX does not implement the
+  NPY Load primitive on GPU; GPU sessions explicitly copy owned tensors to
+  Metal.
+- The Metal FP16 fingerprint exactly matches the pinned official MLX Examples
+  Whisper graph. The source-built CPU FP16 convolution did not; the adapter
+  uses the official graph's reference-compatible FP32 CPU behavior.
+- MLX's default device is process-global. The spike serializes create,
+  encode, and destroy through one mutex to prevent cross-session device races.
+- Destroy deletes all session-owned arrays and clears MLX's allocator cache.
+- Inference is synchronous and can be cancelled only at the next task/chunk
+  boundary.
+- `mlx-c` remains an optional control for a named uncertainty. The real model
+  path did not reveal one, so no second product dependency was added.
 
-The remaining #6 work is recorded in the runtime matrix: a real model/weight
-format, repeated lifecycle and memory measurements, output quality, artifact
-packaging, and upgrade evidence across two official MLX releases.
+See [`docs/spikes/mlx-direct.md`](../../docs/spikes/mlx-direct.md) and the
+[raw lifecycle evidence](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).

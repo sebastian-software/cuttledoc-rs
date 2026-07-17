@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-17T08:42:01Z",
+  "source_revision": "09f8735366cc5287c24a89dd16d81be82570294e",
+  "fixture": {
+    "id": "fleurs-en-us-test-000",
+    "pcm_sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+    "audio_duration_ms": 10560,
+    "samples": 168960,
+    "sample_rate_hz": 16000
+  },
+  "model": {
+    "id": "mlx-community/whisper-tiny",
+    "revision": "78c52ab98ca87f570bc57ad852e15ef7060f9f76",
+    "weights_npz_sha256": "d5a3b8671ac7aab11a2c9d0f16e7da94bad5500d785856f438c6bd44c3723944",
+    "weights_npz_bytes": 74418182,
+    "encoder_and_filter_bytes": 15337664,
+    "encoder_tensor_count": 66,
+    "representation": "Float16 Whisper tiny encoder tensors extracted as NPY; Float32 80-bin mel filter",
+    "conversion": "The pinned model card records conversion of OpenAI Whisper tiny with the official MLX Examples whisper/convert.py.",
+    "license": "MIT source model and converter; the converted artifact's pinned model card does not carry structured license metadata"
+  },
+  "frontend": {
+    "implementation_reference": "ml-explore/mlx-examples@796f5b53cab69a3d48a44233ce21aae889e94a08",
+    "mel_filters_sha256": "7450ae70723a5ef9d341e3cee628c7cb0177f36ce42c44b7ed2bf3325f0f6d4c",
+    "input_shape": [1, 3000, 80],
+    "encoder_output_shape": [1, 1500, 384]
+  },
+  "host": {
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "xcode": "26.6 (17F113)",
+    "cmake": "4.4.0",
+    "rustc": "rustc 1.95.0-nightly (842bd5be2 2026-01-29)",
+    "ffmpeg": "8.1.2",
+    "deployment_target": "macOS 14.0",
+    "metal_language_version": "310"
+  },
+  "releases": [
+    {
+      "tag": "v0.31.2",
+      "commit": "68cf2fddd8de5edd8ab3d926391772b2e2cedad8",
+      "adapter_source_changes": 0,
+      "artifacts": {
+        "shim_dylib_bytes": 18598072,
+        "rust_probe_bytes": 377136,
+        "metallib_bytes": 125268216,
+        "shim_dylib_sha256": "4b584f99b4d1b7fc60df9904e9ec08ac51306c721538d822900f7c03097a8fee",
+        "rust_probe_sha256": "10343c53a496a81fa6d4380f93fc4e2852c74e796e2cc014aa0aa17fe6abb96a",
+        "metallib_sha256": "11d0d29b504bb7f321b65165aae945192b2d90d7912376bc773003c7a19a7793"
+      },
+      "cpu": {
+        "compute_dtype": "Float32 activations with converted Float16 weights",
+        "load_wall_ms": [38.865, 3.441, 3.308],
+        "inference_ms": [[139.927667, 119.055292], [128.765625, 117.749458], [132.016375, 126.341958]],
+        "destroy_wall_ms": [3.114, 3.109, 3.152],
+        "mlx_peak_memory_bytes": 132410012,
+        "maximum_resident_set_bytes": 214990848,
+        "process_peak_footprint_bytes": 204112664,
+        "fingerprint": {
+          "mean": 0.032257499,
+          "stddev": 1.308827875,
+          "minimum": -17.519777298,
+          "maximum": 16.900856018,
+          "l1": 449521.638794638,
+          "first_values": [0.111390486, 0.119997054, 0.076544493, 0.10807091, -0.022673845, -0.175392002, -0.062083066, 1.366091728]
+        }
+      },
+      "gpu": {
+        "compute_dtype": "Float16",
+        "load_wall_ms": [47.692, 3.983, 3.684],
+        "inference_ms": [[533.002958, 11.649416], [15.969916, 11.61025], [15.030541, 11.629583]],
+        "destroy_wall_ms": [0.785, 0.932, 0.849],
+        "mlx_peak_memory_bytes": 229041540,
+        "maximum_resident_set_bytes": 53379072,
+        "process_peak_footprint_bytes": 246842088,
+        "fingerprint": {
+          "mean": 0.032257844,
+          "stddev": 1.308756234,
+          "minimum": -17.515625,
+          "maximum": 16.90625,
+          "l1": 449485.791029692,
+          "first_values": [0.11151123, 0.119750977, 0.076538086, 0.107849121, -0.023010254, -0.175170898, -0.062042236, 1.366210938]
+        }
+      }
+    },
+    {
+      "tag": "v0.32.0",
+      "commit": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+      "adapter_source_changes": 0,
+      "artifacts": {
+        "shim_dylib_bytes": 18638120,
+        "rust_probe_bytes": 377136,
+        "metallib_bytes": 130164152,
+        "shim_dylib_sha256": "3eb77f8fee52ef4d819472c0ac176a0f3fc9d04534a333813ce1c218f73d83b7",
+        "rust_probe_sha256": "10343c53a496a81fa6d4380f93fc4e2852c74e796e2cc014aa0aa17fe6abb96a",
+        "metallib_sha256": "f0c9a5ca57470c56195e3c8a9d3c61464970583cc5876a8349ac6bf424943d67"
+      },
+      "cpu": {
+        "compute_dtype": "Float32 activations with converted Float16 weights",
+        "load_wall_ms": [36.439, 3.208, 3.151],
+        "inference_ms": [[130.132917, 115.136416], [131.373584, 115.995167], [128.103375, 113.268958]],
+        "destroy_wall_ms": [3.464, 3.402, 3.562],
+        "mlx_peak_memory_bytes": 132410012,
+        "maximum_resident_set_bytes": 213729280,
+        "process_peak_footprint_bytes": 202769152,
+        "fingerprint": {
+          "mean": 0.032257499,
+          "stddev": 1.308827875,
+          "minimum": -17.519777298,
+          "maximum": 16.900856018,
+          "l1": 449521.638794638,
+          "first_values": [0.111390486, 0.119997054, 0.076544493, 0.10807091, -0.022673845, -0.175392002, -0.062083066, 1.366091728]
+        }
+      },
+      "gpu": {
+        "compute_dtype": "Float16",
+        "load_wall_ms": [48.784, 3.783, 3.688],
+        "inference_ms": [[27.618666, 11.757708], [14.838041, 11.753917], [14.682291, 11.689625]],
+        "destroy_wall_ms": [1.206, 0.757, 0.806],
+        "mlx_peak_memory_bytes": 229041540,
+        "maximum_resident_set_bytes": 52723712,
+        "process_peak_footprint_bytes": 246072016,
+        "fingerprint": {
+          "mean": 0.032257844,
+          "stddev": 1.308756234,
+          "minimum": -17.515625,
+          "maximum": 16.90625,
+          "l1": 449485.791029692,
+          "first_values": [0.11151123, 0.119750977, 0.076538086, 0.107849121, -0.023010254, -0.175170898, -0.062042236, 1.366210938]
+        }
+      }
+    }
+  ],
+  "reference_validation": {
+    "implementation": "Pinned official mlx-examples Whisper graph executed with the official MLX 0.32.0 Python wheel as a test-only oracle; no Python runtime is used by the product probe.",
+    "cpu_float32": {
+      "mean": 0.032257501,
+      "stddev": 1.308827999,
+      "minimum": -17.519779205,
+      "maximum": 16.900856018,
+      "l1": 449521.655799229
+    },
+    "gpu_float16": {
+      "mean": 0.032257844,
+      "stddev": 1.308756234,
+      "minimum": -17.515625,
+      "maximum": 16.90625,
+      "l1": 449485.791029692
+    }
+  },
+  "observations": [
+    "The unchanged adapter built and produced identical CPU and GPU fingerprints on both official MLX releases.",
+    "The Metal Float16 output exactly matched the official MLX Examples oracle. The CPU Float32 output matched within normal last-bit reduction differences.",
+    "A source-built CPU Float16 convolution diverged at the first convolution even though the log-Mel input matched. The adapter therefore follows MLX Whisper's supported Float32 CPU path and retains Float16 on Metal.",
+    "NPY loading evaluates on CPU; GPU sessions must explicitly materialize weights on CPU and copy them to Metal.",
+    "MLX caches Metal kernels and buffers across an encode call. The session destroy path deletes owned arrays and clears the MLX cache; all three create/run/destroy cycles completed.",
+    "The global MLX default device makes the current adapter process-serialized. The C ABI mutex prevents cross-session device races.",
+    "An executable-relative RPATH and a colocated mlx.metallib are required at runtime.",
+    "This is the complete Whisper tiny audio encoder on real speech, not a decoder or transcription-quality result."
+  ]
+}

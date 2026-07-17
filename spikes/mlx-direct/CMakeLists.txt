@@ -27,6 +27,7 @@ add_subdirectory("${MLX_SOURCE_DIR}" mlx-upstream EXCLUDE_FROM_ALL)
 
 add_library(cuttledoc_mlx_shim SHARED Sources/CuttledocMlxShim.cpp)
 target_link_libraries(cuttledoc_mlx_shim PRIVATE mlx)
+target_include_directories(cuttledoc_mlx_shim PUBLIC include)
 target_compile_options(cuttledoc_mlx_shim PRIVATE -Wall -Wextra -Wpedantic)
 
 # MLX resolves its default Metal kernels from mlx.metallib at runtime. Make the

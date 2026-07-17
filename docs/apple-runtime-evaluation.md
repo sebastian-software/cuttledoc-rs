@@ -72,7 +72,7 @@ and [MLX architecture](https://ml-explore.github.io/mlx/).
 | STT | CoreML through an internal Rust adapter | `objc2-core-ml`: accepted, bounded; adapter: repository-owned | Existing Parakeet model components, compiled CoreML models, named feature input/output, `MLMultiArray` transfer, compute-policy diagnostics, and a direct path to current compatibility fixtures. | Binding coverage, autorelease/ownership, `Send`/`Sync`, stateful serialization, model conversion, and repeat-run cleanup have not been demonstrated in this repository. | #5 real-model spike. |
 | STT | whisper.cpp plus CoreML/Metal | Repository-owned boundary candidate | Mature compatibility path for the existing Whisper baseline; upstream owns specialized decode/runtime work. | Exact build/options, model pairing, artifact cost, concurrency, and maintenance surface remain unmeasured here. | Keep for the bakeoff/compatibility backend; do not add a generic Rust wrapper. |
 | STT | Apple SpeechAnalyzer / SpeechTranscriber | Repository-owned Swift boundary candidate | System-managed assets, file/PCM analysis, asynchronous results, volatile ranges, timestamps, and confidence without product model conversion. | CLI identity, asset reservation/installation, locale availability, result revision/revocation semantics, Swift actor bridge, cancellation, and release tooling require an actual macOS 26 test. | #11 Swift-shim spike. |
-| STT or text generation | Official MLX via owned C++ adapter | Third first-class candidate; repository-owned boundary | Apple-optimized MLX execution through a small task-level bridge under Cuttledoc ownership and a direct path for future model classes. | Model support/conversion, release integration, C++ update cost, memory/lifecycle, and a useful task-level result are unproven. | #6 direct-official-MLX spike. |
+| STT or text generation | Official MLX via owned C++ adapter | Advance as third first-class foundation; repository-owned boundary | Real Whisper Tiny frontend/encoder on CPU and Metal, reference-matched output, repeated lifecycle, pinned conversion, and unchanged source across two MLX releases. | Decoder/tokenizer/timestamps, end-to-end quality, clean cold start, energy, cancellation within a graph, and artifact pruning remain unproven. | Continue with an end-to-end MLX ASR model path under the common benchmark contract. |
 | STT or text generation | official `mlx-c` | Optional reference/control only | A secondary C-level check for a specific allocation, stream, or interface uncertainty. | No GitHub releases; every use must bind an audited commit to its MLX revision. C API use does not make a model integration smaller or safer by itself. | Use only when it answers a stated #6 question; never make it a product dependency by default. |
 | STT or text generation | `mlx-rs`, OminiX-MLX, `mlx-node` | Reference only | Prior art, model-format clues, test vectors, and benchmark hypotheses. | Their wrappers/runtime ownership cannot silently become Cargo, build, or distribution dependencies. | Do not import. |
 | Text generation | Remote HTTP provider | Repository-owned product adapter | Straightforward text-generation/enhancement path with no embedded native model runtime; preserves separate task ownership. | Credentials, network/error semantics, cost, latency, privacy, and API/model lifecycle must be evaluated independently from STT. | #7, after the common contracts are shaped. |
@@ -180,6 +180,20 @@ cost, and the work to advance across two official MLX releases. Use pinned
 `mlx-c` only as an optional secondary control when it answers a named interface
 or lifecycle question; do not make it a competing product path. Do not
 benchmark unrelated demos or use a community wrapper as a primary path.
+
+**Observed disposition (2026-07-17):** advance MLX as the third first-class
+foundation. The repository-owned ABI ran the complete Whisper Tiny frontend
+and four-layer audio encoder on real FLEURS PCM on CPU and GPU. Three repeated
+load/run/destroy cycles were stable, and the unchanged source produced the same
+per-device fingerprints on MLX 0.31.2 and 0.32.0. Warm GPU encoder time was
+11.8 ms; the v0.32.0 runtime package was an 18.6 MB shim plus 130.2 MB
+metallib. NPY weights must load on CPU before copying to GPU, and current
+default-device use is process-serialized. The adapter follows the
+reference-compatible Float32 CPU and Float16 Metal paths; both match the
+official MLX Examples graph. This proves the foundation, not end-to-end ASR:
+decoder, timestamps, transcript quality, energy, and artifact pruning remain.
+Exact evidence is in
+[`docs/spikes/mlx-direct.md`](spikes/mlx-direct.md).
 
 ## Decision rule after the spikes
 
