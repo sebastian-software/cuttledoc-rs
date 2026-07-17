@@ -25,6 +25,43 @@ families without exposing a generic tensor runtime in the public API.
 not expose an uncertainty that a second C wrapper would resolve, so it was not
 added. Community Rust and Node wrappers remain reference-only.
 
+## What “Rust talks directly to MLX” means
+
+Rust already owns and invokes this MLX path. The word “direct” describes the
+upstream dependency and ownership chain, not the absence of a language
+boundary:
+
+```text
+safe Rust engine proxy
+  -> five-function repository-owned C ABI
+  -> repository-owned C++ task/model implementation
+  -> pinned official MLX C++ core
+```
+
+Rust cannot declare MLX's C++ templates, overloads, namespaces, exceptions, and
+standard-library types through its stable `extern "C"` FFI. It could use
+`cxx`, `autocxx`, or generated bindings, but those approaches still generate or
+compile C++ glue. More importantly, exposing MLX arrays and operators to Rust
+would widen the unsafe and upgrade-sensitive surface without moving product
+logic into Rust.
+
+The small `extern "C"` surface is therefore both the fastest spike path and the
+intended production seam:
+
+- Rust owns PCM input, model identity, scheduling, cancellation checkpoints,
+  errors, progress, domain results, and deterministic lifecycle.
+- C++ owns MLX arrays, the lazy graph, model-specific kernels, exceptions, and
+  device/runtime state.
+- The ABI transfers only pointers with explicit ownership, scalar values,
+  caller-owned PCM, and Rust-owned result/error copies.
+- A future private `cuttledoc-mlx` Rust crate can make the five unsafe calls
+  safe and ergonomic without becoming a general MLX binding or port.
+
+Replacing the handwritten declarations with generated bindings later is a
+tooling choice, not an architectural change. The boundary should widen only
+when an end-to-end task requires a new product-level operation, never merely to
+mirror another MLX operator.
+
 ## Proven path
 
 The Rust probe passes real 16-kHz f32 PCM through an owned C ABI. The C++

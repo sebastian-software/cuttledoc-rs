@@ -83,6 +83,14 @@ is a small owned adapter directly over official MLX. In both cases arrays stay
 on the far side of that adapter rather than becoming product API. See the
 [MLX C overview](https://ml-explore.github.io/mlx-c/build/html/overview.html).
 
+“Directly over official MLX” does not mean that Rust consumes the C++ API
+without glue. Rust's stable native FFI is C-shaped; MLX's public implementation
+API is C++ and uses language features that cannot be declared as an
+`extern "C"` Rust module. The repository-owned C ABI is the deliberate seam:
+Rust owns the safe task lifecycle and C++ owns MLX-native graph state. Binding
+generators could automate that seam, but they would not remove it and would
+create a broader upstream-coupled surface for no current product benefit.
+
 ## Capability vocabulary
 
 Capability discovery describes product behavior and an actionable reason for
