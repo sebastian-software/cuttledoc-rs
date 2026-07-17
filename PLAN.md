@@ -65,6 +65,27 @@ Exit criteria:
 - The packed addon loads on Node 22 and Node 24 without `node-gyp`.
 - Interop ownership and thread-affinity rules are documented.
 
+### Current Phase 0 status
+
+Evidence snapshot: 2026-07-17.
+
+| Workstream | State | Remaining gate |
+| --- | --- | --- |
+| Dependency policy and runtime matrix (#10, #2) | Complete | Apply the accepted policy to each newly selected production pin. |
+| Capability-oriented API and ownership (#8) | Complete | Check the provisional types against the first real vertical slice. |
+| CoreML feasibility (#5) | Foundation proven | A complete ASR graph, typed adapter errors, cancellation boundary, and common benchmark remain. |
+| Apple Speech feasibility (#11) | Foundation proven | Broader fixture quality, clean cold start, energy, and shipped executable identity remain selection evidence. |
+| Official MLX feasibility (#6) | Foundation proven | End-to-end tokenizer/decoder/timestamps, transcript quality, clean cold start, energy, and artifact pruning remain. |
+| Mandatory ASR benchmark (#4) | Partial | Expand the fixture set, make measurements comparable, and recommend a first backend plus fallback. |
+| Exploratory ASR sweep (#12) | Open | Use it selectively to find a stronger end-to-end MLX ASR path; breadth must not block #4. |
+| Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
+| Local text-generation runtime (#7) | Open | Run one bounded transcript-enhancement experiment and record adopt/defer. |
+
+The open issue list is a work queue, not a second architecture plan. Completed
+foundation issues should close with links to their evidence. Productization
+gaps receive focused follow-ups rather than keeping a successful feasibility
+spike indefinitely open.
+
 ## Phase 1 — Workspace foundation
 
 **Purpose:** create only the structure justified by the spike.
@@ -265,9 +286,10 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Complete the initial dependency inventory and runtime decision matrix.
-2. Establish the benchmark fixture/schema and measure current Parakeet, Whisper, and Apple system baselines.
-3. Run the bounded CoreML, MLX, and SpeechAnalyzer-shim Rust spikes without committing any wrapper as a production dependency.
-4. Record the selected first ASR runtime/model and interop boundary in follow-up ADRs.
-5. Scaffold only the crates justified by those decisions.
-6. Produce the first packed npm addon and test ESM/CommonJS loading on Node 22 and 24.
+1. Reconcile this plan and the GitHub issue state with completed Phase 0 evidence.
+2. Close the bounded MLX foundation spike with an explicit Rust/C/C++ boundary decision.
+3. Build a focused end-to-end MLX ASR proof through the repository-owned task ABI.
+4. Complete #4/#12 with a multilingual fixture set and comparable cold, warm, memory, energy, and quality evidence.
+5. Finish #9 with Node 22 plus packed-artifact CI gates.
+6. Record the selected first ASR backend and fallback in an ADR, then scaffold only the Phase 1 crates justified by that decision.
+7. Complete #7 independently with an evidence-backed embedded-LLM recommendation or defer decision.

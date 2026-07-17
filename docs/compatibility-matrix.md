@@ -52,9 +52,18 @@ Unsupported local inference must be represented as capability absence. Installin
 | Structured progress  | Download callbacks/CLI output | Download callbacks/CLI output |                    New |           Limited | New unified API                    |
 | Streaming results    |  Final segments (VAD-chunked) |       Final segments (chunks) |       Volatile + final |   Model-dependent | New, capability-gated (ADR-0008)   |
 
-The Apple Speech column corresponds to the provisional `AppleSpeech` / `"apple-speech"` backend identifier and is a bakeoff candidate under ADR-0006/0007; its rows carry evaluation status, not legacy parity obligations.
+The Apple Speech column corresponds to the provisional `AppleSpeech` /
+`"apple-speech"` backend identifier. The repository-owned Swift C ABI has
+proven real streamed recognition, asset lifecycle, cancellation, word timing,
+confidence, and volatile-to-final replacement on macOS 26. It remains a
+bakeoff candidate under ADR-0006/0007 rather than a legacy parity obligation.
 
-Streaming contract tests reduce ordered, range-addressed replace/revoke updates into a transcript. They must cover volatile replacement, synthetic revocation, finalization, overlap rejection for finalized ranges, and identical Rust/Node results. Spike #11 separately determines whether Apple Speech ever retracts volatile text without replacement (ADR-0008).
+Streaming contract tests reduce ordered, range-addressed replace/revoke updates
+into a transcript. They must cover volatile replacement, synthetic revocation,
+finalization, overlap rejection for finalized ranges, and identical Rust/Node
+results. Spike #11 observed no replacement-free Apple Speech revocation in the
+tested real stream; synthetic `Revoke` remains part of the backend-independent
+contract (ADR-0008).
 
 ## Parakeet gates
 
