@@ -1,6 +1,6 @@
 use std::{
     env,
-    ffi::{c_void, CStr, CString},
+    ffi::{CStr, CString, c_void},
     fs,
     os::raw::c_char,
     ptr,
@@ -57,8 +57,7 @@ fn main() {
 fn run() -> Result<(), String> {
     let mut arguments = env::args().skip(1);
     let pcm_path = arguments.next().ok_or_else(|| {
-        "usage: cuttledoc-speech-spike /path/to/f32le-pcm [--locale xx-YY] [--cancel]"
-            .to_owned()
+        "usage: cuttledoc-speech-spike /path/to/f32le-pcm [--locale xx-YY] [--cancel]".to_owned()
     })?;
     let mut cancel_probe = false;
     let mut locale = "en-US".to_owned();
@@ -74,13 +73,11 @@ fn run() -> Result<(), String> {
         }
     }
 
-    let inventory = call_string(|output| unsafe {
-        cuttledoc_speech_locale_inventory(output)
-    })?;
+    let inventory = call_string(|output| unsafe { cuttledoc_speech_locale_inventory(output) })?;
     println!("LOCALE_INVENTORY {inventory}");
 
-    let bytes = fs::read(&pcm_path)
-        .map_err(|error| format!("could not read {pcm_path}: {error}"))?;
+    let bytes =
+        fs::read(&pcm_path).map_err(|error| format!("could not read {pcm_path}: {error}"))?;
     if bytes.len() % 4 != 0 {
         return Err("PCM byte count is not divisible by four".to_owned());
     }
@@ -113,7 +110,10 @@ fn run() -> Result<(), String> {
         }
         return Err(error);
     }
-    println!("CREATE_MS {:.6}", create_started.elapsed().as_secs_f64() * 1_000.0);
+    println!(
+        "CREATE_MS {:.6}",
+        create_started.elapsed().as_secs_f64() * 1_000.0
+    );
     println!(
         "SESSION_METADATA {}",
         take_optional_string(metadata).unwrap_or_else(|| "{}".to_owned())
@@ -140,21 +140,15 @@ fn run() -> Result<(), String> {
                 let mut summary = ptr::null_mut();
                 let mut finish_error = ptr::null_mut();
                 let status = unsafe {
-                    cuttledoc_speech_session_finish(
-                        handle,
-                        &mut summary,
-                        &mut finish_error,
-                    )
+                    cuttledoc_speech_session_finish(handle, &mut summary, &mut finish_error)
                 };
                 if status != 0 {
-                    Err(take_optional_string(finish_error).unwrap_or_else(|| {
-                        format!("session finish failed with status {status}")
-                    }))
+                    Err(take_optional_string(finish_error)
+                        .unwrap_or_else(|| format!("session finish failed with status {status}")))
                 } else {
                     println!(
                         "SESSION_SUMMARY {}",
-                        take_optional_string(summary)
-                            .unwrap_or_else(|| "{}".to_owned())
+                        take_optional_string(summary).unwrap_or_else(|| "{}".to_owned())
                     );
                     Ok(())
                 }
@@ -165,9 +159,8 @@ fn run() -> Result<(), String> {
     unsafe {
         cuttledoc_speech_session_destroy(handle);
     }
-    let inventory_after = call_string(|output| unsafe {
-        cuttledoc_speech_locale_inventory(output)
-    })?;
+    let inventory_after =
+        call_string(|output| unsafe { cuttledoc_speech_locale_inventory(output) })?;
     println!("LOCALE_INVENTORY_AFTER {inventory_after}");
     let updates = unsafe { Box::from_raw(sink_pointer) }
         .into_inner()
@@ -220,9 +213,7 @@ fn push_chunk(handle: *mut c_void, chunk: &[f32]) -> Result<(), String> {
     }
 }
 
-fn call_string(
-    operation: impl FnOnce(*mut *mut c_char) -> i32,
-) -> Result<String, String> {
+fn call_string(operation: impl FnOnce(*mut *mut c_char) -> i32) -> Result<String, String> {
     let mut output = ptr::null_mut();
     let status = operation(&mut output);
     let message = take_optional_string(output)
