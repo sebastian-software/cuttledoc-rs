@@ -16,12 +16,48 @@ swiftc \
   -o "$build_dir/libcuttledoc_speech_shim.dylib"
 
 rustc \
+  --edition 2021 \
   "$rust_source" \
   -L "native=$build_dir" \
   -l dylib=cuttledoc_speech_shim \
   -o "$build_dir/cuttledoc-speech-spike"
 
-fixture="$build_dir/fixture.aiff"
-say -v Samantha -o "$fixture" "Cuttledoc is testing offline speech transcription on Apple Silicon."
+source_fixture="${CUTTLEDOC_SPEECH_FIXTURE:-$root/../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.ogg}"
+if [[ ! -f "$source_fixture" ]]; then
+  echo "missing real fixture: $source_fixture" >&2
+  exit 2
+fi
+fixture="$build_dir/fleurs-en-000.f32le"
+ffmpeg \
+  -v error \
+  -i "$source_fixture" \
+  -ar 16000 \
+  -ac 1 \
+  -f f32le \
+  -acodec pcm_f32le \
+  "$fixture"
 
-DYLD_LIBRARY_PATH="$build_dir" "$build_dir/cuttledoc-speech-spike" "$fixture"
+echo "IDENTITY"
+codesign -d --verbose=4 "$build_dir/cuttledoc-speech-spike" 2>&1
+if otool -l "$build_dir/cuttledoc-speech-spike" | grep -q __info_plist; then
+  echo "embedded_info_plist=true"
+else
+  echo "embedded_info_plist=false"
+fi
+
+echo "STREAM"
+DYLD_LIBRARY_PATH="$build_dir" \
+  /usr/bin/time -l \
+  "$build_dir/cuttledoc-speech-spike" \
+  "$fixture"
+
+echo "CANCEL"
+DYLD_LIBRARY_PATH="$build_dir" \
+  "$build_dir/cuttledoc-speech-spike" \
+  "$fixture" \
+  --locale es-ES \
+  --cancel
+
+echo "ARTIFACTS"
+stat -f 'swift_dylib_bytes=%z' "$build_dir/libcuttledoc_speech_shim.dylib"
+stat -f 'rust_executable_bytes=%z' "$build_dir/cuttledoc-speech-spike"

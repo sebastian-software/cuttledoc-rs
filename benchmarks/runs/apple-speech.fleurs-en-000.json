@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.apple-speech.fleurs-en-000-1",
+  "captured_at": "2026-07-17T07:33:28Z",
+  "source_revision": "4a38f0625e136851753fb7c22544a5ae78b136a4",
+  "fixture_id": "fleurs-en-us-test-000",
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "apple-speechtranscriber-system-model",
+      "revision": "macOS 26.5.2 system-managed asset; asset revision is not exposed",
+      "quantization": "system-managed and not exposed",
+      "license": "Apple platform asset; not redistributed by Cuttledoc"
+    },
+    "runtime": {
+      "id": "apple-speechanalyzer",
+      "version": "macOS 26.5.2 Speech framework / Swift 6.3.3",
+      "boundary": "Repository-owned Swift C ABI called from Rust"
+    },
+    "options": {
+      "locale": "en-US",
+      "sample_rate_hz": 16000,
+      "input": "caller-owned f32 mono converted to framework-required s16 mono",
+      "reporting_options": ["volatileResults"],
+      "attribute_options": ["audioTimeRange", "transcriptionConfidence"]
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": 0.05263157894736842,
+      "cer": 0.012345679012345678
+    },
+    "timing": {
+      "audio_duration_ms": 10560,
+      "cold_load_ms": 151.003833,
+      "warm_inference_ms": 198.246042,
+      "real_time_factor": 0.018773299431818182
+    },
+    "resources": {
+      "peak_memory_bytes": 21921792,
+      "model_size_bytes": null,
+      "binary_size_bytes": 346992
+    },
+    "streaming": {
+      "supported": true,
+      "first_result_ms": 38.303417,
+      "update_count": 28,
+      "volatile_update_count": 27,
+      "final_update_count": 1,
+      "revoke_count": 0,
+      "timestamps": "word"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "The repeatable powermetrics procedure is defined, but this baseline did not run with root privileges."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "No model conversion; the owned shim converts public f32 PCM to the Int16 buffers required by SpeechAnalyzer.",
+    "update_cost": "The shim compiles only against the Swift-only macOS 26 Speech API and must be retested with each supported Xcode/macOS line.",
+    "packaging_cost": "The optimized Swift dylib was 346992 bytes and the Rust probe 603816 bytes; production still needs a stable host bundle identity and normal signing/notarization."
+  },
+  "reproduction": {
+    "command": "bash scripts/run-apple-speech-spike.sh",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.apple-speech.fleurs-en-000-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "partial",
+    "blocker": "The system asset revision, quantization, and byte size are not exposed; clean-host cold load and relative energy remain unmeasured, and one English fixture cannot select a product backend.",
+    "observations": [
+      "The final transcript differed from the reference only by pluralizing the last word.",
+      "Twenty-seven volatile whole-range replacements were followed by one final update with 19 word time ranges and confidence values.",
+      "No empty result or replacement-free retraction was observed, so no Revoke update was emitted.",
+      "A separate es-ES lifecycle probe moved asset status from supported to installed, owned and released its reservation, and cancelled cleanly.",
+      "The ad-hoc unbundled executable worked, but Speech logged that the absent bundle identifier produces an unstable client identifier."
+    ]
+  }
+}

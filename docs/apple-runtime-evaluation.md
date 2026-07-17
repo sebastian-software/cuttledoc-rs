@@ -145,6 +145,16 @@ confidence; show volatile-to-final behavior; cancel and clean up; and reproduce
 the executable identity/asset behavior from an unbundled CLI. The shim owns the
 Swift task/actor lifetime and maps callbacks to Rust-owned buffers.
 
+**Observed disposition (2026-07-17):** advance through the repository-owned
+Swift C ABI. The real FLEURS run produced 27 volatile replacements, one final
+result with 19 word ranges/confidences, and no replacement-free revocation.
+An unbundled ad-hoc CLI installed/reserved a missing `es-ES` asset and released
+it on cancel/destroy, but Speech logged an unstable client identity because the
+binary had no bundle identifier. Public f32 PCM must be copied and converted to
+the framework-required Int16 buffer format. Exact evidence and remaining
+system-asset opacity are in
+[`docs/spikes/apple-speech-swift-shim.md`](spikes/apple-speech-swift-shim.md).
+
 Apple documents `SpeechAnalyzer` as an actor whose modules return an
 `AsyncSequence`, process one input sequence at a time, and require assets to be
 available before analysis. The result-stream/revision mapping therefore needs

@@ -13,19 +13,20 @@ fixture; Apple Speech and a real MLX ASR path remain before selection.
 | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
 | Parakeet TDT 0.6B v3 | Legacy Node addon + CoreML/VAD | 36.84% / 27.16% | 223.8 ms / 0.0212 | 145 MB | 1.90 GB downloaded | segment / final-only | measured |
 | Whisper large-v3-turbo | Legacy Node addon + CoreML encoder + whisper.cpp | 21.05% / 3.70% | 657.6 ms / 0.0623 | 1.94 GB | 2.90 GB | segment / final-only | measured |
-| Apple SpeechTranscriber | Repository-owned Swift C ABI | — | — | — | system asset | current shim has no update evidence | partial |
+| Apple SpeechTranscriber | Repository-owned Swift C ABI | 5.26% / 1.23% | 198.2 ms / 0.0188 | 21.9 MB | system asset size unavailable | word / 27 volatile → 1 final | partial |
 | MLX ASR candidate | Repository-owned C++ adapter over official MLX | — | — | — | — | model-dependent | precise blocker: no real ASR artifact has run |
 
 The MLX row is a first-class candidate with a named model-path blocker. It is
 not a rejection of the runtime: the direct official-core boundary and Metal
 packaging path are already technically proven in #6.
 
-The numeric rows use one 10.56-second English FLEURS sample and five warm
-repetitions on an M1 Ultra with 64 GB RAM. They are initial implementation
-baselines, not statistically meaningful model rankings. Whisper was more
-accurate on this clip; Parakeet was about 2.9 times faster and used about
-one-thirteenth of the peak RSS. The raw records retain every timing value and
-the exact hypothesis.
+The numeric rows use one 10.56-second English FLEURS sample on an M1 Ultra with
+64 GB RAM. Parakeet and Whisper used five warm repetitions; Apple Speech is one
+instrumented streamed run. They are initial implementation baselines, not
+statistically meaningful model rankings. Apple Speech was fastest, most
+accurate, and smallest in process RSS on this clip, but its system asset size
+and revision are opaque and the lifecycle/identity tradeoff is materially
+different. The raw records retain timing values and exact hypotheses.
 
 Whisper's recorded 1.07-second cold load is a new process with an existing
 CoreML execution plan. The very first process after model download took
@@ -42,6 +43,7 @@ other yet.
 | Silero VAD CoreML | `FluidInference/silero-vad-coreml@b419383c55c110e2c9271fa6ee0ea83d03c70d96` | compiled CoreML v6.0.0 bundle | MIT |
 | Whisper GGML | `ggerganov/whisper.cpp@5359861c739e955e79d9a303bcbc70fb988958b1` | upstream large-v3-turbo F16 GGML | MIT |
 | Whisper CoreML encoder | `sebastian-software/whisper-coreml-models@dd3515371e6b560b63ec275abf020153a45caa60` | Float16 | MIT |
+| Apple Speech asset | system-managed by macOS 26.5.2; revision not exposed | not exposed | Apple platform asset; not redistributed |
 
 The Parakeet model repository's structured metadata declares CC-BY-4.0 while
 older prose associated with the conversion has also mentioned Apache-2.0.
@@ -72,11 +74,9 @@ stdout, so `--output` writes the machine-readable result independently.
 
 ## Next measurement order
 
-1. Extend Apple Speech to expose timestamps, volatile/final updates, asset
-   identity, cancellation, and raw timing/resource samples.
-2. Select and run a real ASR artifact through the official MLX adapter, keeping
+1. Select and run a real ASR artifact through the official MLX adapter, keeping
    the same fixture bytes and record schema.
-3. Expand the quality set beyond one English clip and capture alternating
+2. Expand the quality set beyond one English clip and capture alternating
    energy plus comparable clean-system cold starts.
-4. Only then choose the first vertical slice and fallback from measured product
+3. Only then choose the first vertical slice and fallback from measured product
    readiness, not runtime novelty.

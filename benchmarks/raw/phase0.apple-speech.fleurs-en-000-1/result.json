@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-17T07:33:28Z",
+  "fixture": {
+    "source_sha256": "3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c",
+    "pcm_sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+    "reference_sha256": "94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365",
+    "audio_duration_ms": 10560,
+    "samples": 168960,
+    "sample_rate_hz": 16000
+  },
+  "host": {
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "swift": "Apple Swift 6.3.3",
+    "xcode": "26.6 (17F113)",
+    "rustc": "rustc 1.95.0-nightly (842bd5be2 2026-01-29)",
+    "ffmpeg": "8.1.2"
+  },
+  "identity": {
+    "codesign_identifier": "cuttledoc-speech-spike",
+    "signature": "ad-hoc, linker-signed",
+    "team_identifier": null,
+    "embedded_info_plist": false,
+    "bundle_identifier": null,
+    "speech_log_observation": "Application does not have a bundle identifier; the framework reported an unstable client identifier."
+  },
+  "locale_inventory_before": {
+    "supported_count": 30,
+    "installed": ["de_AT", "de_CH", "de_DE", "en_AU", "en_CA", "en_GB", "en_IE", "en_IN", "en_NZ", "en_SG", "en_US", "en_ZA"],
+    "reserved": ["en_US"],
+    "maximum_reserved_locales": 5
+  },
+  "stream_run": {
+    "locale": "en_US",
+    "asset_status_before": "installed",
+    "asset_status_after": "installed",
+    "installation_request_returned": true,
+    "reservation_owned_by_session": false,
+    "create_ms": 151.003833,
+    "elapsed_ms": 198.246042,
+    "first_result_ms": 38.303417,
+    "update_count": 28,
+    "volatile_update_count": 27,
+    "final_update_count": 1,
+    "revoke_count": 0,
+    "volatile_texts": [
+      "However",
+      "However,",
+      "However, due",
+      "However, due to",
+      "However, due to the",
+      "However, due to the slow",
+      "However, due to the slow commun",
+      "However, due to the slow communication",
+      "However, due to the slow communication ch",
+      "However, due to the slow communication chann",
+      "However, due to the slow communication channels",
+      "However, due to the slow communication channels,",
+      "However, due to the slow communication channels, st",
+      "However, due to the slow communication channels, styles",
+      "However, due to the slow communication channels, styles in",
+      "However, due to the slow communication channels, styles in the",
+      "However, due to the slow communication channels, styles in the West",
+      "However, due to the slow communication channels, styles in the West could",
+      "However, due to the slow communication channels, styles in the West could l",
+      "However, due to the slow communication channels, styles in the West could lag",
+      "However, due to the slow communication channels, styles in the West could lag behind",
+      "However, due to the slow communication channels, styles in the West could lag behind by",
+      "However, due to the slow communication channels, styles in the West could lag behind by 25",
+      "However, due to the slow communication channels, styles in the West could lag behind by 25 to",
+      "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30",
+      "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years",
+      "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years."
+    ],
+    "final_update": {
+      "sequence": 28,
+      "replace_range": { "start_ms": 0, "end_ms": 8940 },
+      "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years.",
+      "segments": [
+        { "text": "However,", "start_ms": 0, "end_ms": 1620, "confidence": 0.991 },
+        { "text": " due", "start_ms": 1620, "end_ms": 2160, "confidence": 0.971 },
+        { "text": " to", "start_ms": 2160, "end_ms": 2340, "confidence": 0.995 },
+        { "text": " the", "start_ms": 2340, "end_ms": 2520, "confidence": 0.996 },
+        { "text": " slow", "start_ms": 2520, "end_ms": 2640, "confidence": 0.997 },
+        { "text": " communication", "start_ms": 2640, "end_ms": 3240, "confidence": 0.993 },
+        { "text": " channels,", "start_ms": 3240, "end_ms": 4080, "confidence": 0.977 },
+        { "text": " styles", "start_ms": 4080, "end_ms": 4800, "confidence": 0.854 },
+        { "text": " in", "start_ms": 4800, "end_ms": 5220, "confidence": 0.999 },
+        { "text": " the", "start_ms": 5220, "end_ms": 5340, "confidence": 0.999 },
+        { "text": " West", "start_ms": 5340, "end_ms": 5520, "confidence": 0.764 },
+        { "text": " could", "start_ms": 5520, "end_ms": 5940, "confidence": 0.996 },
+        { "text": " lag", "start_ms": 5940, "end_ms": 6300, "confidence": 0.999 },
+        { "text": " behind", "start_ms": 6300, "end_ms": 6600, "confidence": 0.999 },
+        { "text": " by", "start_ms": 6600, "end_ms": 7200, "confidence": 0.999 },
+        { "text": " 25", "start_ms": 7200, "end_ms": 7920, "confidence": 0.996 },
+        { "text": " to", "start_ms": 7920, "end_ms": 8100, "confidence": 0.994 },
+        { "text": " 30", "start_ms": 8100, "end_ms": 8280, "confidence": 0.992 },
+        { "text": " years.", "start_ms": 8280, "end_ms": 8880, "confidence": 0.958 }
+      ]
+    }
+  },
+  "cancel_and_asset_run": {
+    "locale": "es_ES",
+    "asset_status_before": "supported",
+    "asset_status_after": "installed",
+    "installation_request_returned": true,
+    "reservation_owned_by_session": true,
+    "create_ms": 1252.357583,
+    "cancelled": true,
+    "installed_after_destroy_contains_es_ES": false,
+    "reserved_after_destroy": ["en_US"]
+  },
+  "measurements": {
+    "wer": 0.05263157894736842,
+    "cer": 0.012345679012345678,
+    "max_resident_set_size_bytes": 21921792,
+    "peak_memory_footprint_bytes": 7848656,
+    "swift_dylib_bytes": 346992,
+    "rust_probe_bytes": 603816
+  },
+  "framework_precondition": {
+    "observed_failure": "SpeechRecognizerWorker rejected Float32 AVAudioPCMBuffer input with the message that sample data must be 16-bit signed integers.",
+    "boundary_decision": "The C ABI remains caller-owned f32 PCM; the repository-owned Swift shim clamps and converts each copied chunk to Int16 before AnalyzerInput."
+  }
+}
