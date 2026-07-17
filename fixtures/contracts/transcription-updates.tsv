@@ -1,0 +1,15 @@
+# Shared Rust/Node contract vectors. Time ranges are half-open milliseconds.
+case	sequence	operation	stability	affected_start_ms	affected_end_ms	segment_start_ms	segment_end_ms	text	expected_text	expected_error
+finals_only	1	replace	final	0	1000	0	1000	hello	hello	-
+finals_only	2	replace	final	1000	2000	1000	2000	world	hello_world	-
+volatile_to_final	1	replace	volatile	0	1000	0	1000	hello	hello	-
+volatile_to_final	2	replace	volatile	0	1000	0	1000	hello_there	hello_there	-
+volatile_to_final	3	replace	final	0	1000	0	1000	hello_world	hello_world	-
+revoke_volatile	1	replace	volatile	0	1000	0	1000	draft	draft	-
+revoke_volatile	2	revoke	-	0	1000	0	0	-	~	-
+final_is_immutable	1	replace	final	0	1000	0	1000	locked	locked	-
+final_is_immutable	2	replace	volatile	500	1500	500	1500	mutation	locked	finalized_range_overlap
+sequence_gap	2	replace	final	0	1000	0	1000	late	~	unexpected_sequence
+segment_outside	1	replace	final	0	1000	0	1200	outside	~	segment_outside_affected_range
+partial_volatile	1	replace	volatile	0	1000	0	1000	draft	draft	-
+partial_volatile	2	replace	volatile	500	1500	500	1500	partial	draft	partial_volatile_overlap

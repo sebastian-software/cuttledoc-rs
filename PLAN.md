@@ -46,7 +46,7 @@ Deliverables:
 - Define separate streaming contracts for speech recognition and text generation plus the audio input buffer/format types. Transcription updates include ordered range-based replace/revoke/final semantics per ADR-0008. Defer the speech-synthesis contract to its Phase 5 vertical slice (ADR-0009).
 - Establish reproducible Apple Silicon ASR fixtures and benchmark output.
 - Build a minimal CoreML interop spike from Rust on `darwin-arm64`.
-- Build a time-boxed meaningful MLX inference spike from Rust comparing a narrow repository-owned C++ adapter over official `ml-explore/mlx` with official `mlx-c`; community wrappers remain reference-only unless they pass ADR-0005.
+- Build a time-boxed meaningful MLX inference spike from Rust through a narrow repository-owned C++ adapter over official `ml-explore/mlx`. Keep official `mlx-c` as an optional pinned control for named interface/lifecycle questions; community wrappers remain reference-only unless they pass ADR-0005.
 - Exercise Apple SpeechAnalyzer/SpeechTranscriber as a full bakeoff candidate through a repository-owned Swift shim, including AssetInventory model installation and executable-identity behavior from a CLI context (ADR-0007).
 - Re-evaluate current ASR candidates against the existing Parakeet and Whisper baselines.
 - Decide the first selected local ASR model/runtime and its repository-owned or external interop boundary.

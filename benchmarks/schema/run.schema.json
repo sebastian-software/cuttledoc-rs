@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/benchmark-run-1.0.0.json",
+  "title": "Cuttledoc benchmark run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "captured_at",
+    "source_revision",
+    "fixture_id",
+    "candidate",
+    "host",
+    "measurements",
+    "engineering_cost",
+    "reproduction",
+    "result"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "source_revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "fixture_id": { "type": ["string", "null"] },
+    "candidate": { "$ref": "#/$defs/candidate" },
+    "host": { "$ref": "#/$defs/host" },
+    "measurements": { "$ref": "#/$defs/measurements" },
+    "engineering_cost": { "$ref": "#/$defs/engineeringCost" },
+    "reproduction": { "$ref": "#/$defs/reproduction" },
+    "result": { "$ref": "#/$defs/result" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "result": { "properties": { "status": { "const": "blocked" } } } }
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "properties": { "blocker": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "result": { "properties": { "status": { "const": "measured" } } } }
+      },
+      "then": {
+        "properties": {
+          "fixture_id": { "type": "string", "minLength": 1 },
+          "host": {
+            "properties": { "memory_bytes": { "type": "integer", "minimum": 1 } }
+          },
+          "measurements": {
+            "properties": {
+              "quality": {
+                "properties": {
+                  "wer": { "type": "number", "minimum": 0 },
+                  "cer": { "type": "number", "minimum": 0 }
+                }
+              },
+              "timing": {
+                "properties": {
+                  "audio_duration_ms": { "type": "number", "exclusiveMinimum": 0 },
+                  "cold_load_ms": { "type": "number", "minimum": 0 },
+                  "warm_inference_ms": { "type": "number", "minimum": 0 },
+                  "real_time_factor": { "type": "number", "minimum": 0 }
+                }
+              },
+              "resources": {
+                "properties": {
+                  "peak_memory_bytes": { "type": "integer", "minimum": 0 },
+                  "model_size_bytes": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          },
+          "reproduction": {
+            "properties": { "raw_artifacts": { "minItems": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "measurements": {
+            "properties": {
+              "streaming": { "properties": { "supported": { "const": true } } }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "measurements": {
+            "properties": {
+              "streaming": {
+                "properties": {
+                  "first_result_ms": { "type": "number", "minimum": 0 },
+                  "update_count": { "type": "integer", "minimum": 1 },
+                  "final_update_count": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nullableNumber": { "type": ["number", "null"], "minimum": 0 },
+    "nullableInteger": { "type": ["integer", "null"], "minimum": 0 },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task", "model", "runtime", "options"],
+      "properties": {
+        "task": { "const": "asr" },
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "revision", "quantization", "license"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "revision": { "type": "string", "minLength": 1 },
+            "quantization": { "type": "string", "minLength": 1 },
+            "license": { "type": "string", "minLength": 1 }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "boundary"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 },
+            "boundary": { "type": "string", "minLength": 1 }
+          }
+        },
+        "options": { "type": "object" }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "chip", "memory_bytes", "os", "architecture", "power_state"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "chip": { "type": "string", "minLength": 1 },
+        "memory_bytes": { "type": ["integer", "null"], "minimum": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "architecture": { "const": "arm64" },
+        "power_state": { "enum": ["ac", "battery", "unknown"] }
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quality", "timing", "resources", "streaming", "energy"],
+      "properties": {
+        "quality": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wer", "cer"],
+          "properties": {
+            "wer": { "$ref": "#/$defs/nullableNumber" },
+            "cer": { "$ref": "#/$defs/nullableNumber" }
+          }
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["audio_duration_ms", "cold_load_ms", "warm_inference_ms", "real_time_factor"],
+          "properties": {
+            "audio_duration_ms": { "$ref": "#/$defs/nullableNumber" },
+            "cold_load_ms": { "$ref": "#/$defs/nullableNumber" },
+            "warm_inference_ms": { "$ref": "#/$defs/nullableNumber" },
+            "real_time_factor": { "$ref": "#/$defs/nullableNumber" }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["peak_memory_bytes", "model_size_bytes", "binary_size_bytes"],
+          "properties": {
+            "peak_memory_bytes": { "$ref": "#/$defs/nullableInteger" },
+            "model_size_bytes": { "$ref": "#/$defs/nullableInteger" },
+            "binary_size_bytes": { "$ref": "#/$defs/nullableInteger" }
+          }
+        },
+        "streaming": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["supported", "first_result_ms", "update_count", "volatile_update_count", "final_update_count", "revoke_count", "timestamps"],
+          "properties": {
+            "supported": { "type": "boolean" },
+            "first_result_ms": { "$ref": "#/$defs/nullableNumber" },
+            "update_count": { "$ref": "#/$defs/nullableInteger" },
+            "volatile_update_count": { "$ref": "#/$defs/nullableInteger" },
+            "final_update_count": { "$ref": "#/$defs/nullableInteger" },
+            "revoke_count": { "$ref": "#/$defs/nullableInteger" },
+            "timestamps": { "enum": ["none", "segment", "word", "unknown"] }
+          }
+        },
+        "energy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "sample_rate_ms", "sample_count", "energy_joules", "raw_artifact", "notes"],
+          "properties": {
+            "method": { "enum": ["powermetrics", "external-meter", "not-measured"] },
+            "sample_rate_ms": { "$ref": "#/$defs/nullableInteger" },
+            "sample_count": { "$ref": "#/$defs/nullableInteger" },
+            "energy_joules": { "$ref": "#/$defs/nullableNumber" },
+            "raw_artifact": { "type": ["string", "null"] },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    },
+    "engineeringCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conversion_effort", "update_cost", "packaging_cost"],
+      "properties": {
+        "conversion_effort": { "type": "string", "minLength": 1 },
+        "update_cost": { "type": "string", "minLength": 1 },
+        "packaging_cost": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reproduction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "raw_artifacts"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "raw_artifacts": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "blocker", "observations"],
+      "properties": {
+        "status": { "enum": ["measured", "partial", "blocked"] },
+        "blocker": { "type": ["string", "null"] },
+        "observations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

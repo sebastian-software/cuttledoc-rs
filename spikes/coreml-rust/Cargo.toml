@@ -1,0 +1,25 @@
+[package]
+name = "cuttledoc-coreml-spike"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+
+[dependencies]
+objc2 = { version = "0.6.4", features = ["std"] }
+objc2-core-ml = { version = "0.3.2", features = [
+  "MLDictionaryFeatureProvider",
+  "MLFeatureProvider",
+  "MLFeatureValue",
+  "MLModel",
+  "MLModelConfiguration",
+  "MLMultiArray",
+] }
+objc2-foundation = { version = "0.3.2", features = [
+  "NSArray",
+  "NSDictionary",
+  "NSError",
+  "NSValue",
+  "NSString",
+  "NSURL",
+] }

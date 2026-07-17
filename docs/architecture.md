@@ -203,7 +203,7 @@ Transcription results are delivered as an ordered stream of range-addressed repl
 Rust remains the owner even when foreign implementations are reused:
 
 - Existing Parakeet Objective-C++ and Whisper C++ implementations are compatibility references and may be temporary bridges only when that is the smallest maintainable path.
-- The primary MLX spike uses the official C++ core through the smallest repository-owned task-level adapter; official `mlx-c` is the comparison path. Community bindings remain reference-only unless they pass ADR-0005.
+- The primary MLX path uses the official C++ core through the smallest repository-owned task-level adapter. Official `mlx-c` is only an optional pinned control for a named interface/lifecycle question, not a second product path. Community bindings remain reference-only unless they pass ADR-0005.
 - Specialized upstream implementations such as whisper.cpp remain candidates rather than automatic dependencies.
 - Unsafe code and foreign pointers remain isolated in sys/interop modules.
 - Public Rust types never expose Objective-C, C++, N-API, CoreML, MLX, Metal, or whisper.cpp handles.

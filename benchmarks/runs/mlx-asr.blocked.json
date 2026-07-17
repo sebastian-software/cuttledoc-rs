@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.mlx-asr.blocked-1",
+  "captured_at": "2026-07-17T00:29:37+02:00",
+  "source_revision": "22c4dd5ed7c589a492460ef9581330ece432b25f",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "not-selected",
+      "revision": "not-applicable",
+      "quantization": "not-applicable",
+      "license": "not-applicable until a concrete ASR artifact is selected"
+    },
+    "runtime": {
+      "id": "official-mlx-cpp",
+      "version": "v0.32.0 (7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247)",
+      "boundary": "Repository-owned task-level C++ adapter and C ABI"
+    },
+    "options": { "devices_proven": ["cpu", "gpu"] }
+  },
+  "host": {
+    "id": "local-macos-arm64",
+    "chip": "not captured for blocked ASR record",
+    "memory_bytes": null,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": { "audio_duration_ms": null, "cold_load_ms": null, "warm_inference_ms": null, "real_time_factor": null },
+    "resources": { "peak_memory_bytes": null, "model_size_bytes": null, "binary_size_bytes": null },
+    "streaming": { "supported": false, "first_result_ms": null, "update_count": null, "volatile_update_count": null, "final_update_count": null, "revoke_count": null, "timestamps": "unknown" },
+    "energy": { "method": "not-measured", "sample_rate_ms": null, "sample_count": null, "energy_joules": null, "raw_artifact": null, "notes": "The runtime projection is not an ASR benchmark." }
+  },
+  "engineering_cost": {
+    "conversion_effort": "A real licensed ASR model block and loader remain to be selected and implemented.",
+    "update_cost": "The direct adapter must be checked across two official MLX releases.",
+    "packaging_cost": "Initial static library was 31 MiB and metallib about 155 MiB; kernel selection/stripping is unresolved."
+  },
+  "reproduction": { "command": "bash scripts/run-mlx-direct-spike.sh", "raw_artifacts": ["docs/spikes/mlx-direct.md"] },
+  "result": {
+    "status": "blocked",
+    "blocker": "The official MLX runtime and direct Rust boundary execute a representative dense audio block, but no real ASR model has been selected or run, so ASR quality and streaming metrics would be fabricated.",
+    "observations": ["MLX remains a first-class candidate; this blocker is model-path work, not rejection of the runtime."]
+  }
+}

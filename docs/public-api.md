@@ -281,12 +281,22 @@ for await (const update of engine.transcribeStream("meeting.mp4")) {
 
 Rules:
 
+- Time ranges are half-open (`start <= t < end`). Incoming replacement
+  segments are ordered, non-overlapping, and wholly contained in the affected
+  range. A replacement that only partially overlaps an existing volatile
+  segment is a backend contract error rather than silently deleting content
+  outside the affected range.
 - Backends report `supportsStreaming` (incremental finals) and `emitsVolatileResults` (revisions before finalization) as capabilities; callers rely on the report, not probing.
 - Consumers apply updates in `sequence` order. `replace` removes prior non-final content in `affectedRange` before inserting the new segments; `revoke` removes it without replacement.
 - Finalized ranges are immutable. Overlap with final content is surfaced as a backend contract error.
 - Finals-only backends emit completed segments as they are produced; they never emit volatile updates.
 - Input sources are files and caller-provided PCM feeds. The library does not capture microphone or system audio.
 - Result updates are distinct from progress events; progress remains observational.
+
+These rules are executable in the dependency-free
+[`spikes/stream-contract`](../spikes/stream-contract/) reducer. Rust and Node
+consume the same checked-in vectors for finals-only, volatile replacement,
+revocation, immutable-final overlap, sequence gaps, and invalid ranges.
 
 ## Node.js API
 

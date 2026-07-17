@@ -41,7 +41,14 @@ A fork is not a loophole. Forking or vendoring requires a separate accepted ADR 
 ## Initial application
 
 - `mlx-rs`, OminiX-MLX, and similar young Rust MLX projects are reference-only until the Phase 0 audit demonstrates that they pass this policy.
-- The official `ml-explore/mlx` C++ core is the source-of-truth MLX candidate. A narrow repository-owned C++ adapter is decision class 2; the official `mlx-c` API is the conservative comparison path. `mlx-c` currently publishes no GitHub releases, so experiments pin an audited commit and record the corresponding MLX revision rather than treating its documentation version as a release. Neither path is selected for production until the spike records its maintenance, versioning, upgrade, and packaging cost.
+- The official `ml-explore/mlx` C++ core is the source-of-truth and third
+  first-class inference candidate. Cuttledoc pursues it through a narrow,
+  repository-owned C++ adapter (decision class 2), pinned to an official MLX
+  release/revision. `mlx-c` is an optional reference/control experiment, not
+  the presumed product integration path: it publishes no GitHub releases, so
+  any such comparison pins an audited commit and its corresponding MLX
+  revision. The owned adapter still needs spike evidence for maintenance,
+  versioning, upgrade, and packaging cost before production adoption.
 - `mlx-node` is prior art only and cannot become a dependency because it retains Node/C++ ownership and install-time native build concerns.
 - `objc2-core-ml`, `napi-rs`, whisper.cpp integration options, FFmpeg/audio choices, `mistral.rs`, and Candle must each receive an explicit disposition before production adoption.
 
@@ -51,5 +58,7 @@ Phase 0 produces `docs/dependency-policy.md` and a dependency disposition table 
 
 ## References
 
+- [`ml-explore/mlx` repository](https://github.com/ml-explore/mlx)
+- [`ml-explore/mlx` releases](https://github.com/ml-explore/mlx/releases)
 - [`ml-explore/mlx-c` repository](https://github.com/ml-explore/mlx-c)
 - [`ml-explore/mlx-c` releases](https://github.com/ml-explore/mlx-c/releases)

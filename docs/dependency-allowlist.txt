@@ -1,0 +1,11 @@
+# Direct Cargo dependencies accepted by the dependency policy.
+#
+# This repository has no Cargo workspace yet. Add a package here only in the
+# same reviewed change that adds its inventory row, pin, scope, and replacement
+# plan. Keep the list sorted.
+napi
+napi-build
+napi-derive
+objc2
+objc2-core-ml
+objc2-foundation

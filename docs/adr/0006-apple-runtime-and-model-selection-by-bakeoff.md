@@ -18,7 +18,7 @@ Evaluate, where technically and legally viable:
 
 - the existing Parakeet and Whisper implementations as compatibility baselines;
 - CoreML from a Rust-owned lifecycle;
-- MLX from Rust as a technical experiment with two primary paths: a narrow repository-owned C++ adapter directly over a pinned official `ml-explore/mlx` release, and the official `mlx-c` API as a conservative comparison;
+- MLX from Rust through a narrow repository-owned C++ adapter directly over a pinned official `ml-explore/mlx` release; use official `mlx-c` only as an optional pinned control for a named interface or lifecycle question;
 - `mlx-rs`, `mlx-node`, and other community bindings as reference/test inputs only unless they independently pass ADR-0005;
 - Apple SpeechAnalyzer/SpeechTranscriber as a system baseline;
 - maintained Metal-native paths for relevant ASR or LLM models;
@@ -49,7 +49,7 @@ LLM/transcript-enhancement runtime selection is evaluated separately because aut
 
 - Model novelty is not a selection criterion.
 - Technical feasibility and production dependency suitability are separate conclusions.
-- The MLX spike does not recreate a complete operator-level Rust API. It compares the smallest task-level bridge needed by a real model and records upgrade effort across at least two official MLX releases.
+- The MLX spike does not recreate a complete operator-level Rust API. It proves the smallest direct task-level bridge needed by a real model and records upgrade effort across at least two official MLX releases; `mlx-c` comparison work is required only when it resolves a specific uncertainty.
 - Existing behavior remains a measured baseline and migration input even when a different model wins.
 - The bakeoff does not promise that every candidate ships.
 - Each chosen production runtime receives a follow-up ADR naming its dependency disposition and interop boundary.

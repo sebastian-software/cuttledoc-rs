@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/benchmark-fixtures-1.0.0.json",
+  "title": "Cuttledoc benchmark fixture manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "revision", "fixtures"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "revision": { "type": "string", "minLength": 1 },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "purpose", "availability", "language", "reference_text", "duration_ms", "sha256", "provenance", "materialization", "normalization"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+          "purpose": { "enum": ["smoke", "quality"] },
+          "availability": { "enum": ["generated", "local-required", "external"] },
+          "language": { "type": "string", "minLength": 2 },
+          "reference_text": { "type": "string", "minLength": 1 },
+          "duration_ms": { "type": ["integer", "null"], "minimum": 1 },
+          "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "license", "redistributable"],
+            "properties": {
+              "source": { "type": "string", "minLength": 1 },
+              "license": { "type": "string", "minLength": 1 },
+              "redistributable": { "type": "boolean" }
+            }
+          },
+          "materialization": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["command", "notes"],
+            "properties": {
+              "command": { "type": "string", "minLength": 1 },
+              "notes": { "type": "string" }
+            }
+          },
+          "normalization": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sample_rate_hz", "channels", "sample_format"],
+            "properties": {
+              "sample_rate_hz": { "type": "integer", "minimum": 1 },
+              "channels": { "type": "integer", "minimum": 1 },
+              "sample_format": { "enum": ["f32", "s16"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

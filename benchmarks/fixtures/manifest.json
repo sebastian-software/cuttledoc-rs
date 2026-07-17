@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "phase0-bootstrap-1",
+  "fixtures": [
+    {
+      "id": "apple-say-en-us-smoke",
+      "purpose": "smoke",
+      "availability": "generated",
+      "language": "en-US",
+      "reference_text": "Cuttledoc is testing offline speech transcription on Apple Silicon.",
+      "duration_ms": null,
+      "sha256": null,
+      "provenance": {
+        "source": "Repository-authored text rendered locally with the macOS Samantha voice",
+        "license": "MIT text; generated audio is not redistributed",
+        "redistributable": false
+      },
+      "materialization": {
+        "command": "say -v Samantha -o fixture.aiff 'Cuttledoc is testing offline speech transcription on Apple Silicon.'",
+        "notes": "Pipeline smoke fixture only. Synthetic speech must not contribute to WER/CER selection."
+      },
+      "normalization": {
+        "sample_rate_hz": 22050,
+        "channels": 1,
+        "sample_format": "s16"
+      }
+    }
+  ]
+}

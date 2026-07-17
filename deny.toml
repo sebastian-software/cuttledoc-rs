@@ -1,0 +1,44 @@
+# Baseline cargo-deny policy for the workspace created after Phase 0.
+# Direct dependency admission is enforced separately by
+# scripts/check-dependency-policy.sh against docs/dependency-allowlist.txt.
+
+[graph]
+all-features = true
+no-default-features = false
+
+[advisories]
+version = 2
+unmaintained = "workspace"
+yanked = "deny"
+ignore = []
+
+[licenses]
+version = 2
+confidence-threshold = 0.8
+allow = [
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "MIT",
+  "Unicode-3.0",
+  "Zlib",
+]
+exceptions = []
+
+[bans]
+multiple-versions = "deny"
+wildcards = "deny"
+highlight = "all"
+deny = [
+  { name = "mlx-rs", reason = "Reference-only candidate; use no Rust MLX wrapper without a new ADR." },
+  { name = "mlx-sys", reason = "Use the owned C++ adapter directly over official MLX; mlx-c remains optional reference-only." },
+  { name = "mistralrs", reason = "Phase 5 reference-only candidate." },
+  { name = "candle-core", reason = "Phase 5 reference-only candidate." },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

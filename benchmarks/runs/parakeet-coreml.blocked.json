@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.parakeet-coreml.blocked-1",
+  "captured_at": "2026-07-17T00:29:37+02:00",
+  "source_revision": "22c4dd5ed7c589a492460ef9581330ece432b25f",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "parakeet-tdt-0.6b-v3",
+      "revision": "pending exact artifact pin",
+      "quantization": "pending",
+      "license": "pending exact artifact audit"
+    },
+    "runtime": {
+      "id": "coreml",
+      "version": "macOS 26.5.2 system framework",
+      "boundary": "Rust-owned CoreML worker"
+    },
+    "options": {}
+  },
+  "host": {
+    "id": "local-macos-arm64",
+    "chip": "not captured for blocked bootstrap record",
+    "memory_bytes": null,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": { "audio_duration_ms": null, "cold_load_ms": null, "warm_inference_ms": null, "real_time_factor": null },
+    "resources": { "peak_memory_bytes": null, "model_size_bytes": null, "binary_size_bytes": null },
+    "streaming": { "supported": false, "first_result_ms": null, "update_count": null, "volatile_update_count": null, "final_update_count": null, "revoke_count": null, "timestamps": "unknown" },
+    "energy": { "method": "not-measured", "sample_rate_ms": null, "sample_count": null, "energy_joules": null, "raw_artifact": null, "notes": "No baseline runner in this repository yet." }
+  },
+  "engineering_cost": {
+    "conversion_effort": "Pending import audit of the existing Parakeet pipeline and model conversion.",
+    "update_cost": "Pending exact model and converter revisions.",
+    "packaging_cost": "Pending model manifest and redistribution audit."
+  },
+  "reproduction": { "command": "not available: baseline runner must be imported", "raw_artifacts": [] },
+  "result": {
+    "status": "blocked",
+    "blocker": "The repository proves a real CoreML lifecycle with a VAD model, but does not yet contain the Parakeet decoder/model pipeline or a licensed quality fixture.",
+    "observations": ["CoreML execution itself is technically feasible through the #5 boundary."]
+  }
+}

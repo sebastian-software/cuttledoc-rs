@@ -1,0 +1,32 @@
+{
+  "name": "cuttledoc-node-spike",
+  "version": "0.0.0",
+  "description": "Packaging spike for the cuttledoc Rust stream contract",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
+  "files": [
+    "cuttledoc-node-spike.darwin-arm64.node",
+    "index.cjs",
+    "index.js",
+    "index.d.ts"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}
