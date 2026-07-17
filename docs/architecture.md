@@ -29,15 +29,15 @@ The target makes Rust the product center while preserving proven native inferenc
               │                         │                         │
     ┌─────────▼─────────┐     ┌─────────▼─────────┐     ┌─────────▼─────────┐
     │ Audio pipeline     │     │ Task engines      │     │ Model manager     │
-    │ probe/decode/PCM   │     │ STT │ text gen    │     │ manifest/download │
-    │ normalize          │     │ lifecycle/results │     │ validate/migrate  │
+    │ probe/decode/PCM   │     │ STT │ text gen    │     │ all provisioning  │
+    │ normalize          │     │ proxy/worker/queue│     │ modes + migration │
     └─────────┬─────────┘     └─────────┬─────────┘     └───────────────────┘
               │                         │
               │          ┌──────────────┼──────────────┐
               │          │              │              │
               │  ┌───────▼───────┐ ┌────▼─────┐ ┌──────▼──────┐
               │  │ Apple-local    │ │ Native   │ │ Remote      │
-              │  │ CoreML/System  │ │ MLX/Metal│ │ HTTP APIs   │
+              │  │ CoreML/Speech  │ │ MLX/C++  │ │ HTTP APIs   │
               │  └───────────────┘ └──────────┘ └─────────────┘
               │
               └── managed FFmpeg compatibility path initially
@@ -53,10 +53,10 @@ cuttledoc-node ────┼──▶ cuttledoc ───▶ backend/audio/mod
                    │                         ▲
                    └─────────────────────────┘
 
-cuttledoc-apple/runtime adapters ─▶ abstractions
-cuttledoc-openai ─────▶ abstractions
-cuttledoc-audio ──────▶ domain audio types
-cuttledoc-models ─────▶ model manifests and storage contracts
+runtime-specific adapter crates ─▶ internal task abstractions
+cuttledoc-openai ────────────────▶ internal task abstractions
+cuttledoc-audio ─────────────────▶ domain audio types
+cuttledoc-models ────────────────▶ provisioning and storage contracts
 ```
 
 The public `cuttledoc` crate must not depend on Node.js. `cuttledoc-node` depends on the Rust API and contains only conversion, callback bridging, and Node-specific lifecycle handling.
@@ -87,25 +87,42 @@ Owns:
 
 It does not own platform FFI or JavaScript types.
 
-### Apple runtime adapters (exact crate split deferred)
+### Runtime adapter crates
 
 Own selected Apple-local inference behind task contracts:
 
 - CoreML, Apple system Speech, and any accepted MLX/Metal/native paths;
 - selected ASR model preprocessing, decoding, segmentation, and alignment;
 - runtime-specific compute-unit/device configuration;
-- Apple-specific thread affinity, autorelease behavior, and deterministic cleanup;
+- runtime-specific thread affinity, autorelease/actor behavior, and
+  deterministic cleanup;
 - conversion of native results into shared domain results.
 
-Phase 0 decides whether these adapters live in one `cuttledoc-apple` crate or smaller runtime-specific crates. No crate is created merely to mirror an old npm package or an experimental dependency.
+The adapters do not live in one broad `cuttledoc-apple` crate. Each accepted
+foreign toolchain and ownership boundary receives a private crate, for example
+`cuttledoc-coreml`, `cuttledoc-apple-speech`, `cuttledoc-mlx`, or
+`cuttledoc-whisper`. This keeps Swift, Objective-C, and C++ build/link
+requirements out of unrelated backends. A candidate crate enters the workspace
+only after its production disposition is accepted; no crate mirrors an old npm
+package or an experimental dependency.
 
 Platform code is gated to `target_os = "macos"` and `target_arch = "aarch64"` with a macOS 26 deployment baseline (ADR-0007). Other targets expose capability absence at the orchestration layer rather than compiling Apple frameworks.
 
-Apple SpeechAnalyzer/SpeechTranscriber has no Objective-C or C interface. It is reached through a repository-owned Swift shim exposing a narrow C ABI to Rust, including AssetInventory model installation for CLI and library consumers.
+Apple SpeechAnalyzer/SpeechTranscriber has no Objective-C or C interface. It
+is reached through a repository-owned Swift shim exposing a narrow C ABI to
+Rust, including AssetInventory model installation for CLI and library
+consumers. Official MLX is reached through a separate repository-owned,
+task-level C ABI over the C++ core.
 
 ### `cuttledoc-models`
 
-Owns a versioned manifest per model artifact:
+Owns logical model descriptors across three provisioning modes:
+
+- Cuttledoc-managed artifact manifests;
+- system-managed inventory/install/reservation; and
+- remote provider/model identity.
+
+For Cuttledoc-managed artifacts it owns:
 
 - logical model ID and backend;
 - upstream URL and immutable revision when available;
@@ -115,6 +132,10 @@ Owns a versioned manifest per model artifact:
 - validation and atomic commit;
 - progress and cancellation;
 - migration from existing cache locations.
+
+Every descriptor reports supported install, verify, and remove operations.
+System and remote models do not receive fake file trees merely to satisfy the
+local artifact API.
 
 Compatibility baseline model set (the bakeoff decides what ships initially):
 
@@ -154,7 +175,10 @@ Owns:
 - Promise, progress callback, and cancellation bridging;
 - Node-specific object finalizers.
 
-It must not select backends, manage model paths independently, or implement transcription behavior.
+Rust domain types are authoritative. CI regenerates or mechanically checks the
+TypeScript surface and runs the same reducer contract vectors through Rust and
+Node. The binding must not select backends, manage model paths independently,
+or implement transcription behavior.
 
 ## Runtime model
 
@@ -163,23 +187,43 @@ It must not select backends, manage model paths independently, or implement tran
 Engines are explicit, reusable resources:
 
 ```text
-Configured → Loading → Ready → Running → Ready → Closing → Closed
-                 └──────────── failure ───────────────▶ Failed
+Configured → Loading → Ready ⇄ Running → Closing → Closed
+                 └──────── failure ─────────────▶ Failed
 ```
 
 Rules:
 
 - Initialization is idempotent.
-- One engine does not execute concurrent transcriptions unless the backend proves it safe.
-- The public API queues, rejects, or creates multiple engines deliberately; it never races a global native singleton accidentally.
-- Cleanup is explicit and also guarded by `Drop`/Node finalizers.
+- The public `Send + Sync` engine is a proxy; native state stays on an
+  adapter-owned worker/actor and may remain thread-affine and non-`Send`.
+- Requests enter a bounded FIFO queue. One request executes at a time unless
+  the backend proves and capability-reports a higher bounded limit.
+- Queue policy either waits for capacity or rejects with `ENGINE_BUSY`; no
+  backend-global singleton is raced accidentally.
+- One-shot calls own ephemeral contexts. Warm engine reuse requires an explicit
+  `Cuttledoc` context rather than a hidden process-global cache.
+- Awaited `close()` stops admission, cancels work, waits for the backend's safe
+  boundary, destroys native state on its owner, and closes result streams.
+  `Drop`/Node finalizers are best-effort safety nets.
 - Errors preserve backend and phase context.
 
 ### Apple-local execution
 
-Phase 0 must determine thread affinity, run-loop, executor, and cleanup rules separately for each candidate runtime. The CoreML adapter must preserve concurrent async prediction where supported, bound in-flight work to control peak memory, serialize synchronous prediction on a model instance, and serialize predictions that share one `MLState`. All Objective-C objects must live inside bounded autorelease pools. MLX or Metal behavior must be measured rather than assumed equivalent.
+The adapter worker absorbs each runtime's actual ownership:
 
-### Progress and cancellation
+- CoreML objects in the accepted Rust bindings are neither `Send` nor `Sync`;
+  they remain on their owner and inside bounded autorelease pools. Stateful
+  predictions sharing one `MLState` are serialized.
+- Apple Speech remains on its Swift actor. Its blocking C entry points run on a
+  blocking worker, while result callbacks are copied immediately into
+  Rust-owned updates.
+- The current direct MLX adapter serializes entry because its default device is
+  process-global. Its synchronous graph is not preempted mid-evaluation.
+
+Future evidence may permit higher CoreML concurrency, but it widens an
+execution capability rather than changing the public engine type.
+
+### Progress, cancellation, backpressure, and shutdown
 
 Long operations emit typed events:
 
@@ -194,7 +238,16 @@ Long operations emit typed events:
 
 Speech-synthesis progress events are added only after the Phase 5 vertical slice validates their meaning (ADR-0009).
 
-Cancellation is cooperative. Downloads remove or retain resumable partial state according to the model-manager policy. Native inference that cannot be interrupted reports cancellation at the next safe boundary.
+Cancellation is cooperative and capability-reported. Queued work is removed
+immediately. Apple Speech can cancel its actor task; synchronous MLX/native
+work observes cancellation at the next chunk or decoder step. No adapter
+destroys foreign state while a native call is active.
+
+Streaming PCM uses a bounded asynchronous input writer. A successful write
+transfers ownership or completes the required copy/conversion; a full queue
+waits or reports explicit backpressure. It never silently drops samples.
+Output consumers likewise apply normal async-stream backpressure, with a
+bounded adapter-to-core queue and cancellation on abandoned streams.
 
 Transcription results are delivered as an ordered stream of range-addressed replace/revoke updates per ADR-0008. Replacement content is volatile or final; finalized ranges are immutable. Progress events remain separate and observational.
 
@@ -209,15 +262,30 @@ Rust remains the owner even when foreign implementations are reused:
 - Public Rust types never expose Objective-C, C++, N-API, CoreML, MLX, Metal, or whisper.cpp handles.
 - Ownership, nullability, thread affinity, error transfer, and cleanup are documented at every FFI boundary.
 
-The Phase 0 bakeoff selects model/runtime pairs and then records each production interop boundary in a follow-up ADR. See ADR-0003, ADR-0005, and ADR-0006.
+Current disposition:
+
+| Component | Boundary disposition |
+| --- | --- |
+| CoreML through `objc2-core-ml` | Accepted bounded dependency behind a repository-owned adapter |
+| Apple Speech | System framework behind a repository-owned Swift C ABI |
+| Official MLX C++ | Approved upstream foundation behind a repository-owned task C ABI |
+| `mlx-c` and community MLX wrappers | Reference/control only |
+| whisper.cpp | Repository-owned boundary candidate pending the production bakeoff |
+| Legacy Parakeet/Whisper Node addons | Compatibility and benchmark references only |
+| Remote HTTP providers | Repository-owned task adapters; provider SDKs require separate acceptance |
+| `napi-rs` | Accepted bounded dependency for the thin Node boundary |
+
+The bakeoff still selects production model/backend pairs. Each selected native
+boundary receives its final pin, artifact, ownership, and rollback decision
+before release. See ADR-0003, ADR-0005, ADR-0006, and ADR-0010.
 
 ## Dependency acceptance
 
 Every material runtime, wrapper, build component, and code generator is classified as an accepted production dependency, repository-owned boundary, reference-only input, or rejected project. A working spike does not bypass this review. Experimental projects may inform tests and implementation without entering Cargo/npm manifests or release artifacts. See ADR-0005.
 
-## Unified model storage
+## Model provisioning and local storage
 
-Proposed new root:
+Only `cuttledoc-managed` models use the local root:
 
 ```text
 ~/.cache/cuttledoc/
@@ -235,9 +303,17 @@ Existing roots:
 - `~/.cache/parakeet-coreml/vad`
 - `~/.cache/whisper-coreml/models`
 
-The model manager should detect complete existing caches and either reuse them read-only, adopt them after verification, or provide an explicit migration. It must not redownload several gigabytes without explanation.
+The model manager should detect complete existing caches and either reuse them
+read-only, adopt them after verification, or provide an explicit migration. It
+must not redownload several gigabytes without explanation.
 
-The `~/.cache` root is a deliberate decision: it matches the existing Parakeet/Whisper cache convention and keeps one path scheme across macOS and future cloud-only targets, instead of the macOS-native `~/Library/Caches`. System Speech models are managed by macOS through AssetInventory and never live in this cache.
+The `~/.cache` root is a deliberate decision: it matches the existing
+Parakeet/Whisper cache convention and keeps one path scheme across macOS and
+future cloud-only targets, instead of the macOS-native `~/Library/Caches`.
+System Speech models are managed by macOS through AssetInventory and never
+live in this cache; remote model IDs have no local artifact entry. Capability
+records may truthfully omit size, digest, quantization, or revision when the
+provider does not expose them.
 
 ## Error model
 
@@ -250,7 +326,10 @@ Internal errors remain rich Rust enums. Public boundaries expose stable categori
 - `MODEL_INVALID`
 - `MODEL_DOWNLOAD_FAILED`
 - `AUDIO_DECODE_FAILED`
+- `ENGINE_BUSY`
+- `ENGINE_CLOSED`
 - `ENGINE_LOAD_FAILED`
+- `BACKEND_CONTRACT_VIOLATION`
 - `TRANSCRIPTION_FAILED`
 - `AUTHENTICATION_FAILED`
 - `CANCELLED`

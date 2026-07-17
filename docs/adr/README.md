@@ -13,6 +13,7 @@ ADRs capture decisions that materially constrain the implementation. Proposed AD
 | [0007](0007-apple-silicon-macos-26-baseline.md)                        | Apple Silicon and macOS 26 baseline for v3          | Accepted |
 | [0008](0008-streaming-first-transcription-results.md)                  | Streaming-first transcription results               | Accepted |
 | [0009](0009-voice-pipeline-direction-and-staged-speech-synthesis.md)   | Voice-pipeline direction and staged speech synthesis | Accepted |
+| [0010](0010-capability-oriented-engine-ownership.md)                   | Capability-oriented engine ownership and backend identity | Accepted |
 
 Status values: proposed, accepted, superseded, rejected.
 

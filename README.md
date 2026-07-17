@@ -38,9 +38,13 @@ The existing repositories remain the sources of truth while this incubator is in
 crates/
 ├── cuttledoc/           # public Rust API and orchestration
 ├── cuttledoc-audio/     # decoding, resampling, normalization
-├── cuttledoc-apple/     # Apple runtime adapters (exact crate split decided in Phase 0)
 ├── cuttledoc-models/    # manifests, downloads, validation, cache migration
 ├── cuttledoc-openai/    # cloud transcription backend
+├── adapters/            # only accepted runtime/toolchain-specific private crates
+│   ├── coreml/          # objc2 ownership boundary, if selected
+│   ├── apple-speech/    # Swift C ABI, if selected
+│   ├── mlx/             # official MLX C++ task ABI, if selected
+│   └── whisper/         # whisper.cpp boundary, if selected
 ├── cuttledoc-cli/       # native CLI
 └── cuttledoc-node/      # thin napi-rs adapter
 npm/
@@ -53,7 +57,9 @@ docs/
 └── public-api.md
 ```
 
-The crate split is a starting hypothesis. Crates should only remain separate when the boundary improves build times, testability, platform isolation, or reuse.
+Runtime adapters are split by foreign toolchain and ownership boundary rather
+than collected in one broad Apple crate. Candidate crates enter the workspace
+only after the bakeoff accepts their production role.
 
 ## First proof
 
@@ -62,7 +68,8 @@ The first implementation milestone is deliberately narrow:
 ```text
 16 kHz mono samples
   → Rust public API
-  → Parakeet CoreML engine
+  → selected local speech-recognition engine proxy
+  → adapter-owned worker and native runtime
   → structured TranscriptionResult
   → napi-rs binding
   → packed npm tarball

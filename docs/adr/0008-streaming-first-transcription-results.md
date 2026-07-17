@@ -52,7 +52,13 @@ Pulls microphone/screen-audio permissions, device handling, and TCC attribution 
 
 ## Validation
 
-Issue #8 (engine/backend boundaries) must incorporate this contract. Phase 0 must map at least one volatile-capable backend (Apple Speech) and one finals-only backend (existing CoreML path) into the same update stream without leaking runtime handles. A reducer shared by Rust/Node contract tests must deterministically reconstruct the same final transcript from replace, revoke, and volatile-to-final sequences.
+Validated for the Phase 0 boundary. The dependency-free reducer and shared
+Rust/Node vectors cover finals-only, volatile replacement, revocation,
+volatile-to-final, immutable-final overlap, sequence gaps, and invalid ranges.
+The Apple Speech spike mapped 27 volatile whole-range replacements and one
+final result into this contract; the legacy Parakeet/Whisper baselines map as
+finals-only streams. No runtime handle crosses either path. ADR-0010
+incorporates the contract into the engine worker and capability model.
 
 ## References
 

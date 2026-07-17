@@ -2,7 +2,10 @@
 
 ## Status
 
-This document is a design target, not a compatibility promise. Names remain provisional until the first vertical slice proves the ownership and async model.
+This document is the Phase 0 boundary decision, not yet a published
+compatibility promise. Task separation, worker ownership, open backend IDs,
+capability discovery, and streaming semantics are settled by ADR-0010; exact
+Rust names remain provisional until the first vertical slice.
 
 ## API layers
 
@@ -15,7 +18,10 @@ Model management and capability discovery are first-class. Backend implementatio
 
 Speech recognition and text generation are separate initial task APIs. They may share model management, progress, cancellation, diagnostics, errors, and lifecycle concepts, but they do not share a generic tensor or inference-runtime interface. Speech synthesis is a strategic direction whose public contract is deferred until a Phase 5 vertical slice (ADR-0009). See ADR-0004.
 
-The `Backend` identifiers below remain provisional compatibility/product choices, not runtime identities. CoreML, MLX, Metal, Apple system APIs, or a native upstream implementation remain internal adapters. If multiple runtimes can execute the same model family, runtime selection does not change `TranscriptionResult`.
+Backend identifiers are product choices, not runtime identities. CoreML, MLX,
+Metal, Apple system APIs, and native upstream implementations remain internal
+adapters. If multiple runtimes execute the same model family, runtime selection
+does not change `TranscriptionResult`.
 
 ## Initial task contracts
 
@@ -25,8 +31,8 @@ The following shapes establish architectural boundaries; exact Rust async syntax
 pub trait SpeechRecognitionEngine {
     async fn transcribe(
         &self,
-        audio: AudioSource,
-        options: TranscriptionOptions,
+        audio: RecognitionInput,
+        options: TranscribeOptions,
     ) -> Result<TranscriptionStream>;
 }
 
@@ -41,38 +47,81 @@ pub trait TextGenerationEngine {
 Audio input primitives support file, in-memory PCM, and streaming recognition use cases:
 
 ```rust
+pub enum RecognitionInput {
+    File(PathBuf),
+    Pcm(PcmBuffer),
+    Stream(PcmInput),
+}
+
 pub struct AudioFormat {
     pub sample_rate: u32,
     pub channels: u16,
     pub sample_format: SampleFormat,
 }
+
+pub struct PcmBuffer {
+    pub format: AudioFormat,
+    pub samples: Arc<[f32]>,
+}
 ```
 
-Recognition streams transcript updates and generation streams text/token deltas. Both streams define cancellation and backpressure behavior. Phase 5 must use a real TTS runtime to validate output sample ownership, chunk timing, format negotiation, cancellation, and backpressure before adding a `SpeechSynthesisEngine` contract.
+`PcmInput::write` is asynchronous and bounded. A full input queue waits or
+returns explicit backpressure according to engine policy; it never drops caller
+audio. The caller owns capture, and the library owns or copies accepted sample
+buffers before `write` completes.
 
-## Shared domain model
+Recognition streams transcript updates. Generation uses a distinct ordered
+delta stream with no audio range semantics:
 
 ```rust
-#[non_exhaustive]
-pub enum Backend {
+pub struct GenerationUpdate {
+    pub sequence: u64,
+    pub text_delta: String,
+    pub token_ids: Option<Vec<u32>>,
+    pub finish_reason: Option<FinishReason>,
+}
+```
+
+Both streams define cancellation and backpressure behavior. Phase 5 must use a
+real TTS runtime to validate output sample ownership, chunk timing, format
+negotiation, cancellation, and backpressure before adding a
+`SpeechSynthesisEngine` contract.
+
+## Identity and shared domain model
+
+The public vocabulary is intentionally precise:
+
+| Term | Public meaning |
+| --- | --- |
+| Task | Stable operation and result contract: speech recognition or text generation. |
+| Backend | Product-selectable implementation of one task. |
+| Runtime | Internal substrate such as CoreML, official MLX, whisper.cpp/Metal, Apple Speech, or HTTP. |
+| Model | Logical revisioned unit; may be local artifacts, a system asset, or a remote model ID. |
+| Provider | Authority that provisions a model/service, credentials, or system assets. |
+| Capability | Discovered behavior of one backend/model/provider configuration on this host. |
+
+`auto` is a selection policy, not a backend. Backend IDs are open product
+identifiers so Rust and Node can evolve together:
+
+```rust
+pub struct BackendId(String);
+
+pub enum BackendSelection {
     Auto,
-    Parakeet,
-    Whisper,
-    AppleSpeech, // Apple SpeechAnalyzer, macOS 26+ (ADR-0007)
-    OpenAi,
+    Id(BackendId),
 }
 
 pub struct TranscribeOptions {
-    pub backend: Backend,
+    pub backend: BackendSelection,
+    pub model: Option<ModelId>,
     pub language: Option<String>,
-    pub openai_api_key: Option<SecretString>,
-    pub openai_model: Option<String>,
 }
 
 pub struct TranscriptionResult {
     pub text: String,
     pub language: Option<String>,
-    pub backend: Backend,
+    pub backend: BackendId,
+    pub model: Option<ModelId>,
     pub media_duration: Duration,
     pub processing_duration: Duration,
     pub segments: Vec<TranscriptionSegment>,
@@ -87,26 +136,39 @@ pub struct TranscriptionSegment {
 }
 ```
 
-`Backend` is `#[non_exhaustive]`: downstream Rust `match` expressions must carry a wildcard arm, which permits adding variants after 1.0. TypeScript has no equivalent closed-enum guarantee: a plain string union can break exhaustive consumer switches when widened. The Node surface therefore uses known completions plus an open string escape hatch:
+Known constants/completions initially cover `parakeet-local`, `whisper-local`,
+`apple-speech`, and `openai-transcription`. The MLX encoder proof does not
+receive a public backend ID until it implements an end-to-end task.
+
+TypeScript uses the same open policy rather than a closed union that makes
+widening a breaking change:
 
 ```ts
-type KnownBackend = "auto" | "parakeet" | "whisper" | "apple-speech" | "openai";
+type KnownBackend =
+  | "parakeet-local"
+  | "whisper-local"
+  | "apple-speech"
+  | "openai-transcription";
 type BackendId = KnownBackend | (string & {});
+type BackendSelection = "auto" | BackendId;
 ```
 
-The exact backend taxonomy is still provisional because the current list mixes legacy model families and providers. Issue #8 must decide the stable identifiers. Capability discovery, not an exhaustive enum or union, is the source of truth for availability.
+Credentials and provider-specific connection settings belong on the
+`Cuttledoc` context/provider configuration, not in common transcription
+options. Capability discovery, not a constant list, is the source of truth for
+availability.
 
 Time is strongly typed in Rust. Node conversions use seconds consistently at the public boundary rather than mixing Parakeet seconds and Whisper milliseconds.
 
 ## Rust one-shot API
 
 ```rust
-use cuttledoc::{transcribe, Backend, TranscribeOptions};
+use cuttledoc::{transcribe, BackendSelection, TranscribeOptions};
 
 let result = transcribe(
     "meeting.mp4",
     TranscribeOptions {
-        backend: Backend::Auto,
+        backend: BackendSelection::Auto,
         language: Some("de".into()),
         ..Default::default()
     },
@@ -116,18 +178,22 @@ let result = transcribe(
 println!("{}", result.text);
 ```
 
-The one-shot API may use an internal bounded engine cache, but its behavior must be deterministic and cleanup must be available at process/service boundaries.
+The top-level one-shot API owns an ephemeral context and closes its engine
+before returning. Applications that need warm reuse create an explicit
+`Cuttledoc` context; no hidden process-global engine cache exists.
 
 ## Rust reusable engine API
 
 ```rust
-use cuttledoc::{Backend, Engine, EngineOptions};
+let cuttledoc = Cuttledoc::builder()
+    .cache_root("/srv/cuttledoc")
+    .build()?;
 
-let engine = Engine::builder()
-    .backend(Backend::Parakeet)
+let engine = cuttledoc
+    .speech_recognition_engine("parakeet-local")
     .language("de")
-    .model_root("/srv/cuttledoc/models")
-    .auto_download(false)
+    .auto_install(false)
+    .queue_policy(QueuePolicy::Wait { capacity: 4 })
     .build()
     .await?;
 
@@ -139,23 +205,19 @@ let result = engine
     .await?;
 
 engine.close().await?;
+cuttledoc.close().await?;
 ```
 
-Open questions for the spike:
+The public engine is a `Send + Sync` proxy; its native state does not have to
+be. Each engine owns an adapter worker/actor and a bounded FIFO queue. Execution
+is serialized by default. A capability may report a higher bounded concurrency
+only after the backend proves it safe. `QueuePolicy::Reject` returns
+`ENGINE_BUSY` instead of waiting.
 
-- Whether `Engine` can be `Send`/`Sync` or is a handle to a thread-affine worker.
-- Whether concurrent calls queue or return a busy error.
-- Whether the one-shot cache is process-global or owned by a `Cuttledoc` context.
-
-The preferred service-oriented shape is an explicit context:
-
-```rust
-let cuttledoc = Cuttledoc::builder()
-    .cache_root("/srv/cuttledoc")
-    .build()?;
-
-let engine = cuttledoc.engine(Backend::Whisper).build().await?;
-```
+`close()` is idempotent and deterministic: stop admission, cancel queued and
+active work, wait for the backend's reported safe cancellation boundary,
+destroy native state on its owner, and finish result streams. `Drop` and Node
+finalizers are best-effort fallbacks, not substitutes for awaiting `close()`.
 
 ## Model API
 
@@ -175,7 +237,7 @@ models.verify("whisper-large-v3-turbo").await?;
 models.remove("whisper-large-v3-turbo").await?;
 ```
 
-Proposed model states:
+Model states:
 
 - `missing`
 - `partial`
@@ -184,7 +246,27 @@ Proposed model states:
 - `ready`
 - `invalid`
 
-Model IDs are stable product identifiers. Upstream filenames remain manifest details.
+Model IDs are stable product identifiers. Upstream filenames remain manifest
+details. A descriptor also reports provisioning:
+
+```rust
+pub enum ModelProvisioning {
+    CuttledocManaged { manifest: ManifestId },
+    SystemManaged { provider: ProviderId },
+    Remote { provider: ProviderId },
+}
+
+pub struct ModelOperations {
+    pub install: bool,
+    pub verify: bool,
+    pub remove: bool,
+}
+```
+
+System Speech may support install/reservation without exposing artifact bytes,
+digest, quantization, or revision. Remote models expose no local file
+operations. Callers inspect `ModelOperations` instead of assuming every model
+has a downloadable artifact tree.
 
 ## Capabilities API
 
@@ -192,24 +274,53 @@ Model IDs are stable product identifiers. Upstream filenames remain manifest det
 let capabilities = cuttledoc.capabilities().await;
 
 for backend in capabilities.backends {
-    println!(
-        "{:?}: available={}, languages={}",
-        backend.id,
-        backend.available,
-        backend.languages.len()
-    );
+    println!("{}: {:?}", backend.id, backend.availability);
 }
 ```
 
-Capability results explain unavailability:
+Availability is machine-readable:
 
-- unsupported OS/architecture;
-- missing model;
-- missing API key;
-- failed native load;
-- unavailable managed FFmpeg binary.
+```rust
+pub enum Availability {
+    Available,
+    Unavailable {
+        reason: AvailabilityReason,
+        detail: Option<String>,
+        remediation: Option<Remediation>,
+    },
+}
 
-## Progress and cancellation
+#[non_exhaustive]
+pub enum AvailabilityReason {
+    UnsupportedPlatform,
+    UnsupportedHardware,
+    ModelMissing,
+    ModelInvalid,
+    SystemAssetUnavailable,
+    CredentialsMissing,
+    NativeComponentUnavailable,
+    DisabledByPolicy,
+    NativeLoadFailed,
+}
+```
+
+Node and CLI serialize the stable reason codes as `snake_case`. Human detail
+may evolve independently. Recognition capabilities additionally report:
+
+- file, bounded PCM, and streaming PCM input;
+- dynamic or enumerated languages/locales;
+- segment/word timestamps and confidence;
+- incremental finals and volatile replacements;
+- model provisioning and supported operations;
+- serialized or bounded-concurrent execution;
+- queue/backpressure behavior;
+- cancellation boundary; and
+- optional runtime/model revision diagnostics.
+
+Runtime diagnostics may mention CoreML, MLX, Metal, Apple Speech, or a remote
+provider. They do not alter task results or become selection handles.
+
+## Progress, cancellation, backpressure, and shutdown
 
 ```rust
 let cancellation = CancellationToken::new();
@@ -225,7 +336,21 @@ let result = engine
     .await?;
 ```
 
-Progress callbacks are observational: slow callbacks must not block native inference indefinitely. Node callbacks are dispatched through a threadsafe function or equivalent `napi-rs` mechanism.
+Progress callbacks are observational: slow callbacks must not block native
+inference indefinitely. Node callbacks are dispatched through a threadsafe
+function or equivalent `napi-rs` mechanism.
+
+Cancellation is cooperative and capability-reported:
+
+- queued work is removed immediately;
+- Apple Speech can cancel its actor task and input sequence;
+- synchronous MLX/native work observes cancellation at the next chunk or
+  decoder step; and
+- native state is never destroyed while a foreign call is active.
+
+Streaming input and engine admission both use bounded queues. Waiting for
+capacity is the default. Reject policy returns `ENGINE_BUSY`; accepted PCM is
+never silently discarded.
 
 ## Streaming results
 
@@ -298,6 +423,11 @@ These rules are executable in the dependency-free
 consume the same checked-in vectors for finals-only, volatile replacement,
 revocation, immutable-final overlap, sequence gaps, and invalid ranges.
 
+Rust domain types are authoritative. `cuttledoc-node` generates or
+mechanically checks its TypeScript declarations from the Rust binding surface
+in CI. The shared vectors check behavior; JavaScript does not implement a
+second reducer.
+
 ## Node.js API
 
 The Node API mirrors domain concepts while remaining idiomatic TypeScript:
@@ -314,10 +444,11 @@ const cuttledoc = await Cuttledoc.create({
   cacheRoot: "/srv/cuttledoc",
 });
 
-const engine = await cuttledoc.createEngine({
-  backend: "parakeet",
+const engine = await cuttledoc.createSpeechRecognitionEngine({
+  backend: "parakeet-local",
   language: "de",
-  autoDownload: false,
+  autoInstall: false,
+  queuePolicy: { mode: "wait", capacity: 4 },
 });
 
 const repeated = await engine.transcribe("interview.wav", {
@@ -331,7 +462,9 @@ await engine.close();
 await cuttledoc.close();
 ```
 
-Advanced PCM input uses `Float32Array` without copying where Node-API ownership permits it:
+Advanced PCM input uses `Float32Array`. The Node boundary may borrow it only
+for a synchronous call; the engine owns or copies accepted data before that
+call returns, and a native adapter may convert formats internally:
 
 ```ts
 await engine.transcribePcm(samples, {
@@ -363,7 +496,10 @@ type CuttledocErrorCode =
   | "MODEL_INVALID"
   | "MODEL_DOWNLOAD_FAILED"
   | "AUDIO_DECODE_FAILED"
+  | "ENGINE_BUSY"
+  | "ENGINE_CLOSED"
   | "ENGINE_LOAD_FAILED"
+  | "BACKEND_CONTRACT_VIOLATION"
   | "TRANSCRIPTION_FAILED"
   | "AUTHENTICATION_FAILED"
   | "CANCELLED";
@@ -374,7 +510,7 @@ type CuttledocErrorCode =
 Proposed commands:
 
 ```text
-cuttledoc <input> [--backend auto|parakeet|whisper|apple-speech|openai]
+cuttledoc <input> [--backend auto|parakeet-local|whisper-local|apple-speech|openai-transcription]
                   [--language <code>]
                   [--output <path>]
                   [--format text|markdown|json]

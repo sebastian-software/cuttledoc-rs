@@ -2,15 +2,14 @@
 
 **Status:** Phase 0 decision matrix, not a production runtime selection.
 
-**Evidence snapshot:** 2026-07-16.
-
-**MLX route reaffirmed:** 2026-07-17.
+**Evidence snapshot:** 2026-07-17.
 
 **Related:** [#2](https://github.com/sebastian-software/cuttledoc-rs/issues/2),
 [ADR-0003](adr/0003-staged-native-interop.md),
 [ADR-0005](adr/0005-third-party-dependency-policy.md),
-[ADR-0006](adr/0006-apple-runtime-and-model-selection-by-bakeoff.md), and
-[ADR-0007](adr/0007-apple-silicon-macos-26-baseline.md).
+[ADR-0006](adr/0006-apple-runtime-and-model-selection-by-bakeoff.md),
+[ADR-0007](adr/0007-apple-silicon-macos-26-baseline.md), and
+[ADR-0010](adr/0010-capability-oriented-engine-ownership.md).
 
 ## Decision summary
 
@@ -19,24 +18,22 @@ complementary *internal* task adapters. Cuttledoc does not select one universal
 Apple runtime, and its public API will never expose tensors, compute units,
 CoreML objects, MLX arrays, Metal objects, or foreign runtime handles.
 
-The next implementation work is deliberately narrow:
+The Phase 0 boundaries now have real evidence:
 
-1. Run the owned CoreML lifecycle spike in [#5](https://github.com/sebastian-software/cuttledoc-rs/issues/5).
-   Its starting dependency is the narrowly accepted `objc2-core-ml` boundary
-   from [the dependency inventory](dependency-policy.md).
-2. In parallel, run the Swift-shim system Speech spike in
-   [#11](https://github.com/sebastian-software/cuttledoc-rs/issues/11).
-3. Pursue official MLX as the third first-class candidate through the smallest
-   owned C++ adapter over a pinned official release/revision. Community
-   wrappers remain reference-only. `mlx-c` is an optional reference/control,
-   not the intended product route or a mandatory comparison. Do not expose an
-   operator-level API.
+1. The CoreML lifecycle works through bounded `objc2-core-ml`, but its native
+   objects require an owned worker and it has not yet proven a complete ASR
+   backend.
+2. Apple Speech works through the owned Swift C ABI with PCM streaming,
+   volatile-to-final replacements, timestamps/confidence, asset lifecycle, and
+   cancellation.
+3. Official MLX works as the third first-class foundation through the owned C++
+   task ABI. The full Whisper Tiny encoder matches the official reference on
+   CPU and Metal across two MLX releases; end-to-end ASR remains.
 
-Neither #5 nor #11 selects the initial transcription backend. Their results
-feed the controlled quality/performance bakeoff and the API work. Text
-generation remains a separate Phase 5 decision; speech synthesis is an
-explicit future direction, not an inference-runtime shortcut or a Phase 0
-contract.
+These results settle the capability-oriented engine boundary in ADR-0010 but
+do not select the initial transcription backend. Text generation remains a
+separate task decision; speech synthesis is an explicit future direction, not
+an inference-runtime shortcut or a Phase 0 contract.
 
 ## Selection criteria
 
@@ -69,9 +66,9 @@ and [MLX architecture](https://ml-explore.github.io/mlx/).
 
 | Task | Candidate | Present disposition | What it can prove | Phase 0 disqualifiers / unknowns | Next action |
 | --- | --- | --- | --- | --- | --- |
-| STT | CoreML through an internal Rust adapter | `objc2-core-ml`: accepted, bounded; adapter: repository-owned | Existing Parakeet model components, compiled CoreML models, named feature input/output, `MLMultiArray` transfer, compute-policy diagnostics, and a direct path to current compatibility fixtures. | Binding coverage, autorelease/ownership, `Send`/`Sync`, stateful serialization, model conversion, and repeat-run cleanup have not been demonstrated in this repository. | #5 real-model spike. |
+| STT | CoreML through an internal Rust adapter | `objc2-core-ml`: accepted, bounded; adapter: repository-owned | A real compiled model completed 100 create/predict/drop cycles; named inputs/outputs and bounded autorelease ownership are proven. | A complete ASR graph, scoped buffer API, typed errors, async cancellation, observed compute plan, quality, and distribution remain. Native objects are neither `Send` nor `Sync`. | Continue only as an owned-worker CoreML ASR candidate under the common benchmark. |
 | STT | whisper.cpp plus CoreML/Metal | Repository-owned boundary candidate | Mature compatibility path for the existing Whisper baseline; upstream owns specialized decode/runtime work. | Exact build/options, model pairing, artifact cost, concurrency, and maintenance surface remain unmeasured here. | Keep for the bakeoff/compatibility backend; do not add a generic Rust wrapper. |
-| STT | Apple SpeechAnalyzer / SpeechTranscriber | Repository-owned Swift boundary candidate | System-managed assets, file/PCM analysis, asynchronous results, volatile ranges, timestamps, and confidence without product model conversion. | CLI identity, asset reservation/installation, locale availability, result revision/revocation semantics, Swift actor bridge, cancellation, and release tooling require an actual macOS 26 test. | #11 Swift-shim spike. |
+| STT | Apple SpeechAnalyzer / SpeechTranscriber | Advance as first-class bakeoff candidate through repository-owned Swift C ABI | Real PCM streaming, 27 volatile replacements plus one final, word timestamps/confidence, dynamic locales, asset install/reservation/release, and cancellation are proven. | Stable shipped bundle identity, opaque system model revision/size, clean cold start, energy, repeated variance, and broader quality remain. | Include in the common bakeoff with dynamic capabilities and system-managed provisioning. |
 | STT or text generation | Official MLX via owned C++ adapter | Advance as third first-class foundation; repository-owned boundary | Real Whisper Tiny frontend/encoder on CPU and Metal, reference-matched output, repeated lifecycle, pinned conversion, and unchanged source across two MLX releases. | Decoder/tokenizer/timestamps, end-to-end quality, clean cold start, energy, cancellation within a graph, and artifact pruning remain unproven. | Continue with an end-to-end MLX ASR model path under the common benchmark contract. |
 | STT or text generation | official `mlx-c` | Optional reference/control only | A secondary C-level check for a specific allocation, stream, or interface uncertainty. | No GitHub releases; every use must bind an audited commit to its MLX revision. C API use does not make a model integration smaller or safer by itself. | Use only when it answers a stated #6 question; never make it a product dependency by default. |
 | STT or text generation | `mlx-rs`, OminiX-MLX, `mlx-node` | Reference only | Prior art, model-format clues, test vectors, and benchmark hypotheses. | Their wrappers/runtime ownership cannot silently become Cargo, build, or distribution dependencies. | Do not import. |
@@ -120,6 +117,16 @@ explicit `MLModelConfiguration`, create named input features, invoke prediction,
 copy named outputs into Rust values, and run create → predict → close repeatedly.
 Capture requested compute units plus any available device/plan diagnostics.
 
+**Observed disposition (2026-07-16):** technically feasible through the
+accepted bounded bindings. A real compiled Silero VAD model completed 100
+create/predict/drop cycles with a stable scalar result and bounded
+autorelease-pool ownership. The bindings mark native model/array/provider
+objects as neither `Send` nor `Sync`, which directly supports ADR-0010's owned
+worker proxy. A complete ASR graph, supported scoped buffer access,
+compute-plan evidence, async cancellation, and the common quality benchmark
+remain. Exact evidence is in
+[`docs/spikes/coreml-rust.md`](spikes/coreml-rust.md).
+
 **Concurrency rule to test:** one stateful `MLState` must be serialized; Apple
 documents undefined behavior if the same state is used in concurrent
 predictions. The spike must separately document what is safe for its selected
@@ -157,8 +164,9 @@ system-asset opacity are in
 
 Apple documents `SpeechAnalyzer` as an actor whose modules return an
 `AsyncSequence`, process one input sequence at a time, and require assets to be
-available before analysis. The result-stream/revision mapping therefore needs
-measurement, not an assumed callback model. See
+available before analysis. The result-stream/revision mapping is therefore
+based on the observed 27-to-1 update sequence rather than an assumed callback
+model. See
 [SpeechAnalyzer](https://developer.apple.com/documentation/Speech/SpeechAnalyzer)
 and [Speech framework](https://developer.apple.com/documentation/speech/).
 
@@ -195,7 +203,7 @@ decoder, timestamps, transcript quality, energy, and artifact pruning remain.
 Exact evidence is in
 [`docs/spikes/mlx-direct.md`](spikes/mlx-direct.md).
 
-## Decision rule after the spikes
+## Next selection rule
 
 The first local STT backend wins only if it passes the dependency gate **and**
 has complete, comparable evidence for fixture quality, timings, memory, energy

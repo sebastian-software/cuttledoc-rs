@@ -57,4 +57,12 @@ This recreates the fragmentation ADR-0001 is intended to remove.
 
 ## Validation
 
-Phase 0 API sketches define speech-recognition and text-generation contracts without exposing runtime handles. Runtime spikes must show that distinct local runtimes can map into the speech-recognition contract. LLM evaluation uses the separate generation contract. Phase 5 validates speech synthesis through a vertical slice before accepting its contract (ADR-0009); it must not be retrofitted through the recognition API.
+Validated for the Phase 0 boundary. The legacy finals-only baselines, Apple
+Speech volatile-to-final stream, CoreML worker ownership, and direct official
+MLX task ABI all map behind recognition-oriented domain types without exposing
+runtime handles. ADR-0010 fixes the remaining backend identity, capability,
+worker, queue, cancellation, and shutdown semantics.
+
+Text generation still requires its own vertical slice and delta contract.
+Phase 5 validates speech synthesis before accepting its contract (ADR-0009);
+it must not be retrofitted through the recognition API.
