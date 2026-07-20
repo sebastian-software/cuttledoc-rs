@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/voxtral-realtime-mlx-direct-model-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "task",
+    "source",
+    "conversion",
+    "official_runtime",
+    "artifacts",
+    "architecture",
+    "expected_layout",
+    "adapter_contract"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "const": "voxtral-mini-4b-realtime-2602-mlx-4bit"
+    },
+    "task": {
+      "const": "asr"
+    },
+    "source": {
+      "$ref": "#/$defs/openObject"
+    },
+    "conversion": {
+      "$ref": "#/$defs/openObject"
+    },
+    "official_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "version",
+        "license",
+        "boundary"
+      ],
+      "properties": {
+        "repository": {
+          "const": "ml-explore/mlx"
+        },
+        "revision": {
+          "const": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+        },
+        "version": {
+          "const": "0.32.0"
+        },
+        "license": {
+          "const": "MIT"
+        },
+        "boundary": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    },
+    "architecture": {
+      "$ref": "#/$defs/openObject"
+    },
+    "expected_layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tensor_count",
+        "float32_tensors",
+        "float16_tensors",
+        "uint32_tensors",
+        "affine_4bit_modules"
+      ],
+      "properties": {
+        "tensor_count": {
+          "const": 1523
+        },
+        "float32_tensors": {
+          "const": 300
+        },
+        "float16_tensors": {
+          "const": 817
+        },
+        "uint32_tensors": {
+          "const": 406
+        },
+        "affine_4bit_modules": {
+          "const": 406
+        }
+      }
+    },
+    "adapter_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_rate_hz",
+        "sample_format",
+        "channel_count",
+        "feed_semantics",
+        "queue_capacity",
+        "step_budget",
+        "end_of_audio",
+        "stable_statuses",
+        "capabilities"
+      ],
+      "properties": {
+        "sample_rate_hz": {
+          "const": 16000
+        },
+        "sample_format": {
+          "const": "f32le"
+        },
+        "channel_count": {
+          "const": 1
+        },
+        "feed_semantics": {
+          "const": "all-or-nothing"
+        },
+        "queue_capacity": {
+          "const": "caller-configured-hard-bound"
+        },
+        "step_budget": {
+          "const": "caller-configured-hard-bound"
+        },
+        "end_of_audio": {
+          "const": "explicit-close"
+        },
+        "stable_statuses": {
+          "const": {
+            "invalid_argument": 1,
+            "cancelled": 3,
+            "busy": 4,
+            "backpressure": 5,
+            "needs_audio": 6,
+            "done": 7
+          }
+        },
+        "capabilities": {
+          "const": {
+            "bounded_ingestion": true,
+            "backpressure": true,
+            "cancellation": true,
+            "transcription": false
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "openObject": {
+      "type": "object",
+      "minProperties": 1
+    }
+  }
+}

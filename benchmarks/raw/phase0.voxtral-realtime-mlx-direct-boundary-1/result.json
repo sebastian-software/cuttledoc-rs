@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.voxtral-realtime-mlx-direct-boundary-1",
+  "recorded_at": "2026-07-20",
+  "candidate": {
+    "id": "voxtral-mini-4b-realtime-mlx-direct",
+    "model": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "runtime": "ml-explore/mlx@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+    "boundary": "repository-owned Rust/C ABI over official MLX"
+  },
+  "fixture": {
+    "id": "audiobook-pilot-de-135_82_000105",
+    "path": "/tmp/cuttledoc-audiobook-pilot/de-135_82_000105.f32le",
+    "sample_rate_hz": 16000,
+    "sample_format": "f32le",
+    "channel_count": 1,
+    "sample_count": 213440,
+    "duration_ms": 13340
+  },
+  "host": {
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "device": "gpu"
+  },
+  "contract": {
+    "input_chunk_samples": 1280,
+    "input_chunk_ms": 80,
+    "queue_capacity_samples": 10240,
+    "queue_capacity_ms": 640,
+    "max_ingest_samples_per_step": 5120,
+    "max_ingest_ms_per_step": 320,
+    "total_fed_samples": 213440,
+    "total_ingested_samples": 213440,
+    "step_count": 42,
+    "maximum_ingested_samples": 5120,
+    "backpressure_count": 40,
+    "maximum_step_wall_ms": 70.664625,
+    "maximum_mlx_elapsed_ms": 70.637416,
+    "stable_statuses": {
+      "invalid_argument": 1,
+      "cancelled": 3,
+      "backpressure": 5,
+      "needs_audio": 6,
+      "done": 7
+    },
+    "repetitions": [
+      {
+        "index": 0,
+        "step_count": 42,
+        "backpressure_count": 40,
+        "maximum_step_wall_ms": 70.664625,
+        "maximum_mlx_elapsed_ms": 70.637416
+      },
+      {
+        "index": 1,
+        "step_count": 42,
+        "backpressure_count": 40,
+        "maximum_step_wall_ms": 17.094959,
+        "maximum_mlx_elapsed_ms": 17.067625
+      }
+    ]
+  },
+  "official_mlx_fingerprint": {
+    "cpu_expected_sum_squares": 1029.376851553117,
+    "mlx_sum_squares": 1029.3768642793293,
+    "relative_error": 1.236302562e-8
+  },
+  "capabilities": {
+    "model_layout_validated": true,
+    "bounded_ingestion": true,
+    "backpressure": true,
+    "cancellation": true,
+    "transcription": false
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18789280,
+    "rust_executable_bytes": 411088,
+    "metallib_bytes": 130164152,
+    "model_safetensors_bytes": 3133798126
+  },
+  "limitations": [
+    "The MLX operation is an audio-slice execution fingerprint, not the Voxtral frontend, encoder, or decoder.",
+    "No transcript, token, WER, first-text latency, model-cache, or end-to-end memory claim follows from this boundary test.",
+    "The fixture is development-exposed and its dataset transcript was not independently verified."
+  ]
+}

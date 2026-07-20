@@ -1,0 +1,118 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "voxtral-mini-4b-realtime-2602-mlx-4bit",
+  "task": "asr",
+  "source": {
+    "repository": "mistralai/Voxtral-Mini-4B-Realtime-2602",
+    "revision": "2769294da9567371363522aac9bbcfdd19447add",
+    "license": "Apache-2.0",
+    "parameter_count": 4429679360,
+    "supported_languages": [
+      "Arabic",
+      "German",
+      "English",
+      "Spanish",
+      "French",
+      "Hindi",
+      "Italian",
+      "Dutch",
+      "Portuguese",
+      "Chinese",
+      "Japanese",
+      "Korean",
+      "Russian"
+    ]
+  },
+  "conversion": {
+    "repository": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit",
+    "revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "license": "Apache-2.0",
+    "format": "MLX affine 4-bit safetensors with group size 64",
+    "conversion_tool": "mlx-audio",
+    "weight_bytes": 3133798126,
+    "snapshot_bytes": 3148833321
+  },
+  "official_runtime": {
+    "repository": "ml-explore/mlx",
+    "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+    "version": "0.32.0",
+    "license": "MIT",
+    "boundary": "Repository-owned C++ adapter and C ABI called from Rust"
+  },
+  "artifacts": [
+    {
+      "path": ".gitattributes",
+      "bytes": 1567,
+      "sha256": "a1533fad1fb49e1230aff61a60028ea63bc924b4cc4501447351b50b9c840683"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3135,
+      "sha256": "022af0f470bbb2036d1d8fea62118d1d14f64b9cbb38415004544990e653f99e"
+    },
+    {
+      "path": "config.json",
+      "bytes": 1513,
+      "sha256": "02060864a4f33df5e4944684fc17f3026af4011830cac4def6e9e025315b10c5"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 3133798126,
+      "sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "bytes": 118632,
+      "sha256": "80f68b80cf4b1638d864d1504061a266f59e37a8d90d7b20f2e1f30c2d034c2e"
+    },
+    {
+      "path": "tekken.json",
+      "bytes": 14910348,
+      "sha256": "8434af1d39eba99f0ef46cf1450bf1a63fa941a26933a1ef5dbbf4adf0d00e44"
+    }
+  ],
+  "architecture": {
+    "model_type": "voxtral_realtime",
+    "sample_rate_hz": 16000,
+    "frame_rate_hz": 12.5,
+    "causal_audio_encoder": true,
+    "audio_encoder_layers": 32,
+    "audio_encoder_hidden_size": 1280,
+    "audio_encoder_sliding_window": 750,
+    "downsample_factor": 4,
+    "decoder_layers": 26,
+    "decoder_hidden_size": 3072,
+    "decoder_sliding_window": 8192,
+    "adaptive_delay_conditioning": true
+  },
+  "expected_layout": {
+    "tensor_count": 1523,
+    "float32_tensors": 300,
+    "float16_tensors": 817,
+    "uint32_tensors": 406,
+    "affine_4bit_modules": 406
+  },
+  "adapter_contract": {
+    "sample_rate_hz": 16000,
+    "sample_format": "f32le",
+    "channel_count": 1,
+    "feed_semantics": "all-or-nothing",
+    "queue_capacity": "caller-configured-hard-bound",
+    "step_budget": "caller-configured-hard-bound",
+    "end_of_audio": "explicit-close",
+    "stable_statuses": {
+      "invalid_argument": 1,
+      "cancelled": 3,
+      "busy": 4,
+      "backpressure": 5,
+      "needs_audio": 6,
+      "done": 7
+    },
+    "capabilities": {
+      "bounded_ingestion": true,
+      "backpressure": true,
+      "cancellation": true,
+      "transcription": false
+    }
+  }
+}

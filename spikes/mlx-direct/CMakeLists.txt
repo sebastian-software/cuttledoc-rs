@@ -46,6 +46,22 @@ target_compile_options(
   -Wextra
   -Wpedantic)
 
+add_library(
+  cuttledoc_voxtral_mlx_shim
+  SHARED
+  ../voxtral-realtime-mlx-direct/Sources/CuttledocVoxtralMlxShim.cpp)
+target_link_libraries(cuttledoc_voxtral_mlx_shim PRIVATE mlx)
+target_include_directories(
+  cuttledoc_voxtral_mlx_shim
+  PUBLIC
+  ../voxtral-realtime-mlx-direct/include)
+target_compile_options(
+  cuttledoc_voxtral_mlx_shim
+  PRIVATE
+  -Wall
+  -Wextra
+  -Wpedantic)
+
 # MLX resolves its default Metal kernels from mlx.metallib at runtime. Make the
 # artifact an explicit build dependency of the shim so the spike cannot appear
 # to link successfully while omitting the file needed for GPU execution.
@@ -54,7 +70,8 @@ if(TARGET mlx-metallib)
     shim_target
     IN ITEMS
     cuttledoc_mlx_shim
-    cuttledoc_qwen3_mlx_shim)
+    cuttledoc_qwen3_mlx_shim
+    cuttledoc_voxtral_mlx_shim)
     add_dependencies(${shim_target} mlx-metallib)
     add_custom_command(
       TARGET ${shim_target}
