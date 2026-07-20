@@ -57,6 +57,15 @@ int32_t cuttledoc_qwen3_mlx_probe_decoder_prefill(
     const char *language, int32_t device_kind, char **json_out,
     char **error_out);
 
+/*
+ * Runs greedy generation through an end token and returns the decoded UTF-8
+ * transcript plus the generated token sequence.
+ */
+int32_t cuttledoc_qwen3_mlx_transcribe(
+    const char *model_directory, const float *audio, size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out);
+
 void cuttledoc_qwen3_mlx_free_string(char *value);
 
 #ifdef __cplusplus

@@ -46,6 +46,7 @@ constexpr std::size_t kAudioEncoderLayers = 18;
 constexpr float kAudioLayerNormEpsilon = 1e-5f;
 constexpr int32_t kImStartToken = 151644;
 constexpr int32_t kImEndToken = 151645;
+constexpr int32_t kEndOfTextToken = 151643;
 constexpr int32_t kAudioStartToken = 151669;
 constexpr int32_t kAudioEndToken = 151670;
 constexpr int32_t kAudioPadToken = 151676;
@@ -58,6 +59,7 @@ constexpr std::size_t kTextDecoderLayers = 28;
 constexpr float kTextRmsNormEpsilon = 1e-6f;
 constexpr float kTextRopeBase = 1'000'000.0f;
 constexpr std::size_t kTextCacheStep = 256;
+constexpr std::size_t kMaximumGeneratedTokens = 256;
 
 std::mutex runtime_mutex;
 
@@ -599,6 +601,30 @@ public:
   explicit QwenTokenizer(const std::filesystem::path &model_directory)
       : vocabulary_(load_vocabulary(model_directory / "vocab.json")),
         byte_symbols_(make_byte_symbols()) {
+    id_to_token_.resize(vocabulary_.size());
+    std::vector<bool> assigned(vocabulary_.size(), false);
+    for (const auto &[token, token_id] : vocabulary_) {
+      if (token_id < 0 ||
+          static_cast<std::size_t>(token_id) >= id_to_token_.size()) {
+        throw std::runtime_error("token id is outside the base vocabulary");
+      }
+      if (assigned[static_cast<std::size_t>(token_id)]) {
+        throw std::runtime_error("duplicate token id in vocab.json");
+      }
+      id_to_token_[static_cast<std::size_t>(token_id)] = token;
+      assigned[static_cast<std::size_t>(token_id)] = true;
+    }
+    if (std::find(assigned.begin(), assigned.end(), false) != assigned.end()) {
+      throw std::runtime_error("token ids are not contiguous in vocab.json");
+    }
+    for (std::size_t byte = 0; byte < byte_symbols_.size(); ++byte) {
+      if (!byte_decoder_
+               .emplace(byte_symbols_[byte], static_cast<unsigned char>(byte))
+               .second) {
+        throw std::runtime_error("byte-level tokenizer symbols are not unique");
+      }
+    }
+
     std::ifstream merges(model_directory / "merges.txt");
     if (!merges) {
       throw std::runtime_error("missing tokenizer merges: " +
@@ -652,6 +678,47 @@ public:
     append_piece(tokens, " " + std::string(language));
     tokens.push_back(kAsrTextToken);
     return tokens;
+  }
+
+  std::string decode(const std::vector<int32_t> &token_ids) const {
+    std::string output;
+    for (const auto token_id : token_ids) {
+      if (token_id >= static_cast<int32_t>(id_to_token_.size())) {
+        continue;
+      }
+      if (token_id < 0) {
+        throw std::runtime_error("cannot decode a negative token id");
+      }
+      const auto &encoded = id_to_token_[static_cast<std::size_t>(token_id)];
+      for (std::size_t position = 0; position < encoded.size();) {
+        const auto leading =
+            static_cast<unsigned char>(encoded[static_cast<std::size_t>(position)]);
+        std::size_t symbol_length = 0;
+        if ((leading & 0x80) == 0) {
+          symbol_length = 1;
+        } else if ((leading & 0xe0) == 0xc0) {
+          symbol_length = 2;
+        } else if ((leading & 0xf0) == 0xe0) {
+          symbol_length = 3;
+        } else if ((leading & 0xf8) == 0xf0) {
+          symbol_length = 4;
+        } else {
+          throw std::runtime_error("invalid UTF-8 in tokenizer vocabulary");
+        }
+        if (position + symbol_length > encoded.size()) {
+          throw std::runtime_error("truncated UTF-8 in tokenizer vocabulary");
+        }
+        const auto found =
+            byte_decoder_.find(encoded.substr(position, symbol_length));
+        if (found == byte_decoder_.end()) {
+          throw std::runtime_error(
+              "token contains a symbol outside the byte-level alphabet");
+        }
+        output.push_back(static_cast<char>(found->second));
+        position += symbol_length;
+      }
+    }
+    return output;
   }
 
 private:
@@ -738,8 +805,10 @@ private:
   }
 
   std::unordered_map<std::string, int32_t> vocabulary_;
+  std::vector<std::string> id_to_token_;
   std::unordered_map<std::string, std::size_t> merge_ranks_;
   std::array<std::string, 256> byte_symbols_;
+  std::unordered_map<std::string, unsigned char> byte_decoder_;
   mutable std::unordered_map<std::string, std::vector<int32_t>> cache_;
 };
 
@@ -1292,6 +1361,83 @@ public:
          << ",\"logits\":" << second_logits_fingerprint
          << "},\"first_top_tokens\":" << first_top_tokens
          << ",\"second_top_tokens\":" << second_top_tokens << "}";
+    return json.str();
+  }
+
+  std::string transcribe(const float *audio, std::size_t audio_len,
+                         std::string_view language) const {
+    const auto started = std::chrono::steady_clock::now();
+    const auto prompt = build_prompt_inputs(audio, audio_len, language);
+    if (prompt.token_ids.size() < 2) {
+      throw std::runtime_error(
+          "transcription prompt must contain at least two tokens");
+    }
+
+    std::vector<TextKeyValueCache> caches(kTextDecoderLayers);
+    const auto prefix_length = prompt.token_ids.size() - 1;
+    const auto prefix_embeddings = mx::slice(
+        prompt.embeddings, {0, 0, 0},
+        {1, static_cast<int>(prefix_length),
+         static_cast<int>(kTextHiddenSize)},
+        {1, 1, 1}, device_);
+    static_cast<void>(text_model(prefix_embeddings, caches));
+    evaluate_text_caches(caches);
+
+    const auto final_prompt_embedding = mx::slice(
+        prompt.embeddings, {0, static_cast<int>(prefix_length), 0},
+        {1, static_cast<int>(prompt.token_ids.size()),
+         static_cast<int>(kTextHiddenSize)},
+        {1, 1, 1}, device_);
+    auto hidden = text_model(final_prompt_embedding, caches);
+    auto token = greedy_token(mx::squeeze(output_logits(hidden), 1, device_));
+
+    std::vector<int32_t> generated_tokens;
+    generated_tokens.reserve(kMaximumGeneratedTokens);
+    std::optional<int32_t> stop_token;
+    for (std::size_t index = 0; index < kMaximumGeneratedTokens; ++index) {
+      if (token == kEndOfTextToken || token == kImEndToken) {
+        stop_token = token;
+        break;
+      }
+      generated_tokens.push_back(token);
+      hidden = text_model(embed_token_ids({token}), caches);
+      token = greedy_token(mx::squeeze(output_logits(hidden), 1, device_));
+    }
+
+    const QwenTokenizer tokenizer(model_directory_);
+    const auto text = tokenizer.decode(generated_tokens);
+    const auto elapsed =
+        std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - started)
+            .count();
+
+    std::ostringstream json;
+    json << std::setprecision(17)
+         << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+         << "\"stage\":\"qwen3-transcription\",\"device\":\""
+         << (device_ == mx::Device::gpu ? "gpu" : "cpu") << "\","
+         << "\"pcm_samples\":" << audio_len << ",\"language\":\""
+         << json_escape(language) << "\",\"prompt_length\":"
+         << prompt.token_ids.size() << ",\"generated_tokens\":[";
+    for (std::size_t index = 0; index < generated_tokens.size(); ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << generated_tokens[index];
+    }
+    json << "],\"text\":\"" << json_escape(text)
+         << "\",\"generation_tokens\":" << generated_tokens.size()
+         << ",\"finish_reason\":\""
+         << (stop_token.has_value() ? "eos" : "length")
+         << "\",\"stop_token\":";
+    if (stop_token.has_value()) {
+      json << stop_token.value();
+    } else {
+      json << "null";
+    }
+    json << ",\"cache_offset_after_generation\":"
+         << caches.front().offset() << ",\"elapsed_ms\":" << elapsed
+         << ",\"peak_memory_bytes\":" << mx::get_peak_memory() << "}";
     return json.str();
   }
 
@@ -1944,6 +2090,47 @@ extern "C" int32_t cuttledoc_qwen3_mlx_probe_decoder_prefill(
     return fail(error.what(), error_out);
   } catch (...) {
     return fail("MLX raised a non-standard exception in decoder prefill",
+                error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_qwen3_mlx_transcribe(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || language == nullptr ||
+      json_out == nullptr) {
+    return fail(
+        "model_directory, audio, language, and json_out must be non-null",
+        error_out);
+  }
+
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      return fail("requested MLX device is not available", error_out);
+    }
+    mx::set_default_device(device);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    const Qwen3AudioEncoder model(model_directory, device);
+    const auto json = model.transcribe(audio, audio_len, language);
+    *json_out = strdup(json.c_str());
+    if (*json_out == nullptr) {
+      return fail("could not allocate JSON result", error_out);
+    }
+    return 0;
+  } catch (const std::exception &error) {
+    return fail(error.what(), error_out);
+  } catch (...) {
+    return fail("MLX raised a non-standard exception in transcription",
                 error_out);
   }
 }

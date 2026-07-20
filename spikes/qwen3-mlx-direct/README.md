@@ -41,6 +41,11 @@ grouped-query attention, RoPE, SwiGLU, tied output projection, and a
 repository-owned growable KV cache. Prompt prefill and the first two greedy
 decode positions match the pinned Python reference.
 
+The sixth vertical slice continues greedy decoding to either Qwen end token,
+maps base-vocabulary symbols back through the byte-level decoder, and returns a
+UTF-8 transcript. The pinned fixture matches all 61 reference tokens and the
+complete reference text exactly.
+
 ## Pinned inputs
 
 - official MLX `v0.32.0`,
@@ -135,6 +140,19 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   gpu
 ```
 
+Replace `decoder` with `transcribe` to continue greedy generation through an
+end token and return the complete token sequence and decoded text:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  transcribe \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  en \
+  gpu
+```
+
 Compare its JSON output with the pinned reference oracle:
 
 ```sh
@@ -171,5 +189,5 @@ direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Require exact full-transcript parity on one fixture.
-2. Run the multilingual audiobook matrix.
+1. Run the multilingual audiobook matrix.
+2. Add task lifecycle, cancellation, and bounded streaming behavior.

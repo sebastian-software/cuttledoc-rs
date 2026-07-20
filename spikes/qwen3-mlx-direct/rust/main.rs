@@ -44,6 +44,15 @@ unsafe extern "C" {
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
+    fn cuttledoc_qwen3_mlx_transcribe(
+        model_directory: *const c_char,
+        audio: *const f32,
+        audio_len: usize,
+        language: *const c_char,
+        device_kind: i32,
+        json_out: *mut *mut c_char,
+        error_out: *mut *mut c_char,
+    ) -> i32;
     fn cuttledoc_qwen3_mlx_free_string(value: *mut c_char);
 }
 
@@ -80,6 +89,15 @@ fn run() -> Result<(), String> {
                 language,
                 device,
                 TextProbe::Decoder,
+            )
+        }
+        [command, model_directory, pcm_path, language, device] if command == "transcribe" => {
+            probe_text_boundary(
+                model_directory,
+                pcm_path,
+                language,
+                device,
+                TextProbe::Transcribe,
             )
         }
         _ => Err(usage()),
@@ -176,6 +194,7 @@ fn probe_audio(
 enum TextProbe {
     Prompt,
     Decoder,
+    Transcribe,
 }
 
 fn probe_text_boundary(
@@ -226,6 +245,15 @@ fn probe_text_boundary(
                 &mut json,
                 &mut error,
             ),
+            TextProbe::Transcribe => cuttledoc_qwen3_mlx_transcribe(
+                model_directory.as_ptr(),
+                audio.as_ptr(),
+                audio.len(),
+                language.as_ptr(),
+                device_kind,
+                &mut json,
+                &mut error,
+            ),
         }
     };
     if status != 0 {
@@ -243,7 +271,7 @@ fn probe_text_boundary(
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect encoder MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect prompt MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect decoder MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect encoder MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect prompt MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect decoder MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect transcribe MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu".to_owned()
 }
 
 fn take_string(value: *mut c_char) -> Option<String> {

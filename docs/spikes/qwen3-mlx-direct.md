@@ -5,8 +5,8 @@
 progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
 complete. All 18 audio transformer layers also match the reference oracle;
 the tokenizer/prompt/audio-embedding boundary matches as well. The complete
-28-layer decoder and KV cache now reproduce the first two greedy decisions;
-full-transcript parity remains open.
+28-layer decoder and KV cache reproduce the first two greedy decisions and the
+full pinned transcript exactly. Broader audiobook evidence remains open.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -154,10 +154,30 @@ reported a 1,918,491,576-byte MLX peak. Top-candidate fingerprinting forces the
 full vocabulary logits to materialize, so this remains a development probe
 rather than a production memory measurement.
 
+## Milestone 6: exact greedy transcript
+
+The direct adapter now continues generation for up to 256 tokens, stops on
+either Qwen EOS token, and decodes normal token IDs with its repository-owned
+inverse byte-level vocabulary. No Transformers or `mlx-audio` tokenizer is
+present in this runtime path.
+
+On the pinned English audiobook fixture, the direct result matches all 61
+generated reference tokens and the complete decoded transcript exactly:
+
+> Minnie's Flat, as the one-floor resident apartments were then being called,
+> was in a part of West Van Buren Street inhabited by families of laborers and
+> clerks, men who had come and were still coming, with the rush of population
+> pouring in at the rate of fifty thousand a year.
+
+Generation stopped on `<|im_end|>` (`151645`) with the expected cache offset of
+281. The single Metal development run took 772.659 ms after adapter
+construction and reported a 1,904,298,424-byte MLX peak. It includes audio
+encoding, prompt construction, model prefill, 61 cached decoder steps, and
+token decoding, but is not yet a repeated performance sample.
+
 ## Remaining parity gates
 
-1. Require exact full-transcript parity on one fixture before adding the direct
-   adapter to the multilingual audiobook matrix.
+1. Add the direct adapter to the multilingual audiobook matrix.
 2. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
    memory measurements after materialization, and artifact pruning evidence.
 
