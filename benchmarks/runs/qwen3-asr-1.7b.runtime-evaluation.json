@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.qwen3-asr-1.7b.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "Qwen/Qwen3-ASR-1.7B",
+      "revision": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+      "quantization": "BF16 Safetensors with 2349217408 parameters",
+      "license": "Apache-2.0"
+    },
+    "runtime": {
+      "id": "qwen-asr-transformers-or-vllm",
+      "version": "official Qwen3-ASR repository at 7c6daf77a2421100f5fb066495372c00129d39ff",
+      "boundary": "official Python Transformers and vLLM backends; streaming is vLLM-only"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "Safetensors",
+      "supported_languages_and_dialects": 52,
+      "official_source": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/tree/7278e1e70fe206f11671096ffdd38061171dd6e5",
+      "official_runtime_source": "https://github.com/QwenLM/Qwen3-ASR/commit/7c6daf77a2421100f5fb066495372c00129d39ff",
+      "redistribution": "allowed under Apache-2.0"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "The smaller 0.6B model was measured first through the reference-only MLX path."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "The architecture work is shared with Qwen3-ASR 0.6B, but the product path still requires a repository-owned C++ implementation over official MLX.",
+    "update_cost": "Official Qwen changes and model conversion would be tracked by the same owned adapter proposed for the 0.6B candidate.",
+    "packaging_cost": "The official BF16 artifact is about 4.70 GB of repository storage before an MLX quantized conversion and is substantially larger than the measured 0.6B reference."
+  },
+  "reproduction": {
+    "command": "No product benchmark command: measure the smaller 0.6B reference first, then port the shared architecture over official MLX before considering the larger weights.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The official runtime is Python through Transformers or vLLM; streaming is vLLM-only and timestamps require a separate 0.6B forced aligner. With no accepted Apple-local runtime, the 1.7B weights add size before resolving the same interop boundary already exposed by the measured 0.6B model.",
+    "observations": [
+      "Qwen3-ASR 0.6B was measured through a pinned reference-only MLX port and already crossed the quality threshold.",
+      "The official streaming path does not return timestamps.",
+      "The larger model should be reconsidered only if an owned 0.6B official-MLX port shows a product-quality gap."
+    ]
+  }
+}

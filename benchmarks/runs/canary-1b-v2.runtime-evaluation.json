@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.canary-1b-v2.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "nvidia/canary-1b-v2",
+      "revision": "87bc52657add533cd0156b3fc1aef027280754bf",
+      "quantization": "NeMo checkpoint; no official Safetensors artifact at the evaluated revision",
+      "license": "CC-BY-4.0; redistribution and commercial use require attribution"
+    },
+    "runtime": {
+      "id": "nvidia-nemo",
+      "version": "NeMo main branch pending the model card's NeMo 2.5 release",
+      "boundary": "official Python/NeMo path on Linux and NVIDIA Ampere, Blackwell, or Hopper hardware"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "canary-1b-v2.nemo",
+      "supported_languages": 25,
+      "official_source": "https://huggingface.co/nvidia/canary-1b-v2/tree/87bc52657add533cd0156b3fc1aef027280754bf",
+      "redistribution": "allowed with CC-BY-4.0 attribution"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No accepted Apple-local runtime reached inference."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "An owned Apple path would need a new FastConformer and multitask decoder implementation plus checkpoint conversion and timestamp behavior.",
+    "update_cost": "The official model currently points at a moving NeMo main branch rather than an immutable Apple-local runtime.",
+    "packaging_cost": "The official runtime brings Python, PyTorch, NeMo, and an NVIDIA-oriented native stack; none belongs in the Cuttledoc product artifact."
+  },
+  "reproduction": {
+    "command": "No benchmark command: the pinned official model card supports Linux/NVIDIA through NeMo and publishes no accepted Apple-local runtime.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The exact CC-BY-4.0 model is commercially usable, but its supported official runtime is NeMo on Linux/NVIDIA hardware. No official MLX/CoreML path or accepted repository-owned adapter exists, so it cannot enter the Apple-local product bakeoff.",
+    "observations": [
+      "The original canary-1b non-commercial license does not apply to canary-1b-v2.",
+      "Word and segment timestamps are model capabilities, but they were not measured on Apple Silicon.",
+      "Community MLX implementations remain reference-only under ADR-0005."
+    ]
+  }
+}

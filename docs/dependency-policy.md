@@ -2,7 +2,7 @@
 
 **Status:** binding for Phase 0 and later.
 
-**Evidence snapshot:** 2026-07-16.
+**Evidence snapshot:** 2026-07-20.
 
 **MLX route reaffirmed:** 2026-07-17.
 
@@ -49,6 +49,7 @@ remain part of each actual adoption review.
 | Owned C++ adapter over MLX | Repository-owned boundary candidate | The intended MLX route: a small task-level C ABI directly over official MLX, pinned to a release/revision. It exposes no MLX types publicly and owns lifecycle, errors, thread-affinity, build, and distribution. Production adoption still requires spike and bakeoff evidence plus a dedicated accepted ADR. |
 | [mlx-rs](https://github.com/oxiglade/mlx-rs) | Reference only | A useful community Rust binding and comparison source, but it is an additional wrapper/API and build path over MLX. It must not become a shortcut around ownership, update, or binary-size evidence. |
 | [OminiX-MLX](https://github.com/OminiX-ai/OminiX-MLX) | Reference only | Young, task-specific MLX implementation. It can supply prior art and fixtures but is not an acceptable critical ASR, TTS, or LLM runtime dependency. |
+| [mlx-audio](https://github.com/Blaizzy/mlx-audio) | Reference only | The active v0.4.5 Python project supplies useful Qwen3-ASR, Canary, Nemotron, Parakeet, and Voxtral MLX model oracles, but it owns a broad task/runtime surface that Cuttledoc cannot delegate across its Rust boundary. It may run only in disposable benchmark environments and supply fixtures, shape mappings, and expected output. It is absent from product manifests and release artifacts. |
 | [mlx-node](https://github.com/mlx-node/mlx-node) | Reference only | Node/C++ ownership and its own packaging model conflict with the Rust-owned core and thin Node boundary. It can inform npm artifact tests only. |
 | [`objc2-core-ml`](https://docs.rs/objc2-core-ml/) via [objc2](https://github.com/madsmtm/objc2) | Accepted production dependency, bounded | The versioned `objc2` framework crates provide the narrow Rust-to-Objective-C boundary needed by the CoreML spike (`objc2-core-ml` `0.3.2` at the snapshot). Acceptance is limited to an internal Apple adapter; no Objective-C type crosses the product API. #5 must still demonstrate required API coverage, ownership, thread behavior, deployment target, and binary impact. |
 | [mistral.rs](https://github.com/EricLBuehler/mistral.rs) | Reference only | Active MIT project with releases, but its broad multimodal runtime and feature surface are disproportionate to the initial product boundary. Reconsider only in the separate Phase 5 LLM evaluation. |
@@ -72,7 +73,8 @@ Source and release checks used for the snapshot:
 - [MLX releases](https://github.com/ml-explore/mlx/releases) and
   [mlx-c releases](https://github.com/ml-explore/mlx-c/releases)
 - [mlx-rs releases](https://github.com/oxiglade/mlx-rs/releases),
-  [OminiX-MLX releases](https://github.com/OminiX-ai/OminiX-MLX/releases), and
+  [OminiX-MLX releases](https://github.com/OminiX-ai/OminiX-MLX/releases),
+  [mlx-audio releases](https://github.com/Blaizzy/mlx-audio/releases), and
   [mlx-node releases](https://github.com/mlx-node/mlx-node/releases)
 - [mistral.rs releases](https://github.com/EricLBuehler/mistral.rs/releases),
   [whisper.cpp releases](https://github.com/ggml-org/whisper.cpp/releases), and

@@ -144,6 +144,125 @@ function nonNullMaximum(values) {
   return present.length === 0 ? null : Math.max(...present);
 }
 
+function aggregateSummary(results) {
+  const languageGroups = {};
+  for (const result of results) {
+    const group = languageGroups[result.requested_language] ?? [];
+    group.push(result);
+    languageGroups[result.requested_language] = group;
+  }
+  return {
+    macro_wer: mean(results.map((result) => result.quality.wer)),
+    macro_cer: mean(results.map((result) => result.quality.cer)),
+    mean_warm_inference_ms: mean(
+      results.map((result) => result.timing.warm_inference_ms),
+    ),
+    mean_real_time_factor: mean(
+      results.map((result) => result.timing.real_time_factor),
+    ),
+    maximum_peak_memory_bytes: Math.max(
+      ...results.map((result) => result.resources.peak_memory_bytes),
+    ),
+    by_language: Object.fromEntries(
+      Object.entries(languageGroups).map(([language, languageResults]) => [
+        language,
+        {
+          fixture_count: languageResults.length,
+          macro_wer: mean(
+            languageResults.map((result) => result.quality.wer),
+          ),
+          macro_cer: mean(
+            languageResults.map((result) => result.quality.cer),
+          ),
+        },
+      ]),
+    ),
+  };
+}
+
+function validateAggregate(aggregate, manifest, path) {
+  const errors = [];
+  const qualityFixtureIds = manifest.fixtures
+    .filter((fixture) => fixture.purpose === 'quality')
+    .map((fixture) => fixture.id);
+  if (aggregate.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(aggregate.matrix_run_id?.length > 0)) {
+    errors.push('matrix_run_id must be a non-empty string');
+  }
+  if (!/^[0-9a-f]{40}$/.test(aggregate.source_revision ?? '')) {
+    errors.push('source_revision must be a 40-character Git SHA');
+  }
+  if (aggregate.fixture_manifest_revision !== manifest.revision) {
+    errors.push(`fixture_manifest_revision must be ${manifest.revision}`);
+  }
+  for (const field of [
+    'candidate.id',
+    'candidate.model',
+    'candidate.runtime',
+    'candidate.boundary',
+    'candidate.license',
+    'host.id',
+    'host.chip',
+    'host.os',
+  ]) {
+    if (!(at(aggregate, field)?.length > 0)) {
+      errors.push(`${field} must be a non-empty string`);
+    }
+  }
+  if (!arrayEquals(aggregate.procedure?.fixture_order ?? [], qualityFixtureIds)) {
+    errors.push('procedure.fixture_order must equal the quality fixture order');
+  }
+  if (aggregate.procedure?.fixture_count !== qualityFixtureIds.length) {
+    errors.push(`procedure.fixture_count must be ${qualityFixtureIds.length}`);
+  }
+  const resultIds = (aggregate.results ?? []).map((result) => result.fixture_id);
+  if (!arrayEquals(resultIds, qualityFixtureIds)) {
+    errors.push('result fixture order must equal the quality fixture order');
+  }
+
+  for (const result of aggregate.results ?? []) {
+    if (!(result.text?.length > 0)) {
+      errors.push(`${result.fixture_id}: text must be non-empty`);
+    }
+    for (const field of [
+      'quality.wer',
+      'quality.cer',
+      'timing.audio_duration_ms',
+      'timing.cold_load_ms',
+      'timing.warm_inference_ms',
+      'timing.real_time_factor',
+      'resources.peak_memory_bytes',
+      'resources.model_size_bytes',
+      'resources.binary_size_bytes',
+    ]) {
+      if (!isMetric(at(result, field))) {
+        errors.push(`${result.fixture_id}: ${field} must be a non-negative metric`);
+      }
+    }
+    if (!Array.isArray(result.repetitions) ||
+        result.repetitions.length !== aggregate.procedure?.repetitions) {
+      errors.push(`${result.fixture_id}: repetition count does not match procedure`);
+    }
+    if (result.streaming?.supported &&
+        !isMetric(result.streaming.first_result_ms)) {
+      errors.push(`${result.fixture_id}: streaming requires first_result_ms`);
+    }
+    if (!['none', 'segment', 'word', 'unknown'].includes(result.streaming?.timestamps)) {
+      errors.push(`${result.fixture_id}: invalid streaming timestamps`);
+    }
+  }
+
+  if ((aggregate.results ?? []).length > 0) {
+    const derived = aggregateSummary(aggregate.results);
+    if (JSON.stringify(aggregate.summary) !== JSON.stringify(derived)) {
+      errors.push('summary does not match the per-fixture results');
+    }
+  }
+  return errors.map((error) => `${path}: ${error}`);
+}
+
 async function validateMatrix(matrix, manifest, path) {
   const errors = [];
   if (matrix.schema_version !== schemaVersion) errors.push(`schema_version must be ${schemaVersion}`);
@@ -298,6 +417,23 @@ for (const path of matrixPaths) {
   failures.push(...await validateMatrix(matrix, manifest, path));
 }
 
+const rawDirectory = join(repoRoot, 'benchmarks/raw');
+const aggregatePaths = (await readdir(rawDirectory, { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => join(rawDirectory, entry.name, 'result.json'))
+  .sort();
+const aggregates = [];
+for (const path of aggregatePaths) {
+  try {
+    const raw = await readJson(path);
+    if (typeof raw.matrix_run_id !== 'string') continue;
+    aggregates.push(raw);
+    failures.push(...validateAggregate(raw, manifest, path));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
+
 if (process.argv.includes('--self-test')) {
   const invalid = structuredClone(runs[0]);
   invalid.result.status = 'measured';
@@ -311,6 +447,11 @@ if (process.argv.includes('--self-test')) {
   if ((await validateMatrix(invalidMatrix, manifest, '<matrix-self-test>')).length === 0) {
     failures.push('validator self-test failed to reject a matrix that diverges from its raw artifact');
   }
+  const invalidAggregate = structuredClone(aggregates[0]);
+  invalidAggregate.summary.macro_wer += 1;
+  if (validateAggregate(invalidAggregate, manifest, '<aggregate-self-test>').length === 0) {
+    failures.push('validator self-test failed to reject an aggregate with a divergent summary');
+  }
 }
 
 if (failures.length > 0) {
@@ -320,5 +461,5 @@ if (failures.length > 0) {
 
 console.log(
   `benchmark data: ${manifest.fixtures.length} fixture(s), ${runs.length} run record(s), ` +
-  `${matrices.length} matrix record(s), schema ${schemaVersion}`,
+  `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), schema ${schemaVersion}`,
 );

@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.canary-qwen-2.5b.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "nvidia/canary-qwen-2.5b",
+      "revision": "b1469e1bba1cfe140205529c79c434ca47180960",
+      "quantization": "BF16 Safetensors with 2559447568 parameters",
+      "license": "CC-BY-4.0; redistribution and commercial use require attribution"
+    },
+    "runtime": {
+      "id": "nvidia-nemo",
+      "version": "NeMo 2.5.0 or newer",
+      "boundary": "official Python/NeMo path on Linux and NVIDIA GPU hardware"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "Safetensors",
+      "supported_languages": ["en"],
+      "official_source": "https://huggingface.co/nvidia/canary-qwen-2.5b/tree/b1469e1bba1cfe140205529c79c434ca47180960",
+      "redistribution": "allowed with CC-BY-4.0 attribution"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No accepted Apple-local runtime reached inference."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "An Apple port would combine the Canary audio encoder, projection, Qwen decoder, prompt format, and model conversion.",
+    "update_cost": "Cuttledoc would own parity with both NeMo Canary and Qwen revisions.",
+    "packaging_cost": "The BF16 model is substantially larger than the measured Qwen3-ASR 0.6B path while adding only English ASR coverage."
+  },
+  "reproduction": {
+    "command": "No benchmark command: the pinned official model is English-only and has no accepted Apple-local runtime.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The exact artifact is CC-BY-4.0 rather than non-commercial, but the official NeMo runtime targets Linux/NVIDIA and the model is English-only. It cannot satisfy the common multilingual matrix or justify a larger new Apple adapter over the measured Qwen3-ASR 0.6B reference.",
+    "observations": [
+      "The model card explicitly warns that non-English transcription is unlikely to be reliable.",
+      "The measured Qwen3-ASR 0.6B reference is smaller and covers every matrix language.",
+      "No stale non-commercial-family label is applied to this artifact."
+    ]
+  }
+}

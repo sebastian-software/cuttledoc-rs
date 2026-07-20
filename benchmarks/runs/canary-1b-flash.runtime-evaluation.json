@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.canary-1b-flash.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "nvidia/canary-1b-flash",
+      "revision": "2b6e4d2dacb11cc1b1724de31bb48fe68c26c12e",
+      "quantization": "F32 Safetensors with 811049984 parameters plus an official NeMo checkpoint",
+      "license": "CC-BY-4.0; redistribution and commercial use require attribution"
+    },
+    "runtime": {
+      "id": "nvidia-nemo",
+      "version": "NeMo main at the evaluated model revision",
+      "boundary": "official Python/NeMo path on NVIDIA GPU platforms"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "NeMo checkpoint and Safetensors",
+      "supported_languages": ["en", "de", "es", "fr"],
+      "official_source": "https://huggingface.co/nvidia/canary-1b-flash/tree/2b6e4d2dacb11cc1b1724de31bb48fe68c26c12e",
+      "redistribution": "allowed with CC-BY-4.0 attribution"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No accepted Apple-local runtime reached inference."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "Safetensors make weights inspectable, but an owned Apple path still needs the complete FastConformer, decoder, tokenizer, timestamp, and streaming behavior.",
+    "update_cost": "Cuttledoc would own model conversion and architecture parity because the official supported runtime is NeMo.",
+    "packaging_cost": "The official Python/PyTorch/NeMo stack is incompatible with the thin native product artifact."
+  },
+  "reproduction": {
+    "command": "No benchmark command: the pinned official model has no accepted Apple-local runtime.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The CC-BY-4.0 weights are available as Safetensors, but NVIDIA supports inference through NeMo on NVIDIA-oriented hardware rather than MLX or CoreML. A community port cannot become the product runtime without a separate ADR-0005 acceptance or an owned official-MLX implementation.",
+    "observations": [
+      "The original canary-1b non-commercial license does not apply to canary-1b-flash.",
+      "The model covers only four of the evaluated languages and does not cover Portuguese.",
+      "Community MLX code can inform a future owned port but is not production evidence."
+    ]
+  }
+}

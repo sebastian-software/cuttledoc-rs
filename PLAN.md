@@ -78,7 +78,7 @@ Evidence snapshot: 2026-07-20.
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
 | End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
-| Exploratory ASR sweep (#12) | In progress | Run a bounded stronger-model check, prioritizing an MLX-compatible path; record precise blockers without reopening the completed mandatory comparison. |
+| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advances to an owned official-MLX adapter; every other named artifact has an exact runtime/license blocker. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Open | Run one bounded transcript-enhancement experiment and record adopt/defer. |
 
@@ -287,8 +287,8 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Complete the bounded #12 stronger-model check, prioritizing an
-   MLX-compatible candidate and precise blockers over a broad wrapper survey.
+1. Open and execute the bounded Qwen3-ASR 0.6B adapter follow-up directly over
+   official MLX; the community runtime remains an external oracle only.
 2. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 3. Finish #9 with Node 22 plus packed-artifact CI gates.

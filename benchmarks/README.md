@@ -72,6 +72,10 @@ validator derives and cross-checks their metrics against the linked raw
 artifacts. `docs/model-evaluation.md` is explanatory evidence, not the source
 of truth.
 
+The validator also derives every checked-in multilingual aggregate directly
+from its per-fixture results, including exploratory aggregates that have not
+been promoted into a product-selection matrix.
+
 The initial multilingual breadth set is intentionally bounded to two FLEURS
 test samples in each of `en_us`, `de_de`, `es_419`, `fr_fr`, and `pt_br`.
 Those ten quality fixtures are pinned in the manifest with source, reference,

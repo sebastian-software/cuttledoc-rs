@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.voxtral-mini-3b-2507.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "mistralai/Voxtral-Mini-3B-2507",
+      "revision": "3060fe34b35ba5d44202ce9ff3c097642914f8f3",
+      "quantization": "BF16 Safetensors with 4674351104 parameters plus 1920000 F32 parameters",
+      "license": "Apache-2.0"
+    },
+    "runtime": {
+      "id": "vllm-or-transformers-voxtral",
+      "version": "vLLM 0.10.0 or newer, or Hugging Face Transformers",
+      "boundary": "official Python runtime; the model card recommends vLLM and about 9.5 GB GPU memory"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "Safetensors",
+      "official_source": "https://huggingface.co/mistralai/Voxtral-Mini-3B-2507/tree/3060fe34b35ba5d44202ce9ff3c097642914f8f3",
+      "redistribution": "allowed under Apache-2.0",
+      "llama_cpp_assumption": "none; current official vLLM and Transformers support was recorded instead"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No accepted Apple-local runtime reached inference."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "An owned MLX route needs the Voxtral audio encoder, adapter, Mistral decoder, audio preprocessing, prompt protocol, and weight conversion.",
+    "update_cost": "Cuttledoc would own parity because the available community MLX port is reference-only.",
+    "packaging_cost": "The official BF16 files use about 9.35 GB for model weights, larger than the measured Qwen3-ASR reference."
+  },
+  "reproduction": {
+    "command": "No product benchmark command: current official support is vLLM/Transformers and no accepted Apple-local adapter exists.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The Apache-2.0 model now has current official vLLM and Transformers support, so no stale llama.cpp claim is used. Neither official path is the native Apple boundary, and the community MLX port remains reference-only; a new owned adapter would be much larger than the measured Qwen3-ASR 0.6B work.",
+    "observations": [
+      "The blocker is the accepted Apple-local runtime, not model format or license.",
+      "The official model card reports about 9.5 GB GPU memory for BF16/FP16 inference.",
+      "Qwen3-ASR 0.6B is the bounded direct-MLX follow-up because it produced stronger evidence at materially lower size."
+    ]
+  }
+}

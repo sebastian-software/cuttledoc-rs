@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.nemotron-3.5-asr-streaming-0.6b.runtime-evaluation-1",
+  "captured_at": "2026-07-20T10:37:54Z",
+  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "nvidia/nemotron-3.5-asr-streaming-0.6b",
+      "revision": "f3d333391852ba876df169dcc9ba902d25b6ab0b",
+      "quantization": "F32 Safetensors with 637997088 parameters plus a NeMo checkpoint",
+      "license": "OpenMDW-1.1 custom model license; explicit dependency and legal disposition required"
+    },
+    "runtime": {
+      "id": "nvidia-nemo-or-transformers",
+      "version": "NeMo 26.06 or Transformers 5.13.0 and newer",
+      "boundary": "official Python/PyTorch path; supported product integration lists Linux and NVIDIA GPU hardware"
+    },
+    "options": {
+      "evaluated_at": "2026-07-20",
+      "model_format": "Safetensors and NeMo checkpoint",
+      "supported_language_locales": 40,
+      "official_source": "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/tree/f3d333391852ba876df169dcc9ba902d25b6ab0b",
+      "redistribution": "not approved; requires OpenMDW-1.1 review"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": { "wer": null, "cer": null },
+    "timing": {
+      "audio_duration_ms": null,
+      "cold_load_ms": null,
+      "warm_inference_ms": null,
+      "real_time_factor": null
+    },
+    "resources": {
+      "peak_memory_bytes": null,
+      "model_size_bytes": null,
+      "binary_size_bytes": null
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "unknown"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "Runtime and license gates stopped the Apple-local benchmark."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "An owned MLX route would need FastConformer, cache-aware streaming, RNNT decoding, locale prompting, and checkpoint conversion.",
+    "update_cost": "The repository would own parity with both the NVIDIA architecture and its Transformers integration.",
+    "packaging_cost": "The official Python/PyTorch stack is not an acceptable native product boundary; a converted model cannot ship before OpenMDW-1.1 is accepted."
+  },
+  "reproduction": {
+    "command": "No benchmark command: OpenMDW-1.1 and the absence of an accepted Apple-local runtime block product evaluation.",
+    "raw_artifacts": []
+  },
+  "result": {
+    "status": "blocked",
+    "blocker": "The model now has both NeMo and Safetensors/Transformers paths and real cache-aware streaming, but the official supported integration remains Python/PyTorch on Linux/NVIDIA. Its OpenMDW-1.1 license also lacks the explicit ADR-0005 disposition required before redistribution or product use.",
+    "observations": [
+      "The artifact must not be described as NeMo-checkpoint-only.",
+      "Transformers exposes offline and streaming RNNT inference, but that does not create a native Apple product boundary.",
+      "A community MLX model adapter cannot bypass either the runtime policy or the custom-license review."
+    ]
+  }
+}
