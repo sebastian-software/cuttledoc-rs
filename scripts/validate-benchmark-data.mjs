@@ -1375,6 +1375,172 @@ function validateVoxtralRealtimeDirectFrontend(
   return errors;
 }
 
+function validateVoxtralRealtimeDirectEncoder(
+  run,
+  oracle,
+  modelManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
+      run.issue !==
+        'https://github.com/sebastian-software/cuttledoc-rs/issues/19' ||
+      run.model?.source !== oracle.model?.source ||
+      run.model?.conversion !== oracle.model?.conversion ||
+      run.model?.artifact_sha256 !== oracle.model?.artifact_sha256 ||
+      run.toolchain?.mlx?.revision !==
+        modelManifest.official_runtime?.revision) {
+    errors.push('direct encoder identity must pin source, model, and MLX');
+  }
+  if (!fixture ||
+      run.fixture?.id !== fixture.id ||
+      run.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.pcm_samples !== fixture.normalized.sample_count ||
+      run.fixture?.sample_rate_hz !== 16000 ||
+      run.fixture?.gold_status !== fixture.gold_status ||
+      oracle.fixture?.id !== fixture.id ||
+      oracle.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      oracle.fixture?.pcm_samples !== fixture.normalized.sample_count) {
+    errors.push('direct encoder must use the pinned audiobook fixture');
+  }
+
+  const result = run.result;
+  const probe = result?.probe;
+  if (result?.status !== 'ok' ||
+      result?.reference_oracle !==
+        'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.encoder-480ms.json' ||
+      probe?.status !== 'ok' ||
+      probe?.boundary !== 'official-mlx-cpp' ||
+      probe?.stage !== 'voxtral-causal-encoder' ||
+      probe?.device !== 'gpu' ||
+      probe?.pcm_samples !== fixture?.normalized.sample_count ||
+      probe?.transcription_delay_ms !== 480 ||
+      probe?.delay_tokens !== 6 ||
+      !(probe?.elapsed_ms > 0) ||
+      !(probe?.peak_memory_bytes > 0)) {
+    errors.push('direct encoder probe must record successful official-MLX GPU work');
+  }
+  for (const field of [
+    'layers',
+    'dimension',
+    'attention_heads',
+    'head_dimension',
+    'sliding_window',
+    'downsample_factor',
+    'adapter_dimension',
+  ]) {
+    if (probe?.architecture?.[field] !== oracle.architecture?.[field]) {
+      errors.push(`direct encoder architecture.${field} differs from oracle`);
+    }
+  }
+  if (JSON.stringify(probe?.chunks) !== JSON.stringify(oracle.chunks)) {
+    errors.push('direct encoder chunk and mask structure differs from oracle');
+  }
+  for (const field of [
+    'layer_0_offset',
+    'layer_0_size',
+    'layer_0_materialized_key_frames',
+    'layer_0_materialized_value_frames',
+  ]) {
+    if (probe?.cache?.[field] !== oracle.cache?.[field]) {
+      errors.push(`direct encoder cache.${field} differs from oracle`);
+    }
+  }
+  if (probe?.output?.encoded_frames !== oracle.output?.encoded_frames ||
+      probe?.output?.adapter_frames !== oracle.output?.adapter_frames ||
+      probe?.capabilities?.causal_encoder !== true ||
+      probe?.capabilities?.rotating_kv_cache !== true ||
+      probe?.capabilities?.sliding_window_attention !== true ||
+      probe?.capabilities?.adapter_projection !== true ||
+      probe?.capabilities?.decoder !== false ||
+      probe?.capabilities?.transcription !== false ||
+      modelManifest.adapter_contract?.capabilities?.causal_encoder !== true ||
+      modelManifest.adapter_contract?.capabilities?.decoder !== false) {
+    errors.push('direct encoder output and capability ceiling must match oracle');
+  }
+
+  let maximumSampleAbsoluteError = 0;
+  let maximumAggregateRelativeError = 0;
+  for (const stage of [
+    'conv_stem',
+    'chunk_0_layer_0',
+    'chunk_0_layer_15',
+    'chunk_0_layer_31',
+    'chunk_0_norm',
+    'chunk_1_layer_0',
+    'chunk_1_layer_15',
+    'chunk_1_layer_31',
+    'chunk_1_norm',
+    'encoded',
+    'adapter_projection0_gelu',
+    'adapter',
+    'layer_0_cache_keys',
+    'layer_0_cache_values',
+  ]) {
+    const expected = oracle.fingerprints?.[stage];
+    const observed = probe?.fingerprints?.[stage];
+    if (!expected || !observed ||
+        !arrayEquals(expected.shape ?? [], observed.shape ?? []) ||
+        !arrayEquals(
+          expected.sample_indices ?? [],
+          observed.sample_indices ?? [],
+        ) ||
+        expected.sample_values?.length !== observed.sample_values?.length) {
+      errors.push(`${stage}: direct encoder fingerprint identity differs`);
+      continue;
+    }
+    for (let index = 0; index < expected.sample_values.length; index += 1) {
+      maximumSampleAbsoluteError = Math.max(
+        maximumSampleAbsoluteError,
+        Math.abs(observed.sample_values[index] - expected.sample_values[index]),
+      );
+    }
+    for (const field of ['mean', 'stddev', 'minimum', 'maximum', 'l1']) {
+      const relativeError = Math.abs(observed[field] - expected[field]) /
+        Math.max(Math.abs(expected[field]), 1e-12);
+      maximumAggregateRelativeError = Math.max(
+        maximumAggregateRelativeError,
+        relativeError,
+      );
+    }
+  }
+  const parity = result?.parity;
+  if (parity?.status !== 'ok' ||
+      parity?.sample_absolute_tolerance !== 5e-5 ||
+      parity?.aggregate_relative_tolerance !== 1e-5 ||
+      maximumSampleAbsoluteError > parity.sample_absolute_tolerance ||
+      maximumAggregateRelativeError > parity.aggregate_relative_tolerance ||
+      Math.abs(
+        parity.maximum_sample_absolute_error - maximumSampleAbsoluteError,
+      ) > 1e-15 ||
+      Math.abs(
+        parity.maximum_aggregate_relative_error -
+          maximumAggregateRelativeError,
+      ) > 1e-15) {
+    errors.push('direct encoder parity must be derived within pinned tolerances');
+  }
+  if (result?.cpu_smoke?.status !== 'ok' ||
+      result?.cpu_smoke?.encoded_frames !== oracle.output?.encoded_frames ||
+      result?.cpu_smoke?.adapter_frames !== oracle.output?.adapter_frames ||
+      result?.cpu_smoke?.cache_size !== oracle.cache?.layer_0_size ||
+      result?.cpu_smoke?.materialized_cache_frames !==
+        oracle.cache?.layer_0_materialized_key_frames ||
+      !(result?.cpu_smoke?.elapsed_ms > 0) ||
+      !(result?.cpu_smoke?.peak_memory_bytes > 0) ||
+      !(run.artifacts?.shim_dylib_bytes > 0) ||
+      !(run.artifacts?.rust_probe_bytes > 0) ||
+      !(run.artifacts?.mlx_metallib_bytes > 0) ||
+      !run.limitations?.some((item) => item.includes('No token'))) {
+    errors.push('direct encoder CPU/artifact evidence and limits must be explicit');
+  }
+  return errors;
+}
+
 function validateVoxtralRealtimeAggregate(
   aggregate,
   modelManifest,
@@ -2875,6 +3041,14 @@ const voxtralRealtimeDirectFrontendPath = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json',
 );
+const voxtralRealtimeDirectEncoderOraclePath = join(
+  repoRoot,
+  'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.encoder-480ms.json',
+);
+const voxtralRealtimeDirectEncoderPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -2973,6 +3147,12 @@ const voxtralRealtimeDirectFrontendOracle = await readJson(
 );
 const voxtralRealtimeDirectFrontend = await readJson(
   voxtralRealtimeDirectFrontendPath,
+);
+const voxtralRealtimeDirectEncoderOracle = await readJson(
+  voxtralRealtimeDirectEncoderOraclePath,
+);
+const voxtralRealtimeDirectEncoder = await readJson(
+  voxtralRealtimeDirectEncoderPath,
 );
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -3160,6 +3340,14 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     audiobookPilot,
   ).map((error) => `${voxtralRealtimeDirectFrontendPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralRealtimeDirectEncoder(
+    voxtralRealtimeDirectEncoder,
+    voxtralRealtimeDirectEncoderOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralRealtimeDirectEncoderPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -3421,6 +3609,20 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject a false direct Voxtral encoder capability',
     );
   }
+  const invalidVoxtralDirectEncoder = structuredClone(
+    voxtralRealtimeDirectEncoder,
+  );
+  invalidVoxtralDirectEncoder.result.probe.cache.layer_0_size += 1;
+  if (validateVoxtralRealtimeDirectEncoder(
+    invalidVoxtralDirectEncoder,
+    voxtralRealtimeDirectEncoderOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject a divergent direct Voxtral cache',
+    );
+  }
   const invalidVoxtralRealtimeAggregate = structuredClone(
     voxtralRealtime480,
   );
@@ -3503,6 +3705,7 @@ console.log(
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 direct Voxtral boundary record, 1 direct Voxtral frontend parity record, ` +
+  `1 direct Voxtral encoder parity record, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

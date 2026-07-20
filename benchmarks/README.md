@@ -197,8 +197,12 @@ contract, backpressure, and cancellation. The separate
 matches the pinned
 [`Python oracle`](oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json)
 through offline-streaming padding, log-mel extraction, and both causal Conv1d
-stages. Both records deliberately keep `transcription: false`: the next parity
-gate is the 32-layer causal encoder, so neither record is an ASR-quality result.
+stages. The
+[`encoder result`](raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json)
+then proves all 32 causal layers, repository-owned rotating cache and
+sliding-window semantics, downsampling, and adapter projection against its
+pinned oracle. All records deliberately keep `transcription: false`: the next
+parity gate is the delay-conditioned decoder, so none is an ASR-quality result.
 
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in

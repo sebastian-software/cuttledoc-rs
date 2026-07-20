@@ -217,15 +217,25 @@ error of `5.36e-7` and a maximum aggregate relative error of `3.64e-7`, below
 the fixed `2e-6` and `2e-5` tolerances. The shape also matches in a CPU smoke
 run.
 
+The repository-owned path now also completes all 32 causal encoder layers,
+RoPE, rotating KV-cache updates, 750-frame sliding-window attention, 4x
+downsampling, and the audio-language adapter. The 864 stem frames split into
+750 and 114; the second chunk's explicit mask is `114 x 863`, while the cache
+reports a logical size of 750 and retains 863 materialized frames for the
+multi-token update. Fourteen layer, cache, and adapter fingerprints stay below
+`5e-5` sampled absolute and `1e-5` aggregate relative tolerances. The recorded
+GPU probe takes 391 ms and peaks at 2.46 GB.
+
 The machine-readable
 [`boundary record`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json),
 [`frontend oracle`](../benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json),
+[`frontend result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json),
 and
-[`frontend result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json)
-all explicitly keep `transcription: false`. The result stops before the
-32-layer causal encoder; it is not token, transcript, WER, or first-text-latency
-evidence. Those claims require the remaining staged parity gates through the
-same repository-owned session.
+[`encoder result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json)
+all explicitly keep `transcription: false`. The current result stops before
+delay conditioning and the 26-layer decoder; it is not token, transcript, WER,
+or first-text-latency evidence. Those claims require the remaining staged
+parity gates through the same repository-owned session.
 
 ## Artifact and license pins
 

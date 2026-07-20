@@ -6,7 +6,7 @@ product-boundary experiment without rejecting its model implementation as a
 reference oracle.
 
 The current milestone proves model identity, streaming lifecycle mechanics, and
-numerical parity through the audio frontend:
+numerical parity through the complete causal audio encoder:
 
 1. The C++ adapter loads the pinned 3.13 GB safetensors through official MLX
    and validates 1,523 tensors, their dtypes, 406 affine 4-bit modules, and
@@ -21,11 +21,15 @@ numerical parity through the audio frontend:
 5. The same adapter reproduces the reference runtime's offline-streaming
    padding, 128-bin log-mel frontend, and two causal Conv1d/GELU stages using
    the pinned model weights and official MLX operations.
+6. A reusable repository-owned rotating KV cache and sliding-window mask drive
+   all 32 encoder transformer layers, RoPE, 4x downsampling, and the
+   audio-language adapter without linking Python or `mlx-lm`.
 
 This milestone does **not** implement or claim transcription. The bounded
 session's small sum-of-squares operation remains a lifecycle fingerprint. The
-separate frontend probe executes real model preprocessing and weights, but it
-stops before all 32 causal encoder transformer layers and the decoder.
+separate model probe executes real preprocessing and weights through all 32
+causal encoder transformer layers. It stops before delay conditioning and the
+26-layer decoder.
 
 ## Pinned inputs
 
@@ -77,13 +81,23 @@ and
 `benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json`.
 The runner validates them with `scripts/validate-voxtral-mlx-frontend.mjs`.
 
+The encoder then processes the 864 stem frames as 750- and 114-frame chunks.
+The second chunk uses an explicit `114 x 863` causal sliding-window mask. Its
+cache has an absolute offset of 864 and a logical size of 750 while retaining
+863 materialized frames during the multi-token update, matching the pinned
+reference semantics. Across 14 encoder, adapter, and cache fingerprints, the
+maximum sampled absolute error is `2.29e-5` (tolerance `5e-5`) and the maximum
+aggregate relative error is `4.20e-6` (tolerance `1e-5`). The GPU probe takes
+391 ms and peaks at 2.46 GB on the recorded M1 Ultra run. The checked-in oracle
+and result use the corresponding `encoder-480ms` paths under
+`benchmarks/oracles` and `benchmarks/raw`.
+
 ## Remaining parity gates
 
-1. Port the 32-layer causal encoder with its cache and sliding-window rules.
-2. Port Tekken tokenization, delay conditioning, the 26-layer decoder, and its
+1. Port Tekken tokenization, delay conditioning, the 26-layer decoder, and its
    cache behind the same session handle.
-3. Require exact fixed-fixture token/text parity before claiming ASR.
-4. Rerun the 80/320 ms live-input, multilingual audiobook, and held-out
+2. Require exact fixed-fixture token/text parity before claiming ASR.
+3. Rerun the 80/320 ms live-input, multilingual audiobook, and held-out
    German-first target-domain gates through this repository-owned boundary.
-5. Only then compare packaging and lifecycle evidence with the pure-C/MPS
+4. Only then compare packaging and lifecycle evidence with the pure-C/MPS
    control and decide whether Voxtral becomes a product engine.

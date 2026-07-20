@@ -1,0 +1,578 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.voxtral-realtime-mlx-direct.encoder-480ms-1",
+  "captured_at": "2026-07-20T21:38:11.897Z",
+  "source_revision": "06dec4c8f0659a7b3992a03ac3d4480a524e5e83",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/19",
+  "measurement_scope": "Repository-owned 32-layer Voxtral causal encoder, rotating KV cache, sliding-window attention, 4x downsampling, and audio-language adapter executed through official MLX C++. This is encoder parity evidence, not a decoder, transcript, or quality result.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "conversion": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "artifact_sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+  },
+  "fixture": {
+    "id": "audiobook-de-135_82_000105",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+    "pcm_samples": 213440,
+    "sample_rate_hz": 16000,
+    "gold_status": "dataset-transcript-unverified"
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned Rust/C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.encoder-480ms.json",
+    "probe": {
+      "status": "ok",
+      "boundary": "official-mlx-cpp",
+      "stage": "voxtral-causal-encoder",
+      "device": "gpu",
+      "pcm_samples": 213440,
+      "transcription_delay_ms": 480,
+      "delay_tokens": 6,
+      "architecture": {
+        "layers": 32,
+        "dimension": 1280,
+        "attention_heads": 32,
+        "head_dimension": 64,
+        "sliding_window": 750,
+        "downsample_factor": 4,
+        "adapter_dimension": 3072
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "start": 0,
+          "length": 750,
+          "mask_kind": "causal",
+          "mask_shape": []
+        },
+        {
+          "index": 1,
+          "start": 750,
+          "length": 114,
+          "mask_kind": "array",
+          "mask_shape": [
+            114,
+            863
+          ]
+        }
+      ],
+      "cache": {
+        "layer_0_offset": 864,
+        "layer_0_size": 750,
+        "layer_0_materialized_key_frames": 863,
+        "layer_0_materialized_value_frames": 863
+      },
+      "output": {
+        "encoded_frames": 864,
+        "adapter_frames": 216
+      },
+      "elapsed_ms": 390.769166,
+      "peak_memory_bytes": 2455485568,
+      "fingerprints": {
+        "conv_stem": {
+          "shape": [
+            864,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.02189923957342291,
+          "stddev": 0.15480421580820136,
+          "minimum": -0.16997121274471283,
+          "maximum": 5.189393043518066,
+          "l1": 62046.490545981665,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            368640,
+            737280,
+            1105919
+          ],
+          "sample_values": [
+            0.036014266312122345,
+            -0.16036751866340637,
+            -0.004997228737920523,
+            -0.14058822393417358,
+            0.3293404281139374,
+            -0.021500462666153908,
+            -0.07055574655532837,
+            -0.014965852722525597
+          ]
+        },
+        "chunk_0_layer_0": {
+          "shape": [
+            750,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.009799597600682651,
+          "stddev": 0.2830581831683778,
+          "minimum": -41.79983901977539,
+          "maximum": 36.8428840637207,
+          "l1": 137435.59442085613,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            320000,
+            640000,
+            959999
+          ],
+          "sample_values": [
+            1.7345085144042969,
+            -8.878331184387207,
+            1.187568187713623,
+            -1.6993868350982666,
+            -1.6479785442352295,
+            0.11813181638717651,
+            0.08237571269273758,
+            -0.021277301013469696
+          ]
+        },
+        "chunk_0_layer_15": {
+          "shape": [
+            750,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.003658651277641426,
+          "stddev": 0.8310935289951826,
+          "minimum": -52.33709716796875,
+          "maximum": 40.40271759033203,
+          "l1": 593309.1982075647,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            320000,
+            640000,
+            959999
+          ],
+          "sample_values": [
+            -0.6238714456558228,
+            -13.716390609741211,
+            -3.020883560180664,
+            -3.4480390548706055,
+            -7.442144870758057,
+            0.21231652796268463,
+            -0.9239213466644287,
+            0.7832862734794617
+          ]
+        },
+        "chunk_0_layer_31": {
+          "shape": [
+            750,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.04599802822111645,
+          "stddev": 6.423666668241951,
+          "minimum": -483.2959289550781,
+          "maximum": 505.47650146484375,
+          "l1": 1408908.846576296,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            320000,
+            640000,
+            959999
+          ],
+          "sample_values": [
+            -65.24858093261719,
+            -14.053799629211426,
+            -4.05863618850708,
+            -5.64263916015625,
+            -16.13555335998535,
+            -40.66963195800781,
+            -35.803287506103516,
+            0.07677745819091797
+          ]
+        },
+        "chunk_0_norm": {
+          "shape": [
+            750,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.005097452655854812,
+          "stddev": 0.7187049433914625,
+          "minimum": -10.400391578674316,
+          "maximum": 11.185202598571777,
+          "l1": 223651.22512411544,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            320000,
+            640000,
+            959999
+          ],
+          "sample_values": [
+            -5.074468612670898,
+            -1.0470941066741943,
+            -0.30118846893310547,
+            -0.4137113690376282,
+            -1.1782493591308594,
+            -6.4218363761901855,
+            -6.285704135894775,
+            0.014940106309950352
+          ]
+        },
+        "chunk_1_layer_0": {
+          "shape": [
+            114,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.007841855312113821,
+          "stddev": 0.2145722631318418,
+          "minimum": -3.1523704528808594,
+          "maximum": 3.5004959106445312,
+          "l1": 16186.101441024919,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            48640,
+            97280,
+            145919
+          ],
+          "sample_values": [
+            0.13441167771816254,
+            -0.2328646332025528,
+            -0.061033979058265686,
+            0.04714719206094742,
+            0.197702556848526,
+            -0.17097057402133942,
+            -0.4092645049095154,
+            0.04335906356573105
+          ]
+        },
+        "chunk_1_layer_15": {
+          "shape": [
+            114,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.027747387737328384,
+          "stddev": 0.8257023685824485,
+          "minimum": -18.599817276000977,
+          "maximum": 9.54145622253418,
+          "l1": 85371.59925649012,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            48640,
+            97280,
+            145919
+          ],
+          "sample_values": [
+            0.18742744624614716,
+            0.8101348876953125,
+            -1.7522151470184326,
+            0.19758686423301697,
+            0.10668669641017914,
+            -7.470489501953125,
+            -16.686237335205078,
+            0.49036651849746704
+          ]
+        },
+        "chunk_1_layer_31": {
+          "shape": [
+            114,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.08969066266732913,
+          "stddev": 7.298660316769609,
+          "minimum": -145.28285217285156,
+          "maximum": 155.2088623046875,
+          "l1": 219901.89634001534,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            48640,
+            97280,
+            145919
+          ],
+          "sample_values": [
+            -27.049518585205078,
+            1.1705387830734253,
+            -1.4044573307037354,
+            -0.8937209248542786,
+            0.14555329084396362,
+            -36.81430435180664,
+            -75.52381134033203,
+            0.4232677221298218
+          ]
+        },
+        "chunk_1_norm": {
+          "shape": [
+            114,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.008837056326834403,
+          "stddev": 0.7167422884454653,
+          "minimum": -10.183367729187012,
+          "maximum": 10.9350004196167,
+          "l1": 29388.559784094054,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            48640,
+            97280,
+            145919
+          ],
+          "sample_values": [
+            -6.253835678100586,
+            0.2592657804489136,
+            -0.30983766913414,
+            -0.19479802250862122,
+            0.03159677982330322,
+            -7.993122100830078,
+            -8.604717254638672,
+            0.048851240426301956
+          ]
+        },
+        "encoded": {
+          "shape": [
+            864,
+            1280
+          ],
+          "source_dtype": "float32",
+          "mean": 0.00559087258466462,
+          "stddev": 0.718447403738523,
+          "minimum": -10.400391578674316,
+          "maximum": 11.185202598571777,
+          "l1": 253039.78490820964,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            368640,
+            737280,
+            1105919
+          ],
+          "sample_values": [
+            -5.074468612670898,
+            -1.0470941066741943,
+            -0.30118846893310547,
+            -0.4137113690376282,
+            -1.1782493591308594,
+            -6.368152141571045,
+            -6.612545967102051,
+            0.048851240426301956
+          ]
+        },
+        "adapter_projection0_gelu": {
+          "shape": [
+            216,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": -0.05616430955714585,
+          "stddev": 0.05503464278564534,
+          "minimum": -0.16997122764587402,
+          "maximum": 4.334818363189697,
+          "l1": 41507.045359007556,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            221184,
+            442368,
+            663551
+          ],
+          "sample_values": [
+            -0.06587786227464676,
+            -0.056841060519218445,
+            -0.13326258957386017,
+            -0.16984789073467255,
+            -0.16996444761753082,
+            -0.05848053842782974,
+            -0.004120930097997189,
+            -0.02276493050158024
+          ]
+        },
+        "adapter": {
+          "shape": [
+            216,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.002216646560579703,
+          "stddev": 0.17398108395557746,
+          "minimum": -1.5957626104354858,
+          "maximum": 21.612367630004883,
+          "l1": 29135.936276591343,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            221184,
+            442368,
+            663551
+          ],
+          "sample_values": [
+            0.31536105275154114,
+            -1.4522747993469238,
+            21.612367630004883,
+            -0.5491347312927246,
+            -0.4050767421722412,
+            -0.09804920107126236,
+            -0.04969922825694084,
+            0.029070356860756874
+          ]
+        },
+        "layer_0_cache_keys": {
+          "shape": [
+            1,
+            32,
+            863,
+            64
+          ],
+          "source_dtype": "float32",
+          "mean": -0.000906927316813112,
+          "stddev": 1.0833533713301648,
+          "minimum": -11.11555004119873,
+          "maximum": 11.90030288696289,
+          "l1": 1186098.2433771174,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            589141,
+            1178282,
+            1767423
+          ],
+          "sample_values": [
+            0.2664026618003845,
+            0.19174982607364655,
+            0.35046955943107605,
+            -0.3606393039226532,
+            0.4093487858772278,
+            -0.6816439032554626,
+            -0.922265887260437,
+            0.4539567530155182
+          ]
+        },
+        "layer_0_cache_values": {
+          "shape": [
+            1,
+            32,
+            863,
+            64
+          ],
+          "source_dtype": "float32",
+          "mean": -0.001845815417739641,
+          "stddev": 0.13322402076377507,
+          "minimum": -1.3773674964904785,
+          "maximum": 1.9696552753448486,
+          "l1": 163265.20971245167,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            589141,
+            1178282,
+            1767423
+          ],
+          "sample_values": [
+            -0.0256928913295269,
+            0.1095241829752922,
+            -0.21368932723999023,
+            -0.09235145151615143,
+            0.16407723724842072,
+            -0.06184355914592743,
+            -0.13894252479076385,
+            -0.04268708825111389
+          ]
+        }
+      },
+      "capabilities": {
+        "causal_encoder": true,
+        "rotating_kv_cache": true,
+        "sliding_window_attention": true,
+        "adapter_projection": true,
+        "decoder": false,
+        "transcription": false
+      }
+    },
+    "parity": {
+      "status": "ok",
+      "sample_absolute_tolerance": 0.00005,
+      "aggregate_relative_tolerance": 0.00001,
+      "maximum_sample_absolute_error": 0.00002288818359375,
+      "maximum_aggregate_relative_error": 0.000004191682710747764
+    },
+    "cpu_smoke": {
+      "status": "ok",
+      "elapsed_ms": 134461.069709,
+      "peak_memory_bytes": 1143966520,
+      "encoded_frames": 864,
+      "adapter_frames": 216,
+      "cache_size": 750,
+      "materialized_cache_frames": 863
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18869616,
+    "rust_probe_bytes": 411424,
+    "mlx_metallib_bytes": 130164152
+  },
+  "limitations": [
+    "The probe stops after the audio-language adapter; it does not execute delay conditioning, any of the 26 decoder transformer layers, the tied language-model head, or Tekken decoding.",
+    "No token, transcript, WER, first-text latency, or end-to-end streaming claim follows from this encoder result.",
+    "The 134-second CPU smoke test is a portability check; Apple-local product performance is measured on the MLX GPU path."
+  ],
+  "next_gate": "Match delay conditioning, prompt embeddings, the 26-layer GQA decoder, decoder cache, greedy tokens, and Tekken text against the pinned reference."
+}
