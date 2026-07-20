@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -62,12 +63,36 @@ constexpr std::size_t kTextCacheStep = 256;
 constexpr std::size_t kMaximumGeneratedTokens = 256;
 
 std::mutex runtime_mutex;
+std::optional<mx::Stream> runtime_cpu_stream;
+std::optional<mx::Stream> runtime_gpu_stream;
 
 int32_t fail(const std::string &message, char **error_out) {
   if (error_out != nullptr) {
     *error_out = strdup(message.c_str());
   }
   return 1;
+}
+
+int32_t fail_with_status(int32_t status, const std::string &message,
+                         char **error_out) {
+  if (error_out != nullptr) {
+    *error_out = strdup(message.c_str());
+  }
+  return status;
+}
+
+class CancelledError : public std::runtime_error {
+public:
+  using std::runtime_error::runtime_error;
+};
+
+mx::Stream reusable_thread_unsafe_stream(mx::Device device) {
+  auto &stream =
+      device == mx::Device::cpu ? runtime_cpu_stream : runtime_gpu_stream;
+  if (!stream.has_value()) {
+    stream = mx::new_thread_unsafe_stream(device);
+  }
+  return stream.value();
 }
 
 std::string json_escape(std::string_view value) {
@@ -1364,9 +1389,19 @@ public:
     return json.str();
   }
 
-  std::string transcribe(const float *audio, std::size_t audio_len,
-                         std::string_view language) const {
+  std::string transcribe(
+      const float *audio, std::size_t audio_len, std::string_view language,
+      const std::atomic<bool> *cancel_requested = nullptr) const {
+    const auto check_cancelled = [&](std::string_view boundary) {
+      if (cancel_requested != nullptr &&
+          cancel_requested->load(std::memory_order_relaxed)) {
+        throw CancelledError("transcription cancelled at " +
+                             std::string(boundary));
+      }
+    };
+
     const auto started = std::chrono::steady_clock::now();
+    check_cancelled("prompt graph");
     const auto prompt = build_prompt_inputs(audio, audio_len, language);
     if (prompt.token_ids.size() < 2) {
       throw std::runtime_error(
@@ -1382,6 +1417,7 @@ public:
         {1, 1, 1}, device_);
     static_cast<void>(text_model(prefix_embeddings, caches));
     evaluate_text_caches(caches);
+    check_cancelled("decoder prefill");
 
     const auto final_prompt_embedding = mx::slice(
         prompt.embeddings, {0, static_cast<int>(prefix_length), 0},
@@ -1390,11 +1426,13 @@ public:
         {1, 1, 1}, device_);
     auto hidden = text_model(final_prompt_embedding, caches);
     auto token = greedy_token(mx::squeeze(output_logits(hidden), 1, device_));
+    check_cancelled("decoder step");
 
     std::vector<int32_t> generated_tokens;
     generated_tokens.reserve(kMaximumGeneratedTokens);
     std::optional<int32_t> stop_token;
     for (std::size_t index = 0; index < kMaximumGeneratedTokens; ++index) {
+      check_cancelled("decoder step");
       if (token == kEndOfTextToken || token == kImEndToken) {
         stop_token = token;
         break;
@@ -1402,10 +1440,13 @@ public:
       generated_tokens.push_back(token);
       hidden = text_model(embed_token_ids({token}), caches);
       token = greedy_token(mx::squeeze(output_logits(hidden), 1, device_));
+      check_cancelled("decoder step");
     }
 
+    check_cancelled("tokenizer decode");
     const QwenTokenizer tokenizer(model_directory_);
     const auto text = tokenizer.decode(generated_tokens);
+    check_cancelled("result serialization");
     const auto elapsed =
         std::chrono::duration<double, std::milli>(
             std::chrono::steady_clock::now() - started)
@@ -1898,6 +1939,22 @@ private:
   std::vector<float> mel_filters_;
 };
 
+struct Qwen3MlxSession {
+  Qwen3MlxSession(const std::filesystem::path &model_directory,
+                  mx::Device requested_device, mx::Stream requested_cpu_stream,
+                  mx::Stream requested_device_stream)
+      : device(requested_device), cpu_stream(requested_cpu_stream),
+        device_stream(requested_device_stream),
+        model(model_directory, requested_device) {}
+
+  mx::Device device;
+  mx::Stream cpu_stream;
+  mx::Stream device_stream;
+  Qwen3AudioEncoder model;
+  std::atomic<bool> cancel_requested{false};
+  std::mutex operation_mutex;
+};
+
 mx::Device requested_device(int32_t device_kind) {
   if (device_kind == 0) {
     return mx::Device::cpu;
@@ -1905,7 +1962,7 @@ mx::Device requested_device(int32_t device_kind) {
   if (device_kind == 1) {
     return mx::Device::gpu;
   }
-  throw std::runtime_error("device_kind must be 0 (CPU) or 1 (GPU)");
+  throw std::invalid_argument("device_kind must be 0 (CPU) or 1 (GPU)");
 }
 
 } // namespace
@@ -2133,6 +2190,141 @@ extern "C" int32_t cuttledoc_qwen3_mlx_transcribe(
     return fail("MLX raised a non-standard exception in transcription",
                 error_out);
   }
+}
+
+extern "C" void *cuttledoc_qwen3_mlx_session_create(
+    const char *model_directory, int32_t device_kind, int32_t *status_out,
+    char **error_out) {
+  if (status_out != nullptr) {
+    *status_out = CUTTLEDOC_QWEN3_MLX_OK;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || status_out == nullptr) {
+    if (status_out != nullptr) {
+      *status_out = CUTTLEDOC_QWEN3_MLX_INVALID_ARGUMENT;
+    }
+    fail_with_status(CUTTLEDOC_QWEN3_MLX_INVALID_ARGUMENT,
+                     "model_directory and status_out must be non-null",
+                     error_out);
+    return nullptr;
+  }
+
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      *status_out = CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR;
+      fail_with_status(CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR,
+                       "requested MLX device is not available", error_out);
+      return nullptr;
+    }
+    mx::set_default_device(device);
+    const auto cpu_stream =
+        reusable_thread_unsafe_stream(mx::Device::cpu);
+    mx::set_default_stream(cpu_stream);
+    const auto device_stream =
+        device == mx::Device::cpu
+            ? cpu_stream
+            : reusable_thread_unsafe_stream(device);
+    mx::set_default_stream(device_stream);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    return new Qwen3MlxSession(model_directory, device, cpu_stream,
+                               device_stream);
+  } catch (const std::invalid_argument &error) {
+    *status_out = CUTTLEDOC_QWEN3_MLX_INVALID_ARGUMENT;
+    fail_with_status(*status_out, error.what(), error_out);
+  } catch (const std::exception &error) {
+    *status_out = CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR;
+    fail_with_status(*status_out, error.what(), error_out);
+  } catch (...) {
+    *status_out = CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR;
+    fail_with_status(*status_out,
+                     "MLX raised a non-standard exception while creating a "
+                     "transcription session",
+                     error_out);
+  }
+  return nullptr;
+}
+
+extern "C" int32_t cuttledoc_qwen3_mlx_session_transcribe(
+    void *handle, const float *audio, std::size_t audio_len,
+    const char *language, char **json_out, char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (handle == nullptr || audio == nullptr || audio_len == 0 ||
+      language == nullptr || json_out == nullptr) {
+    return fail_with_status(
+        CUTTLEDOC_QWEN3_MLX_INVALID_ARGUMENT,
+        "handle, non-empty audio, language, and json_out must be non-null",
+        error_out);
+  }
+
+  auto *session = static_cast<Qwen3MlxSession *>(handle);
+  std::unique_lock operation(session->operation_mutex, std::try_to_lock);
+  if (!operation.owns_lock()) {
+    return fail_with_status(CUTTLEDOC_QWEN3_MLX_BUSY,
+                            "transcription session is already active",
+                            error_out);
+  }
+
+  session->cancel_requested.store(false, std::memory_order_relaxed);
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    mx::set_default_device(session->device);
+    mx::set_default_stream(session->cpu_stream);
+    mx::set_default_stream(session->device_stream);
+    mx::reset_peak_memory();
+    const auto json = session->model.transcribe(
+        audio, audio_len, language, &session->cancel_requested);
+    *json_out = strdup(json.c_str());
+    if (*json_out == nullptr) {
+      return fail_with_status(CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR,
+                              "could not allocate JSON result", error_out);
+    }
+    return CUTTLEDOC_QWEN3_MLX_OK;
+  } catch (const CancelledError &error) {
+    return fail_with_status(CUTTLEDOC_QWEN3_MLX_CANCELLED, error.what(),
+                            error_out);
+  } catch (const std::invalid_argument &error) {
+    return fail_with_status(CUTTLEDOC_QWEN3_MLX_INVALID_ARGUMENT, error.what(),
+                            error_out);
+  } catch (const std::exception &error) {
+    return fail_with_status(CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR, error.what(),
+                            error_out);
+  } catch (...) {
+    return fail_with_status(
+        CUTTLEDOC_QWEN3_MLX_RUNTIME_ERROR,
+        "MLX raised a non-standard exception in session transcription",
+        error_out);
+  }
+}
+
+extern "C" void cuttledoc_qwen3_mlx_session_cancel(void *handle) {
+  if (handle == nullptr) {
+    return;
+  }
+  static_cast<Qwen3MlxSession *>(handle)->cancel_requested.store(
+      true, std::memory_order_relaxed);
+}
+
+extern "C" void cuttledoc_qwen3_mlx_session_destroy(void *handle) {
+  if (handle == nullptr) {
+    return;
+  }
+  auto *session = static_cast<Qwen3MlxSession *>(handle);
+  session->cancel_requested.store(true, std::memory_order_relaxed);
+  session->operation_mutex.lock();
+  session->operation_mutex.unlock();
+  const std::lock_guard lock(runtime_mutex);
+  delete session;
+  mx::clear_cache();
 }
 
 extern "C" void cuttledoc_qwen3_mlx_free_string(char *value) {
