@@ -78,7 +78,8 @@ Evidence snapshot: 2026-07-20.
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
 | End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
-| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advances to an owned official-MLX adapter; every other named artifact has an exact runtime/license blocker. |
+| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advanced to the owned adapter in #17; every other named artifact has an exact runtime/license blocker. |
+| Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
 
@@ -287,15 +288,18 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Establish the language-by-domain quality protocol: preserve the historical
-   correction evidence, add severity-aware alignments, expand the FLEURS
-   variance set, and acquire audiobook plus professional-podcast gold data.
-2. Open and execute the bounded Qwen3-ASR 0.6B adapter follow-up directly over
-   official MLX; the community runtime remains an external oracle only.
-3. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
+1. Acquire source-grouped, held-out professional-podcast and independent
+   audiobook gold data, German first; expand the short-read variance set
+   without mixing inspected development sources into validation or test.
+2. Run Apple SpeechTranscriber, Whisper large-v3-turbo, direct Qwen3-ASR, and
+   Parakeet on identical language/domain cells. Retain raw output, surface
+   scores, semantic-severity review, and backend-specific error profiles.
+3. Use those real raw outputs to execute the frozen surface-only and bounded
+   lexical postprocessing candidates under #7. Keep corrected text separate
+   from raw ASR ranking and reject critical semantic regressions.
+4. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
-4. Finish #9 with Node 22 plus packed-artifact CI gates.
-4. Record the selected first ASR backend and fallback in an ADR, then scaffold
-   only the Phase 1 crates justified by that decision.
-5. Complete #7 independently with an evidence-backed embedded-LLM
-   recommendation or defer decision.
+5. Finish #9 with Node 22 plus packed-artifact CI gates.
+6. Record Apple SpeechTranscriber as the selected first backend and Whisper
+   large-v3-turbo as the opt-in fallback in an ADR, then scaffold only the
+   Phase 1 crates justified by that decision.
