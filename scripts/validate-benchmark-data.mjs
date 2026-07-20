@@ -364,6 +364,7 @@ function validateSyntheticRoundtripPlan(plan) {
   const requiredCandidateIds = [
     'apple-avspeechsynthesizer',
     'qwen3-tts-0.6b-customvoice-mlx-audio',
+    'voxtral-tts-4b-mlx-audio',
     'chatterbox-multilingual-mlx-audio',
     'qwen-audio-3.0-tts-plus-api',
   ];
@@ -507,7 +508,7 @@ function validateSyntheticRoundtripPlan(plan) {
   const mlxCandidates = candidates.filter(
     (candidate) => candidate.runtime?.startsWith('Blaizzy/mlx-audio'),
   );
-  if (mlxCandidates.length !== 2 ||
+  if (mlxCandidates.length !== 3 ||
       mlxCandidates.some(
         (candidate) => candidate.source_revision !==
           '64e8416c303fb3b3463dab8eb4ebd78c55a87c1a',
@@ -897,6 +898,84 @@ function validateQwen3TtsModelManifest(modelManifest, plan, selection) {
       candidate.status !==
         'measured-reference-run-pending-listening') {
     errors.push('synthetic plan does not reference the pinned model and runtime');
+  }
+  return errors;
+}
+
+function validateVoxtralTtsModelManifest(modelManifest, plan, selection) {
+  const errors = [];
+  if (modelManifest.id !== 'voxtral-4b-tts-2603-mlx-4bit' ||
+      modelManifest.task !== 'tts') {
+    errors.push('id and task must identify the Voxtral TTS MLX reference');
+  }
+  for (const revision of [
+    modelManifest.source?.observed_revision,
+    modelManifest.conversion?.revision,
+    modelManifest.reference_runtime?.revision,
+  ]) {
+    if (!/^[0-9a-f]{40}$/.test(revision ?? '')) {
+      errors.push(`invalid pinned revision: ${revision}`);
+    }
+  }
+  if (modelManifest.source?.license !== 'CC-BY-NC-4.0' ||
+      modelManifest.conversion?.license !== 'CC-BY-NC-4.0' ||
+      modelManifest.reference_runtime?.license !== 'MIT' ||
+      !(modelManifest.source?.provenance_limit?.length > 0)) {
+    errors.push('Voxtral licenses and conversion provenance must be explicit');
+  }
+  const contract = modelManifest.generation_contract;
+  if (!modelManifest.source?.supported_languages?.includes('German') ||
+      contract?.locale !== 'de-DE' ||
+      contract?.speaker !== 'de_female' ||
+      contract?.speaker_native_language !== 'German' ||
+      contract?.cross_lingual !== false ||
+      contract?.sample_rate_hz !== 24000) {
+    errors.push('Voxtral must preserve the native German voice contract');
+  }
+  const passage = selection.sources
+    .flatMap((source) => source.passages)
+    .find((item) => item.id === contract?.passage_id);
+  if (!passage) {
+    errors.push('Voxtral generation passage is not in the selection');
+  }
+
+  const artifactPaths = new Set();
+  let artifactBytes = 0;
+  for (const artifact of modelManifest.artifacts ?? []) {
+    if (!(artifact.path?.length > 0) || artifactPaths.has(artifact.path)) {
+      errors.push(`invalid or duplicate Voxtral artifact: ${artifact.path}`);
+    }
+    artifactPaths.add(artifact.path);
+    if (!(Number.isInteger(artifact.bytes) && artifact.bytes > 0) ||
+        !/^[0-9a-f]{64}$/.test(artifact.sha256 ?? '')) {
+      errors.push(`${artifact.path}: invalid byte count or SHA-256`);
+    }
+    artifactBytes += artifact.bytes ?? 0;
+  }
+  for (const requiredPath of [
+    'config.json',
+    'model.safetensors',
+    'tekken.json',
+    'voice_embedding/de_female.safetensors',
+  ]) {
+    if (!artifactPaths.has(requiredPath)) {
+      errors.push(`missing required Voxtral artifact: ${requiredPath}`);
+    }
+  }
+  if (artifactBytes !== modelManifest.conversion?.snapshot_bytes ||
+      modelManifest.conversion?.weight_bytes !== 2509879373) {
+    errors.push('Voxtral artifact bytes do not reconcile with the snapshot');
+  }
+
+  const candidate = plan.tts_candidates.find(
+    (item) => item.id === 'voxtral-tts-4b-mlx-audio',
+  );
+  if (!candidate ||
+      !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
+      candidate.source_revision !== modelManifest.reference_runtime?.revision ||
+      candidate.status !== 'artifact-pinned-pending-reference-run' ||
+      !candidate.license.includes('CC-BY-NC-4.0')) {
+    errors.push('synthetic plan must pin Voxtral and keep it reference-only');
   }
   return errors;
 }
@@ -1922,6 +2001,10 @@ const qwen3TtsModelManifestPath = join(
   repoRoot,
   'spikes/qwen3-tts-mlx-reference/model-manifest.json',
 );
+const voxtralTtsModelManifestPath = join(
+  repoRoot,
+  'spikes/voxtral-tts-mlx-reference/model-manifest.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -1972,6 +2055,7 @@ const syntheticRoundtripSelection = await readJson(
 const appleTtsRun = await readJson(appleTtsRunPath);
 const qwen3TtsRun = await readJson(qwen3TtsRunPath);
 const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
+const voxtralTtsModelManifest = await readJson(voxtralTtsModelManifestPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -2027,6 +2111,13 @@ failures.push(
     syntheticRoundtripPlan,
     syntheticRoundtripSelection,
   ).map((error) => `${qwen3TtsModelManifestPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralTtsModelManifest(
+    voxtralTtsModelManifest,
+    syntheticRoundtripPlan,
+    syntheticRoundtripSelection,
+  ).map((error) => `${voxtralTtsModelManifestPath}: ${error}`),
 );
 failures.push(
   ...validateQwen3TtsRun(
@@ -2215,6 +2306,19 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push(
       'validator self-test failed to reject divergent Qwen3-TTS content metrics',
+    );
+  }
+  const invalidVoxtralTtsModelManifest = structuredClone(
+    voxtralTtsModelManifest,
+  );
+  invalidVoxtralTtsModelManifest.artifacts[0].bytes += 1;
+  if (validateVoxtralTtsModelManifest(
+    invalidVoxtralTtsModelManifest,
+    syntheticRoundtripPlan,
+    syntheticRoundtripSelection,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent Voxtral TTS snapshot bytes',
     );
   }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);

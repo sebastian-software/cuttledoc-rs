@@ -65,6 +65,7 @@ repository license.
 | --- | --- | --- | --- |
 | Apple `AVSpeechSynthesizer` | system baseline | narrow Swift-to-C ABI called from Rust | fastest path to validate the synthesis lifecycle and capture an installed German voice |
 | Qwen3-TTS 0.6B CustomVoice | primary open MLX candidate | pinned `mlx-audio` Python reference runner | German-capable, comparatively bounded model and a practical Apple Silicon implementation |
+| Voxtral 4B TTS 2603 | native European-language quality candidate | pinned 4-bit `mlx-audio` reference runner | native German/French/Spanish/Italian/Portuguese/Dutch voices and strong publisher-reported European-language results |
 | Chatterbox multilingual | expressive open MLX comparator | pinned `mlx-audio` Python reference runner | German support and a different quality/prosody trade-off |
 | Qwen-Audio-3.0-TTS-Plus | remote English quality ceiling | Alibaba Cloud API reference runner | current provider-voice leader; prevents the local comparison from defining quality only relative to weak baselines |
 
@@ -83,6 +84,16 @@ measure model behavior. The measurements then decide between:
 The reference path must not silently define the future Rust API. It exists to
 produce evidence for the repository-owned synthesis contract required by
 ADR-0009.
+
+Voxtral is evaluated separately for synthesis and recognition. For TTS, the
+official model provides 20 presets across nine languages, including native
+German and French voices. The publisher paper reports a German WER reduction
+from 4.08% before DPO to 0.83% after DPO, plus a 72.0% German human preference
+win rate against ElevenLabs Flash v2.5. Those figures justify a local
+language-specific measurement but do not substitute for the shared benchmark.
+The open TTS weights and supplied voices are CC BY-NC 4.0, so they remain
+reference-only; production would require the hosted Mistral API or a separate
+commercial license.
 
 On 2026-07-20, Artificial Analysis ranked Qwen-Audio-3.0-TTS-Plus first in its
 Provider Voice Arena at 1,237 Quality Elo (±17) from 1,427 samples. That is
@@ -185,7 +196,8 @@ to assign any audible residual errors.
 4. Run the two local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.
-5. Add Chatterbox only after the runner and report contract are stable.
+5. Run Voxtral TTS with its native German preset, then add Chatterbox only
+   after the runner and report contract are stable.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

@@ -121,6 +121,33 @@
       "decision_after_pilot": "Compare accepting mlx-audio with owning only the required Qwen3-TTS path directly over official MLX."
     },
     {
+      "id": "voxtral-tts-4b-mlx-audio",
+      "role": "native-european-language-quality-candidate",
+      "runtime": "Blaizzy/mlx-audio over official Apple MLX",
+      "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-4bit@f98fc91b9cb5adc7dab56102c690458276c14c6a",
+      "integration": "pinned Python reference runner with a native German preset; production use requires a separate commercial license or provider API",
+      "source_url": "https://huggingface.co/mlx-community/Voxtral-4B-TTS-2603-mlx-4bit",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "CC-BY-NC-4.0 model and supplied voice references; MIT reference runtime; reference evaluation only under the repository dependency policy",
+      "status": "artifact-pinned-pending-reference-run",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "supported_languages": [
+        "de-DE",
+        "en-US",
+        "fr-FR",
+        "es-ES",
+        "it-IT",
+        "pt-PT",
+        "nl-NL",
+        "ar",
+        "hi"
+      ],
+      "decision_after_pilot": "If native German and other European-language quality materially lead, evaluate the hosted Mistral API or a commercial weight license; do not ship the CC-BY-NC artifact."
+    },
+    {
       "id": "chatterbox-multilingual-mlx-audio",
       "role": "expressive-open-mlx-comparator",
       "runtime": "Blaizzy/mlx-audio over official Apple MLX",
