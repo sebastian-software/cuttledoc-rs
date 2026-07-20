@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <mutex>
 #include <numeric>
 #include <optional>
@@ -502,7 +503,7 @@ std::string model_json(const LoadedModel &model) {
        << "\"adapter_projection\":true,\"delay_conditioning\":true,"
        << "\"decoder\":true,\"decoder_kv_cache\":true,"
        << "\"tekken_decode\":true,\"greedy_transcription\":true,"
-       << "\"transcription\":true,\"streaming_session\":false}}";
+       << "\"transcription\":true,\"streaming_session\":true}}";
   return json.str();
 }
 
@@ -794,6 +795,58 @@ public:
   VoxtralCausalEncoder(const LoadedModel &model, mx::Device device)
       : model_(model), device_(device) {}
 
+  std::vector<mx_support::RotatingKeyValueCache> make_cache() const {
+    std::vector<mx_support::RotatingKeyValueCache> caches;
+    caches.reserve(kEncoderLayers);
+    for (std::size_t layer = 0; layer < kEncoderLayers; ++layer) {
+      caches.emplace_back(kEncoderSlidingWindow, 0);
+    }
+    return caches;
+  }
+
+  mx::array encode_chunk(
+      const mx::array &conv_chunk, std::size_t start_position,
+      std::vector<mx_support::RotatingKeyValueCache> &caches) const {
+    if (conv_chunk.ndim() != 2 ||
+        conv_chunk.shape(1) != static_cast<int>(kEncoderDimension) ||
+        conv_chunk.shape(0) == 0 || caches.size() != kEncoderLayers) {
+      throw std::invalid_argument(
+          "streaming encoder requires non-empty [frames, 1280] input and 32 caches");
+    }
+    const auto chunk_length =
+        static_cast<std::size_t>(conv_chunk.shape(0));
+    const auto mask = caches.front().make_mask(
+        chunk_length, kEncoderSlidingWindow, device_, true);
+    auto hidden = conv_chunk;
+    for (std::size_t layer = 0; layer < kEncoderLayers; ++layer) {
+      hidden = encoder_layer(hidden, start_position, layer, mask,
+                             caches[layer]);
+    }
+    return rms_norm(hidden, "encoder.transformer_norm.weight");
+  }
+
+  mx::array project_aligned(const mx::array &encoded) const {
+    if (encoded.ndim() != 2 ||
+        encoded.shape(1) != static_cast<int>(kEncoderDimension) ||
+        encoded.shape(0) == 0 ||
+        encoded.shape(0) % static_cast<int>(kDownsampleFactor) != 0) {
+      throw std::invalid_argument(
+          "adapter projection requires aligned [frames, 1280] encoder output");
+    }
+    const auto adapter_frames =
+        static_cast<std::size_t>(encoded.shape(0)) / kDownsampleFactor;
+    auto downsampled = mx::reshape(
+        encoded,
+        {static_cast<int>(adapter_frames),
+         static_cast<int>(kEncoderDimension * kDownsampleFactor)},
+        device_);
+    auto projection0 = precise_gelu(
+        linear(downsampled, "encoder.audio_language_projection_0.weight"),
+        device_);
+    return linear(projection0,
+                  "encoder.audio_language_projection_2.weight");
+  }
+
   EncoderResult encode(const mx::array &conv_stem,
                        EncoderEvidence *evidence = nullptr) const {
     if (conv_stem.ndim() != 2 ||
@@ -803,11 +856,7 @@ public:
           "encoder input must be aligned [frames, 1280] conv output");
     }
 
-    std::vector<mx_support::RotatingKeyValueCache> caches;
-    caches.reserve(kEncoderLayers);
-    for (std::size_t layer = 0; layer < kEncoderLayers; ++layer) {
-      caches.emplace_back(kEncoderSlidingWindow, 0);
-    }
+    auto caches = make_cache();
 
     std::vector<mx::array> encoded_chunks;
     for (std::size_t chunk_start = 0;
@@ -1313,6 +1362,505 @@ private:
   std::vector<mx::array> ada_scales_;
 };
 
+int32_t greedy_token(const mx::array &logits, mx::Device device);
+
+class StreamingMel {
+public:
+  explicit StreamingMel(mx::Device device)
+      : device_(device), window_(0.0f), mel_filters_(0.0f) {
+    std::vector<float> window(kFftSize);
+    constexpr auto pi = 3.14159265358979323846;
+    for (std::size_t index = 0; index < kFftSize; ++index) {
+      window[index] = static_cast<float>(
+          0.5 - 0.5 * std::cos(2.0 * pi * static_cast<double>(index) /
+                               static_cast<double>(kFftSize)));
+    }
+    window_ = mx::array(window.begin(), {static_cast<int>(window.size())});
+    const auto filters = make_slaney_mel_filters();
+    mel_filters_ = mx::array(
+        filters.begin(),
+        {static_cast<int>(kFrequencyBins), static_cast<int>(kMelBins)});
+    if (device_ == mx::Device::gpu) {
+      window_ = mx::copy(std::move(window_), device_);
+      mel_filters_ = mx::copy(std::move(mel_filters_), device_);
+    }
+    mx::eval(window_, mel_filters_);
+  }
+
+  std::optional<mx::array> append(const float *samples,
+                                  std::size_t sample_count) {
+    if (closed_) {
+      throw std::runtime_error("streaming mel is closed");
+    }
+    if (sample_count == 0) {
+      return std::nullopt;
+    }
+    audio_.insert(audio_.end(), samples, samples + sample_count);
+    return drain(false);
+  }
+
+  std::optional<mx::array> append(const std::vector<float> &samples) {
+    return append(samples.data(), samples.size());
+  }
+
+  std::optional<mx::array> close() {
+    if (closed_) {
+      return std::nullopt;
+    }
+    closed_ = true;
+    return drain(true);
+  }
+
+  std::size_t received_samples() const { return audio_.size(); }
+  std::size_t emitted_frames() const { return next_frame_; }
+
+private:
+  std::optional<mx::array> drain(bool final) {
+    const auto received = audio_.size();
+    std::size_t maximum_frame = 0;
+    if (final) {
+      if (received < kHopLength) {
+        return std::nullopt;
+      }
+      maximum_frame = received / kHopLength - 1;
+    } else {
+      if (received < kFftSize / 2) {
+        return std::nullopt;
+      }
+      maximum_frame = (received - kFftSize / 2) / kHopLength;
+    }
+    if (next_frame_ > maximum_frame) {
+      return std::nullopt;
+    }
+
+    const auto frame_count = maximum_frame - next_frame_ + 1;
+    std::vector<float> windows(frame_count * kFftSize);
+    for (std::size_t frame = 0; frame < frame_count; ++frame) {
+      const auto global_frame = next_frame_ + frame;
+      const auto start =
+          static_cast<std::int64_t>(global_frame * kHopLength) -
+          static_cast<std::int64_t>(kFftSize / 2);
+      for (std::size_t offset = 0; offset < kFftSize; ++offset) {
+        const auto raw_index = start + static_cast<std::int64_t>(offset);
+        std::int64_t source_index = raw_index;
+        if (raw_index < 0) {
+          source_index = -raw_index;
+        } else if (raw_index >= static_cast<std::int64_t>(received)) {
+          if (!closed_) {
+            throw std::runtime_error(
+                "non-final streaming mel attempted right reflection");
+          }
+          source_index =
+              2 * static_cast<std::int64_t>(received) - 2 - raw_index;
+        }
+        if (source_index < 0 ||
+            source_index >= static_cast<std::int64_t>(received)) {
+          throw std::runtime_error(
+              "streaming mel reflection exceeded available audio");
+        }
+        windows[frame * kFftSize + offset] =
+            audio_[static_cast<std::size_t>(source_index)];
+      }
+    }
+    next_frame_ = maximum_frame + 1;
+
+    auto frames = mx::array(
+        windows.begin(),
+        {static_cast<int>(frame_count), static_cast<int>(kFftSize)});
+    if (device_ == mx::Device::gpu) {
+      frames = mx::copy(std::move(frames), device_);
+    }
+    auto frequencies = mx::fft::rfft(
+        frames * window_, -1, mx::fft::FFTNorm::Backward, device_);
+    auto log_mel = mx::log10(
+        mx::maximum(
+            mx::matmul(mx::square(mx::abs(frequencies, device_), device_),
+                       mel_filters_, device_),
+            mx::array(1e-10f), device_),
+        device_);
+    log_mel = mx::maximum(log_mel, mx::array(-6.5f), device_);
+    log_mel = (log_mel + 4.0) / 4.0;
+    return mx::transpose(log_mel, {1, 0}, device_);
+  }
+
+  mx::Device device_;
+  mx::array window_;
+  mx::array mel_filters_;
+  std::vector<float> audio_;
+  std::size_t next_frame_{0};
+  bool closed_{false};
+};
+
+class StreamingCausalConv1d {
+public:
+  StreamingCausalConv1d(mx::array weight, mx::array bias, std::size_t stride,
+                        mx::Device device)
+      : weight_(std::move(weight)), bias_(std::move(bias)), stride_(stride),
+        keep_(static_cast<std::size_t>(weight_.shape(1)) - stride),
+        device_(device) {}
+
+  mx::array step(const mx::array &input) {
+    if (input.ndim() != 2) {
+      throw std::invalid_argument(
+          "streaming causal convolution requires [frames, channels]");
+    }
+    if (input.shape(0) == 0) {
+      return empty(input.dtype());
+    }
+    auto context = input;
+    if (!initialized_) {
+      if (keep_ > 0) {
+        context = mx::concatenate(
+            {mx::zeros({static_cast<int>(keep_), input.shape(1)},
+                       input.dtype(), device_),
+             input},
+            0, device_);
+      }
+      initialized_ = true;
+    } else if (state_.has_value()) {
+      context = mx::concatenate({state_.value(), input}, 0, device_);
+    }
+
+    const auto kernel = static_cast<std::size_t>(weight_.shape(1));
+    if (static_cast<std::size_t>(context.shape(0)) < kernel) {
+      state_ = context;
+      return empty(input.dtype());
+    }
+    auto output = mx::squeeze(
+        mx::conv1d(mx::expand_dims(context, 0, device_), weight_,
+                   static_cast<int>(stride_), 0, 1, 1, device_) +
+            bias_,
+        0, device_);
+    const auto output_frames = static_cast<std::size_t>(output.shape(0));
+    const auto leftover =
+        static_cast<std::size_t>(context.shape(0)) - output_frames * stride_;
+    if (keep_ == 0 || leftover == 0) {
+      state_.reset();
+    } else {
+      const auto state_frames = std::min(keep_, leftover);
+      state_ = mx::slice(
+          context,
+          {context.shape(0) - static_cast<int>(state_frames), 0},
+          {context.shape(0), context.shape(1)}, {1, 1}, device_);
+    }
+    return output;
+  }
+
+private:
+  mx::array empty(mx::Dtype dtype) const {
+    return mx::zeros({0, weight_.shape(0)}, dtype, device_);
+  }
+
+  mx::array weight_;
+  mx::array bias_;
+  std::size_t stride_;
+  std::size_t keep_;
+  mx::Device device_;
+  std::optional<mx::array> state_;
+  bool initialized_{false};
+};
+
+class StreamingConvStem {
+public:
+  StreamingConvStem(const LoadedModel &model, mx::Device device)
+      : first_(model.weights.at("encoder.conv_layers_0_conv.conv.weight"),
+               model.weights.at("encoder.conv_layers_0_conv.conv.bias"), 1,
+               device),
+        second_(model.weights.at("encoder.conv_layers_1_conv.conv.weight"),
+                model.weights.at("encoder.conv_layers_1_conv.conv.bias"), 2,
+                device),
+        device_(device) {}
+
+  mx::array step(const mx::array &mel) {
+    if (mel.ndim() != 2 || mel.shape(0) != static_cast<int>(kMelBins)) {
+      throw std::invalid_argument(
+          "streaming convolution requires [128, frames] log-mel input");
+    }
+    auto hidden = mx::transpose(mel, {1, 0}, device_);
+    hidden = precise_gelu(first_.step(hidden), device_);
+    hidden = precise_gelu(second_.step(hidden), device_);
+    return hidden;
+  }
+
+private:
+  StreamingCausalConv1d first_;
+  StreamingCausalConv1d second_;
+  mx::Device device_;
+};
+
+class StreamingVoxtralEncoder {
+public:
+  StreamingVoxtralEncoder(const LoadedModel &model, mx::Device device)
+      : encoder_(model, device), caches_(encoder_.make_cache()),
+        device_(device) {}
+
+  mx::array step(const mx::array &conv_chunk) {
+    if (conv_chunk.shape(0) == 0) {
+      return empty_adapter(conv_chunk.dtype());
+    }
+    auto encoded = encoder_.encode_chunk(conv_chunk, position_, caches_);
+    position_ += static_cast<std::size_t>(conv_chunk.shape(0));
+    if (pending_.has_value()) {
+      encoded = mx::concatenate({pending_.value(), encoded}, 0, device_);
+    }
+    const auto frames = static_cast<std::size_t>(encoded.shape(0));
+    const auto usable = frames - frames % kDownsampleFactor;
+    if (usable == 0) {
+      pending_ = encoded;
+      return empty_adapter(encoded.dtype());
+    }
+    auto aligned = mx::slice(
+        encoded, {0, 0},
+        {static_cast<int>(usable), static_cast<int>(kEncoderDimension)},
+        {1, 1}, device_);
+    if (usable < frames) {
+      pending_ = mx::slice(
+          encoded, {static_cast<int>(usable), 0},
+          {static_cast<int>(frames), static_cast<int>(kEncoderDimension)},
+          {1, 1}, device_);
+    } else {
+      pending_.reset();
+    }
+    auto adapter = encoder_.project_aligned(aligned);
+    mx::eval(adapter);
+    return adapter;
+  }
+
+  std::size_t position() const { return position_; }
+  std::size_t cache_size() const { return caches_.front().size(); }
+
+private:
+  mx::array empty_adapter(mx::Dtype dtype) const {
+    return mx::zeros({0, static_cast<int>(kDecoderDimension)}, dtype,
+                     device_);
+  }
+
+  VoxtralCausalEncoder encoder_;
+  std::vector<mx_support::RotatingKeyValueCache> caches_;
+  mx::Device device_;
+  std::optional<mx::array> pending_;
+  std::size_t position_{0};
+};
+
+struct StreamingAdvance {
+  bool did_work;
+  bool done;
+  std::size_t adapter_frames_added;
+  std::size_t tokens_added;
+  std::string text_delta;
+};
+
+class VoxtralStreamingModel {
+public:
+  VoxtralStreamingModel(const LoadedModel &model,
+                        const std::filesystem::path &model_directory,
+                        int32_t transcription_delay_ms,
+                        std::size_t max_generated_tokens, mx::Device device)
+      : device_(device),
+        delay_tokens_(delay_token_count(transcription_delay_ms)),
+        prompt_length_(1 + kLeftPadTokens + delay_tokens_),
+        max_generated_tokens_(max_generated_tokens), mel_(device),
+        conv_stem_(model, device), encoder_(model, device),
+        decoder_(model, delay_tokens_, device),
+        tokenizer_(model_directory / "tekken.json") {
+    if (max_generated_tokens_ == 0) {
+      throw std::invalid_argument("max generated tokens must be positive");
+    }
+  }
+
+  StreamingAdvance advance(const std::vector<float> &audio,
+                            bool flush_close,
+                            std::size_t max_decode_tokens) {
+    const auto previous_adapter_frames = adapter_frames_;
+    const auto previous_token_count = generated_.size();
+    const auto previous_text = text_;
+    bool did_work = false;
+    if (!audio.empty()) {
+      seed_left_pad();
+      process_mel(mel_.append(audio));
+      did_work = true;
+    }
+    if (flush_close && !close_flushed_) {
+      seed_left_pad();
+      close_flushed_ = true;
+      const auto right_pad_tokens = delay_tokens_ + 1 + 10;
+      std::vector<float> right_pad(
+          right_pad_tokens * kRawAudioSamplesPerToken, 0.0f);
+      process_mel(mel_.append(right_pad));
+      process_mel(mel_.close());
+      did_work = true;
+    }
+    if (!prefilled_ && adapter_frames_ >= prompt_length_) {
+      prefill();
+      did_work = true;
+    }
+    if (!prefilled_ && close_flushed_) {
+      done_ = true;
+    }
+    if (prefilled_ && !done_ && max_decode_tokens > 0) {
+      did_work = decode_some(max_decode_tokens) || did_work;
+    }
+    return {
+        did_work,
+        done_,
+        adapter_frames_ - previous_adapter_frames,
+        generated_.size() - previous_token_count,
+        text_.substr(previous_text.size()),
+    };
+  }
+
+  bool done() const { return done_; }
+  bool close_flushed() const { return close_flushed_; }
+  bool prefilled() const { return prefilled_; }
+  std::size_t adapter_frames() const { return adapter_frames_; }
+  std::size_t generated_tokens() const { return generated_.size(); }
+  std::size_t decoder_position() const { return decoder_position_; }
+  std::size_t encoder_position() const { return encoder_.position(); }
+  std::size_t encoder_cache_size() const { return encoder_.cache_size(); }
+  std::size_t decoder_cache_size() const {
+    return decoder_caches_.empty() ? 0 : decoder_caches_.front().size();
+  }
+  std::size_t mel_frames() const { return mel_.emitted_frames(); }
+  const std::string &text() const { return text_; }
+
+private:
+  static std::size_t delay_token_count(int32_t transcription_delay_ms) {
+    if (transcription_delay_ms <= 0) {
+      throw std::invalid_argument("transcription delay must be positive");
+    }
+    const auto delay_samples = static_cast<std::size_t>(
+        static_cast<double>(transcription_delay_ms) / 1000.0 *
+        static_cast<double>(kSampleRate));
+    return audio_token_count(delay_samples);
+  }
+
+  void seed_left_pad() {
+    if (left_pad_seeded_) {
+      return;
+    }
+    left_pad_seeded_ = true;
+    std::vector<float> left_pad(kLeftPadTokens * kRawAudioSamplesPerToken,
+                                0.0f);
+    process_mel(mel_.append(left_pad));
+  }
+
+  void process_mel(std::optional<mx::array> mel) {
+    if (!mel.has_value() || mel->shape(1) == 0) {
+      return;
+    }
+    auto conv = conv_stem_.step(mel.value());
+    if (conv.shape(0) == 0) {
+      return;
+    }
+    auto adapter = encoder_.step(conv);
+    if (adapter.shape(0) == 0) {
+      return;
+    }
+    if (adapter_.has_value()) {
+      adapter_ =
+          mx::concatenate({adapter_.value(), adapter}, 0, device_);
+    } else {
+      adapter_ = adapter;
+    }
+    mx::eval(adapter_.value());
+    adapter_frames_ = static_cast<std::size_t>(adapter_->shape(0));
+  }
+
+  mx::array adapter_at(std::size_t position) const {
+    if (!adapter_.has_value() || position >= adapter_frames_) {
+      throw std::out_of_range("decoder position exceeds adapter frames");
+    }
+    return mx::take(adapter_.value(), static_cast<int>(position), 0,
+                    device_);
+  }
+
+  void prefill() {
+    std::vector<int32_t> prompt_ids{kBosToken};
+    prompt_ids.insert(prompt_ids.end(), kLeftPadTokens + delay_tokens_,
+                      kStreamingPadToken);
+    auto prefix = mx::slice(
+                      adapter_.value(), {0, 0},
+                      {static_cast<int>(prompt_length_),
+                       static_cast<int>(kDecoderDimension)},
+                      {1, 1}, device_) +
+                  decoder_.embed_tokens(prompt_ids);
+    decoder_caches_ = decoder_.make_cache();
+    auto hidden = decoder_.forward(prefix, 0, decoder_caches_);
+    auto logits = decoder_.logits(
+        mx::take(hidden, hidden.shape(0) - 1, 0, device_));
+    next_token_ = greedy_token(logits, device_);
+    decoder_position_ = prompt_length_;
+    prefilled_ = true;
+  }
+
+  bool decode_some(std::size_t maximum_tokens) {
+    bool did_work = false;
+    for (std::size_t index = 0; index < maximum_tokens && !done_; ++index) {
+      if (adapter_frames_ <= decoder_position_ && !close_flushed_) {
+        break;
+      }
+      const auto token = next_token_;
+      if (adapter_frames_ <= decoder_position_) {
+        generated_.push_back(token);
+        update_text();
+        done_ = true;
+        did_work = true;
+        break;
+      }
+
+      auto input = adapter_at(decoder_position_) +
+                   decoder_.embed_token(token);
+      auto hidden = decoder_.forward(mx::expand_dims(input, 0, device_),
+                                     decoder_position_, decoder_caches_);
+      auto logits = decoder_.logits(mx::squeeze(hidden, 0, device_));
+      const auto following_token = greedy_token(logits, device_);
+      generated_.push_back(token);
+      update_text();
+      did_work = true;
+      if (token == kEosToken ||
+          generated_.size() >= max_generated_tokens_) {
+        done_ = true;
+        break;
+      }
+      next_token_ = following_token;
+      ++decoder_position_;
+    }
+    return did_work;
+  }
+
+  void update_text() {
+    std::vector<int32_t> text_tokens;
+    text_tokens.reserve(generated_.size());
+    for (const auto token : generated_) {
+      if (token != kEosToken) {
+        text_tokens.push_back(token);
+      }
+    }
+    text_ = trim_ascii_whitespace(tokenizer_.decode(text_tokens));
+  }
+
+  mx::Device device_;
+  std::size_t delay_tokens_;
+  std::size_t prompt_length_;
+  std::size_t max_generated_tokens_;
+  StreamingMel mel_;
+  StreamingConvStem conv_stem_;
+  StreamingVoxtralEncoder encoder_;
+  VoxtralDecoder decoder_;
+  TekkenTokenizer tokenizer_;
+  std::optional<mx::array> adapter_;
+  std::vector<mx_support::RotatingKeyValueCache> decoder_caches_;
+  std::vector<int32_t> generated_;
+  std::string text_;
+  std::size_t adapter_frames_{0};
+  std::size_t decoder_position_{0};
+  int32_t next_token_{kStreamingPadToken};
+  bool left_pad_seeded_{false};
+  bool close_flushed_{false};
+  bool prefilled_{false};
+  bool done_{false};
+};
+
 int32_t greedy_token(const mx::array &logits, mx::Device device) {
   const auto token = mx::argmax(logits, -1, false, device);
   mx::eval(token);
@@ -1547,23 +2095,41 @@ mx::Stream reusable_thread_unsafe_stream(mx::Device device) {
 
 struct VoxtralMlxSession {
   VoxtralMlxSession(const std::filesystem::path &model_directory,
+                    int32_t requested_delay_ms,
+                    std::size_t requested_max_generated_tokens,
+                    std::size_t requested_max_decode_tokens_per_step,
                     mx::Device requested_device,
                     mx::Stream requested_cpu_stream,
                     mx::Stream requested_device_stream,
                     std::size_t requested_max_pending,
                     std::size_t requested_step_budget)
-      : device(requested_device), cpu_stream(requested_cpu_stream),
+      : model_directory(model_directory),
+        transcription_delay_ms(requested_delay_ms),
+        max_generated_tokens(requested_max_generated_tokens),
+        max_decode_tokens_per_step(requested_max_decode_tokens_per_step),
+        device(requested_device), cpu_stream(requested_cpu_stream),
         device_stream(requested_device_stream),
         max_pending_samples(requested_max_pending),
         max_ingest_samples_per_step(requested_step_budget),
-        model(load_and_validate_model(model_directory)) {}
+        model(load_and_validate_model(model_directory)) {
+    materialize_weight_prefix_on_device(model, "encoder.", device);
+    materialize_weight_prefix_on_device(model, "decoder.", device);
+    streaming = std::make_unique<VoxtralStreamingModel>(
+        model, model_directory, transcription_delay_ms, max_generated_tokens,
+        device);
+  }
 
+  std::filesystem::path model_directory;
+  int32_t transcription_delay_ms;
+  std::size_t max_generated_tokens;
+  std::size_t max_decode_tokens_per_step;
   mx::Device device;
   mx::Stream cpu_stream;
   mx::Stream device_stream;
   std::size_t max_pending_samples;
   std::size_t max_ingest_samples_per_step;
   LoadedModel model;
+  std::unique_ptr<VoxtralStreamingModel> streaming;
   std::deque<float> pending;
   std::size_t total_fed_samples{0};
   std::size_t total_ingested_samples{0};
@@ -1577,8 +2143,9 @@ struct VoxtralMlxSession {
 
 std::string state_json(const VoxtralMlxSession &session,
                        std::string_view state, std::size_t ingested_samples,
-                       std::size_t pending_samples, double energy,
-                       double elapsed_ms) {
+                       std::size_t pending_samples,
+                       const StreamingAdvance &advance, double elapsed_ms) {
+  const auto &streaming = *session.streaming;
   std::ostringstream json;
   json << std::setprecision(17) << "{\"state\":\"" << state << "\","
        << "\"ingested_samples\":" << ingested_samples << ","
@@ -1588,10 +2155,29 @@ std::string state_json(const VoxtralMlxSession &session,
        << ",\"step_count\":" << session.step_count << ","
        << "\"max_ingest_samples_per_step\":"
        << session.max_ingest_samples_per_step << ","
-       << "\"mlx_sum_squares\":" << energy << ","
+       << "\"max_decode_tokens_per_step\":"
+       << session.max_decode_tokens_per_step << ","
+       << "\"transcription_delay_ms\":" << session.transcription_delay_ms
+       << ",\"max_generated_tokens\":" << session.max_generated_tokens << ","
+       << "\"adapter_frames_added\":" << advance.adapter_frames_added << ","
+       << "\"tokens_added\":" << advance.tokens_added << ","
+       << "\"mel_frames\":" << streaming.mel_frames() << ","
+       << "\"encoder_position\":" << streaming.encoder_position() << ","
+       << "\"encoder_cache_size\":" << streaming.encoder_cache_size() << ","
+       << "\"adapter_frames\":" << streaming.adapter_frames() << ","
+       << "\"decoder_position\":" << streaming.decoder_position() << ","
+       << "\"decoder_cache_size\":" << streaming.decoder_cache_size() << ","
+       << "\"generated_tokens\":" << streaming.generated_tokens() << ","
+       << "\"text_delta\":\"" << json_escape(advance.text_delta) << "\","
+       << "\"text\":\"" << json_escape(streaming.text()) << "\","
        << "\"mlx_elapsed_ms\":" << elapsed_ms << ","
+       << "\"peak_memory_bytes\":" << mx::get_peak_memory() << ","
        << "\"audio_closed\":" << (session.audio_closed ? "true" : "false")
-       << ",\"transcription_implemented\":false}";
+       << ",\"close_flushed\":"
+       << (streaming.close_flushed() ? "true" : "false")
+       << ",\"prefilled\":" << (streaming.prefilled() ? "true" : "false")
+       << ",\"transcription_implemented\":true,"
+       << "\"streaming_session\":true}";
   return json.str();
 }
 
@@ -1794,7 +2380,9 @@ extern "C" int32_t cuttledoc_voxtral_mlx_transcribe(
 }
 
 extern "C" void *cuttledoc_voxtral_mlx_session_create(
-    const char *model_directory, int32_t device_kind,
+    const char *model_directory, int32_t transcription_delay_ms,
+    std::size_t max_generated_tokens,
+    std::size_t max_decode_tokens_per_step, int32_t device_kind,
     std::size_t max_pending_samples,
     std::size_t max_ingest_samples_per_step, int32_t *status_out,
     char **error_out) {
@@ -1805,6 +2393,8 @@ extern "C" void *cuttledoc_voxtral_mlx_session_create(
     *error_out = nullptr;
   }
   if (model_directory == nullptr || status_out == nullptr ||
+      transcription_delay_ms <= 0 || max_generated_tokens == 0 ||
+      max_decode_tokens_per_step == 0 ||
       max_pending_samples == 0 || max_ingest_samples_per_step == 0 ||
       max_ingest_samples_per_step > max_pending_samples) {
     if (status_out != nullptr) {
@@ -1812,8 +2402,8 @@ extern "C" void *cuttledoc_voxtral_mlx_session_create(
     }
     fail_with_status(
         CUTTLEDOC_VOXTRAL_MLX_INVALID_ARGUMENT,
-        "model, status, positive queue capacity, and a step budget no larger "
-        "than capacity are required",
+        "model, status, positive delay and generation limits, positive queue "
+        "capacity, and an ingest budget no larger than capacity are required",
         error_out);
     return nullptr;
   }
@@ -1830,7 +2420,11 @@ extern "C" void *cuttledoc_voxtral_mlx_session_create(
         device == mx::Device::cpu ? cpu_stream
                                   : reusable_thread_unsafe_stream(device);
     mx::set_default_stream(device_stream);
-    return new VoxtralMlxSession(model_directory, device, cpu_stream,
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    return new VoxtralMlxSession(model_directory, transcription_delay_ms,
+                                 max_generated_tokens,
+                                 max_decode_tokens_per_step, device, cpu_stream,
                                  device_stream, max_pending_samples,
                                  max_ingest_samples_per_step);
   } catch (const std::invalid_argument &error) {
@@ -1930,25 +2524,16 @@ extern "C" int32_t cuttledoc_voxtral_mlx_session_step(
   }
 
   std::vector<float> snapshot;
+  bool audio_closed = false;
   {
     const std::lock_guard lock(session->state_mutex);
     if (session->done) {
+      const StreamingAdvance advance{false, true, 0, 0, ""};
       return return_json(
           CUTTLEDOC_VOXTRAL_MLX_DONE,
-          state_json(*session, "done", 0, 0, 0.0, 0.0), json_out,
-          error_out);
-    }
-    if (session->pending.empty()) {
-      if (session->audio_closed) {
-        session->done = true;
-        return return_json(
-            CUTTLEDOC_VOXTRAL_MLX_DONE,
-            state_json(*session, "done", 0, 0, 0.0, 0.0), json_out,
-            error_out);
-      }
-      return return_json(
-          CUTTLEDOC_VOXTRAL_MLX_NEEDS_AUDIO,
-          state_json(*session, "needs_audio", 0, 0, 0.0, 0.0), json_out,
+          state_json(*session, "done", 0, session->pending.size(), advance,
+                     0.0),
+          json_out,
           error_out);
     }
     const auto count = std::min(session->max_ingest_samples_per_step,
@@ -1958,26 +2543,28 @@ extern "C" int32_t cuttledoc_voxtral_mlx_session_step(
       snapshot.push_back(session->pending.front());
       session->pending.pop_front();
     }
+    audio_closed = session->audio_closed;
   }
 
   const auto started = std::chrono::steady_clock::now();
-  double energy = 0.0;
+  StreamingAdvance advance{false, false, 0, 0, ""};
   try {
     const std::lock_guard lock(runtime_mutex);
     mx::set_default_device(session->device);
     mx::set_default_stream(session->cpu_stream);
     mx::set_default_stream(session->device_stream);
-    auto input = mx::array(snapshot.begin(),
-                           {static_cast<int>(snapshot.size())});
-    input = mx::copy(std::move(input), session->device);
-    const auto squared = mx::square(input, session->device_stream);
-    energy = static_cast<double>(
-        mx::sum(squared, false, session->device_stream).item<float>());
+    bool flush_close = false;
+    {
+      const std::lock_guard state_lock(session->state_mutex);
+      flush_close = audio_closed && session->pending.empty() &&
+                    !session->streaming->close_flushed();
+    }
+    advance = session->streaming->advance(
+        snapshot, flush_close, session->max_decode_tokens_per_step);
   } catch (const std::exception &error) {
     const std::lock_guard lock(session->state_mutex);
-    for (auto sample = snapshot.rbegin(); sample != snapshot.rend(); ++sample) {
-      session->pending.push_front(*sample);
-    }
+    session->pending.clear();
+    session->done = true;
     return fail_with_status(CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR, error.what(),
                             error_out);
   }
@@ -1997,15 +2584,28 @@ extern "C" int32_t cuttledoc_voxtral_mlx_session_step(
 
   std::size_t pending_samples = 0;
   std::string json;
+  int32_t status = CUTTLEDOC_VOXTRAL_MLX_OK;
   {
     const std::lock_guard lock(session->state_mutex);
     session->total_ingested_samples += snapshot.size();
     ++session->step_count;
     pending_samples = session->pending.size();
-    json = state_json(*session, "progress", snapshot.size(), pending_samples,
-                      energy, elapsed_ms);
+    if (advance.done) {
+      session->done = true;
+      status = CUTTLEDOC_VOXTRAL_MLX_DONE;
+      json = state_json(*session, "done", snapshot.size(), pending_samples,
+                        advance, elapsed_ms);
+    } else if (!advance.did_work && snapshot.empty() &&
+               !session->audio_closed) {
+      status = CUTTLEDOC_VOXTRAL_MLX_NEEDS_AUDIO;
+      json = state_json(*session, "needs_audio", 0, pending_samples, advance,
+                        elapsed_ms);
+    } else {
+      json = state_json(*session, "progress", snapshot.size(), pending_samples,
+                        advance, elapsed_ms);
+    }
   }
-  return return_json(CUTTLEDOC_VOXTRAL_MLX_OK, json, json_out, error_out);
+  return return_json(status, json, json_out, error_out);
 }
 
 extern "C" void cuttledoc_voxtral_mlx_session_cancel(void *handle) {

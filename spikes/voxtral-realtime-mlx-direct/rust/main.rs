@@ -2,7 +2,12 @@ use std::{
     env,
     ffi::{CStr, CString, c_char, c_void},
     fs, ptr,
-    time::Instant,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, AtomicUsize, Ordering},
+    },
+    thread,
+    time::{Duration, Instant},
 };
 
 const OK: i32 = 0;
@@ -15,6 +20,8 @@ const DONE: i32 = 7;
 const INPUT_CHUNK_SAMPLES: usize = 1_280;
 const MAX_PENDING_SAMPLES: usize = 10_240;
 const MAX_INGEST_SAMPLES_PER_STEP: usize = 5_120;
+const SAMPLE_RATE_HZ: usize = 16_000;
+const MAX_GENERATED_TOKENS: usize = 4_096;
 
 unsafe extern "C" {
     fn cuttledoc_voxtral_mlx_inspect_model(
@@ -52,6 +59,9 @@ unsafe extern "C" {
     ) -> i32;
     fn cuttledoc_voxtral_mlx_session_create(
         model_directory: *const c_char,
+        transcription_delay_ms: i32,
+        max_generated_tokens: usize,
+        max_decode_tokens_per_step: usize,
         device_kind: i32,
         max_pending_samples: usize,
         max_ingest_samples_per_step: usize,
@@ -124,6 +134,22 @@ fn run() -> Result<(), String> {
         [command, model_directory, pcm_path, device] if command == "contract" => {
             contract(model_directory, pcm_path, device)
         }
+        [
+            command,
+            model_directory,
+            pcm_path,
+            delay_ms,
+            chunk_ms,
+            max_decode_tokens,
+            device,
+        ] if command == "stream" => stream(
+            model_directory,
+            pcm_path,
+            delay_ms,
+            chunk_ms,
+            max_decode_tokens,
+            device,
+        ),
         _ => Err(usage()),
     }
 }
@@ -307,14 +333,14 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
     let model_directory = c_string(model_directory, "model path")?;
     let device_kind = parse_device(device)?;
     let audio = read_audio(pcm_path)?;
-    if audio.len() <= MAX_PENDING_SAMPLES {
+    if audio.len() < MAX_PENDING_SAMPLES + INPUT_CHUNK_SAMPLES {
         return Err(format!(
-            "contract fixture must exceed the {}-sample queue capacity",
-            MAX_PENDING_SAMPLES
+            "contract fixture must contain at least {} samples",
+            MAX_PENDING_SAMPLES + INPUT_CHUNK_SAMPLES
         ));
     }
 
-    let session = create_session(&model_directory, device_kind)?;
+    let session = create_session(&model_directory, 480, 16, device_kind)?;
     let initial = step(session.handle);
     if initial.status != NEEDS_AUDIO || initial.json.is_none() {
         return Err(format!(
@@ -322,49 +348,23 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
             initial.status
         ));
     }
-
-    let expected_energy = audio
-        .iter()
-        .map(|sample| {
-            let sample = f64::from(*sample);
-            sample * sample
-        })
-        .sum::<f64>();
-    let mut offset = 0;
-    let mut backpressure_count = 0;
-    let mut total_ingested = 0;
-    let mut actual_energy = 0.0;
-    let mut step_count = 0;
-    let mut maximum_ingested = 0;
-    let mut maximum_step_wall_ms = 0.0_f64;
-    let mut maximum_mlx_elapsed_ms = 0.0_f64;
-
-    while offset < audio.len() {
-        let end = (offset + INPUT_CHUNK_SAMPLES).min(audio.len());
-        let response = feed(session.handle, &audio[offset..end]);
-        match response.status {
-            OK => offset = end,
-            BACKPRESSURE => {
-                backpressure_count += 1;
-                consume_step(
-                    session.handle,
-                    &mut total_ingested,
-                    &mut actual_energy,
-                    &mut step_count,
-                    &mut maximum_ingested,
-                    &mut maximum_step_wall_ms,
-                    &mut maximum_mlx_elapsed_ms,
-                )?;
-            }
-            status => {
-                return Err(response
-                    .error
-                    .unwrap_or_else(|| format!("feed returned unexpected status {status}")));
-            }
+    for chunk in audio[..MAX_PENDING_SAMPLES].chunks(INPUT_CHUNK_SAMPLES) {
+        let response = feed(session.handle, chunk);
+        if response.status != OK {
+            return Err(response
+                .error
+                .unwrap_or_else(|| format!("queue fill returned status {}", response.status)));
         }
     }
-    if backpressure_count == 0 {
-        return Err("fixture did not exercise hard queue backpressure".to_owned());
+    let backpressure = feed(
+        session.handle,
+        &audio[MAX_PENDING_SAMPLES..MAX_PENDING_SAMPLES + INPUT_CHUNK_SAMPLES],
+    );
+    if backpressure.status != BACKPRESSURE {
+        return Err(format!(
+            "full queue returned status {}, expected BACKPRESSURE ({BACKPRESSURE})",
+            backpressure.status
+        ));
     }
 
     let closed = close(session.handle);
@@ -372,44 +372,6 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
         return Err(closed
             .error
             .unwrap_or_else(|| format!("close returned status {}", closed.status)));
-    }
-    loop {
-        let started = Instant::now();
-        let response = step(session.handle);
-        let wall_ms = started.elapsed().as_secs_f64() * 1_000.0;
-        maximum_step_wall_ms = maximum_step_wall_ms.max(wall_ms);
-        match response.status {
-            OK => record_step(
-                response.json.as_deref(),
-                &mut total_ingested,
-                &mut actual_energy,
-                &mut step_count,
-                &mut maximum_ingested,
-                &mut maximum_mlx_elapsed_ms,
-            )?,
-            DONE if response.json.is_some() => break,
-            status => {
-                return Err(response
-                    .error
-                    .unwrap_or_else(|| format!("drain step returned unexpected status {status}")));
-            }
-        }
-    }
-
-    if total_ingested != audio.len() || maximum_ingested > MAX_INGEST_SAMPLES_PER_STEP {
-        return Err(format!(
-            "bounded ingestion mismatch: fed {}, ingested {}, maximum step {}",
-            audio.len(),
-            total_ingested,
-            maximum_ingested
-        ));
-    }
-    let energy_absolute_error = (actual_energy - expected_energy).abs();
-    let energy_relative_error = energy_absolute_error / expected_energy.max(f64::EPSILON);
-    if energy_relative_error > 5e-5 {
-        return Err(format!(
-            "official-MLX energy fingerprint drifted: expected {expected_energy}, got {actual_energy}, relative error {energy_relative_error}"
-        ));
     }
 
     let closed_feed = feed(session.handle, &audio[..1]);
@@ -419,11 +381,8 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
             closed_feed.status
         ));
     }
-    drop(session);
-
-    let cancelled_session = create_session(&model_directory, device_kind)?;
-    unsafe { cuttledoc_voxtral_mlx_session_cancel(cancelled_session.handle) };
-    let cancelled = step(cancelled_session.handle);
+    unsafe { cuttledoc_voxtral_mlx_session_cancel(session.handle) };
+    let cancelled = step(session.handle);
     if cancelled.status != CANCELLED || cancelled.json.is_some() {
         return Err(format!(
             "cancelled step returned status {}, expected CANCELLED ({CANCELLED})",
@@ -432,93 +391,316 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
     }
 
     println!(
-        "{{\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-bounded-ingestion\",\"device\":{},\"pcm_samples\":{},\"input_chunk_samples\":{},\"queue_capacity_samples\":{},\"max_ingest_samples_per_step\":{},\"total_fed_samples\":{},\"total_ingested_samples\":{},\"step_count\":{},\"maximum_ingested_samples\":{},\"backpressure_count\":{},\"stable_statuses\":{{\"invalid_argument\":{},\"cancelled\":{},\"backpressure\":{},\"needs_audio\":{},\"done\":{}}},\"maximum_step_wall_ms\":{:.6},\"maximum_mlx_elapsed_ms\":{:.6},\"energy\":{{\"cpu_expected_sum_squares\":{:.17},\"mlx_sum_squares\":{:.17},\"relative_error\":{:.17}}},\"capabilities\":{{\"bounded_ingestion\":true,\"backpressure\":true,\"cancellation\":true,\"transcription\":false}}}}",
+        "{{\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-streaming-lifecycle\",\"device\":{},\"input_chunk_samples\":{},\"queue_capacity_samples\":{},\"max_ingest_samples_per_step\":{},\"stable_statuses\":{{\"invalid_argument\":{},\"cancelled\":{},\"backpressure\":{},\"needs_audio\":{},\"done\":{}}},\"capabilities\":{{\"bounded_ingestion\":true,\"backpressure\":true,\"cancellation\":true,\"persistent_model_state\":true,\"transcription\":true}}}}",
         json_string(device),
-        audio.len(),
         INPUT_CHUNK_SAMPLES,
         MAX_PENDING_SAMPLES,
         MAX_INGEST_SAMPLES_PER_STEP,
-        audio.len(),
-        total_ingested,
-        step_count,
-        maximum_ingested,
-        backpressure_count,
         INVALID_ARGUMENT,
         CANCELLED,
         BACKPRESSURE,
         NEEDS_AUDIO,
         DONE,
-        maximum_step_wall_ms,
-        maximum_mlx_elapsed_ms,
-        expected_energy,
-        actual_energy,
-        energy_relative_error,
     );
     Ok(())
 }
 
-#[allow(clippy::too_many_arguments)]
-fn consume_step(
-    handle: *mut c_void,
-    total_ingested: &mut usize,
-    actual_energy: &mut f64,
-    step_count: &mut usize,
-    maximum_ingested: &mut usize,
-    maximum_step_wall_ms: &mut f64,
-    maximum_mlx_elapsed_ms: &mut f64,
-) -> Result<(), String> {
-    let started = Instant::now();
-    let response = step(handle);
-    *maximum_step_wall_ms = maximum_step_wall_ms.max(started.elapsed().as_secs_f64() * 1_000.0);
-    if response.status != OK {
-        return Err(response.error.unwrap_or_else(|| {
-            format!(
-                "backpressure drain returned status {}, expected OK",
-                response.status
-            )
-        }));
-    }
-    record_step(
-        response.json.as_deref(),
-        total_ingested,
-        actual_energy,
-        step_count,
-        maximum_ingested,
-        maximum_mlx_elapsed_ms,
-    )
+struct ProducerStats {
+    audio_close_ms: f64,
+    backpressure_count: usize,
+    chunk_count: usize,
+    maximum_schedule_lateness_ms: f64,
 }
 
-fn record_step(
-    json: Option<&str>,
-    total_ingested: &mut usize,
-    actual_energy: &mut f64,
-    step_count: &mut usize,
-    maximum_ingested: &mut usize,
-    maximum_mlx_elapsed_ms: &mut f64,
+struct AppendEvent {
+    elapsed_ms: f64,
+    audio_fed_ms: f64,
+    delta: String,
+}
+
+struct ProducerThread {
+    handle: *mut c_void,
+    thread: Option<thread::JoinHandle<Result<ProducerStats, String>>>,
+}
+
+impl ProducerThread {
+    fn join(mut self) -> Result<ProducerStats, String> {
+        self.thread
+            .take()
+            .expect("producer thread is present")
+            .join()
+            .map_err(|_| "audio producer thread panicked".to_owned())?
+    }
+}
+
+impl Drop for ProducerThread {
+    fn drop(&mut self) {
+        if let Some(thread) = self.thread.take() {
+            unsafe { cuttledoc_voxtral_mlx_session_cancel(self.handle) };
+            let _ = thread.join();
+        }
+    }
+}
+
+fn stream(
+    model_directory: &str,
+    pcm_path: &str,
+    delay_ms: &str,
+    chunk_ms: &str,
+    max_decode_tokens: &str,
+    device: &str,
 ) -> Result<(), String> {
-    let json = json.ok_or_else(|| "successful step returned no JSON".to_owned())?;
-    let ingested = json_usize(json, "ingested_samples")?;
-    let energy = json_number(json, "mlx_sum_squares")?;
-    let mlx_elapsed_ms = json_number(json, "mlx_elapsed_ms")?;
-    if ingested == 0 || ingested > MAX_INGEST_SAMPLES_PER_STEP {
+    let model_directory = c_string(model_directory, "model path")?;
+    let audio = Arc::new(read_audio(pcm_path)?);
+    let delay_ms = parse_positive_i32(delay_ms, "delay")?;
+    let chunk_ms = parse_positive_usize(chunk_ms, "chunk milliseconds")?;
+    let max_decode_tokens = parse_positive_usize(max_decode_tokens, "max decode tokens")?;
+    let chunk_samples = chunk_ms
+        .checked_mul(SAMPLE_RATE_HZ)
+        .ok_or_else(|| "chunk size overflows usize".to_owned())?
+        / 1_000;
+    if chunk_samples == 0 || chunk_samples > MAX_PENDING_SAMPLES {
         return Err(format!(
-            "step ingested invalid bounded slice of {ingested} samples"
+            "chunk must resolve to 1..={MAX_PENDING_SAMPLES} samples"
         ));
     }
-    *total_ingested += ingested;
-    *actual_energy += energy;
-    *step_count += 1;
-    *maximum_ingested = (*maximum_ingested).max(ingested);
-    *maximum_mlx_elapsed_ms = (*maximum_mlx_elapsed_ms).max(mlx_elapsed_ms);
+    let device_kind = parse_device(device)?;
+    let session = create_session(&model_directory, delay_ms, max_decode_tokens, device_kind)?;
+    let initial = step(session.handle);
+    if initial.status != NEEDS_AUDIO || initial.json.is_none() {
+        return Err(format!(
+            "empty open session returned status {}, expected NEEDS_AUDIO ({NEEDS_AUDIO})",
+            initial.status
+        ));
+    }
+
+    let started = Instant::now();
+    let fed_samples = Arc::new(AtomicUsize::new(0));
+    let producer_finished = Arc::new(AtomicBool::new(false));
+    let producer_fed_samples = Arc::clone(&fed_samples);
+    let producer_finished_signal = Arc::clone(&producer_finished);
+    let producer_audio = Arc::clone(&audio);
+    let producer_handle = session.handle as usize;
+    let producer = ProducerThread {
+        handle: session.handle,
+        thread: Some(thread::spawn(move || {
+            let result = produce_audio(
+                producer_handle,
+                producer_audio,
+                chunk_samples,
+                producer_fed_samples,
+                started,
+            );
+            producer_finished_signal.store(true, Ordering::Release);
+            result
+        })),
+    };
+
+    let mut step_call_count = 0usize;
+    let mut total_ingested = 0usize;
+    let mut maximum_ingested = 0usize;
+    let mut maximum_step_wall_ms = 0.0_f64;
+    let mut maximum_mlx_elapsed_ms = 0.0_f64;
+    let mut previous_text = String::new();
+    let mut append_events = Vec::new();
+    let mut wait_after_fed_samples = None;
+
+    let (final_text, generated_tokens, adapter_frames) = loop {
+        if let Some(observed) = wait_after_fed_samples {
+            while fed_samples.load(Ordering::Acquire) == observed
+                && !producer_finished.load(Ordering::Acquire)
+            {
+                thread::sleep(Duration::from_millis(1));
+            }
+            wait_after_fed_samples = None;
+        }
+        let step_started = Instant::now();
+        let response = step(session.handle);
+        let step_wall_ms = step_started.elapsed().as_secs_f64() * 1_000.0;
+        maximum_step_wall_ms = maximum_step_wall_ms.max(step_wall_ms);
+        step_call_count += 1;
+        match response.status {
+            OK | NEEDS_AUDIO | DONE => {
+                let json = response
+                    .json
+                    .as_deref()
+                    .ok_or_else(|| format!("status {} returned no JSON", response.status))?;
+                let ingested = json_usize(json, "ingested_samples")?;
+                if ingested > MAX_INGEST_SAMPLES_PER_STEP {
+                    return Err(format!(
+                        "step ingested {ingested} samples, exceeding {MAX_INGEST_SAMPLES_PER_STEP}"
+                    ));
+                }
+                total_ingested += ingested;
+                maximum_ingested = maximum_ingested.max(ingested);
+                maximum_mlx_elapsed_ms =
+                    maximum_mlx_elapsed_ms.max(json_number(json, "mlx_elapsed_ms")?);
+                let current_generated_tokens = json_usize(json, "generated_tokens")?;
+                let current_adapter_frames = json_usize(json, "adapter_frames")?;
+                let text = json_string_field(json, "text")?;
+                let delta = json_string_field(json, "text_delta")?;
+                if !text.starts_with(&previous_text) {
+                    return Err("streaming text revoked an already emitted prefix".to_owned());
+                }
+                let expected_delta = &text[previous_text.len()..];
+                if delta != expected_delta {
+                    return Err(format!(
+                        "text_delta mismatch: expected {}, got {}",
+                        json_string(expected_delta),
+                        json_string(&delta)
+                    ));
+                }
+                if !delta.is_empty() {
+                    append_events.push(AppendEvent {
+                        elapsed_ms: started.elapsed().as_secs_f64() * 1_000.0,
+                        audio_fed_ms: fed_samples.load(Ordering::Acquire) as f64
+                            / SAMPLE_RATE_HZ as f64
+                            * 1_000.0,
+                        delta,
+                    });
+                }
+                previous_text = text.clone();
+                if response.status == DONE {
+                    break (text, current_generated_tokens, current_adapter_frames);
+                }
+                if response.status == NEEDS_AUDIO {
+                    wait_after_fed_samples = Some(fed_samples.load(Ordering::Acquire));
+                }
+            }
+            status => {
+                return Err(response
+                    .error
+                    .unwrap_or_else(|| format!("streaming step returned status {status}")));
+            }
+        }
+    };
+    let final_ms = started.elapsed().as_secs_f64() * 1_000.0;
+    let producer = producer.join()?;
+    if total_ingested != audio.len() {
+        return Err(format!(
+            "stream ingested {total_ingested} of {} fed samples",
+            audio.len()
+        ));
+    }
+    if final_text.is_empty() || append_events.is_empty() {
+        return Err("streaming session completed without transcript updates".to_owned());
+    }
+    let first_append = &append_events[0];
+    let endpoint_finalization_ms = final_ms - producer.audio_close_ms;
+
+    print!(
+        "{{\"schema_version\":\"1.0.0\",\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-incremental-streaming\",\"device\":{},\"transcription_delay_ms\":{},\"fixture\":{{\"pcm_samples\":{},\"duration_ms\":{:.6}}},\"procedure\":{{\"realtime_pacing\":true,\"producer_thread_independent_from_mlx_executor\":true,\"chunk_ms\":{},\"chunk_samples\":{},\"max_pending_samples\":{},\"max_ingest_samples_per_step\":{},\"max_decode_tokens_per_step\":{}}},\"timing\":{{\"first_append_ms\":{:.6},\"first_append_audio_fed_ms\":{:.6},\"audio_close_ms\":{:.6},\"final_ms\":{:.6},\"endpoint_finalization_ms\":{:.6},\"maximum_step_wall_ms\":{:.6},\"maximum_mlx_elapsed_ms\":{:.6},\"maximum_feed_schedule_lateness_ms\":{:.6}}},\"streaming\":{{\"append_only\":true,\"update_count\":{},\"revoke_count\":0,\"audio_chunk_count\":{},\"step_call_count\":{},\"generated_tokens\":{},\"adapter_frames\":{},\"total_ingested_samples\":{},\"maximum_ingested_samples\":{},\"backpressure_count\":{},\"done\":true}},\"text\":{},\"events\":[",
+        json_string(device),
+        delay_ms,
+        audio.len(),
+        audio.len() as f64 / SAMPLE_RATE_HZ as f64 * 1_000.0,
+        chunk_ms,
+        chunk_samples,
+        MAX_PENDING_SAMPLES,
+        MAX_INGEST_SAMPLES_PER_STEP,
+        max_decode_tokens,
+        first_append.elapsed_ms,
+        first_append.audio_fed_ms,
+        producer.audio_close_ms,
+        final_ms,
+        endpoint_finalization_ms,
+        maximum_step_wall_ms,
+        maximum_mlx_elapsed_ms,
+        producer.maximum_schedule_lateness_ms,
+        append_events.len(),
+        producer.chunk_count,
+        step_call_count,
+        generated_tokens,
+        adapter_frames,
+        total_ingested,
+        maximum_ingested,
+        producer.backpressure_count,
+        json_string(&final_text),
+    );
+    for (index, event) in append_events.iter().enumerate() {
+        if index != 0 {
+            print!(",");
+        }
+        print!(
+            "{{\"index\":{},\"elapsed_ms\":{:.6},\"audio_fed_ms\":{:.6},\"delta\":{}}}",
+            index,
+            event.elapsed_ms,
+            event.audio_fed_ms,
+            json_string(&event.delta)
+        );
+    }
+    println!("]}}");
     Ok(())
 }
 
-fn create_session(model_directory: &CString, device_kind: i32) -> Result<Session, String> {
+fn produce_audio(
+    handle: usize,
+    audio: Arc<Vec<f32>>,
+    chunk_samples: usize,
+    fed_samples: Arc<AtomicUsize>,
+    started: Instant,
+) -> Result<ProducerStats, String> {
+    let handle = handle as *mut c_void;
+    let mut offset = 0usize;
+    let mut chunk_count = 0usize;
+    let mut backpressure_count = 0usize;
+    let mut maximum_schedule_lateness_ms = 0.0_f64;
+    while offset < audio.len() {
+        let end = (offset + chunk_samples).min(audio.len());
+        let target = Duration::from_secs_f64(end as f64 / SAMPLE_RATE_HZ as f64);
+        if let Some(remaining) = target.checked_sub(started.elapsed()) {
+            thread::sleep(remaining);
+        }
+        maximum_schedule_lateness_ms = maximum_schedule_lateness_ms.max(
+            (started.elapsed().as_secs_f64() - target.as_secs_f64()).max(0.0) * 1_000.0,
+        );
+        loop {
+            let response = feed(handle, &audio[offset..end]);
+            match response.status {
+                OK => break,
+                BACKPRESSURE => {
+                    backpressure_count += 1;
+                    thread::sleep(Duration::from_millis(1));
+                }
+                status => {
+                    return Err(response
+                        .error
+                        .unwrap_or_else(|| format!("audio producer feed returned status {status}")));
+                }
+            }
+        }
+        offset = end;
+        chunk_count += 1;
+        fed_samples.store(offset, Ordering::Release);
+    }
+    let response = close(handle);
+    if response.status != OK {
+        return Err(response
+            .error
+            .unwrap_or_else(|| format!("audio producer close returned status {}", response.status)));
+    }
+    Ok(ProducerStats {
+        audio_close_ms: started.elapsed().as_secs_f64() * 1_000.0,
+        backpressure_count,
+        chunk_count,
+        maximum_schedule_lateness_ms,
+    })
+}
+
+fn create_session(
+    model_directory: &CString,
+    delay_ms: i32,
+    max_decode_tokens_per_step: usize,
+    device_kind: i32,
+) -> Result<Session, String> {
     let mut status = OK;
     let mut error = ptr::null_mut();
     let handle = unsafe {
         cuttledoc_voxtral_mlx_session_create(
             model_directory.as_ptr(),
+            delay_ms,
+            MAX_GENERATED_TOKENS,
+            max_decode_tokens_per_step,
             device_kind,
             MAX_PENDING_SAMPLES,
             MAX_INGEST_SAMPLES_PER_STEP,
@@ -588,6 +770,26 @@ fn parse_device(device: &str) -> Result<i32, String> {
     }
 }
 
+fn parse_positive_i32(value: &str, name: &str) -> Result<i32, String> {
+    let value = value
+        .parse::<i32>()
+        .map_err(|error| format!("{name} must be a positive integer: {error}"))?;
+    if value <= 0 {
+        return Err(format!("{name} must be positive"));
+    }
+    Ok(value)
+}
+
+fn parse_positive_usize(value: &str, name: &str) -> Result<usize, String> {
+    let value = value
+        .parse::<usize>()
+        .map_err(|error| format!("{name} must be a positive integer: {error}"))?;
+    if value == 0 {
+        return Err(format!("{name} must be positive"));
+    }
+    Ok(value)
+}
+
 fn c_string(value: &str, name: &str) -> Result<CString, String> {
     CString::new(value).map_err(|_| format!("{name} contains an embedded NUL byte"))
 }
@@ -622,6 +824,56 @@ fn json_usize(json: &str, key: &str) -> Result<usize, String> {
     Ok(value as usize)
 }
 
+fn json_string_field(json: &str, key: &str) -> Result<String, String> {
+    let marker = format!("\"{key}\":\"");
+    let start = json
+        .find(&marker)
+        .ok_or_else(|| format!("step JSON is missing string field {key}"))?
+        + marker.len();
+    let mut characters = json[start..].chars();
+    let mut result = String::new();
+    while let Some(character) = characters.next() {
+        match character {
+            '"' => return Ok(result),
+            '\\' => match characters
+                .next()
+                .ok_or_else(|| format!("unterminated escape in JSON field {key}"))?
+            {
+                '"' => result.push('"'),
+                '\\' => result.push('\\'),
+                '/' => result.push('/'),
+                'b' => result.push('\u{0008}'),
+                'f' => result.push('\u{000c}'),
+                'n' => result.push('\n'),
+                'r' => result.push('\r'),
+                't' => result.push('\t'),
+                'u' => {
+                    let digits = (0..4)
+                        .map(|_| {
+                            characters.next().ok_or_else(|| {
+                                format!("short Unicode escape in JSON field {key}")
+                            })
+                        })
+                        .collect::<Result<String, String>>()?;
+                    let value = u32::from_str_radix(&digits, 16).map_err(|error| {
+                        format!("invalid Unicode escape in JSON field {key}: {error}")
+                    })?;
+                    result.push(char::from_u32(value).ok_or_else(|| {
+                        format!("invalid Unicode scalar in JSON field {key}")
+                    })?);
+                }
+                escape => {
+                    return Err(format!(
+                        "unsupported JSON escape \\{escape} in field {key}"
+                    ));
+                }
+            },
+            character => result.push(character),
+        }
+    }
+    Err(format!("unterminated JSON string field {key}"))
+}
+
 fn json_string(value: &str) -> String {
     let mut result = String::from("\"");
     for character in value.chars() {
@@ -653,5 +905,5 @@ fn take_string(value: *mut c_char) -> Option<String> {
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx frontend MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx encoder MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx transcribe MODEL_DIR PCM_F32LE DELAY_MS MAX_TOKENS cpu|gpu\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx frontend MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx encoder MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx transcribe MODEL_DIR PCM_F32LE DELAY_MS MAX_TOKENS cpu|gpu\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-voxtral-mlx stream MODEL_DIR PCM_F32LE DELAY_MS CHUNK_MS MAX_DECODE_TOKENS cpu|gpu".to_owned()
 }

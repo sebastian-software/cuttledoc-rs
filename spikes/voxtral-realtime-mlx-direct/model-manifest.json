@@ -116,7 +116,9 @@
     "feed_semantics": "all-or-nothing",
     "queue_capacity": "caller-configured-hard-bound",
     "step_budget": "caller-configured-hard-bound",
+    "decode_budget": "caller-configured-hard-bound",
     "end_of_audio": "explicit-close",
+    "output": "append-only-text-deltas-and-final-text",
     "stable_statuses": {
       "invalid_argument": 1,
       "cancelled": 3,
@@ -135,9 +137,9 @@
       "rotating_kv_cache": true,
       "sliding_window_attention": true,
       "adapter_projection": true,
-      "decoder": false,
-      "transcription": false,
-      "streaming_session": false
+      "decoder": true,
+      "transcription": true,
+      "streaming_session": true
     }
   }
 }

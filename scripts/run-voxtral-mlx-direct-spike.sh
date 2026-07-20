@@ -12,6 +12,8 @@ expected_mlx_commit=7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247
 frontend_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json"
 encoder_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.encoder-480ms.json"
 decoder_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.decoder-480ms.json"
+streaming_oracle_80="$root/benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-80ms-1/result.json"
+streaming_oracle_320="$root/benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-320ms-1/result.json"
 
 if [[ ! -d "$source_dir/.git" ]]; then
   echo "missing official MLX checkout: $source_dir" >&2
@@ -86,6 +88,36 @@ node "$root/scripts/validate-voxtral-mlx-decoder.mjs" \
   --actual "$decoder_result"
 echo "CONTRACT"
 "$build_dir/cuttledoc-voxtral-mlx" contract "$model_dir" "$fixture" gpu
+echo "STREAMING 480 MS DELAY / 320 MS INPUT"
+streaming_480_result="$build_dir/voxtral-streaming-480ms-320ms-input.json"
+"$build_dir/cuttledoc-voxtral-mlx" \
+  stream "$model_dir" "$fixture" 480 320 16 gpu >"$streaming_480_result"
+cat "$streaming_480_result"
+node "$root/scripts/validate-voxtral-mlx-streaming.mjs" \
+  --oracle "$streaming_oracle_320" \
+  --actual "$streaming_480_result" \
+  --delay-ms 480 \
+  --chunk-ms 320
+echo "STREAMING 2400 MS DELAY / 320 MS INPUT"
+streaming_2400_result="$build_dir/voxtral-streaming-2400ms-320ms-input.json"
+"$build_dir/cuttledoc-voxtral-mlx" \
+  stream "$model_dir" "$fixture" 2400 320 16 gpu >"$streaming_2400_result"
+cat "$streaming_2400_result"
+node "$root/scripts/validate-voxtral-mlx-streaming.mjs" \
+  --oracle "$streaming_oracle_320" \
+  --actual "$streaming_2400_result" \
+  --delay-ms 2400 \
+  --chunk-ms 320
+echo "STREAMING 480 MS DELAY / 80 MS INPUT"
+streaming_80_result="$build_dir/voxtral-streaming-480ms-80ms-input.json"
+"$build_dir/cuttledoc-voxtral-mlx" \
+  stream "$model_dir" "$fixture" 480 80 16 gpu >"$streaming_80_result"
+cat "$streaming_80_result"
+node "$root/scripts/validate-voxtral-mlx-streaming.mjs" \
+  --oracle "$streaming_oracle_80" \
+  --actual "$streaming_80_result" \
+  --delay-ms 480 \
+  --chunk-ms 80
 echo "ARTIFACTS"
 echo "mlx_commit=$actual_mlx_commit"
 stat -f 'shim_dylib_bytes=%z' "$build_dir/libcuttledoc_voxtral_mlx_shim.dylib"

@@ -1132,6 +1132,11 @@ function validateVoxtralRealtimeDirectModelManifest(
       contract?.sample_format !== 'f32le' ||
       contract?.channel_count !== 1 ||
       contract?.feed_semantics !== 'all-or-nothing' ||
+      contract?.queue_capacity !== 'caller-configured-hard-bound' ||
+      contract?.step_budget !== 'caller-configured-hard-bound' ||
+      contract?.decode_budget !== 'caller-configured-hard-bound' ||
+      contract?.end_of_audio !== 'explicit-close' ||
+      contract?.output !== 'append-only-text-deltas-and-final-text' ||
       contract?.stable_statuses?.invalid_argument !== 1 ||
       contract?.stable_statuses?.cancelled !== 3 ||
       contract?.stable_statuses?.busy !== 4 ||
@@ -1147,9 +1152,9 @@ function validateVoxtralRealtimeDirectModelManifest(
       contract?.capabilities?.rotating_kv_cache !== true ||
       contract?.capabilities?.sliding_window_attention !== true ||
       contract?.capabilities?.adapter_projection !== true ||
-      contract?.capabilities?.decoder !== false ||
-      contract?.capabilities?.transcription !== false ||
-      contract?.capabilities?.streaming_session !== false) {
+      contract?.capabilities?.decoder !== true ||
+      contract?.capabilities?.transcription !== true ||
+      contract?.capabilities?.streaming_session !== true) {
     errors.push('direct Voxtral boundary contract must remain explicit and bounded');
   }
   return errors;
@@ -1477,7 +1482,7 @@ function validateVoxtralRealtimeDirectEncoder(
       probe?.capabilities?.decoder !== false ||
       probe?.capabilities?.transcription !== false ||
       modelManifest.adapter_contract?.capabilities?.causal_encoder !== true ||
-      modelManifest.adapter_contract?.capabilities?.decoder !== false) {
+      modelManifest.adapter_contract?.capabilities?.decoder !== true) {
     errors.push('direct encoder output and capability ceiling must match oracle');
   }
 
@@ -1646,7 +1651,7 @@ function validateVoxtralRealtimeDirectTranscription(
       probe?.capabilities?.streaming_session !== false ||
       modelManifest.batch_contract?.capabilities?.transcription !== true ||
       modelManifest.batch_contract?.capabilities?.streaming_session !== false ||
-      modelManifest.adapter_contract?.capabilities?.transcription !== false) {
+      modelManifest.adapter_contract?.capabilities?.transcription !== true) {
     errors.push('batch transcription must not overclaim the streaming session');
   }
 

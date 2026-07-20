@@ -61,12 +61,16 @@ int32_t cuttledoc_voxtral_mlx_transcribe(
     int32_t device_kind, char **json_out, char **error_out);
 
 /*
- * Creates the repository-owned streaming task boundary. max_pending_samples
- * is the hard caller-visible queue capacity. max_ingest_samples_per_step is
- * the maximum snapshot a single step may remove and evaluate through MLX.
+ * Creates the repository-owned incremental Voxtral session. The delay and
+ * generation limits are fixed for the lifetime of the session.
+ * max_pending_samples is the hard caller-visible queue capacity;
+ * max_ingest_samples_per_step and max_decode_tokens_per_step bound the work
+ * performed by one synchronous step.
  */
 void *cuttledoc_voxtral_mlx_session_create(
-    const char *model_directory, int32_t device_kind,
+    const char *model_directory, int32_t transcription_delay_ms,
+    size_t max_generated_tokens, size_t max_decode_tokens_per_step,
+    int32_t device_kind,
     size_t max_pending_samples, size_t max_ingest_samples_per_step,
     int32_t *status_out, char **error_out);
 
@@ -83,8 +87,9 @@ int32_t cuttledoc_voxtral_mlx_session_feed(void *handle, const float *audio,
 int32_t cuttledoc_voxtral_mlx_session_close(void *handle, char **error_out);
 
 /*
- * Removes at most max_ingest_samples_per_step from a fixed snapshot, runs a
- * small official-MLX fingerprint over exactly that slice, and returns JSON.
+ * Removes at most max_ingest_samples_per_step from a fixed snapshot and
+ * advances persistent mel, causal-convolution, encoder, downsampler, decoder,
+ * tokenizer, and delta-text state through official MLX tensor operations.
  * NEEDS_AUDIO and DONE are normal states and also return JSON.
  */
 int32_t cuttledoc_voxtral_mlx_session_step(void *handle, char **json_out,

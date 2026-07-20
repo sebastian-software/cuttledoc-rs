@@ -172,7 +172,9 @@
         "feed_semantics",
         "queue_capacity",
         "step_budget",
+        "decode_budget",
         "end_of_audio",
+        "output",
         "stable_statuses",
         "capabilities"
       ],
@@ -195,8 +197,14 @@
         "step_budget": {
           "const": "caller-configured-hard-bound"
         },
+        "decode_budget": {
+          "const": "caller-configured-hard-bound"
+        },
         "end_of_audio": {
           "const": "explicit-close"
+        },
+        "output": {
+          "const": "append-only-text-deltas-and-final-text"
         },
         "stable_statuses": {
           "const": {
@@ -219,9 +227,9 @@
             "rotating_kv_cache": true,
             "sliding_window_attention": true,
             "adapter_projection": true,
-            "decoder": false,
-            "transcription": false,
-            "streaming_session": false
+            "decoder": true,
+            "transcription": true,
+            "streaming_session": true
           }
         }
       }
