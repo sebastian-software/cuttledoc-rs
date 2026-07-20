@@ -81,7 +81,7 @@ Evidence snapshot: 2026-07-20.
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements; held-out and true-streaming gates remain. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical Apple/Whisper/Qwen/Parakeet/Voxtral runs remain. |
-| Voxtral Realtime live streaming (#19) | In progress | The pinned MLX oracle now covers identical five-language audiobook and FLEURS cells at 480/2,400 ms. True incremental audio input, first/stable/final timing, cancellation, lifecycle, and the official-MLX versus C/MPS boundary comparison remain. |
+| Voxtral Realtime live streaming (#19) | In progress | True incremental input and repeated lifecycle are proven: 320 ms chunks remain bounded, while the reference runtime's live queue can block an 80 ms `step()` for 25.15 s. The model advances, but `mlx-audio` is rejected as the product boundary; owned bounded ingestion, cooperative cancellation, and the official-MLX versus C/MPS comparison remain. |
 | Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
@@ -300,9 +300,10 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    Parakeet, and Voxtral Realtime on identical language/domain cells. Retain
    raw output, surface scores, semantic-severity review, and backend-specific
    error profiles.
-3. Prove Voxtral's stateful live-input streaming, first stable output,
-   cancellation, and lifecycle behavior before choosing between a direct
-   official-MLX adapter and the smaller pure-C/MPS boundary.
+3. Preserve Voxtral's proven 320 ms stateful streaming behavior in a bounded
+   repository-owned official-MLX adapter, add real cooperative cancellation,
+   and compare that boundary with pure C/MPS. Do not adopt the reference
+   runtime's unbounded live queue.
 4. Use those real raw outputs to execute the frozen surface-only and bounded
    lexical postprocessing candidates under #7. Keep corrected text separate
    from raw ASR ranking and reject critical semantic regressions.

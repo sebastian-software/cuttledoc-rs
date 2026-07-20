@@ -1094,6 +1094,173 @@ function validateVoxtralRealtimeAggregate(
   return errors;
 }
 
+function validateVoxtralRealtimeStreamingRun(
+  run,
+  modelManifest,
+  audiobookManifest,
+  chunkMs,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '')) {
+    errors.push('streaming run identity must pin capture time and source');
+  }
+  if (run.candidate?.id !==
+        'voxtral-mini-4b-realtime-mlx-reference' ||
+      !run.candidate?.model?.includes(
+        `@${modelManifest.conversion?.revision}`,
+      ) ||
+      !run.candidate?.model?.includes(
+        `@${modelManifest.source?.revision}`,
+      ) ||
+      !run.candidate?.runtime?.includes(
+        `@${modelManifest.reference_runtime?.revision}`,
+      )) {
+    errors.push('streaming candidate must pin the selected model and runtime');
+  }
+  if (!fixture ||
+      run.fixture?.id !== fixture.id ||
+      run.fixture?.language !== fixture.language ||
+      run.fixture?.gold_status !== fixture.gold_status ||
+      run.fixture?.reference_text !== fixture.reference_text ||
+      run.fixture?.audio_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.sample_rate_hz !==
+        modelManifest.inference_contract?.sample_rate_hz ||
+      run.fixture?.sample_count !== fixture.normalized.sample_count ||
+      run.fixture?.duration_ms !== fixture.normalized.duration_ms) {
+    errors.push('streaming fixture must match the pinned audiobook PCM');
+  }
+  if (run.procedure?.repetitions !== 2 ||
+      !arrayEquals(
+        run.procedure?.transcription_delays_ms ?? [],
+        modelManifest.inference_contract?.transcription_delay_ms ?? [],
+      ) ||
+      run.procedure?.chunk_ms !== chunkMs ||
+      run.procedure?.max_decode_tokens_per_step !== 16 ||
+      run.procedure?.max_tokens !==
+        modelManifest.inference_contract?.max_tokens ||
+      run.procedure?.realtime_pacing !== true ||
+      run.procedure?.first_chunk_available_after_capture !== true ||
+      run.procedure?.producer_thread_independent_from_mlx_executor !== true ||
+      run.procedure?.consumer_step_after_feed_signal !== true ||
+      run.procedure?.feed_signals_may_coalesce_while_mlx_step_runs !== true ||
+      run.procedure?.additional_step_calls_after_close_until_done !== true) {
+    errors.push('streaming procedure must preserve the live-input contract');
+  }
+  for (const field of ['feed', 'step', 'close', 'done', 'generated']) {
+    if (run.api_contract?.[field] !== true) {
+      errors.push(`streaming API ${field} must remain available`);
+    }
+  }
+  if (run.api_contract?.cancel !== false ||
+      run.api_contract?.finalize_step !== false ||
+      !run.api_contract?.close_semantics?.includes('not cancellation') ||
+      run.abandonment_probe?.native_cancel_available !== false ||
+      run.abandonment_probe?.done !== false ||
+      !run.abandonment_probe?.claim?.includes(
+        'not cooperative cancellation',
+      )) {
+    errors.push('streaming cancellation gap must remain explicit');
+  }
+
+  const expectedPairs = [
+    '480:1',
+    '480:2',
+    '2400:1',
+    '2400:2',
+  ];
+  const actualPairs = (run.runs ?? []).map(
+    (result) =>
+      `${result.transcription_delay_ms}:${result.repetition}`,
+  );
+  if (!arrayEquals(actualPairs, expectedPairs)) {
+    errors.push('streaming runs must cover both delays and repetitions');
+  }
+  const expectedChunkCount = Math.ceil(
+    fixture.normalized.sample_count /
+    (chunkMs * modelManifest.inference_contract.sample_rate_hz / 1000),
+  );
+  for (const result of run.runs ?? []) {
+    if (!(result.text?.length > 0) ||
+        result.quality?.wer !== 0 ||
+        result.quality?.cer !== 0 ||
+        result.streaming?.input_streaming_measured !== true ||
+        result.streaming?.append_only !== true ||
+        result.streaming?.revoke_count !== 0 ||
+        result.streaming?.audio_chunk_count !== expectedChunkCount ||
+        result.streaming?.done !== true ||
+        !(result.streaming?.generated_tokens > 0) ||
+        result.events?.length !== result.streaming?.update_count ||
+        result.step_trace?.length !== result.streaming?.step_call_count ||
+        !(result.resources?.runtime_peak_memory_bytes > 0)) {
+      errors.push(
+        `${result.transcription_delay_ms}:${result.repetition}: ` +
+        'invalid streaming result',
+      );
+      continue;
+    }
+    if ((result.events ?? []).some(
+      (event, index) =>
+        event.index !== index ||
+        !(event.delta?.length > 0) ||
+        !isMetric(event.elapsed_ms) ||
+        !isMetric(event.audio_fed_before_step_ms) ||
+        !isMetric(event.audio_fed_at_emit_ms),
+    )) {
+      errors.push(
+        `${result.transcription_delay_ms}:${result.repetition}: ` +
+        'invalid append trace',
+      );
+    }
+    if ((result.step_trace ?? []).some(
+      (step, index) =>
+        step.index !== index ||
+        !isMetric(step.started_ms) ||
+        !isMetric(step.duration_ms) ||
+        !isMetric(step.audio_fed_before_step_ms) ||
+        !isMetric(step.audio_fed_after_step_ms) ||
+        typeof step.producer_done_before_step !== 'boolean' ||
+        typeof step.producer_done_after_step !== 'boolean' ||
+        !(Number.isInteger(step.delta_count) && step.delta_count >= 0),
+    )) {
+      errors.push(
+        `${result.transcription_delay_ms}:${result.repetition}: ` +
+        'invalid executor step trace',
+      );
+    }
+    if (!(result.timing?.first_append_ms > 0) ||
+        result.timing?.first_stable_ms !==
+          result.timing?.first_append_ms ||
+        !(result.timing?.final_ms >= result.timing?.audio_close_ms) ||
+        !(result.timing?.maximum_step_ms > 0) ||
+        !(result.timing?.p95_feed_schedule_lateness_ms < 15)) {
+      errors.push(
+        `${result.transcription_delay_ms}:${result.repetition}: ` +
+        'invalid streaming timing',
+      );
+    }
+  }
+  if (new Set((run.runs ?? []).map((result) => result.text)).size !== 1) {
+    errors.push('streaming transcripts must be deterministic across lifecycle');
+  }
+  if ((run.batch_controls ?? []).length !== 2 ||
+      run.batch_controls.some(
+        (control) =>
+          control.quality?.wer !== 0 ||
+          control.quality?.cer !== 0 ||
+          control.matches_stream_runs !== false,
+      )) {
+    errors.push(
+      'batch controls must retain lexical parity and surface-form differences',
+    );
+  }
+  return errors;
+}
+
 function validateQwen3TtsRun(run, selection, modelManifest) {
   const errors = [];
   if (run.schema_version !== schemaVersion ||
@@ -2386,6 +2553,14 @@ const voxtralRealtimeFleurs2400Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.multilingual-fleurs-10-1/result.json',
 );
+const voxtralRealtimeStreaming80Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-80ms-1/result.json',
+);
+const voxtralRealtimeStreaming320Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-320ms-1/result.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -2460,6 +2635,12 @@ const voxtralRealtimeFleurs480 = await readJson(
 );
 const voxtralRealtimeFleurs2400 = await readJson(
   voxtralRealtimeFleurs2400Path,
+);
+const voxtralRealtimeStreaming80 = await readJson(
+  voxtralRealtimeStreaming80Path,
+);
+const voxtralRealtimeStreaming320 = await readJson(
+  voxtralRealtimeStreaming320Path,
 );
 const aggregateManifests = new Map([
   [manifest.revision, manifest],
@@ -2589,6 +2770,34 @@ if (!(voxtralRealtimeFleurs2400.summary?.macro_wer <
       voxtralRealtimeFleurs480.summary?.macro_wer)) {
   failures.push(
     'Voxtral Realtime 2400 ms FLEURS control must preserve its observed macro-WER gain',
+  );
+}
+failures.push(
+  ...validateVoxtralRealtimeStreamingRun(
+    voxtralRealtimeStreaming80,
+    voxtralRealtimeModelManifest,
+    audiobookPilot,
+    80,
+  ).map((error) => `${voxtralRealtimeStreaming80Path}: ${error}`),
+  ...validateVoxtralRealtimeStreamingRun(
+    voxtralRealtimeStreaming320,
+    voxtralRealtimeModelManifest,
+    audiobookPilot,
+    320,
+  ).map((error) => `${voxtralRealtimeStreaming320Path}: ${error}`),
+);
+const maximumRunningStep = (run) => Math.max(
+  ...run.runs.map(
+    (result) => result.timing.maximum_step_started_before_close_ms,
+  ),
+);
+if (!(maximumRunningStep(voxtralRealtimeStreaming80) > 25_000) ||
+    !(maximumRunningStep(voxtralRealtimeStreaming320) < 250) ||
+    !voxtralRealtimeStreaming320.runs.every(
+      (result) => result.timing.endpoint_finalization_ms < 1_000,
+    )) {
+  failures.push(
+    'Voxtral streaming controls must preserve the measured 80 ms queue stall and stable 320 ms workaround',
   );
 }
 const rightsReviewIds = new Set();
@@ -2809,6 +3018,20 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push(
       'validator self-test failed to reject false Voxtral streaming evidence',
+    );
+  }
+  const invalidVoxtralStreaming = structuredClone(
+    voxtralRealtimeStreaming320,
+  );
+  invalidVoxtralStreaming.runs[0].streaming.input_streaming_measured = false;
+  if (validateVoxtralRealtimeStreamingRun(
+    invalidVoxtralStreaming,
+    voxtralRealtimeModelManifest,
+    audiobookPilot,
+    320,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject false Voxtral live-input evidence',
     );
   }
   const invalidVoxtralTtsRun = structuredClone(voxtralTtsRun);

@@ -64,9 +64,7 @@ Their boundary-review alignments are part of the shared
 
 The aggregate agreement is not a universal delay rule. Per-language results
 change by source, and the German FLEURS errors are dominated by token
-boundaries rather than character changes. The next experiment must feed audio
-incrementally and record first, stable, and final output plus cancellation and
-repeated lifecycle behavior.
+boundaries rather than character changes.
 
 Run that true-input streaming experiment with 80 ms, wall-clock-paced chunks:
 
@@ -84,3 +82,41 @@ also inspects the session for cancellation and finalization methods, abandons
 one prefix session, and then runs repeated complete lifecycles. Dropping a
 Python session reference is only an abandonment smoke test; it must not be
 reported as cooperative cancellation.
+
+## Streaming result
+
+The 13.34-second German audiobook fixture completed four repeated sessions per
+chunk-size control. Every run emitted the same 177-token, 51-delta,
+append-only transcript at 0% WER/CER and roughly 5.5 GB MLX peak allocation.
+
+| Input chunk | Delay | First append | Maximum running `step()` | Endpoint finalization |
+| --- | ---: | ---: | ---: | ---: |
+| 80 ms | 480 ms | 1.63-1.66 s | 6.24-13.75 s | 5.24-5.38 s |
+| 80 ms | 2,400 ms | 3.55-28.12 s | 0.13-25.15 s | 3.30-16.76 s |
+| 320 ms | 480 ms | 1.69-1.71 s | 0.13-0.20 s | 0.36-0.50 s |
+| 320 ms | 2,400 ms | 3.61 s | 0.13-0.14 s | 0.66-0.72 s |
+
+The configured delay is not end-to-end startup latency; left context, prefill,
+input cadence, and executor time are additional terms. The selected fixture
+has an unverified dataset transcript and is an operational control, not a
+German quality benchmark.
+
+The exact
+[`80 ms trace`](../../benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-80ms-1/result.json)
+and
+[`320 ms trace`](../../benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-320ms-1/result.json)
+retain every audio/feed boundary, append delta, and executor step.
+
+This is a reference-runtime backpressure defect, not evidence against the
+official MLX core or the Voxtral model. The pinned `mlx-audio`
+`_ingest_pending()` loop keeps draining while the producer can append more
+80 ms chunks. Once ingestion falls behind, one nominally bounded `step()` can
+therefore monopolize the executor until end-of-audio. A 320 ms producer cadence
+avoids the failure on this fixture, but an owned adapter must instead snapshot
+or cap ingestion work per call.
+
+The session exposes `feed()`, `step()`, `close()`, `done`, and generated tokens.
+It exposes neither `cancel()` nor the `finalize_step()` named by its model
+docstring. `close()` flushes right padding and final text; it is not
+cancellation. The reference runtime is therefore rejected as a product
+boundary even though the model remains a serious official-MLX candidate.

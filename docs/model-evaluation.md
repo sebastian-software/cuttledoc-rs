@@ -151,6 +151,47 @@ This is useful evidence that Voxtral deserves intensive evaluation, while also
 showing that delay tuning must be judged by source, language, CER, and error
 class rather than a global WER alone.
 
+## Voxtral Realtime live-input follow-up
+
+A separate probe fed one 13.34-second German audiobook clip from a producer
+thread at wall-clock pace while the MLX executor called the stateful session
+cooperatively. Both delays, two repeated lifecycles, and two input chunk sizes
+produced the same append-only transcript at 0% WER/CER:
+
+| Input chunk | Delay | First append | Maximum running `step()` | Endpoint finalization |
+| --- | ---: | ---: | ---: | ---: |
+| 80 ms | 480 ms | 1.63-1.66 s | 6.24-13.75 s | 5.24-5.38 s |
+| 80 ms | 2,400 ms | 3.55-28.12 s | 0.13-25.15 s | 3.30-16.76 s |
+| 320 ms | 480 ms | 1.69-1.71 s | 0.13-0.20 s | 0.36-0.50 s |
+| 320 ms | 2,400 ms | 3.61 s | 0.13-0.14 s | 0.66-0.72 s |
+
+The configured transcription delay is therefore not total startup latency:
+left context, prefill, chunk cadence, and executor time also contribute. This
+single development-exposed, dataset-transcript-unverified fixture is an
+operational control, not a German quality estimate.
+
+The 320 ms control proves usable incremental model behavior. The 80 ms trace
+also exposes a reference-runtime defect: `mlx-audio` drains its pending audio
+list in a loop while the independent producer can append more work. Once the
+consumer falls behind, one documented bounded `step()` can keep ingesting until
+end-of-audio. Producer p95 scheduling lateness remains about 5 ms, so the
+multi-second stalls are not microphone scheduling noise.
+
+The exact
+[`80 ms trace`](../benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-80ms-1/result.json)
+and
+[`320 ms trace`](../benchmarks/raw/phase0.voxtral-realtime-mlx-reference.streaming-320ms-1/result.json)
+retain all 51 append deltas and every executor step. The runtime exposes no
+`cancel()` method, and `close()` performs end-of-stream padding and
+finalization rather than cancellation. Its model docstring also names a
+`finalize_step()` method that the session does not implement.
+
+This rejects `mlx-audio` as Cuttledoc's product boundary, not official MLX or
+Voxtral. The candidate advances to a bounded repository-owned ingestion loop
+over official MLX, with cooperative cancellation designed into the Rust-owned
+lifecycle. The pure-C/MPS implementation remains a comparison boundary, not a
+reason to abandon the first-class MLX platform.
+
 ## Artifact and license pins
 
 | Artifact | Exact revision | Representation | License |
@@ -208,9 +249,10 @@ timestamp detail, and streaming behavior.
    repeated Rust-owned lifecycle, exact transcript, busy, error, and
    cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
-2. Treat Voxtral Realtime as a measured model candidate. Prove stateful
-   live-input streaming, first stable output, cancellation, and repeated
-   lifecycle behavior before choosing an integration boundary.
+2. Treat Voxtral Realtime as a measured model candidate. Preserve the proven
+   320 ms live-input behavior in a repository-owned official-MLX adapter with
+   bounded ingestion and cooperative cancellation; compare that narrow
+   boundary with pure C/MPS without adopting `mlx-audio`.
 3. Acquire held-out German-first professional-podcast material and independent
    audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
    Voxtral on the identical language/domain cells.

@@ -131,6 +131,20 @@ identical across delay settings. The boundary-review report lowers the
 spaces as token boundaries. This is strong candidate evidence, not a
 population-level European-language ranking.
 
+True incremental input is also proven on a 13.34-second German audiobook
+fixture. Four repeated 320 ms-chunk sessions are deterministic at 0% WER/CER,
+first append arrives at 1.69-1.71 seconds for the 480 ms setting and 3.61
+seconds for 2,400 ms, running steps stay below 202 ms, and endpoint
+finalization stays below 717 ms.
+
+The finer 80 ms control exposes a blocking queue defect in the reference
+runtime: one `step()` can drain audio concurrently appended by the producer
+until end-of-stream, producing observed 6.24-25.15 second executor stalls.
+There is no native cancellation method; `close()` is EOS finalization. This
+rejects `mlx-audio` as the product boundary while strengthening the case for a
+bounded owned adapter over official MLX.
+
 Do not broaden Qwen to 1.7B yet. For Voxtral, compare a narrow official-MLX
-adapter with the pure-C/MPS path only after it survives those quality and
-streaming gates. Canary and Nemotron remain useful future evidence.
+adapter with the pure-C/MPS path while preserving the measured 320 ms behavior
+and adding cooperative cancellation. Canary and Nemotron remain useful future
+evidence.

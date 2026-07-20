@@ -254,8 +254,8 @@ are useful hypotheses, not an acceptance result for Cuttledoc 3.
 4. Add a compact MLS/LibriSpeech audiobook subset for all five languages.
 5. Add GigaSpeech English podcast material and a legally reviewed,
    German-first curated podcast set.
-6. Re-run Apple, Whisper, Qwen, and Parakeet on identical cells before defining
-   language-specific routing. The compact development pass is complete; the
-   target-size held-out pass remains open.
+6. Re-run Apple, Whisper, Qwen, Parakeet, and Voxtral on identical cells before
+   defining language-specific routing. The compact development pass is
+   complete; the target-size held-out pass remains open.
 7. Evaluate Gemma and other correction models only on the resulting real raw
    outputs.
