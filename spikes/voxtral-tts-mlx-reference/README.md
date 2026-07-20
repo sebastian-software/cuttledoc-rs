@@ -16,7 +16,9 @@ Mistral API is evaluated as a distinct commercial-service path.
 
 The reference runtime is the same pinned `mlx-audio` revision used by the
 Qwen3-TTS spike. It runs over official Apple MLX and keeps the future Rust
-boundary undecided.
+boundary undecided. The environment additionally pins `mistral-common` to the
+officially documented 1.10 compatibility line; 1.9.1 cannot parse the
+Voxtral-TTS tokenizer's voice metadata.
 
 Download and verify the 2.54 GB snapshot:
 

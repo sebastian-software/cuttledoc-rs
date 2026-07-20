@@ -4,6 +4,7 @@ version = "0.0.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "mlx-audio[tts] @ git+https://github.com/Blaizzy/mlx-audio.git@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+  "mistral-common[audio]>=1.10.0,<1.11",
 ]
 
 [tool.uv]
