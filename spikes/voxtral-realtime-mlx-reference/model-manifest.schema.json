@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/voxtral-realtime-mlx-reference-model-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "task",
+    "source",
+    "conversion",
+    "reference_runtime",
+    "inference_contract",
+    "artifacts",
+    "architecture"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "const": "voxtral-mini-4b-realtime-2602-mlx-4bit"
+    },
+    "task": {
+      "const": "asr"
+    },
+    "source": {
+      "$ref": "#/$defs/openObject"
+    },
+    "conversion": {
+      "type": "object",
+      "required": [
+        "repository",
+        "revision",
+        "license",
+        "format",
+        "conversion_tool",
+        "weight_bytes",
+        "snapshot_bytes"
+      ],
+      "properties": {
+        "repository": {
+          "const": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "license": {
+          "const": "Apache-2.0"
+        },
+        "format": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "conversion_tool": {
+          "const": "mlx-audio"
+        },
+        "weight_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "snapshot_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "reference_runtime": {
+      "$ref": "#/$defs/openObject"
+    },
+    "inference_contract": {
+      "type": "object",
+      "required": [
+        "sample_rate_hz",
+        "sample_format",
+        "channel_count",
+        "temperature",
+        "transcription_delay_ms",
+        "repetitions",
+        "warmup_runs",
+        "max_tokens"
+      ],
+      "properties": {
+        "sample_rate_hz": {
+          "const": 16000
+        },
+        "sample_format": {
+          "const": "f32le"
+        },
+        "channel_count": {
+          "const": 1
+        },
+        "temperature": {
+          "const": 0
+        },
+        "transcription_delay_ms": {
+          "const": [
+            480,
+            2400
+          ]
+        },
+        "repetitions": {
+          "const": 2
+        },
+        "warmup_runs": {
+          "const": 1
+        },
+        "max_tokens": {
+          "const": 4096
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/digest"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "architecture": {
+      "$ref": "#/$defs/openObject"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "openObject": {
+      "type": "object",
+      "minProperties": 1
+    }
+  }
+}

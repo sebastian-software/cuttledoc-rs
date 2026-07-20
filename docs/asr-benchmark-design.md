@@ -90,8 +90,8 @@ before semantic error severity or postprocessing acceptance is reported.
 
 ### Development-pilot ASR results
 
-All five candidates ran sequentially on identical digest-checked PCM with one
-discarded warm-up and two measured repetitions. The immutable matrix is
+Seven candidate/settings ran sequentially on identical digest-checked PCM with
+one discarded warm-up and two measured repetitions. The immutable matrix is
 [`phase0.audiobook-pilot-1.json`](../benchmarks/matrices/phase0.audiobook-pilot-1.json);
 the deterministic word alignments are in
 [`phase0.audiobook-pilot-1.errors.json`](../benchmarks/analysis/phase0.audiobook-pilot-1.errors.json).
@@ -103,6 +103,8 @@ the deterministic word alignments are in
 | Parakeet TDT 0.6B/CoreML | 8.90% | 8.56% | 0.0211 |
 | Qwen3-ASR 0.6B/MLX reference | 11.14% | 10.53% | 0.0305 |
 | Qwen3-ASR 0.6B/direct MLX | 10.96% | pending | 0.0510 |
+| Voxtral Realtime 4B/MLX, 480 ms | 5.84% | pending | 0.2229 |
+| Voxtral Realtime 4B/MLX, 2,400 ms | 4.25% | pending | 0.2245 |
 
 The boundary-review view keeps apostrophes inside words while treating
 hyphens, dashes, and slashes as boundaries. It removes obvious scoring
@@ -117,14 +119,25 @@ equivalence or repair the unverified references.
 | French | 3.33% | 3.70% | 9.70% | 3.42% |
 | Portuguese | 7.99% | 11.91% | 9.95% | 22.74% |
 
-These numbers reject a single language-agnostic quality claim, but they do not
-yet justify language routing. Whisper leads every language after the limited
-boundary normalization, while Apple is close on German, English, and French
-and remains materially faster with real incremental word-timestamp updates.
-Portuguese is the weakest cell for every candidate except Parakeet relative to
-its own other languages. Qwen's strong French result and weak Portuguese row
+These numbers reject a single language-agnostic quality claim. Whisper leads
+the original candidates after the limited boundary normalization, while Apple
+is close on German, English, and French and remains materially faster with
+real incremental word-timestamp updates. Portuguese is the weakest cell for
+most original candidates. Qwen's strong French result and weak Portuguese row
 show why its direct MLX adapter should be evaluated, not selected or rejected,
 on a global mean.
+
+The newer Voxtral cells currently have only the immutable raw normalization:
+
+| Voxtral delay | German | English | Spanish | French | Portuguese |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 480 ms | 2.72% | 5.41% | 7.94% | 6.68% | 6.45% |
+| 2,400 ms | 0.68% | 6.06% | 5.31% | 1.74% | 7.46% |
+
+The longer delay is dramatically better for German and French, but the shorter
+delay is better for English and Portuguese. This is enough to require
+language-specific delay cells in the held-out design, not enough to accept
+production routing from three already-inspected clips per language.
 
 The direct Qwen adapter is now that evaluation: it completed all 45 runs, was
 deterministic per fixture, and matched the Python reference text on 12/15

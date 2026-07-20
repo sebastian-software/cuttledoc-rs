@@ -20,7 +20,7 @@ the official MLX core?
 | [Qwen3-ASR 0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B/tree/5eb144179a02acc5e5ba31e748d22b0cf3e303b0) | Apache-2.0 | official Transformers/vLLM Python stack | measured end to end through the repository-owned adapter over official MLX; lifecycle/cancellation accepted, advance corpus and packaging gates |
 | [Qwen3-ASR 1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B/tree/7278e1e70fe206f11671096ffdd38061171dd6e5) | Apache-2.0 | official Transformers/vLLM Python stack | blocked until the shared 0.6B architecture has an accepted Apple boundary |
 | [Voxtral Mini 3B](https://huggingface.co/mistralai/Voxtral-Mini-3B-2507/tree/3060fe34b35ba5d44202ce9ff3c097642914f8f3) | Apache-2.0 | vLLM 0.10+ or Transformers; about 9.5 GB GPU memory | blocked: no accepted Apple runtime; owned port is materially larger than Qwen 0.6B |
-| [Voxtral Mini 4B Realtime](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add) | Apache-2.0 | vLLM realtime endpoint; at least 16 GB GPU memory | blocked: community MLX path is reference-only; owned 4B port follows a smaller adapter proof |
+| [Voxtral Mini 4B Realtime](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add) | Apache-2.0 | official vLLM and Transformers; publisher-linked ExecuTorch, C/MPS, MLX, and Rust paths | measured through pinned 4-bit MLX reference on 15 audiobook clips at 480/2,400 ms; advance held-out corpus and true-streaming gates |
 
 The machine-readable blocked records retain exact format, revision, license,
 runtime, platform, engineering cost, and blocker under
@@ -34,10 +34,11 @@ NeMo plus Transformers offline and cache-aware streaming paths. The remaining
 gates are its custom model license and the absence of an accepted native Apple
 runtime.
 
-The Voxtral entries likewise do not rely on a stale llama.cpp claim. Their
-current publisher cards list vLLM/Transformers for Mini 3B and vLLM's realtime
-endpoint for Mini 4B. Those are valid upstream runtimes, but not Cuttledoc's
-native Apple boundary.
+The Voxtral entries likewise do not rely on a stale llama.cpp claim. Mini 4B
+Realtime now has official Transformers support in addition to vLLM, and its
+publisher card links ExecuTorch, pure C with Metal/MPS, MLX, and Rust community
+paths. The pinned MLX oracle proves Apple-local feasibility and quality; none
+of those paths automatically defines Cuttledoc's accepted product boundary.
 
 ## Qwen3-ASR 0.6B reference result
 
@@ -96,7 +97,22 @@ batch-versus-streaming capabilities, clean materialization measurements, and a
 documented release artifact budget—without importing `mlx-audio` or another
 community runtime.
 
-Do not broaden the implementation to Qwen 1.7B or Voxtral until the smaller
-adapter demonstrates that the architecture and release cost are maintainable.
-Canary and Nemotron remain useful future model evidence, but neither displaces
-the current product selection or the direct Qwen/MLX follow-up.
+Voxtral Realtime is now a measured third model candidate rather than blocked
+future research. Its 15-clip audiobook results are language- and delay-specific:
+
+| Delay | Macro WER | German | English | Spanish | French | Portuguese | Mean RTF |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 480 ms | 5.84% | 2.72% | 5.41% | 7.94% | 6.68% | 6.45% | 0.223 |
+| 2,400 ms | 4.25% | 0.68% | 6.06% | 5.31% | 1.74% | 7.46% | 0.225 |
+| Whisper comparison | 4.49% | 2.52% | 5.95% | 1.21% | 4.77% | 8.00% | 0.0569 |
+
+The higher delay wins macro, German, Spanish, and French quality without a
+meaningful offline-runtime increase, while 480 ms is better for English and
+Portuguese. This validates language-specific selection and rules out a single
+global Voxtral setting. The pilot is small, uses development-exposed
+unverified transcripts, and measures complete-clip inference. The next gate is
+held-out professional speech plus stateful streaming latency and cancellation.
+
+Do not broaden Qwen to 1.7B yet. For Voxtral, compare a narrow official-MLX
+adapter with the pure-C/MPS path only after it survives those quality and
+streaming gates. Canary and Nemotron remain useful future evidence.

@@ -3,7 +3,8 @@
 **Status:** the mandatory phase-0 comparison is complete. Apple
 SpeechTranscriber is the selected first vertical-slice backend, Whisper
 large-v3-turbo is the opt-in quality and coverage fallback, and direct official
-MLX remains a first-class research foundation.
+MLX remains a first-class research foundation. Voxtral Realtime is now a
+measured third model candidate with language-specific delay behavior.
 
 **Evidence date:** 2026-07-20.
 
@@ -114,6 +115,25 @@ reviewable numeric representation difference, while `3` versus `XI` is a
 critical content error. The report flags both rather than silently deciding
 that they are equivalent.
 
+## Voxtral Realtime audiobook follow-up
+
+The pinned 4-bit Voxtral Realtime MLX oracle completed the 15 professionally
+recorded audiobook clips at both the publisher-recommended 480 ms delay and a
+2,400 ms quality control:
+
+| Delay | Macro WER | German | English | Spanish | French | Portuguese | RTF |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 480 ms | 5.84% | 2.72% | 5.41% | 7.94% | 6.68% | 6.45% | 0.223 |
+| 2,400 ms | 4.25% | 0.68% | 6.06% | 5.31% | 1.74% | 7.46% | 0.225 |
+| Whisper | 4.49% | 2.52% | 5.95% | 1.21% | 4.77% | 8.00% | 0.0569 |
+
+Voxtral at 2,400 ms has the lowest raw macro WER in this development pilot,
+while 480 ms is better for English and Portuguese. The artifact is
+Apache-2.0 and Apple-local feasibility is proven, but it is substantially
+heavier: a 3.15 GB model, roughly 5.8 GB MLX peak allocation, and about four
+times Whisper's offline RTF. The runner loads complete clips, so no live-input
+latency or cancellation claim follows from these numbers.
+
 ## Artifact and license pins
 
 | Artifact | Exact revision | Representation | License |
@@ -126,6 +146,7 @@ that they are equivalent.
 | Apple Speech asset | system-managed by macOS 26.5.2; revision not exposed | not exposed | Apple platform asset; not redistributed |
 | Whisper Tiny MLX conversion | `mlx-community/whisper-tiny@78c52ab98ca87f570bc57ad852e15ef7060f9f76` | Float16 NPZ | MIT source model/converter; converted model card has no structured license field |
 | Qwen3-ASR 0.6B official / MLX reference | `Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0` / `mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f` | BF16 official / 8-bit MLX conversion | Apache-2.0 |
+| Voxtral Realtime 4B official / MLX reference | `mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add` / `mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e` | BF16 official / 4-bit MLX conversion | Apache-2.0 |
 | Official MLX | `ml-explore/mlx@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247` | v0.32.0 source build | MIT |
 
 The Parakeet model repository's structured metadata declares CC-BY-4.0 while
@@ -170,14 +191,17 @@ timestamp detail, and streaming behavior.
    repeated Rust-owned lifecycle, exact transcript, busy, error, and
    cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
-2. Acquire held-out German-first professional-podcast material and independent
-   audiobook works, then rerun Apple, Whisper, direct Qwen, and Parakeet on the
-   identical language/domain cells.
-3. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
+2. Treat Voxtral Realtime as a measured model candidate. Prove stateful
+   live-input streaming, first stable output, cancellation, and repeated
+   lifecycle behavior before choosing an integration boundary.
+3. Acquire held-out German-first professional-podcast material and independent
+   audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
+   Voxtral on the identical language/domain cells.
+4. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
    selected Apple-primary and Whisper-fallback architecture.
-4. Record the backend selection in an ADR, then begin the smallest Phase 1 /
+5. Record the backend selection in an ADR, then begin the smallest Phase 1 /
    Phase 2 vertical slice justified by this evidence.
-5. Evaluate the frozen postprocessing prompt/model tuples on the held-out raw
+6. Evaluate the frozen postprocessing prompt/model tuples on the held-out raw
    outputs; never fold corrected text into the raw backend ranking.
-6. Treat alternating energy and clean-host cold starts as release-threshold
+7. Treat alternating energy and clean-host cold starts as release-threshold
    follow-ups rather than reopening the runtime selection.

@@ -328,20 +328,134 @@
         "timestamps": "none"
       },
       "disposition": "research"
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-480ms",
+      "raw_artifact": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json",
+      "source_revision": "13419d82fade6d90fb41acb35d1ae59d42b8460c",
+      "quality": {
+        "macro_wer": 0.05838509265809133,
+        "macro_cer": 0.01666999495181525,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.027210884353741496,
+            "macro_cer": 0.006006006006006006
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.05408496732026144,
+            "macro_cer": 0.019995262642321467
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.0793726741095162,
+            "macro_cer": 0.015851026735649733
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.06676587301587301,
+            "macro_cer": 0.02443376798219857
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.0644910644910645,
+            "macro_cer": 0.017063911392900474
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 1440.6031861999998,
+        "minimum_cold_load_ms": 1112.724375,
+        "maximum_cold_load_ms": 5413.475083,
+        "mean_warm_inference_ms": 3315.9660887999994,
+        "mean_real_time_factor": 0.22289846751202527
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 3418783744,
+        "runtime_peak_memory_bytes": 5768037348,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": null,
+        "timestamps": "none"
+      },
+      "disposition": "research"
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-2400ms",
+      "raw_artifact": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.audiobook-pilot-1/result.json",
+      "source_revision": "13419d82fade6d90fb41acb35d1ae59d42b8460c",
+      "quality": {
+        "macro_wer": 0.042486741292026564,
+        "macro_cer": 0.014451306329981038,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.006802721088435374,
+            "macro_cer": 0.003003003003003003
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.060620915032679745,
+            "macro_cer": 0.03134484752131811
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.053056884635832004,
+            "macro_cer": 0.009716057410496358
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.01736111111111111,
+            "macro_cer": 0.006771413847241697
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.07459207459207459,
+            "macro_cer": 0.02142120986784601
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 1124.3387776666668,
+        "minimum_cold_load_ms": 1100.934875,
+        "maximum_cold_load_ms": 1245.011666,
+        "mean_warm_inference_ms": 3340.092902766666,
+        "mean_real_time_factor": 0.22453258744978433
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 3404742656,
+        "runtime_peak_memory_bytes": 5828248548,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": null,
+        "timestamps": "none"
+      },
+      "disposition": "research"
     }
   ],
   "recommendation": {
     "primary": "whisper-large-v3-turbo-coreml-whispercpp",
     "fallback": "apple-speechtranscriber",
     "research": [
-      "qwen3-asr-0.6b-mlx-direct"
+      "qwen3-asr-0.6b-mlx-direct",
+      "voxtral-mini-4b-realtime-mlx-reference-480ms",
+      "voxtral-mini-4b-realtime-mlx-reference-2400ms"
     ],
     "rationale": [
       "Whisper is the quality hypothesis for professionally recorded audiobooks: it has the lowest raw macro WER at 4.49% and leads German, Spanish, and Portuguese in this development pilot.",
       "Apple remains the product-default and streaming hypothesis: it leads English, nearly matches the best French result, emits word timestamps, and uses far less measured process memory than the bundled model candidates.",
       "Parakeet is competitive with Apple on English and faster than Whisper, but this pilot does not show a quality or streaming advantage for the remaining languages.",
       "The repository-owned Qwen adapter over official MLX is now the first-class research candidate. Its 10.96% macro WER is close to the reference path's 11.14%, it ties that path for best French quality, and it proves the desired direct MLX platform boundary without a Python runtime.",
-      "The direct and Python Qwen paths are text-identical on 12 of 15 clips. Three BF16 decision-boundary differences change one German, one English, and one Portuguese transcript; the direct aggregate is slightly better overall but not byte-equivalent across the matrix."
+      "The direct and Python Qwen paths are text-identical on 12 of 15 clips. Three BF16 decision-boundary differences change one German, one English, and one Portuguese transcript; the direct aggregate is slightly better overall but not byte-equivalent across the matrix.",
+      "Voxtral Realtime at 2400 ms has the lowest raw macro WER in this development pilot at 4.25% and leads German and French; 480 ms instead leads its English and Portuguese cells. The delay must therefore be selected by language and latency budget rather than globally.",
+      "Voxtral's 3.15 GB model, roughly 5.8 GB MLX peak, and 0.223 offline RTF are materially heavier than the existing candidates. The Python MLX path remains a quality oracle until live streaming and an accepted product boundary are proven."
     ]
   },
   "limitations": [
@@ -350,6 +464,7 @@
     "Spanish and Portuguese regional locales are unverified; no es-419 or pt-BR quality claim follows from these rows.",
     "The matrix ranks raw ASR only. It does not yet measure punctuation, capitalization, critical semantic errors, or the constrained LLM correction prompts.",
     "The direct Qwen timing uses fresh processes and adapter-reported inference after construction; it is not directly comparable to the Python reference's repeated inference inside one initialized engine.",
+    "Voxtral exposes stateful streaming, but this matrix loads complete clips and records no live-input first-result latency, chunk behavior, or cancellation.",
     "Energy was not measured, cold loads used warm system caches, and candidate order was not alternated."
   ]
 }

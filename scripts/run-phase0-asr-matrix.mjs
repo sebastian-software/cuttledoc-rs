@@ -20,6 +20,7 @@ const { values } = parseArgs({
     candidate: { type: 'string' },
     output: { type: 'string' },
     repetitions: { type: 'string', default: '2' },
+    'transcription-delay-ms': { type: 'string', default: '480' },
     manifest: {
       type: 'string',
       default: join(repoRoot, 'benchmarks/fixtures/manifest.json'),
@@ -40,18 +41,37 @@ const supportedCandidates = new Set([
   'parakeet',
   'qwen3-mlx-direct',
   'qwen3-mlx-reference',
+  'voxtral-realtime-mlx-reference',
   'whisper',
 ]);
 if (!supportedCandidates.has(values.candidate)) {
   throw new Error(
     '--candidate must be mlx, apple-speech, parakeet, ' +
-    'qwen3-mlx-direct, qwen3-mlx-reference, or whisper',
+    'qwen3-mlx-direct, qwen3-mlx-reference, ' +
+    'voxtral-realtime-mlx-reference, or whisper',
   );
 }
 const candidate = values.candidate;
 const repetitions = Number.parseInt(values.repetitions, 10);
 if (!Number.isInteger(repetitions) || repetitions < 1) {
   throw new Error('--repetitions must be a positive integer');
+}
+const transcriptionDelayMs = Number.parseInt(
+  values['transcription-delay-ms'],
+  10,
+);
+if (
+  !Number.isInteger(transcriptionDelayMs) ||
+  !(
+    (transcriptionDelayMs >= 80 &&
+      transcriptionDelayMs <= 1200 &&
+      transcriptionDelayMs % 80 === 0) ||
+    transcriptionDelayMs === 2400
+  )
+) {
+  throw new Error(
+    '--transcription-delay-ms must be 80..1200 in 80 ms steps, or 2400',
+  );
 }
 
 const manifestPath = resolve(values.manifest);
@@ -83,7 +103,12 @@ for (const fixture of fixtures) {
 
 const record = {
   schema_version: '1.0.0',
-  matrix_run_id: `phase0.${candidate}.${manifest.revision}`,
+  matrix_run_id:
+    `phase0.${candidate}` +
+    (candidate === 'voxtral-realtime-mlx-reference'
+      ? `-${transcriptionDelayMs}ms`
+      : '') +
+    `.${manifest.revision}`,
   captured_at: capturedAt,
   source_revision: commandOutput('git', ['rev-parse', 'HEAD'], {
     cwd: repoRoot,
@@ -117,6 +142,12 @@ const record = {
         : candidate === 'qwen3-mlx-direct'
           ? 'Mean adapter-reported complete inference across fresh processes after one discarded filesystem/Metal-cache warm-up'
         : 'Mean complete inference inside the initialized engine after one discarded warm-up',
+    ...(candidate === 'voxtral-realtime-mlx-reference'
+      ? {
+          transcription_delay_ms: transcriptionDelayMs,
+          live_input_streaming_measured: false,
+        }
+      : {}),
     energy:
       'Not captured in this breadth pass; the alternating powermetrics procedure remains separate',
   },
@@ -146,9 +177,76 @@ async function runCandidate(fixture, pcmPath) {
       return runQwen3MlxReference(fixture, pcmPath);
     case 'qwen3-mlx-direct':
       return runQwen3MlxDirect(fixture, pcmPath);
+    case 'voxtral-realtime-mlx-reference':
+      return runVoxtralRealtimeMlxReference(fixture, pcmPath);
     default:
       throw new Error(`unsupported candidate: ${candidate}`);
   }
+}
+
+async function runVoxtralRealtimeMlxReference(fixture, pcmPath) {
+  const python = requiredEnvironment(
+    'CUTTLEDOC_VOXTRAL_REALTIME_PYTHON',
+  );
+  const modelDirectory = requiredEnvironment(
+    'CUTTLEDOC_VOXTRAL_REALTIME_MODEL_DIR',
+  );
+  const modelManifest = JSON.parse(
+    await readFile(
+      join(
+        repoRoot,
+        'spikes/voxtral-realtime-mlx-reference/model-manifest.json',
+      ),
+      'utf8',
+    ),
+  );
+  const timed = timedCommand(python, [
+    join(repoRoot, 'spikes/voxtral-realtime-mlx-reference/probe.py'),
+    modelDirectory,
+    pcmPath,
+    String(transcriptionDelayMs),
+    String(repetitions + 1),
+    '4096',
+  ]);
+  const native = JSON.parse(timed.stdout.trim());
+  const measured = native.runs.slice(1);
+  const representative = measured.at(-1);
+  return resultRecord({
+    fixture,
+    text: representative.text,
+    reportedLanguage: 'model-managed',
+    runtimeLocaleRequested: 'model-managed',
+    coldLoadMs: native.load_ms,
+    warmInferenceMs: mean(
+      measured.map((sample) => sample.inference_ms),
+    ),
+    peakMemoryBytes: timed.maximumResidentSetBytes,
+    runtimePeakMemoryBytes: Math.max(
+      ...measured.map((sample) => sample.peak_memory_bytes),
+    ),
+    modelSizeBytes: modelManifest.conversion.snapshot_bytes,
+    binarySizeBytes: await directorySize(resolve(python, '..', '..')),
+    streaming: {
+      supported: true,
+      first_result_ms: null,
+      update_count: 1,
+      volatile_update_count: 0,
+      final_update_count: 1,
+      revoke_count: 0,
+      timestamps: 'none',
+      input_streaming_measured: false,
+      transcription_delay_ms: transcriptionDelayMs,
+    },
+    segments: [
+      {
+        start_seconds: 0,
+        end_seconds: fixtureDurationMs(fixture) / 1000,
+        text: representative.text,
+      },
+    ],
+    repetitions: measured,
+    warmup: native.runs[0],
+  });
 }
 
 async function runQwen3MlxDirect(fixture, pcmPath) {
@@ -923,6 +1021,20 @@ function candidateMetadata(name) {
         boundary: 'repository-owned C++ task ABI called from Rust',
         license:
           'Apache-2.0 official model and converted artifact; MIT official MLX',
+      };
+    case 'voxtral-realtime-mlx-reference':
+      return {
+        id:
+          `voxtral-mini-4b-realtime-mlx-reference-` +
+          `${transcriptionDelayMs}ms`,
+        model:
+          'mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e; converted from mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add',
+        runtime:
+          'reference-only mlx-audio v0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official MLX 0.32.0',
+        boundary:
+          'external Python reference probe; not a product dependency or accepted interop boundary',
+        license:
+          'Apache-2.0 official model and converted artifact; MIT mlx-audio and official MLX',
       };
     case 'whisper':
       return {

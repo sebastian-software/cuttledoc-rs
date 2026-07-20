@@ -981,6 +981,119 @@ function validateVoxtralTtsModelManifest(modelManifest, plan, selection) {
   return errors;
 }
 
+function validateVoxtralRealtimeModelManifest(modelManifest) {
+  const errors = [];
+  if (modelManifest.id !==
+        'voxtral-mini-4b-realtime-2602-mlx-4bit' ||
+      modelManifest.task !== 'asr') {
+    errors.push('id and task must identify the Voxtral Realtime MLX reference');
+  }
+  for (const revision of [
+    modelManifest.source?.revision,
+    modelManifest.conversion?.revision,
+    modelManifest.reference_runtime?.revision,
+  ]) {
+    if (!/^[0-9a-f]{40}$/.test(revision ?? '')) {
+      errors.push(`invalid pinned revision: ${revision}`);
+    }
+  }
+  if (modelManifest.source?.license !== 'Apache-2.0' ||
+      modelManifest.conversion?.license !== 'Apache-2.0' ||
+      modelManifest.reference_runtime?.license !== 'MIT' ||
+      modelManifest.reference_runtime?.version !== '0.4.5') {
+    errors.push('Voxtral Realtime model and runtime licenses must be explicit');
+  }
+  const contract = modelManifest.inference_contract;
+  if (contract?.sample_rate_hz !== 16000 ||
+      contract?.sample_format !== 'f32le' ||
+      contract?.channel_count !== 1 ||
+      contract?.temperature !== 0 ||
+      !arrayEquals(contract?.transcription_delay_ms ?? [], [480, 2400]) ||
+      contract?.repetitions !== 2 ||
+      contract?.warmup_runs !== 1 ||
+      contract?.max_tokens !== 4096) {
+    errors.push('inference contract must preserve both greedy delay controls');
+  }
+  if (modelManifest.source?.supported_languages?.length !== 13 ||
+      !modelManifest.source.supported_languages.includes('German') ||
+      !modelManifest.source.supported_languages.includes('French') ||
+      !modelManifest.source.supported_languages.includes('Portuguese') ||
+      modelManifest.architecture?.causal_audio_encoder !== true ||
+      modelManifest.architecture?.adaptive_delay_conditioning !== true) {
+    errors.push('multilingual causal streaming architecture must be recorded');
+  }
+
+  const artifactPaths = new Set();
+  let artifactBytes = 0;
+  for (const artifact of modelManifest.artifacts ?? []) {
+    if (!(artifact.path?.length > 0) || artifactPaths.has(artifact.path)) {
+      errors.push(`invalid or duplicate Voxtral artifact: ${artifact.path}`);
+    }
+    artifactPaths.add(artifact.path);
+    if (!(Number.isInteger(artifact.bytes) && artifact.bytes > 0) ||
+        !/^[0-9a-f]{64}$/.test(artifact.sha256 ?? '')) {
+      errors.push(`${artifact.path}: invalid byte count or SHA-256`);
+    }
+    artifactBytes += artifact.bytes ?? 0;
+  }
+  for (const requiredPath of [
+    'config.json',
+    'model.safetensors',
+    'model.safetensors.index.json',
+    'tekken.json',
+  ]) {
+    if (!artifactPaths.has(requiredPath)) {
+      errors.push(`missing required Voxtral artifact: ${requiredPath}`);
+    }
+  }
+  if (artifactBytes !== modelManifest.conversion?.snapshot_bytes ||
+      modelManifest.conversion?.weight_bytes !== 3133798126) {
+    errors.push('Voxtral Realtime bytes do not reconcile with the snapshot');
+  }
+  return errors;
+}
+
+function validateVoxtralRealtimeAggregate(
+  aggregate,
+  modelManifest,
+  delayMs,
+) {
+  const errors = [];
+  const expectedId =
+    `voxtral-mini-4b-realtime-mlx-reference-${delayMs}ms`;
+  if (aggregate.candidate?.id !== expectedId ||
+      !aggregate.candidate?.model?.includes(
+        `@${modelManifest.conversion?.revision}`,
+      ) ||
+      !aggregate.candidate?.model?.includes(
+        `@${modelManifest.source?.revision}`,
+      ) ||
+      !aggregate.candidate?.runtime?.includes(
+        `@${modelManifest.reference_runtime?.revision}`,
+      ) ||
+      aggregate.procedure?.transcription_delay_ms !== delayMs ||
+      aggregate.procedure?.live_input_streaming_measured !== false) {
+    errors.push('candidate and procedure must pin the selected delay/runtime');
+  }
+  if ((aggregate.results ?? []).some(
+    (result) =>
+      result.streaming?.supported !== true ||
+      result.streaming?.input_streaming_measured !== false ||
+      result.streaming?.transcription_delay_ms !== delayMs ||
+      result.repetitions?.length !==
+        modelManifest.inference_contract?.repetitions ||
+      result.repetitions.some(
+        (sample) => sample.text !== result.repetitions[0]?.text,
+      ) ||
+      !(result.resources?.runtime_peak_memory_bytes > 0),
+  )) {
+    errors.push(
+      'each result must be deterministic and distinguish available from measured streaming',
+    );
+  }
+  return errors;
+}
+
 function validateQwen3TtsRun(run, selection, modelManifest) {
   const errors = [];
   if (run.schema_version !== schemaVersion ||
@@ -2075,6 +2188,7 @@ function validateAggregate(aggregate, manifest, path) {
       errors.push(`${result.fixture_id}: repetition count does not match procedure`);
     }
     if (result.streaming?.supported &&
+        result.streaming?.input_streaming_measured !== false &&
         !isMetric(result.streaming.first_result_ms)) {
       errors.push(`${result.fixture_id}: streaming requires first_result_ms`);
     }
@@ -2252,6 +2366,18 @@ const voxtralTtsModelManifestPath = join(
   repoRoot,
   'spikes/voxtral-tts-mlx-reference/model-manifest.json',
 );
+const voxtralRealtimeModelManifestPath = join(
+  repoRoot,
+  'spikes/voxtral-realtime-mlx-reference/model-manifest.json',
+);
+const voxtralRealtime480Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
+);
+const voxtralRealtime2400Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.audiobook-pilot-1/result.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -2277,6 +2403,10 @@ const schemaPaths = [
   join(
     repoRoot,
     'spikes/qwen3-tts-mlx-reference/model-manifest.schema.json',
+  ),
+  join(
+    repoRoot,
+    'spikes/voxtral-realtime-mlx-reference/model-manifest.schema.json',
   ),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
@@ -2304,6 +2434,9 @@ const qwen3TtsRun = await readJson(qwen3TtsRunPath);
 const voxtralTtsRun = await readJson(voxtralTtsRunPath);
 const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
 const voxtralTtsModelManifest = await readJson(voxtralTtsModelManifestPath);
+const voxtralRealtimeModelManifest = await readJson(
+  voxtralRealtimeModelManifestPath,
+);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -2312,6 +2445,8 @@ const sourceRightsReviews = await Promise.all(
   sourceRightsPaths.map((path) => readJson(path)),
 );
 const audiobookPilot = await readJson(audiobookPilotPath);
+const voxtralRealtime480 = await readJson(voxtralRealtime480Path);
+const voxtralRealtime2400 = await readJson(voxtralRealtime2400Path);
 const aggregateManifests = new Map([
   [manifest.revision, manifest],
   [audiobookPilot.revision, audiobookPilot],
@@ -2368,6 +2503,11 @@ failures.push(
   ).map((error) => `${voxtralTtsModelManifestPath}: ${error}`),
 );
 failures.push(
+  ...validateVoxtralRealtimeModelManifest(
+    voxtralRealtimeModelManifest,
+  ).map((error) => `${voxtralRealtimeModelManifestPath}: ${error}`),
+);
+failures.push(
   ...validateQwen3TtsRun(
     qwen3TtsRun,
     syntheticRoundtripSelection,
@@ -2381,6 +2521,34 @@ failures.push(
     voxtralTtsModelManifest,
   ).map((error) => `${voxtralTtsRunPath}: ${error}`),
 );
+failures.push(
+  ...validateAggregate(
+    voxtralRealtime480,
+    audiobookPilot,
+    voxtralRealtime480Path,
+  ),
+  ...validateVoxtralRealtimeAggregate(
+    voxtralRealtime480,
+    voxtralRealtimeModelManifest,
+    480,
+  ).map((error) => `${voxtralRealtime480Path}: ${error}`),
+  ...validateAggregate(
+    voxtralRealtime2400,
+    audiobookPilot,
+    voxtralRealtime2400Path,
+  ),
+  ...validateVoxtralRealtimeAggregate(
+    voxtralRealtime2400,
+    voxtralRealtimeModelManifest,
+    2400,
+  ).map((error) => `${voxtralRealtime2400Path}: ${error}`),
+);
+if (!(voxtralRealtime2400.summary?.macro_wer <
+      voxtralRealtime480.summary?.macro_wer)) {
+  failures.push(
+    'Voxtral Realtime 2400 ms control must preserve its observed macro-WER gain',
+  );
+}
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
 for (const [index, review] of sourceRightsReviews.entries()) {
@@ -2574,6 +2742,31 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push(
       'validator self-test failed to reject divergent Voxtral TTS snapshot bytes',
+    );
+  }
+  const invalidVoxtralRealtimeModelManifest = structuredClone(
+    voxtralRealtimeModelManifest,
+  );
+  invalidVoxtralRealtimeModelManifest.artifacts[0].bytes += 1;
+  if (validateVoxtralRealtimeModelManifest(
+    invalidVoxtralRealtimeModelManifest,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent Voxtral Realtime bytes',
+    );
+  }
+  const invalidVoxtralRealtimeAggregate = structuredClone(
+    voxtralRealtime480,
+  );
+  invalidVoxtralRealtimeAggregate.results[0].streaming
+    .input_streaming_measured = true;
+  if (validateVoxtralRealtimeAggregate(
+    invalidVoxtralRealtimeAggregate,
+    voxtralRealtimeModelManifest,
+    480,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject false Voxtral streaming evidence',
     );
   }
   const invalidVoxtralTtsRun = structuredClone(voxtralTtsRun);

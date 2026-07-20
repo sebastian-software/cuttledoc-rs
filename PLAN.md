@@ -78,10 +78,10 @@ Evidence snapshot: 2026-07-20.
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
 | End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
-| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advanced to the owned adapter in #17; every other named artifact has an exact runtime/license blocker. |
+| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements; held-out and true-streaming gates remain. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical four-backend runs remain. |
-| Synthetic TTS roundtrip (#13) | In progress | The nine Wikipedia selectors reproduce exactly, and the Apple Rust/Swift slice records real German PCM, timing, memory, ownership, busy/cancel semantics, and the restricted-process control. Pinning and running Qwen3-TTS through MLX-Audio is next. |
+| Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
 
@@ -185,7 +185,7 @@ Evaluate independently:
 - Chunking, correction statistics, Markdown formatting, and prompt compatibility.
 - Whether enhancement belongs in the initial v3 or a later minor release.
 - Candidate local and remote TTS runtimes/models for Apple Silicon.
-- Start with Apple `AVSpeechSynthesizer`, Qwen3-TTS 0.6B CustomVoice and Chatterbox through a pinned MLX-Audio reference, plus Qwen-Audio-3.0-TTS-Plus as an English remote quality ceiling. Treat MLX-Audio as a serious implementation candidate and decide between retaining it and a narrow direct official-MLX adapter only after measurements.
+- Start with Apple `AVSpeechSynthesizer`, Qwen3-TTS 0.6B CustomVoice, Voxtral TTS, and Chatterbox through a pinned MLX-Audio reference, plus Qwen-Audio-3.0-TTS-Plus as an English remote quality ceiling. Treat MLX-Audio as a serious implementation candidate and decide between retaining it and a narrow direct official-MLX adapter only after measurements.
 - Run the separate German-first synthetic TTS → STT diagnostic defined in `benchmarks/fixtures/synthetic-roundtrip-plan.json`. It may validate integration and diagnose pronunciation/recognition errors, but it cannot replace real podcast/audiobook evidence or select the production ASR backend.
 - Voice/language selection, streaming audio chunks, sample formats, and synthesis cancellation.
 - Build one narrow TTS vertical slice before fixing a public synthesis contract; validate output ownership, audio chunking, backpressure, cancellation, and lifecycle against a real runtime.
@@ -295,15 +295,19 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 1. Acquire source-grouped, held-out professional-podcast and independent
    audiobook gold data, German first; expand the short-read variance set
    without mixing inspected development sources into validation or test.
-2. Run Apple SpeechTranscriber, Whisper large-v3-turbo, direct Qwen3-ASR, and
-   Parakeet on identical language/domain cells. Retain raw output, surface
-   scores, semantic-severity review, and backend-specific error profiles.
-3. Use those real raw outputs to execute the frozen surface-only and bounded
+2. Run Apple SpeechTranscriber, Whisper large-v3-turbo, direct Qwen3-ASR,
+   Parakeet, and Voxtral Realtime on identical language/domain cells. Retain
+   raw output, surface scores, semantic-severity review, and backend-specific
+   error profiles.
+3. Prove Voxtral's stateful live-input streaming, first stable output,
+   cancellation, and lifecycle behavior before choosing between a direct
+   official-MLX adapter and the smaller pure-C/MPS boundary.
+4. Use those real raw outputs to execute the frozen surface-only and bounded
    lexical postprocessing candidates under #7. Keep corrected text separate
    from raw ASR ranking and reject critical semantic regressions.
-4. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
+5. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
-5. Finish #9 with Node 22 plus packed-artifact CI gates.
-6. Record Apple SpeechTranscriber as the selected first backend and Whisper
+6. Finish #9 with Node 22 plus packed-artifact CI gates.
+7. Record Apple SpeechTranscriber as the selected first backend and Whisper
    large-v3-turbo as the opt-in fallback in an ADR, then scaffold only the
    Phase 1 crates justified by that decision.

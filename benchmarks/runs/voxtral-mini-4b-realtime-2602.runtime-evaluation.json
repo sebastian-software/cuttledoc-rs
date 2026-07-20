@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "run_id": "phase0.voxtral-mini-4b-realtime-2602.runtime-evaluation-1",
-  "captured_at": "2026-07-20T10:37:54Z",
-  "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+  "captured_at": "2026-07-20T19:00:49.978Z",
+  "source_revision": "13419d82fade6d90fb41acb35d1ae59d42b8460c",
   "fixture_id": null,
   "candidate": {
     "task": "asr",
@@ -13,15 +13,26 @@
       "license": "Apache-2.0"
     },
     "runtime": {
-      "id": "vllm-voxtral-realtime",
-      "version": "current vLLM realtime endpoint at the evaluated model revision",
-      "boundary": "official Python/CUDA serving path with a single GPU requiring at least 16 GB"
+      "id": "mlx-audio-voxtral-realtime-reference",
+      "version": "mlx-audio 0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official MLX 0.32.0",
+      "boundary": "pinned Python reference runner on Apple Silicon; not an accepted product dependency or Rust boundary"
     },
     "options": {
       "evaluated_at": "2026-07-20",
       "model_format": "Safetensors",
       "supported_languages": 13,
       "official_source": "https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add",
+      "mlx_conversion": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+      "official_runtimes": [
+        "vLLM realtime endpoint",
+        "Transformers >=5.2.0"
+      ],
+      "additional_current_paths": [
+        "ExecuTorch (publisher-linked, untested)",
+        "pure C with Metal/MPS",
+        "community MLX",
+        "community Rust"
+      ],
       "redistribution": "allowed under Apache-2.0",
       "llama_cpp_assumption": "none; current official vLLM realtime support was recorded instead"
     }
@@ -66,21 +77,26 @@
     }
   },
   "engineering_cost": {
-    "conversion_effort": "An owned path needs the causal audio encoder, adapter, sliding-window decoder, realtime framing, token feedback, and quantized weight conversion.",
-    "update_cost": "The available community MLX runtime would need to be replaced by owned task code and tracked against the official architecture.",
-    "packaging_cost": "The official repository stores about 17.77 GB and requires at least 16 GB GPU memory in its recommended BF16 serving path."
+    "conversion_effort": "The pinned 4-bit MLX conversion proves the causal encoder, adapter, delay-conditioned decoder, tokenizer, and weights on Apple Silicon. Product work remains around an accepted repository-owned or narrower external boundary.",
+    "update_cost": "Track the official Transformers architecture plus the pinned MLX oracle; decide between a direct official-MLX adapter and the substantially smaller pure-C/MPS boundary only after quality and streaming lifecycle gates.",
+    "packaging_cost": "The measured 4-bit snapshot is 3.15 GB and peaked near 5.8 GB of MLX allocation. The official BF16 repository remains about 17.77 GB and the recommended vLLM path requires at least 16 GB GPU memory."
   },
   "reproduction": {
-    "command": "No product benchmark command: the official realtime runtime is vLLM/CUDA and the community MLX path is reference-only.",
-    "raw_artifacts": []
+    "command": "CUTTLEDOC_VOXTRAL_REALTIME_DELAY_MS=480 bash scripts/run-voxtral-realtime-mlx-reference.sh; repeat with 2400",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json",
+      "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.audiobook-pilot-1/result.json"
+    ]
   },
   "result": {
-    "status": "blocked",
-    "blocker": "The Apache-2.0 model has a current official vLLM realtime implementation with configurable delay, but not an accepted native Apple runtime. Its community MLX conversion demonstrates feasibility only; adopting it would bypass ADR-0005, while an owned 4B port is a larger first step than the measured Qwen3-ASR 0.6B candidate.",
+    "status": "partial",
+    "blocker": "Apple-local reference quality is now measured, but live input streaming, cancellation, lifecycle behavior, and an accepted production boundary are not. The Python MLX oracle cannot be promoted directly under ADR-0005.",
     "observations": [
-      "The current official model card, rather than a stale llama.cpp status, defines the evaluated vLLM runtime.",
-      "Its native streaming architecture remains attractive after the smaller Qwen adapter proves maintainable.",
-      "The model is future research, not a reason to block the selected Apple-primary product path."
+      "The old vLLM/CUDA-only disposition was stale: official Transformers support and publisher-linked ExecuTorch, C/MPS, MLX, and Rust paths now exist.",
+      "At 480 ms, the 15-clip audiobook pilot reached 5.84% macro WER and 2.72% German WER. It beat the existing Whisper result in English and Portuguese while trailing it in Spanish and French.",
+      "At 2400 ms, macro WER improved to 4.25%, German to 0.68%, Spanish to 5.31%, and French to 1.74%; English and Portuguese regressed. Delay therefore belongs in the language-specific selection contract.",
+      "The 2400 ms development result is slightly below the existing Whisper macro WER of 4.49%, but the pilot is too small and already development-exposed for product selection.",
+      "The quality runner consumes complete clips. It does not yet prove live-input first-result latency despite the model and reference implementation exposing stateful streaming."
     ]
   }
 }

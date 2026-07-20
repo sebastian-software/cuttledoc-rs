@@ -1,0 +1,101 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "voxtral-mini-4b-realtime-2602-mlx-4bit",
+  "task": "asr",
+  "source": {
+    "repository": "mistralai/Voxtral-Mini-4B-Realtime-2602",
+    "revision": "2769294da9567371363522aac9bbcfdd19447add",
+    "license": "Apache-2.0",
+    "parameter_count": 4429679360,
+    "supported_languages": [
+      "Arabic",
+      "German",
+      "English",
+      "Spanish",
+      "French",
+      "Hindi",
+      "Italian",
+      "Dutch",
+      "Portuguese",
+      "Chinese",
+      "Japanese",
+      "Korean",
+      "Russian"
+    ]
+  },
+  "conversion": {
+    "repository": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit",
+    "revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "license": "Apache-2.0",
+    "format": "MLX affine 4-bit safetensors with group size 64",
+    "conversion_tool": "mlx-audio",
+    "weight_bytes": 3133798126,
+    "snapshot_bytes": 3148833321
+  },
+  "reference_runtime": {
+    "repository": "Blaizzy/mlx-audio",
+    "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "version": "0.4.5",
+    "license": "MIT",
+    "boundary": "Pinned Python reference runner over official Apple MLX"
+  },
+  "inference_contract": {
+    "sample_rate_hz": 16000,
+    "sample_format": "f32le",
+    "channel_count": 1,
+    "temperature": 0,
+    "transcription_delay_ms": [
+      480,
+      2400
+    ],
+    "repetitions": 2,
+    "warmup_runs": 1,
+    "max_tokens": 4096
+  },
+  "artifacts": [
+    {
+      "path": ".gitattributes",
+      "bytes": 1567,
+      "sha256": "a1533fad1fb49e1230aff61a60028ea63bc924b4cc4501447351b50b9c840683"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3135,
+      "sha256": "022af0f470bbb2036d1d8fea62118d1d14f64b9cbb38415004544990e653f99e"
+    },
+    {
+      "path": "config.json",
+      "bytes": 1513,
+      "sha256": "02060864a4f33df5e4944684fc17f3026af4011830cac4def6e9e025315b10c5"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 3133798126,
+      "sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "bytes": 118632,
+      "sha256": "80f68b80cf4b1638d864d1504061a266f59e37a8d90d7b20f2e1f30c2d034c2e"
+    },
+    {
+      "path": "tekken.json",
+      "bytes": 14910348,
+      "sha256": "8434af1d39eba99f0ef46cf1450bf1a63fa941a26933a1ef5dbbf4adf0d00e44"
+    }
+  ],
+  "architecture": {
+    "model_type": "voxtral_realtime",
+    "sample_rate_hz": 16000,
+    "frame_rate_hz": 12.5,
+    "causal_audio_encoder": true,
+    "audio_encoder_layers": 32,
+    "audio_encoder_hidden_size": 1280,
+    "audio_encoder_sliding_window": 750,
+    "downsample_factor": 4,
+    "decoder_layers": 26,
+    "decoder_hidden_size": 3072,
+    "decoder_sliding_window": 8192,
+    "adaptive_delay_conditioning": true
+  }
+}

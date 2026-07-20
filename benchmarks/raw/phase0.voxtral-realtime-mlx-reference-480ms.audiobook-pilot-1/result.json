@@ -1,0 +1,1197 @@
+{
+  "schema_version": "1.0.0",
+  "matrix_run_id": "phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1",
+  "captured_at": "2026-07-20T18:57:11.528Z",
+  "source_revision": "13419d82fade6d90fb41acb35d1ae59d42b8460c",
+  "fixture_manifest_revision": "audiobook-pilot-1",
+  "candidate": {
+    "id": "voxtral-mini-4b-realtime-mlx-reference-480ms",
+    "model": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e; converted from mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "runtime": "reference-only mlx-audio v0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official MLX 0.32.0",
+    "boundary": "external Python reference probe; not a product dependency or accepted interop boundary",
+    "license": "Apache-2.0 official model and converted artifact; MIT mlx-audio and official MLX"
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "procedure": {
+    "fixture_count": 15,
+    "fixture_domain": "audiobook",
+    "fixture_manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "repetitions": 2,
+    "fixture_order": [
+      "audiobook-de-10870_10823_000000",
+      "audiobook-de-4001_2999_000089",
+      "audiobook-de-135_82_000105",
+      "audiobook-en-2277-149874-0000",
+      "audiobook-en-6313-76958-0021",
+      "audiobook-en-2428-83705-0002",
+      "audiobook-es-10367_10282_000000",
+      "audiobook-es-3473_1378_000097",
+      "audiobook-es-3796_2162_000017",
+      "audiobook-fr-1591_1028_000000",
+      "audiobook-fr-7142_2432_000097",
+      "audiobook-fr-5830_4703_000012",
+      "audiobook-pt-12710_10229_000000",
+      "audiobook-pt-13069_13511_000032",
+      "audiobook-pt-6549_4272_000000"
+    ],
+    "quality_normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 single-fixture records",
+    "cold_load": "First candidate-specific create/initialize value in a fresh process; system and model caches are not cleared",
+    "warm_inference": "Mean complete inference inside the initialized engine after one discarded warm-up",
+    "transcription_delay_ms": 480,
+    "live_input_streaming_measured": false,
+    "energy": "Not captured in this breadth pass; the alternating powermetrics procedure remains separate"
+  },
+  "summary": {
+    "macro_wer": 0.05838509265809133,
+    "macro_cer": 0.01666999495181525,
+    "mean_warm_inference_ms": 3315.9660887999994,
+    "mean_real_time_factor": 0.22289846751202527,
+    "maximum_peak_memory_bytes": 3418783744,
+    "by_language": {
+      "de": {
+        "fixture_count": 3,
+        "macro_wer": 0.027210884353741496,
+        "macro_cer": 0.006006006006006006
+      },
+      "en": {
+        "fixture_count": 3,
+        "macro_wer": 0.05408496732026144,
+        "macro_cer": 0.019995262642321467
+      },
+      "es": {
+        "fixture_count": 3,
+        "macro_wer": 0.0793726741095162,
+        "macro_cer": 0.015851026735649733
+      },
+      "fr": {
+        "fixture_count": 3,
+        "macro_wer": 0.06676587301587301,
+        "macro_cer": 0.02443376798219857
+      },
+      "pt": {
+        "fixture_count": 3,
+        "macro_wer": 0.0644910644910645,
+        "macro_cer": 0.017063911392900474
+      }
+    }
+  },
+  "results": [
+    {
+      "fixture_id": "audiobook-de-10870_10823_000000",
+      "requested_language": "de",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "wie aber kam sie hier auf meinen tisch und warum schauderte ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+      "text": "Wie aber kam sie hier auf meinen Tisch? Und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz, eines offen vor mir liegenden Buches.",
+      "quality": {
+        "wer": 0,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 18630,
+        "cold_load_ms": 5413.475083,
+        "warm_inference_ms": 4083.8614374999997,
+        "real_time_factor": 0.21920888016639828
+      },
+      "resources": {
+        "peak_memory_bytes": 3418783744,
+        "runtime_peak_memory_bytes": 5650785180,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 18.63,
+          "text": "Wie aber kam sie hier auf meinen Tisch? Und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz, eines offen vor mir liegenden Buches."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 4390.726791,
+        "model_total_time_ms": 4319.155931472778,
+        "text": "Wie aber kam sie hier auf meinen Tisch? Und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz, eines offen vor mir liegenden Buches.",
+        "prompt_tokens": 39,
+        "generation_tokens": 244,
+        "total_tokens": 283,
+        "generation_tokens_per_second": 62.885838697276945,
+        "peak_memory_bytes": 5650779036
+      },
+      "repetitions": [
+        {
+          "inference_ms": 4091.439458,
+          "model_total_time_ms": 4039.2489433288574,
+          "text": "Wie aber kam sie hier auf meinen Tisch? Und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz, eines offen vor mir liegenden Buches.",
+          "prompt_tokens": 39,
+          "generation_tokens": 244,
+          "total_tokens": 283,
+          "generation_tokens_per_second": 65.68075338168443,
+          "peak_memory_bytes": 5650785180
+        },
+        {
+          "inference_ms": 4076.283417,
+          "model_total_time_ms": 4030.3280353546143,
+          "text": "Wie aber kam sie hier auf meinen Tisch? Und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz, eines offen vor mir liegenden Buches.",
+          "prompt_tokens": 39,
+          "generation_tokens": 244,
+          "total_tokens": 283,
+          "generation_tokens_per_second": 65.72168817905661,
+          "peak_memory_bytes": 5650785180
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-de-4001_2999_000089",
+      "requested_language": "de",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "der feind hielt sich still als wir in ihren halt kamen ließ uns auch passieren damit wann sie uns angegriffen hätten die konvoi nicht gewarnet würde bis sie auch zu ihnen in die enge käme schickte uns aber einen kornett mit acht reutern nach die uns im gesicht behielten",
+      "text": "Derfeind hielt sich still, als wir in ihren Halt kamen, ließ uns auch passieren, damit man sie uns angegriffen hätten, die Konvoi nicht gewarnet würde, bis sie auch zu ihnen in die Enge käme, schickte uns aber ein Kornett mit acht Reutern nach, die uns im Gesicht behielten.",
+      "quality": {
+        "wer": 0.08163265306122448,
+        "cer": 0.018018018018018018
+      },
+      "timing": {
+        "audio_duration_ms": 17060,
+        "cold_load_ms": 1189.827625,
+        "warm_inference_ms": 3750.042354,
+        "real_time_factor": 0.21981490937866355
+      },
+      "resources": {
+        "peak_memory_bytes": 3407413248,
+        "runtime_peak_memory_bytes": 5609194396,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 17.06,
+          "text": "Derfeind hielt sich still, als wir in ihren Halt kamen, ließ uns auch passieren, damit man sie uns angegriffen hätten, die Konvoi nicht gewarnet würde, bis sie auch zu ihnen in die Enge käme, schickte uns aber ein Kornett mit acht Reutern nach, die uns im Gesicht behielten."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3778.256083,
+        "model_total_time_ms": 3740.9400939941406,
+        "text": "Derfeind hielt sich still, als wir in ihren Halt kamen, ließ uns auch passieren, damit man sie uns angegriffen hätten, die Konvoi nicht gewarnet würde, bis sie auch zu ihnen in die Enge käme, schickte uns aber ein Kornett mit acht Reutern nach, die uns im Gesicht behielten.",
+        "prompt_tokens": 39,
+        "generation_tokens": 225,
+        "total_tokens": 264,
+        "generation_tokens_per_second": 65.63145730846308,
+        "peak_memory_bytes": 5609180060
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3745.053083,
+          "model_total_time_ms": 3709.91587638855,
+          "text": "Derfeind hielt sich still, als wir in ihren Halt kamen, ließ uns auch passieren, damit man sie uns angegriffen hätten, die Konvoi nicht gewarnet würde, bis sie auch zu ihnen in die Enge käme, schickte uns aber ein Kornett mit acht Reutern nach, die uns im Gesicht behielten.",
+          "prompt_tokens": 39,
+          "generation_tokens": 225,
+          "total_tokens": 264,
+          "generation_tokens_per_second": 66.19064385400608,
+          "peak_memory_bytes": 5609178012
+        },
+        {
+          "inference_ms": 3755.031625,
+          "model_total_time_ms": 3715.765953063965,
+          "text": "Derfeind hielt sich still, als wir in ihren Halt kamen, ließ uns auch passieren, damit man sie uns angegriffen hätten, die Konvoi nicht gewarnet würde, bis sie auch zu ihnen in die Enge käme, schickte uns aber ein Kornett mit acht Reutern nach, die uns im Gesicht behielten.",
+          "prompt_tokens": 39,
+          "generation_tokens": 225,
+          "total_tokens": 264,
+          "generation_tokens_per_second": 65.9890976416822,
+          "peak_memory_bytes": 5609194396
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-de-135_82_000105",
+      "requested_language": "de",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "haltet den schnabel sir ich habe euch doch nur deshalb hinausgeschickt damit mein altes gun wieder einmal mitreden kann kehrt ihr zurück so sucht mich auf und erzählt was ihr erlebt und erfahren habt",
+      "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt..",
+      "quality": {
+        "wer": 0,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 13340,
+        "cold_load_ms": 1112.724375,
+        "warm_inference_ms": 2998.487396,
+        "real_time_factor": 0.2247741676161919
+      },
+      "resources": {
+        "peak_memory_bytes": 3397779456,
+        "runtime_peak_memory_bytes": 5579969584,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 13.34,
+          "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt.."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3011.794791,
+        "model_total_time_ms": 2986.4208698272705,
+        "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt..",
+        "prompt_tokens": 39,
+        "generation_tokens": 178,
+        "total_tokens": 217,
+        "generation_tokens_per_second": 66.67385678910736,
+        "peak_memory_bytes": 5579969584
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3007.332958,
+          "model_total_time_ms": 2984.4260215759277,
+          "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt..",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 66.58349775880735,
+          "peak_memory_bytes": 5579969584
+        },
+        {
+          "inference_ms": 2989.641834,
+          "model_total_time_ms": 2966.7742252349854,
+          "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt..",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 66.91495198767365,
+          "peak_memory_bytes": 5579969584
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-en-2277-149874-0000",
+      "requested_language": "en",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "MINNIE'S FLAT AS THE ONE FLOOR RESIDENT APARTMENTS WERE THEN BEING CALLED WAS IN A PART OF WEST VAN BUREN STREET INHABITED BY FAMILIES OF LABOURERS AND CLERKS MEN WHO HAD COME AND WERE STILL COMING WITH THE RUSH OF POPULATION POURING IN AT THE RATE OF FIFTY THOUSAND A YEAR",
+      "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year",
+      "quality": {
+        "wer": 0.058823529411764705,
+        "cer": 0.0045045045045045045
+      },
+      "timing": {
+        "audio_duration_ms": 15505,
+        "cold_load_ms": 1132.356208,
+        "warm_inference_ms": 3407.60875,
+        "real_time_factor": 0.21977483069977427
+      },
+      "resources": {
+        "peak_memory_bytes": 3403169792,
+        "runtime_peak_memory_bytes": 5580641328,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 15.505,
+          "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year"
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3423.802708,
+        "model_total_time_ms": 3397.5830078125,
+        "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year",
+        "prompt_tokens": 39,
+        "generation_tokens": 205,
+        "total_tokens": 244,
+        "generation_tokens_per_second": 66.53234725546587,
+        "peak_memory_bytes": 5580641328
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3404.178333,
+          "model_total_time_ms": 3379.1980743408203,
+          "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year",
+          "prompt_tokens": 39,
+          "generation_tokens": 205,
+          "total_tokens": 244,
+          "generation_tokens_per_second": 66.66879014573384,
+          "peak_memory_bytes": 5580641328
+        },
+        {
+          "inference_ms": 3411.039167,
+          "model_total_time_ms": 3384.7758769989014,
+          "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year",
+          "prompt_tokens": 39,
+          "generation_tokens": 205,
+          "total_tokens": 244,
+          "generation_tokens_per_second": 66.5620293301625,
+          "peak_memory_bytes": 5580641328
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-en-6313-76958-0021",
+      "requested_language": "en",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "KEEP A GOING AND IF YOU'RE LUCKY YOU'LL RUN PLUMB INTO THEM WAS THE JEERING ANSWER AS THE SLEEPY COWMEN SPURRED THEIR PONIES ON TOWARD CAMP MUTTERING THEIR DISAPPROVAL OF TAKING ALONG A BUNCH OF BOYS ON A CATTLE DRIVE",
+      "text": "Keep it going, and if you're lucky, you'll run plumb into them, was the jeering answer as the sleepy cowmen spurred their ponies on toward camp, muttering their disapproval of taking along a bunch of boys on a cattle drive.",
+      "quality": {
+        "wer": 0.025,
+        "cer": 0.011363636363636364
+      },
+      "timing": {
+        "audio_duration_ms": 11925,
+        "cold_load_ms": 1220.881709,
+        "warm_inference_ms": 2720.2579795,
+        "real_time_factor": 0.22811387668763103
+      },
+      "resources": {
+        "peak_memory_bytes": 3405152256,
+        "runtime_peak_memory_bytes": 5579576368,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 11.925,
+          "text": "Keep it going, and if you're lucky, you'll run plumb into them, was the jeering answer as the sleepy cowmen spurred their ponies on toward camp, muttering their disapproval of taking along a bunch of boys on a cattle drive."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 2762.8105,
+        "model_total_time_ms": 2736.186742782593,
+        "text": "Keep it going, and if you're lucky, you'll run plumb into them, was the jeering answer as the sleepy cowmen spurred their ponies on toward camp, muttering their disapproval of taking along a bunch of boys on a cattle drive.",
+        "prompt_tokens": 39,
+        "generation_tokens": 161,
+        "total_tokens": 200,
+        "generation_tokens_per_second": 66.73603093515027,
+        "peak_memory_bytes": 5579576368
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2714.256584,
+          "model_total_time_ms": 2691.6279792785645,
+          "text": "Keep it going, and if you're lucky, you'll run plumb into them, was the jeering answer as the sleepy cowmen spurred their ponies on toward camp, muttering their disapproval of taking along a bunch of boys on a cattle drive.",
+          "prompt_tokens": 39,
+          "generation_tokens": 161,
+          "total_tokens": 200,
+          "generation_tokens_per_second": 67.38358142054125,
+          "peak_memory_bytes": 5579576368
+        },
+        {
+          "inference_ms": 2726.259375,
+          "model_total_time_ms": 2702.4567127227783,
+          "text": "Keep it going, and if you're lucky, you'll run plumb into them, was the jeering answer as the sleepy cowmen spurred their ponies on toward camp, muttering their disapproval of taking along a bunch of boys on a cattle drive.",
+          "prompt_tokens": 39,
+          "generation_tokens": 161,
+          "total_tokens": 200,
+          "generation_tokens_per_second": 67.09063534936197,
+          "peak_memory_bytes": 5579576368
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-en-2428-83705-0002",
+      "requested_language": "en",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "I DO NOT KNOW WHEN IT IS GOING TO BE BUT IT WILL BE EITHER NEXT WEEK OR THE WEEK AFTER CERTAINLY AT THE EARLIEST POSSIBLE MOMENT AND I SHOULDN'T BE AT ALL SURPRISED TO LEARN THAT ALL MARY ANN'S THINGS HAD BEEN ALREADY BOUGHT AND PERHAPS SOME OF THEM MARKED",
+      "text": "I do not know when it is going to be, but it will be either next week or the week after, certainly at the earliest possible moment. And I shouldn't be at all surprised to learn that all Marianne's things have been already bought, and perhaps some of them marked.ished",
+      "quality": {
+        "wer": 0.0784313725490196,
+        "cer": 0.04411764705882353
+      },
+      "timing": {
+        "audio_duration_ms": 16450,
+        "cold_load_ms": 1141.713834,
+        "warm_inference_ms": 3624.2451245,
+        "real_time_factor": 0.2203188525531915
+      },
+      "resources": {
+        "peak_memory_bytes": 3403464704,
+        "runtime_peak_memory_bytes": 5591671708,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 16.45,
+          "text": "I do not know when it is going to be, but it will be either next week or the week after, certainly at the earliest possible moment. And I shouldn't be at all surprised to learn that all Marianne's things have been already bought, and perhaps some of them marked.ished"
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3639.188209,
+        "model_total_time_ms": 3605.0479412078857,
+        "text": "I do not know when it is going to be, but it will be either next week or the week after, certainly at the earliest possible moment. And I shouldn't be at all surprised to learn that all Marianne's things have been already bought, and perhaps some of them marked.ished",
+        "prompt_tokens": 39,
+        "generation_tokens": 217,
+        "total_tokens": 256,
+        "generation_tokens_per_second": 65.98634923139028,
+        "peak_memory_bytes": 5591665564
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3621.789166,
+          "model_total_time_ms": 3592.2398567199707,
+          "text": "I do not know when it is going to be, but it will be either next week or the week after, certainly at the earliest possible moment. And I shouldn't be at all surprised to learn that all Marianne's things have been already bought, and perhaps some of them marked.ished",
+          "prompt_tokens": 39,
+          "generation_tokens": 217,
+          "total_tokens": 256,
+          "generation_tokens_per_second": 66.14796873290955,
+          "peak_memory_bytes": 5591671708
+        },
+        {
+          "inference_ms": 3626.701083,
+          "model_total_time_ms": 3575.5820274353027,
+          "text": "I do not know when it is going to be, but it will be either next week or the week after, certainly at the earliest possible moment. And I shouldn't be at all surprised to learn that all Marianne's things have been already bought, and perhaps some of them marked.ished",
+          "prompt_tokens": 39,
+          "generation_tokens": 217,
+          "total_tokens": 256,
+          "generation_tokens_per_second": 66.35422383371565,
+          "peak_memory_bytes": 5591667612
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-es-10367_10282_000000",
+      "requested_language": "es",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "y á los hijos de los extranjeros que se allegaren á jehová para ministrarle y que amaren el nombre de jehová para ser sus siervos á todos los que guardaren el sábado de profanarlo y abrazaren mi pacto",
+      "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,.",
+      "quality": {
+        "wer": 0.18421052631578946,
+        "cer": 0.04294478527607362
+      },
+      "timing": {
+        "audio_duration_ms": 12010,
+        "cold_load_ms": 1113.257459,
+        "warm_inference_ms": 2753.2664165,
+        "real_time_factor": 0.22924782818484596
+      },
+      "resources": {
+        "peak_memory_bytes": 3399974912,
+        "runtime_peak_memory_bytes": 5579609136,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 12.01,
+          "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 2754.06575,
+        "model_total_time_ms": 2728.5280227661133,
+        "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,.",
+        "prompt_tokens": 39,
+        "generation_tokens": 162,
+        "total_tokens": 201,
+        "generation_tokens_per_second": 67.00996060727752,
+        "peak_memory_bytes": 5579592752
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2731.927541,
+          "model_total_time_ms": 2709.6030712127686,
+          "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,.",
+          "prompt_tokens": 39,
+          "generation_tokens": 162,
+          "total_tokens": 201,
+          "generation_tokens_per_second": 67.46511311334369,
+          "peak_memory_bytes": 5579609136
+        },
+        {
+          "inference_ms": 2774.605292,
+          "model_total_time_ms": 2749.1228580474854,
+          "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,.",
+          "prompt_tokens": 39,
+          "generation_tokens": 162,
+          "total_tokens": 201,
+          "generation_tokens_per_second": 66.4068079470354,
+          "peak_memory_bytes": 5579609136
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-es-3473_1378_000097",
+      "requested_language": "es",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse ordené digo de salir yo solo sin mi familia de mi pueblo y ir a buscar donde llevarla con comodidad y sin la priesa con que los demás salieron porque bien vi",
+      "text": "Bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse, ordené, digo, de salir yo solo, sin mi familia, de mi pueblo, y ir a buscar donde llevarla con comodidad y sin la prisa con que los demás salieron. Porque bien vi.",
+      "quality": {
+        "wer": 0.017543859649122806,
+        "cer": 0.004608294930875576
+      },
+      "timing": {
+        "audio_duration_ms": 19890,
+        "cold_load_ms": 1274.178042,
+        "warm_inference_ms": 4359.258229,
+        "real_time_factor": 0.21916833730517848
+      },
+      "resources": {
+        "peak_memory_bytes": 3406839808,
+        "runtime_peak_memory_bytes": 5768037348,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 19.89,
+          "text": "Bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse, ordené, digo, de salir yo solo, sin mi familia, de mi pueblo, y ir a buscar donde llevarla con comodidad y sin la prisa con que los demás salieron. Porque bien vi."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 4668.22675,
+        "model_total_time_ms": 4646.886825561523,
+        "text": "Bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse, ordené, digo, de salir yo solo, sin mi familia, de mi pueblo, y ir a buscar donde llevarla con comodidad y sin la prisa con que los demás salieron. Porque bien vi.",
+        "prompt_tokens": 39,
+        "generation_tokens": 260,
+        "total_tokens": 299,
+        "generation_tokens_per_second": 60.10171424401741,
+        "peak_memory_bytes": 5768008676
+      },
+      "repetitions": [
+        {
+          "inference_ms": 4359.709417,
+          "model_total_time_ms": 4338.763952255249,
+          "text": "Bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse, ordené, digo, de salir yo solo, sin mi familia, de mi pueblo, y ir a buscar donde llevarla con comodidad y sin la prisa con que los demás salieron. Porque bien vi.",
+          "prompt_tokens": 39,
+          "generation_tokens": 260,
+          "total_tokens": 299,
+          "generation_tokens_per_second": 64.66078671918497,
+          "peak_memory_bytes": 5768037348
+        },
+        {
+          "inference_ms": 4358.807041,
+          "model_total_time_ms": 4347.938060760498,
+          "text": "Bien así como el que sabe que para tal tiempo le han de quitar la casa donde vive y se provee de otra donde mudarse, ordené, digo, de salir yo solo, sin mi familia, de mi pueblo, y ir a buscar donde llevarla con comodidad y sin la prisa con que los demás salieron. Porque bien vi.",
+          "prompt_tokens": 39,
+          "generation_tokens": 260,
+          "total_tokens": 299,
+          "generation_tokens_per_second": 64.51743869116311,
+          "peak_memory_bytes": 5768025060
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-es-3796_2162_000017",
+      "requested_language": "es",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "pueblo a pueblo se ha estado defendiendo un siglo entero del francés huyéndole unas veces otras cayéndole encima con todo el empuje de los caballos y despedazándole el ejército china le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de anam era como echarlo de china",
+      "text": "Pueblo a Pueblo se ha estado defendiendo un siglo entero del francés, huyéndole unas veces, otras cayéndole encima, con todo el empuje de los caballos y despedazándole el ejército. China le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de Anamera como echarlo de China..",
+      "quality": {
+        "wer": 0.03636363636363636,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 18000,
+        "cold_load_ms": 1194.701958,
+        "warm_inference_ms": 3914.4799995000003,
+        "real_time_factor": 0.21747111108333336
+      },
+      "resources": {
+        "peak_memory_bytes": 3401433088,
+        "runtime_peak_memory_bytes": 5633340316,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 18,
+          "text": "Pueblo a Pueblo se ha estado defendiendo un siglo entero del francés, huyéndole unas veces, otras cayéndole encima, con todo el empuje de los caballos y despedazándole el ejército. China le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de Anamera como echarlo de China.."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3933.145125,
+        "model_total_time_ms": 3893.656015396118,
+        "text": "Pueblo a Pueblo se ha estado defendiendo un siglo entero del francés, huyéndole unas veces, otras cayéndole encima, con todo el empuje de los caballos y despedazándole el ejército. China le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de Anamera como echarlo de China..",
+        "prompt_tokens": 39,
+        "generation_tokens": 236,
+        "total_tokens": 275,
+        "generation_tokens_per_second": 65.94336092077276,
+        "peak_memory_bytes": 5633313692
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3922.215583,
+          "model_total_time_ms": 3884.176015853882,
+          "text": "Pueblo a Pueblo se ha estado defendiendo un siglo entero del francés, huyéndole unas veces, otras cayéndole encima, con todo el empuje de los caballos y despedazándole el ejército. China le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de Anamera como echarlo de China..",
+          "prompt_tokens": 39,
+          "generation_tokens": 236,
+          "total_tokens": 275,
+          "generation_tokens_per_second": 66.0407367937807,
+          "peak_memory_bytes": 5633340316
+        },
+        {
+          "inference_ms": 3906.744416,
+          "model_total_time_ms": 3869.9519634246826,
+          "text": "Pueblo a Pueblo se ha estado defendiendo un siglo entero del francés, huyéndole unas veces, otras cayéndole encima, con todo el empuje de los caballos y despedazándole el ejército. China le mandó sus jinetes de pelea porque tampoco quieren los chinos al extranjero en su tierra y echarlo de Anamera como echarlo de China..",
+          "prompt_tokens": 39,
+          "generation_tokens": 236,
+          "total_tokens": 275,
+          "generation_tokens_per_second": 66.18725914189287,
+          "peak_memory_bytes": 5633323932
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-fr-1591_1028_000000",
+      "requested_language": "fr",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "cependant il envoya chercher le pêcheur à l'heure même et quand il fut arrivé pêcheur lui dit-il apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés car il est survenu un certain malheur qui a empêché qu'on ne les ait servis au sultan",
+      "text": "Cependant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan..",
+      "quality": {
+        "wer": 0.08333333333333333,
+        "cer": 0.0228310502283105
+      },
+      "timing": {
+        "audio_duration_ms": 13330,
+        "cold_load_ms": 1123.285708,
+        "warm_inference_ms": 2983.680542,
+        "real_time_factor": 0.2238319986496624
+      },
+      "resources": {
+        "peak_memory_bytes": 3401170944,
+        "runtime_peak_memory_bytes": 5579969584,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 13.33,
+          "text": "Cependant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan.."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3009.945959,
+        "model_total_time_ms": 2984.3761920928955,
+        "text": "Cependant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan..",
+        "prompt_tokens": 39,
+        "generation_tokens": 178,
+        "total_tokens": 217,
+        "generation_tokens_per_second": 66.72561605262645,
+        "peak_memory_bytes": 5579969584
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2981.585584,
+          "model_total_time_ms": 2959.089756011963,
+          "text": "Cependant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan..",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 67.12839610051033,
+          "peak_memory_bytes": 5579969584
+        },
+        {
+          "inference_ms": 2985.7755,
+          "model_total_time_ms": 2960.6919288635254,
+          "text": "Cependant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan..",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 67.04973366858225,
+          "peak_memory_bytes": 5579969584
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-fr-7142_2432_000097",
+      "requested_language": "fr",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "sans les bras de hans plus d'une fois je me serais brisé le crâne contre la paroi de granit je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes",
+      "text": "Saint Libra de Hans, plus d'une fois je me serais brisé le crâne contre la paroi de granit. Je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes.",
+      "quality": {
+        "wer": 0.08571428571428572,
+        "cer": 0.034722222222222224
+      },
+      "timing": {
+        "audio_duration_ms": 12220,
+        "cold_load_ms": 1143.791625,
+        "warm_inference_ms": 2793.1183954999997,
+        "real_time_factor": 0.2285694268003273
+      },
+      "resources": {
+        "peak_memory_bytes": 3396403200,
+        "runtime_peak_memory_bytes": 5579641904,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 12.22,
+          "text": "Saint Libra de Hans, plus d'une fois je me serais brisé le crâne contre la paroi de granit. Je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 2774.558084,
+        "model_total_time_ms": 2749.0060329437256,
+        "text": "Saint Libra de Hans, plus d'une fois je me serais brisé le crâne contre la paroi de granit. Je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes.",
+        "prompt_tokens": 39,
+        "generation_tokens": 164,
+        "total_tokens": 203,
+        "generation_tokens_per_second": 67.1997574084596,
+        "peak_memory_bytes": 5579641904
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2749.249375,
+          "model_total_time_ms": 2725.2819538116455,
+          "text": "Saint Libra de Hans, plus d'une fois je me serais brisé le crâne contre la paroi de granit. Je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes.",
+          "prompt_tokens": 39,
+          "generation_tokens": 164,
+          "total_tokens": 203,
+          "generation_tokens_per_second": 67.70592456738747,
+          "peak_memory_bytes": 5579641904
+        },
+        {
+          "inference_ms": 2836.987416,
+          "model_total_time_ms": 2814.152956008911,
+          "text": "Saint Libra de Hans, plus d'une fois je me serais brisé le crâne contre la paroi de granit. Je n'ai donc conservé aucun souvenir précis de ce qui se passa dans les heures suivantes.",
+          "prompt_tokens": 39,
+          "generation_tokens": 164,
+          "total_tokens": 203,
+          "generation_tokens_per_second": 65.29109618361767,
+          "peak_memory_bytes": 5579641904
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-fr-5830_4703_000012",
+      "requested_language": "fr",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "et avant qu'il eût eu le temps de répondre elle écrivit sur une feuille de papier blanc qui était au milieu de la table les cognes sont là puis jetant la plume",
+      "text": "Et avant qu'il eût le temps de répondre, elle écrivit sur une feuille de papier blanc qui était au milieu de la table, les cognes sont là. Puis, jetant la plume,",
+      "quality": {
+        "wer": 0.03125,
+        "cer": 0.015748031496062992
+      },
+      "timing": {
+        "audio_duration_ms": 13330,
+        "cold_load_ms": 1145.878875,
+        "warm_inference_ms": 2979.7754370000002,
+        "real_time_factor": 0.22353904253563392
+      },
+      "resources": {
+        "peak_memory_bytes": 3401662464,
+        "runtime_peak_memory_bytes": 5579969584,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 13.33,
+          "text": "Et avant qu'il eût le temps de répondre, elle écrivit sur une feuille de papier blanc qui était au milieu de la table, les cognes sont là. Puis, jetant la plume,"
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3025.175542,
+        "model_total_time_ms": 2999.583959579468,
+        "text": "Et avant qu'il eût le temps de répondre, elle écrivit sur une feuille de papier blanc qui était au milieu de la table, les cognes sont là. Puis, jetant la plume,",
+        "prompt_tokens": 39,
+        "generation_tokens": 178,
+        "total_tokens": 217,
+        "generation_tokens_per_second": 66.39110011903668,
+        "peak_memory_bytes": 5579969584
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2984.662833,
+          "model_total_time_ms": 2961.3258838653564,
+          "text": "Et avant qu'il eût le temps de répondre, elle écrivit sur une feuille de papier blanc qui était au milieu de la table, les cognes sont là. Puis, jetant la plume,",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 66.96152456989246,
+          "peak_memory_bytes": 5579969584
+        },
+        {
+          "inference_ms": 2974.888041,
+          "model_total_time_ms": 2950.4339694976807,
+          "text": "Et avant qu'il eût le temps de répondre, elle écrivit sur une feuille de papier blanc qui était au milieu de la table, les cognes sont là. Puis, jetant la plume,",
+          "prompt_tokens": 39,
+          "generation_tokens": 178,
+          "total_tokens": 217,
+          "generation_tokens_per_second": 67.15934367926705,
+          "peak_memory_bytes": 5579969584
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-pt-12710_10229_000000",
+      "requested_language": "pt",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "a dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa tristeza tu me fazes ir até o fundo das remotas raízes do meu espírito",
+      "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito..",
+      "quality": {
+        "wer": 0,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 12840,
+        "cold_load_ms": 1134.280875,
+        "warm_inference_ms": 2879.5968745,
+        "real_time_factor": 0.22426766935358255
+      },
+      "resources": {
+        "peak_memory_bytes": 3401678848,
+        "runtime_peak_memory_bytes": 5579838512,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 12.84,
+          "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito.."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 2907.228291,
+        "model_total_time_ms": 2881.862163543701,
+        "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito..",
+        "prompt_tokens": 39,
+        "generation_tokens": 172,
+        "total_tokens": 211,
+        "generation_tokens_per_second": 66.95089103710175,
+        "peak_memory_bytes": 5579838512
+      },
+      "repetitions": [
+        {
+          "inference_ms": 2882.385291,
+          "model_total_time_ms": 2859.5728874206543,
+          "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito..",
+          "prompt_tokens": 39,
+          "generation_tokens": 172,
+          "total_tokens": 211,
+          "generation_tokens_per_second": 67.23777288364018,
+          "peak_memory_bytes": 5579838512
+        },
+        {
+          "inference_ms": 2876.808458,
+          "model_total_time_ms": 2854.3312549591064,
+          "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito..",
+          "prompt_tokens": 39,
+          "generation_tokens": 172,
+          "total_tokens": 211,
+          "generation_tokens_per_second": 67.36546689660298,
+          "peak_memory_bytes": 5579838512
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-pt-13069_13511_000032",
+      "requested_language": "pt",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "tive horror do ente que amava era só a compaixão que me prendia a ela lembras-te das palavras de simeão quando na apresentação do templo viu o messias em seus braços hoje digo-te o mesmo karl já posso morrer",
+      "text": "Tive o horror doente que amava. Era só a compaixão que me prendia a ela. Lembras-te das palavras de Simeão quando na apresentação do templo viu o Messias em seus braços? Hoje digo-te o mesmo, Carl. Já posso morrer..",
+      "quality": {
+        "wer": 0.10256410256410256,
+        "cer": 0.011976047904191617
+      },
+      "timing": {
+        "audio_duration_ms": 14970,
+        "cold_load_ms": 1118.484417,
+        "warm_inference_ms": 3342.2810005,
+        "real_time_factor": 0.22326526389445558
+      },
+      "resources": {
+        "peak_memory_bytes": 3402153984,
+        "runtime_peak_memory_bytes": 5580526640,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 14.97,
+          "text": "Tive o horror doente que amava. Era só a compaixão que me prendia a ela. Lembras-te das palavras de Simeão quando na apresentação do templo viu o Messias em seus braços? Hoje digo-te o mesmo, Carl. Já posso morrer.."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3344.873,
+        "model_total_time_ms": 3319.3957805633545,
+        "text": "Tive o horror doente que amava. Era só a compaixão que me prendia a ela. Lembras-te das palavras de Simeão quando na apresentação do templo viu o Messias em seus braços? Hoje digo-te o mesmo, Carl. Já posso morrer..",
+        "prompt_tokens": 39,
+        "generation_tokens": 199,
+        "total_tokens": 238,
+        "generation_tokens_per_second": 66.32920057827208,
+        "peak_memory_bytes": 5580526640
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3335.992209,
+          "model_total_time_ms": 3312.0269775390625,
+          "text": "Tive o horror doente que amava. Era só a compaixão que me prendia a ela. Lembras-te das palavras de Simeão quando na apresentação do templo viu o Messias em seus braços? Hoje digo-te o mesmo, Carl. Já posso morrer..",
+          "prompt_tokens": 39,
+          "generation_tokens": 199,
+          "total_tokens": 238,
+          "generation_tokens_per_second": 66.07309289899871,
+          "peak_memory_bytes": 5580526640
+        },
+        {
+          "inference_ms": 3348.569792,
+          "model_total_time_ms": 3323.836088180542,
+          "text": "Tive o horror doente que amava. Era só a compaixão que me prendia a ela. Lembras-te das palavras de Simeão quando na apresentação do templo viu o Messias em seus braços? Hoje digo-te o mesmo, Carl. Já posso morrer..",
+          "prompt_tokens": 39,
+          "generation_tokens": 199,
+          "total_tokens": 238,
+          "generation_tokens_per_second": 66.03441569933744,
+          "peak_memory_bytes": 5580526640
+        }
+      ]
+    },
+    {
+      "fixture_id": "audiobook-pt-6549_4272_000000",
+      "requested_language": "pt",
+      "runtime_locale_requested": "model-managed",
+      "reported_language": "model-managed",
+      "reference_text": "mas como é que eu murchei as tuas flores minha mãezinha regouga o esposo de bruços no divã manequim nem sequer percebeste a alegoria agora vê se te penteias grichka veste-o depressa anda",
+      "text": "Mas como é que eu murchi as tuas flores, minha mãezinha? Regouga o esposo de bruxos no divã. Manequim, nem sequer percebeste a alegoria. Agora vê se te penteias. Crisca, veste-o depressa. Anda!.",
+      "quality": {
+        "wer": 0.09090909090909091,
+        "cer": 0.0392156862745098
+      },
+      "timing": {
+        "audio_duration_ms": 14180,
+        "cold_load_ms": 1150.21,
+        "warm_inference_ms": 3149.5313960000003,
+        "real_time_factor": 0.22211081777150918
+      },
+      "resources": {
+        "peak_memory_bytes": 3402809344,
+        "runtime_peak_memory_bytes": 5580248112,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475002727
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "none",
+        "input_streaming_measured": false,
+        "transcription_delay_ms": 480
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 14.18,
+          "text": "Mas como é que eu murchi as tuas flores, minha mãezinha? Regouga o esposo de bruxos no divã. Manequim, nem sequer percebeste a alegoria. Agora vê se te penteias. Crisca, veste-o depressa. Anda!."
+        }
+      ],
+      "warmup": {
+        "inference_ms": 3171.03,
+        "model_total_time_ms": 3146.608829498291,
+        "text": "Mas como é que eu murchi as tuas flores, minha mãezinha? Regouga o esposo de bruxos no divã. Manequim, nem sequer percebeste a alegoria. Agora vê se te penteias. Crisca, veste-o depressa. Anda!.",
+        "prompt_tokens": 39,
+        "generation_tokens": 189,
+        "total_tokens": 228,
+        "generation_tokens_per_second": 66.65364429599329,
+        "peak_memory_bytes": 5580248112
+      },
+      "repetitions": [
+        {
+          "inference_ms": 3146.808458,
+          "model_total_time_ms": 3123.7800121307373,
+          "text": "Mas como é que eu murchi as tuas flores, minha mãezinha? Regouga o esposo de bruxos no divã. Manequim, nem sequer percebeste a alegoria. Agora vê se te penteias. Crisca, veste-o depressa. Anda!.",
+          "prompt_tokens": 39,
+          "generation_tokens": 189,
+          "total_tokens": 228,
+          "generation_tokens_per_second": 67.0079195827323,
+          "peak_memory_bytes": 5580248112
+        },
+        {
+          "inference_ms": 3152.254334,
+          "model_total_time_ms": 3127.225875854492,
+          "text": "Mas como é que eu murchi as tuas flores, minha mãezinha? Regouga o esposo de bruxos no divã. Manequim, nem sequer percebeste a alegoria. Agora vê se te penteias. Crisca, veste-o depressa. Anda!.",
+          "prompt_tokens": 39,
+          "generation_tokens": 189,
+          "total_tokens": 228,
+          "generation_tokens_per_second": 66.93471192074732,
+          "peak_memory_bytes": 5580248112
+        }
+      ]
+    }
+  ]
+}
