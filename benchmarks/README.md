@@ -74,6 +74,25 @@ Those ten quality fixtures are pinned in the manifest with source, reference,
 and normalized-PCM digests. They expose language-path failures quickly; they
 are not statistically sufficient for a final model-quality ranking.
 
+Run one candidate across the bounded set and write its immutable aggregate
+outside the repository before review:
+
+```sh
+CUTTLEDOC_MLX_PROBE=/absolute/path/to/cuttledoc-mlx-whisper \
+  CUTTLEDOC_MLX_MODEL_DIR=/absolute/path/to/mlx-whisper-tiny \
+  node scripts/run-phase0-asr-matrix.mjs \
+    --candidate mlx \
+    --repetitions 2 \
+    --output /tmp/mlx-multilingual.json
+```
+
+The same command accepts `apple-speech`, `parakeet`, and `whisper`. Their
+required probe, module, model, and VAD paths are named in missing-environment
+errors so local artifacts never become hidden repository assumptions. Every
+candidate uses the same manifest order and quality normalization; the raw
+aggregate retains each transcript, timing repetition, segment list, and
+candidate-specific streaming behavior.
+
 ## Fixture rules
 
 - Record exact provenance, artifact license, language, normalization, and hash.

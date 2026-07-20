@@ -5,8 +5,14 @@ set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 source="$root/spikes/apple-speech-shim/Sources/CuttledocSpeechShim.swift"
 rust_source="$root/spikes/apple-speech-shim/rust/main.rs"
-build_dir=$(mktemp -d /private/tmp/cuttledoc-speech-spike.XXXXXX)
-trap 'rm -rf "$build_dir"' EXIT
+locale=${CUTTLEDOC_SPEECH_LOCALE:-en-US}
+if [[ -n "${CUTTLEDOC_SPEECH_BUILD_DIR:-}" ]]; then
+  build_dir=$CUTTLEDOC_SPEECH_BUILD_DIR
+  mkdir -p "$build_dir"
+else
+  build_dir=$(mktemp -d /private/tmp/cuttledoc-speech-spike.XXXXXX)
+  trap 'rm -rf "$build_dir"' EXIT
+fi
 
 swiftc \
   -emit-library \
@@ -29,6 +35,7 @@ if [[ ! -f "$source_fixture" ]]; then
 fi
 fixture="$build_dir/fleurs-en-000.f32le"
 ffmpeg \
+  -y \
   -v error \
   -i "$source_fixture" \
   -ar 16000 \
@@ -46,17 +53,21 @@ else
 fi
 
 echo "STREAM"
+echo "locale=$locale"
 DYLD_LIBRARY_PATH="$build_dir" \
   /usr/bin/time -l \
   "$build_dir/cuttledoc-speech-spike" \
-  "$fixture"
-
-echo "CANCEL"
-DYLD_LIBRARY_PATH="$build_dir" \
-  "$build_dir/cuttledoc-speech-spike" \
   "$fixture" \
-  --locale es-ES \
-  --cancel
+  --locale "$locale"
+
+if [[ "${CUTTLEDOC_SPEECH_SKIP_CANCEL:-0}" != "1" ]]; then
+  echo "CANCEL"
+  DYLD_LIBRARY_PATH="$build_dir" \
+    "$build_dir/cuttledoc-speech-spike" \
+    "$fixture" \
+    --locale es-ES \
+    --cancel
+fi
 
 echo "ARTIFACTS"
 stat -f 'swift_dylib_bytes=%z' "$build_dir/libcuttledoc_speech_shim.dylib"

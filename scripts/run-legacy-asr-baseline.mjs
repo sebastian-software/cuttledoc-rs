@@ -15,6 +15,7 @@ const { values } = parseArgs({
     'module-dir': { type: 'string' },
     'model-dir': { type: 'string' },
     'vad-dir': { type: 'string' },
+    language: { type: 'string', default: 'en' },
     output: { type: 'string' },
     repetitions: { type: 'string', default: '5' },
   },
@@ -30,6 +31,7 @@ const referencePath = requiredPath(values.reference, '--reference');
 const moduleDir = requiredPath(values['module-dir'], '--module-dir');
 const modelDir = requiredPath(values['model-dir'], '--model-dir');
 const vadDir = values['vad-dir'] ? resolve(values['vad-dir']) : undefined;
+const language = values.language;
 const repetitions = Number.parseInt(values.repetitions, 10);
 if (!Number.isInteger(repetitions) || repetitions < 1) {
   throw new Error('--repetitions must be a positive integer');
@@ -56,7 +58,7 @@ if (backend === 'parakeet') {
 } else {
   engine = new api.WhisperAsrEngine({
     modelPath: join(modelDir, 'ggml-large-v3-turbo.bin'),
-    language: 'en',
+    language,
     useGpu: true,
   });
 }
@@ -78,7 +80,8 @@ try {
       wall_ms: performance.now() - started,
       backend_ms: result.durationMs,
       text: result.text,
-      language: result.language ?? 'en',
+      language:
+        result.language ?? (backend === 'whisper' ? language : 'und'),
       segments: normalizeSegments(result.segments, audioDurationMs),
     });
   }
@@ -118,6 +121,7 @@ const record = {
       runtime: {
         module_revision: moduleDir,
         version: engine.getVersion(),
+        requested_language: backend === 'whisper' ? language : 'model-managed',
       },
       metrics: {
         wer: errorRate(words(reference), words(representative.text)),
@@ -128,6 +132,7 @@ const record = {
         model_size_bytes: modelSizeBytes,
         vad_size_bytes: vadSizeBytes,
         binary_size_bytes: (await stat(addonPath)).size,
+        peak_memory_bytes: process.resourceUsage().maxRSS * 1024,
       },
       behavior: {
         timestamps:
