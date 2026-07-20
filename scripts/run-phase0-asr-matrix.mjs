@@ -165,6 +165,7 @@ async function runMlx(fixture, pcmPath) {
     fixture,
     text: representative.text,
     reportedLanguage: representative.language,
+    runtimeLocaleRequested: language,
     coldLoadMs: session.load_wall_ms,
     warmInferenceMs: mean(
       measured.map((sample) => sample.transcription.inference_ms),
@@ -208,11 +209,12 @@ async function runAppleSpeech(fixture, pcmPath) {
   const libraryDirectory = requiredEnvironment(
     'CUTTLEDOC_SPEECH_LIBRARY_DIR',
   );
+  const runtimeLocale = appleSpeechLocale(fixture.language);
   const runs = [];
   for (let index = 0; index < repetitions + 1; index += 1) {
     const timed = timedCommand(
       probe,
-      [pcmPath, '--locale', fixture.language],
+      [pcmPath, '--locale', runtimeLocale],
       {
         env: {
           ...process.env,
@@ -236,6 +238,7 @@ async function runAppleSpeech(fixture, pcmPath) {
     fixture,
     text: representative.final.text,
     reportedLanguage: representative.metadata.locale,
+    runtimeLocaleRequested: runtimeLocale,
     coldLoadMs: runs[0].create_ms,
     warmInferenceMs: mean(
       measured.map((sample) => sample.summary.elapsed_ms),
@@ -330,6 +333,7 @@ async function runLegacy(fixture) {
     fixture,
     text: representative.text,
     reportedLanguage: representative.language,
+    runtimeLocaleRequested: language,
     coldLoadMs: native.metrics.cold_load_ms,
     warmInferenceMs: native.metrics.warm_inference_ms,
     peakMemoryBytes: native.metrics.peak_memory_bytes,
@@ -355,6 +359,7 @@ function resultRecord({
   fixture,
   text,
   reportedLanguage,
+  runtimeLocaleRequested,
   coldLoadMs,
   warmInferenceMs,
   peakMemoryBytes,
@@ -370,6 +375,7 @@ function resultRecord({
   return {
     fixture_id: fixture.id,
     requested_language: languageCode(fixture.language),
+    runtime_locale_requested: runtimeLocaleRequested,
     reported_language: reportedLanguage,
     reference_text: fixture.reference_text,
     text,
@@ -519,6 +525,13 @@ function fixturePrefix(fixture) {
 
 function languageCode(locale) {
   return locale.split('-')[0].toLowerCase();
+}
+
+function appleSpeechLocale(fixtureLocale) {
+  if (fixtureLocale === 'es-419') {
+    return 'es-MX';
+  }
+  return fixtureLocale;
 }
 
 function qualityMetrics(reference, hypothesis) {
