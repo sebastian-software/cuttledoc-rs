@@ -1111,6 +1111,22 @@ function validateVoxtralRealtimeDirectModelManifest(
       layout?.affine_4bit_modules !== 406) {
     errors.push('direct Voxtral tensor and quantization layout must stay pinned');
   }
+  const batchContract = modelManifest.batch_contract;
+  if (batchContract?.sample_rate_hz !== 16000 ||
+      batchContract?.sample_format !== 'f32le' ||
+      batchContract?.channel_count !== 1 ||
+      batchContract?.input_semantics !== 'complete-audio-buffer' ||
+      batchContract?.generation !== 'greedy' ||
+      batchContract?.tokenizer !== 'tekken' ||
+      batchContract?.output !== 'final-text-and-token-evidence' ||
+      batchContract?.capabilities?.delay_conditioning !== true ||
+      batchContract?.capabilities?.decoder !== true ||
+      batchContract?.capabilities?.decoder_kv_cache !== true ||
+      batchContract?.capabilities?.transcription !== true ||
+      batchContract?.capabilities?.streaming_session !== false ||
+      batchContract?.capabilities?.timestamps !== false) {
+    errors.push('direct Voxtral batch transcription contract must stay explicit');
+  }
   const contract = modelManifest.adapter_contract;
   if (contract?.sample_rate_hz !== 16000 ||
       contract?.sample_format !== 'f32le' ||
@@ -1132,7 +1148,8 @@ function validateVoxtralRealtimeDirectModelManifest(
       contract?.capabilities?.sliding_window_attention !== true ||
       contract?.capabilities?.adapter_projection !== true ||
       contract?.capabilities?.decoder !== false ||
-      contract?.capabilities?.transcription !== false) {
+      contract?.capabilities?.transcription !== false ||
+      contract?.capabilities?.streaming_session !== false) {
     errors.push('direct Voxtral boundary contract must remain explicit and bounded');
   }
   return errors;
@@ -1537,6 +1554,182 @@ function validateVoxtralRealtimeDirectEncoder(
       !(run.artifacts?.mlx_metallib_bytes > 0) ||
       !run.limitations?.some((item) => item.includes('No token'))) {
     errors.push('direct encoder CPU/artifact evidence and limits must be explicit');
+  }
+  return errors;
+}
+
+function validateVoxtralRealtimeDirectTranscription(
+  run,
+  oracle,
+  modelManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
+      run.issue !==
+        'https://github.com/sebastian-software/cuttledoc-rs/issues/19' ||
+      run.model?.source !== oracle.model?.source ||
+      run.model?.conversion !== oracle.model?.conversion ||
+      run.model?.artifact_sha256 !== oracle.model?.artifact_sha256 ||
+      run.toolchain?.mlx?.revision !==
+        modelManifest.official_runtime?.revision) {
+    errors.push('direct transcription identity must pin source, model, and MLX');
+  }
+  if (!fixture ||
+      run.fixture?.id !== fixture.id ||
+      run.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.pcm_samples !== fixture.normalized.sample_count ||
+      run.fixture?.sample_rate_hz !== 16000 ||
+      run.fixture?.duration_ms !== fixture.normalized.duration_ms ||
+      run.fixture?.gold_status !== fixture.gold_status ||
+      oracle.fixture?.id !== fixture.id ||
+      oracle.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      oracle.fixture?.pcm_samples !== fixture.normalized.sample_count) {
+    errors.push('direct transcription must use the pinned audiobook fixture');
+  }
+
+  const result = run.result;
+  const probe = result?.probe;
+  if (result?.status !== 'ok' ||
+      result?.reference_oracle !==
+        'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.decoder-480ms.json' ||
+      probe?.status !== 'ok' ||
+      probe?.boundary !== 'official-mlx-cpp' ||
+      probe?.stage !== 'voxtral-greedy-transcription' ||
+      probe?.device !== 'gpu' ||
+      probe?.pcm_samples !== fixture?.normalized.sample_count ||
+      probe?.transcription_delay_ms !== 480 ||
+      probe?.delay_tokens !== 6 ||
+      !(probe?.elapsed_ms > 0) ||
+      !(probe?.peak_memory_bytes > 0)) {
+    errors.push('direct transcription must record successful official-MLX GPU work');
+  }
+  for (const field of [
+    'layers',
+    'dimension',
+    'attention_heads',
+    'kv_heads',
+    'head_dimension',
+    'hidden_dimension',
+    'sliding_window',
+    'vocabulary_size',
+    'ada_bottleneck_dimension',
+  ]) {
+    if (probe?.architecture?.[field] !== oracle.architecture?.[field]) {
+      errors.push(`direct transcription architecture.${field} differs from oracle`);
+    }
+  }
+  if (JSON.stringify(probe?.prompt) !== JSON.stringify(oracle.prompt)) {
+    errors.push('direct delay-conditioned prompt differs from oracle');
+  }
+  if (JSON.stringify(probe?.generation?.tokens) !==
+        JSON.stringify(oracle.generation?.tokens) ||
+      probe?.generation?.token_count !== oracle.generation?.token_count ||
+      probe?.generation?.forward_steps !== oracle.generation?.forward_steps ||
+      probe?.generation?.finish_reason !== oracle.generation?.finish_reason ||
+      probe?.generation?.text !== oracle.generation?.text) {
+    errors.push('direct generated tokens and text must exactly match the oracle');
+  }
+  if (JSON.stringify(probe?.cache) !== JSON.stringify(oracle.cache)) {
+    errors.push('direct decoder cache state differs from oracle');
+  }
+  if (probe?.capabilities?.delay_conditioning !== true ||
+      probe?.capabilities?.decoder !== true ||
+      probe?.capabilities?.decoder_kv_cache !== true ||
+      probe?.capabilities?.tekken_decode !== true ||
+      probe?.capabilities?.greedy_transcription !== true ||
+      probe?.capabilities?.streaming_session !== false ||
+      modelManifest.batch_contract?.capabilities?.transcription !== true ||
+      modelManifest.batch_contract?.capabilities?.streaming_session !== false ||
+      modelManifest.adapter_contract?.capabilities?.transcription !== false) {
+    errors.push('batch transcription must not overclaim the streaming session');
+  }
+
+  let maximumSampleAbsoluteError = 0;
+  let maximumAggregateRelativeError = 0;
+  for (const stage of [
+    'adapter',
+    'time_embedding',
+    'ada_scale_layer_0',
+    'ada_scale_layer_12',
+    'ada_scale_layer_25',
+    'prompt_text_embeddings',
+    'prefix_embeddings',
+    'prefill_layer_0',
+    'prefill_layer_12',
+    'prefill_layer_25',
+    'prefill_norm',
+    'prefill_logits',
+    'decode_0_input',
+    'decode_0_layer_0',
+    'decode_0_layer_12',
+    'decode_0_layer_25',
+    'decode_0_norm',
+    'decode_0_logits',
+    'final_logits',
+    'decoder_layer_0_cache_keys',
+    'decoder_layer_0_cache_values',
+  ]) {
+    const expected = oracle.fingerprints?.[stage];
+    const observed = probe?.fingerprints?.[stage];
+    if (!expected || !observed ||
+        !arrayEquals(expected.shape ?? [], observed.shape ?? []) ||
+        !arrayEquals(
+          expected.sample_indices ?? [],
+          observed.sample_indices ?? [],
+        ) ||
+        expected.sample_values?.length !== observed.sample_values?.length) {
+      errors.push(`${stage}: direct decoder fingerprint identity differs`);
+      continue;
+    }
+    for (let index = 0; index < expected.sample_values.length; index += 1) {
+      maximumSampleAbsoluteError = Math.max(
+        maximumSampleAbsoluteError,
+        Math.abs(observed.sample_values[index] - expected.sample_values[index]),
+      );
+    }
+    for (const field of ['mean', 'stddev', 'minimum', 'maximum', 'l1']) {
+      const relativeError = Math.abs(observed[field] - expected[field]) /
+        Math.max(Math.abs(expected[field]), 1e-12);
+      maximumAggregateRelativeError = Math.max(
+        maximumAggregateRelativeError,
+        relativeError,
+      );
+    }
+  }
+  const parity = result?.parity;
+  if (parity?.status !== 'ok' ||
+      parity?.exact_token_parity !== true ||
+      parity?.exact_text_parity !== true ||
+      parity?.sample_absolute_tolerance !== 5e-4 ||
+      parity?.aggregate_relative_tolerance !== 5e-4 ||
+      maximumSampleAbsoluteError > parity.sample_absolute_tolerance ||
+      maximumAggregateRelativeError > parity.aggregate_relative_tolerance ||
+      Math.abs(
+        parity.maximum_sample_absolute_error - maximumSampleAbsoluteError,
+      ) > 1e-15 ||
+      Math.abs(
+        parity.maximum_aggregate_relative_error -
+          maximumAggregateRelativeError,
+      ) > 1e-15) {
+    errors.push('direct decoder parity must be exact and within tolerances');
+  }
+  const performance = result?.performance;
+  const calculatedRtf = probe?.elapsed_ms / run.fixture?.duration_ms;
+  if (performance?.inference_elapsed_ms !== probe?.elapsed_ms ||
+      performance?.peak_memory_bytes !== probe?.peak_memory_bytes ||
+      Math.abs(performance?.real_time_factor - calculatedRtf) > 1e-15 ||
+      !(run.artifacts?.shim_dylib_bytes > 0) ||
+      !(run.artifacts?.rust_executable_bytes > 0) ||
+      !(run.artifacts?.mlx_metallib_bytes > 0) ||
+      !run.limitations?.some((item) => item.includes('not WER')) ||
+      !run.limitations?.some((item) => item.includes('does not yet execute'))) {
+    errors.push('direct decoder performance, artifacts, and limits must be explicit');
   }
   return errors;
 }
@@ -3049,6 +3242,14 @@ const voxtralRealtimeDirectEncoderPath = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json',
 );
+const voxtralRealtimeDirectTranscriptionOraclePath = join(
+  repoRoot,
+  'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.decoder-480ms.json',
+);
+const voxtralRealtimeDirectTranscriptionPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.transcription-480ms-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -3153,6 +3354,12 @@ const voxtralRealtimeDirectEncoderOracle = await readJson(
 );
 const voxtralRealtimeDirectEncoder = await readJson(
   voxtralRealtimeDirectEncoderPath,
+);
+const voxtralRealtimeDirectTranscriptionOracle = await readJson(
+  voxtralRealtimeDirectTranscriptionOraclePath,
+);
+const voxtralRealtimeDirectTranscription = await readJson(
+  voxtralRealtimeDirectTranscriptionPath,
 );
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -3348,6 +3555,14 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     audiobookPilot,
   ).map((error) => `${voxtralRealtimeDirectEncoderPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralRealtimeDirectTranscription(
+    voxtralRealtimeDirectTranscription,
+    voxtralRealtimeDirectTranscriptionOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralRealtimeDirectTranscriptionPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -3572,14 +3787,14 @@ if (process.argv.includes('--self-test')) {
   const invalidVoxtralDirectModelManifest = structuredClone(
     voxtralRealtimeDirectModelManifest,
   );
-  invalidVoxtralDirectModelManifest.adapter_contract.capabilities
-    .transcription = true;
+  invalidVoxtralDirectModelManifest.batch_contract.capabilities
+    .streaming_session = true;
   if (validateVoxtralRealtimeDirectModelManifest(
     invalidVoxtralDirectModelManifest,
     voxtralRealtimeModelManifest,
   ).length === 0) {
     failures.push(
-      'validator self-test failed to reject a false direct Voxtral transcription capability',
+      'validator self-test failed to reject a false direct Voxtral streaming capability',
     );
   }
   const invalidVoxtralDirectBoundary = structuredClone(
@@ -3621,6 +3836,20 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push(
       'validator self-test failed to reject a divergent direct Voxtral cache',
+    );
+  }
+  const invalidVoxtralDirectTranscription = structuredClone(
+    voxtralRealtimeDirectTranscription,
+  );
+  invalidVoxtralDirectTranscription.result.probe.generation.tokens[0] += 1;
+  if (validateVoxtralRealtimeDirectTranscription(
+    invalidVoxtralDirectTranscription,
+    voxtralRealtimeDirectTranscriptionOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent direct Voxtral tokens',
     );
   }
   const invalidVoxtralRealtimeAggregate = structuredClone(
@@ -3705,7 +3934,7 @@ console.log(
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 direct Voxtral boundary record, 1 direct Voxtral frontend parity record, ` +
-  `1 direct Voxtral encoder parity record, ` +
+  `1 direct Voxtral encoder parity record, 1 direct Voxtral transcription parity record, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

@@ -232,10 +232,14 @@ The machine-readable
 [`frontend result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json),
 and
 [`encoder result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json)
-all explicitly keep `transcription: false`. The current result stops before
-delay conditioning and the 26-layer decoder; it is not token, transcript, WER,
-or first-text-latency evidence. Those claims require the remaining staged
-parity gates through the same repository-owned session.
+remain stage-specific and keep their original capability ceilings. The new
+[`decoder result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.transcription-480ms-1/result.json)
+executes delay conditioning, all 26 GQA decoder layers, decoder KV caches, the
+tied language-model head, greedy generation, and repository-owned Tekken
+decoding. It emits the same 178 token IDs and exact German text as the pinned
+Python oracle. This proves a usable complete-buffer Rust transcription path,
+not held-out WER, timestamps, or live-input first-text latency. Those remaining
+claims require moving the proven graph behind the bounded session.
 
 ## Artifact and license pins
 
@@ -295,11 +299,12 @@ timestamp detail, and streaming behavior.
    cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
 2. Continue Voxtral Realtime as a measured model candidate. The first
-   repository-owned official-MLX boundary now proves bounded ingestion,
-   backpressure, and cancellation. Port the streaming frontend, causal
-   encoder, Tekken/delay-conditioned decoder, and exact fixed-fixture text
-   parity in that order before comparing the completed narrow adapter with
-   pure C/MPS; do not adopt `mlx-audio` as the product boundary.
+   repository-owned official-MLX path now proves bounded ingestion,
+   backpressure, cancellation, and exact complete-buffer transcript parity.
+   Move that proven frontend/encoder/decoder state behind the bounded session,
+   retain exact final text while adding incremental updates, and then compare
+   the completed narrow adapter with pure C/MPS; do not adopt `mlx-audio` as
+   the product boundary.
 3. Acquire held-out German-first professional-podcast material and independent
    audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
    Voxtral on the identical language/domain cells.

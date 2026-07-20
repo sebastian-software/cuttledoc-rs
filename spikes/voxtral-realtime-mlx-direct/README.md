@@ -6,7 +6,7 @@ product-boundary experiment without rejecting its model implementation as a
 reference oracle.
 
 The current milestone proves model identity, streaming lifecycle mechanics, and
-numerical parity through the complete causal audio encoder:
+exact fixed-fixture batch-transcription parity through the complete model:
 
 1. The C++ adapter loads the pinned 3.13 GB safetensors through official MLX
    and validates 1,523 tensors, their dtypes, 406 affine 4-bit modules, and
@@ -24,12 +24,21 @@ numerical parity through the complete causal audio encoder:
 6. A reusable repository-owned rotating KV cache and sliding-window mask drive
    all 32 encoder transformer layers, RoPE, 4x downsampling, and the
    audio-language adapter without linking Python or `mlx-lm`.
+7. Repository-owned delay conditioning, 26 decoder layers with grouped-query
+   attention, decoder caches, the tied language-model head, greedy generation,
+   and Tekken decoding produce a final transcript through the Rust CLI.
 
-This milestone does **not** implement or claim transcription. The bounded
-session's small sum-of-squares operation remains a lifecycle fingerprint. The
-separate model probe executes real preprocessing and weights through all 32
-causal encoder transformer layers. It stops before delay conditioning and the
-26-layer decoder.
+Batch transcription is usable. The bounded session's small sum-of-squares
+operation remains only a lifecycle fingerprint, so this milestone does **not**
+claim incremental or live streaming. The manifest keeps those two capability
+surfaces separate.
+
+The cache, causal-mask, sliding-window, quantized-linear, and activation
+primitives are implemented in the shared `mlx-direct` support layer and are
+model-independent. Voxtral still owns its layer graph, weight names,
+dimensions, delay conditioning, generation policy, and tokenizer. Official MLX
+provides tensor execution and Metal kernels; there is no call to a prebuilt
+Voxtral implementation in MLX.
 
 ## Pinned inputs
 
@@ -92,11 +101,23 @@ aggregate relative error is `4.20e-6` (tolerance `1e-5`). The GPU probe takes
 and result use the corresponding `encoder-480ms` paths under
 `benchmarks/oracles` and `benchmarks/raw`.
 
+The batch decoder adds a 39-token delay-conditioned prompt and processes 216
+adapter frames through 26 decoder layers. On the pinned fixture it emits the
+same 178 token IDs and the exact same German transcript as the pinned
+`mlx-audio` reference. Across decoder fingerprints, the maximum sampled
+absolute error is `2.44e-4` (tolerance `5e-4`) and the maximum aggregate
+relative error is `2.09e-4` (tolerance `5e-4`). The recorded M1 Ultra run takes
+about 3.94 seconds for 13.34 seconds of audio and peaks at 5.07 GB before memory
+optimization. The checked-in decoder oracle/result and
+`scripts/validate-voxtral-mlx-decoder.mjs` make exact token and text parity a
+hard gate.
+
 ## Remaining parity gates
 
-1. Port Tekken tokenization, delay conditioning, the 26-layer decoder, and its
-   cache behind the same session handle.
-2. Require exact fixed-fixture token/text parity before claiming ASR.
+1. Move the proven frontend, encoder, decoder, and tokenizer state behind the
+   bounded session handle and emit incremental transcript updates.
+2. Preserve fixed step budgets, backpressure, cancellation, and exact final
+   text while replacing the lifecycle fingerprint with real model work.
 3. Rerun the 80/320 ms live-input, multilingual audiobook, and held-out
    German-first target-domain gates through this repository-owned boundary.
 4. Only then compare packaging and lifecycle evidence with the pure-C/MPS

@@ -201,8 +201,13 @@ stages. The
 [`encoder result`](raw/phase0.voxtral-realtime-mlx-direct.encoder-480ms-1/result.json)
 then proves all 32 causal layers, repository-owned rotating cache and
 sliding-window semantics, downsampling, and adapter projection against its
-pinned oracle. All records deliberately keep `transcription: false`: the next
-parity gate is the delay-conditioned decoder, so none is an ASR-quality result.
+pinned oracle. The
+[`decoder result`](raw/phase0.voxtral-realtime-mlx-direct.transcription-480ms-1/result.json)
+adds delay conditioning, all 26 GQA decoder layers, decoder caches, the tied
+language-model head, greedy generation, and Tekken decoding. It matches all 178
+tokens and the final German text from its pinned Python oracle exactly. This is
+a usable complete-buffer Rust transcription path and implementation-parity
+evidence, not held-out ASR-quality or live-input streaming evidence.
 
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in

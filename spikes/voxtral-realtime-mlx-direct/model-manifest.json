@@ -92,6 +92,23 @@
     "uint32_tensors": 406,
     "affine_4bit_modules": 406
   },
+  "batch_contract": {
+    "sample_rate_hz": 16000,
+    "sample_format": "f32le",
+    "channel_count": 1,
+    "input_semantics": "complete-audio-buffer",
+    "generation": "greedy",
+    "tokenizer": "tekken",
+    "output": "final-text-and-token-evidence",
+    "capabilities": {
+      "delay_conditioning": true,
+      "decoder": true,
+      "decoder_kv_cache": true,
+      "transcription": true,
+      "streaming_session": false,
+      "timestamps": false
+    }
+  },
   "adapter_contract": {
     "sample_rate_hz": 16000,
     "sample_format": "f32le",
@@ -119,7 +136,8 @@
       "sliding_window_attention": true,
       "adapter_projection": true,
       "decoder": false,
-      "transcription": false
+      "transcription": false,
+      "streaming_session": false
     }
   }
 }

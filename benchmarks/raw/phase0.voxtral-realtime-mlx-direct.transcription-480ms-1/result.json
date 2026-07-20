@@ -1,0 +1,1006 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.voxtral-realtime-mlx-direct.transcription-480ms-1",
+  "captured_at": "2026-07-20T21:58:04.000Z",
+  "source_revision": "272bc5e3df0160ddb24ec5caa7f2fc9ddbe92dfb",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/19",
+  "measurement_scope": "Repository-owned delay-conditioned Voxtral decoder, grouped-query attention, rotating decoder KV cache, tied language-model head, greedy generation, and Tekken decoding executed through official MLX C++. This is fixed-fixture implementation parity evidence, not held-out ASR-quality or live-streaming evidence.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "conversion": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "artifact_sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+  },
+  "fixture": {
+    "id": "audiobook-de-135_82_000105",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+    "pcm_samples": 213440,
+    "sample_rate_hz": 16000,
+    "duration_ms": 13340,
+    "gold_status": "dataset-transcript-unverified"
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned Rust/C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.decoder-480ms.json",
+    "probe": {
+      "status": "ok",
+      "boundary": "official-mlx-cpp",
+      "stage": "voxtral-greedy-transcription",
+      "device": "gpu",
+      "pcm_samples": 213440,
+      "transcription_delay_ms": 480,
+      "delay_tokens": 6,
+      "architecture": {
+        "layers": 26,
+        "dimension": 3072,
+        "attention_heads": 32,
+        "kv_heads": 8,
+        "head_dimension": 128,
+        "hidden_dimension": 9216,
+        "sliding_window": 8192,
+        "vocabulary_size": 131072,
+        "ada_bottleneck_dimension": 32
+      },
+      "prompt": {
+        "bos_token_id": 1,
+        "streaming_pad_token_id": 32,
+        "eos_token_id": 2,
+        "token_ids": [
+          1,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ],
+        "length": 39,
+        "adapter_frames": 216
+      },
+      "generation": {
+        "tokens": [
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          33,
+          1443,
+          40553,
+          2220,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          33,
+          75538,
+          2865,
+          1044,
+          32,
+          33,
+          13704,
+          1046,
+          32,
+          32,
+          32,
+          32,
+          33,
+          14314,
+          32,
+          33,
+          16881,
+          32,
+          33,
+          70113,
+          17064,
+          32,
+          33,
+          6941,
+          32,
+          32,
+          32,
+          33,
+          56283,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          33,
+          37095,
+          14677,
+          80503,
+          1044,
+          32,
+          32,
+          32,
+          33,
+          16969,
+          32,
+          33,
+          27407,
+          32,
+          32,
+          33,
+          5169,
+          1264,
+          34048,
+          32,
+          32,
+          33,
+          9362,
+          32,
+          32,
+          33,
+          27560,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          33,
+          2635,
+          70643,
+          32,
+          32,
+          33,
+          10248,
+          1046,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          33,
+          7097,
+          77945,
+          8012,
+          32,
+          32,
+          32,
+          32,
+          33,
+          13135,
+          1044,
+          1878,
+          32,
+          32,
+          33,
+          2516,
+          1116,
+          14557,
+          32,
+          32,
+          32,
+          32,
+          33,
+          2987,
+          1044,
+          32,
+          32,
+          33,
+          1673,
+          32,
+          32,
+          32,
+          32,
+          33,
+          77849,
+          1044,
+          1486,
+          8012,
+          32,
+          32,
+          32,
+          32,
+          33,
+          1765,
+          107755,
+          1673,
+          32,
+          32,
+          32,
+          32,
+          33,
+          93234,
+          32,
+          32,
+          32,
+          32,
+          33,
+          3129,
+          1116,
+          1046,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ],
+        "token_count": 178,
+        "forward_steps": 177,
+        "finish_reason": "audio_end",
+        "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt."
+      },
+      "cache": {
+        "layer_0_offset": 216,
+        "layer_0_size": 216,
+        "layer_0_state_frames": 216
+      },
+      "elapsed_ms": 3559.590334,
+      "peak_memory_bytes": 5069112500,
+      "fingerprints": {
+        "adapter": {
+          "shape": [
+            216,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.002216646560579703,
+          "stddev": 0.17398108395557746,
+          "minimum": -1.5957626104354858,
+          "maximum": 21.612367630004883,
+          "l1": 29135.936276591343,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            221184,
+            442368,
+            663551
+          ],
+          "sample_values": [
+            0.31536105275154114,
+            -1.4522747993469238,
+            21.612367630004883,
+            -0.5491347312927246,
+            -0.4050767421722412,
+            -0.09804920107126236,
+            -0.04969922825694084,
+            0.029070356860756874
+          ]
+        },
+        "time_embedding": {
+          "shape": [
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.4449596142123558,
+          "stddev": 0.5495552243855159,
+          "minimum": -0.9999983906745911,
+          "maximum": 0.9999998211860657,
+          "l1": 1733.3006610540906,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            0.9601702690124512,
+            0.949532151222229,
+            0.9377467632293701,
+            0.8628988862037659,
+            0.26655957102775574,
+            0.9999164342880249,
+            0.27490928769111633,
+            0.0006036087870597839
+          ]
+        },
+        "ada_scale_layer_0": {
+          "shape": [
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": -0.04954386522922505,
+          "stddev": 0.16363809281794794,
+          "minimum": -0.6515446305274963,
+          "maximum": 0.5593729615211487,
+          "l1": 414.75426750676706,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            0.2808615565299988,
+            0.2928881049156189,
+            -0.13713338971138,
+            -0.09612163156270981,
+            -0.13490130007266998,
+            0.03558139503002167,
+            -0.13445739448070526,
+            -0.06901799887418747
+          ]
+        },
+        "ada_scale_layer_12": {
+          "shape": [
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.045473423486024935,
+          "stddev": 0.08508390586857568,
+          "minimum": -0.3734043836593628,
+          "maximum": 0.3253180682659149,
+          "l1": 241.51290592877194,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            -0.3734043836593628,
+            -0.3129413425922394,
+            -0.20318253338336945,
+            -0.045275166630744934,
+            -0.17563320696353912,
+            0.09298095107078552,
+            0.09102854877710342,
+            0.09085772186517715
+          ]
+        },
+        "ada_scale_layer_25": {
+          "shape": [
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.10991634989977683,
+          "stddev": 0.10894500475082772,
+          "minimum": -0.4051387906074524,
+          "maximum": 0.4745709300041199,
+          "l1": 405.3358301143162,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            0.09404575824737549,
+            0.06710740923881531,
+            -0.4051387906074524,
+            -0.03124866634607315,
+            0.21941089630126953,
+            0.019947778433561325,
+            -0.007102072238922119,
+            0.09473605453968048
+          ]
+        },
+        "prompt_text_embeddings": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float16",
+          "mean": -0.00029365464141512784,
+          "stddev": 0.014411637182538732,
+          "minimum": -0.296875,
+          "maximum": 0.1630859375,
+          "l1": 1433.144236445427,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            0.039794921875,
+            -0.01318359375,
+            0.1630859375,
+            -0.034912109375,
+            -0.045166015625,
+            0.0220947265625,
+            0.0220947265625,
+            -0.0186767578125
+          ]
+        },
+        "prefix_embeddings": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.0017540516416665662,
+          "stddev": 0.1689551477229379,
+          "minimum": -1.8926376104354858,
+          "maximum": 21.775453567504883,
+          "l1": 4352.99315230838,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            0.35515597462654114,
+            -1.4654583930969238,
+            21.775453567504883,
+            -0.5840468406677246,
+            -0.4502427577972412,
+            -0.06500053405761719,
+            -0.060801319777965546,
+            -0.15845412015914917
+          ]
+        },
+        "prefill_layer_0": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.005040930295827134,
+          "stddev": 0.5202357865390272,
+          "minimum": -29.72846221923828,
+          "maximum": 112.39988708496094,
+          "l1": 7518.220712181792,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            3.396857261657715,
+            -29.72846221923828,
+            112.39988708496094,
+            -3.8160922527313232,
+            -4.4935407638549805,
+            -0.33529311418533325,
+            -0.21788504719734192,
+            -0.11926847696304321
+          ]
+        },
+        "prefill_layer_12": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.019550880492583658,
+          "stddev": 2.942890578893936,
+          "minimum": -191.0481414794922,
+          "maximum": 909.938232421875,
+          "l1": 27185.486445762683,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            1.5214992761611938,
+            -191.0481414794922,
+            909.938232421875,
+            -17.162700653076172,
+            -17.658823013305664,
+            1.5899535417556763,
+            2.3117175102233887,
+            -0.3957337737083435
+          ]
+        },
+        "prefill_layer_25": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.10760307361653028,
+          "stddev": 10.911445564511931,
+          "minimum": -327.4804382324219,
+          "maximum": 2016.031005859375,
+          "l1": 426836.37437730655,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            -158.11917114257812,
+            -166.40574645996094,
+            866.435546875,
+            0.6447906494140625,
+            2.6109867095947266,
+            5.240139007568359,
+            5.951335906982422,
+            -3.8475520610809326
+          ]
+        },
+        "prefill_norm": {
+          "shape": [
+            39,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.040731882260500424,
+          "stddev": 2.300392047284019,
+          "minimum": -25.739933013916016,
+          "maximum": 117.71165466308594,
+          "l1": 142907.467722267,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            39936,
+            79872,
+            119807
+          ],
+          "sample_values": [
+            -20.45917320251465,
+            -12.53636360168457,
+            36.693511962890625,
+            0.10758079588413239,
+            0.3489508628845215,
+            1.3032561540603638,
+            1.477176308631897,
+            -1.2282953262329102
+          ]
+        },
+        "prefill_logits": {
+          "shape": [
+            131072
+          ],
+          "source_dtype": "float32",
+          "mean": -34.17135100537325,
+          "stddev": 1.3898193614649184,
+          "minimum": -41.310638427734375,
+          "maximum": 0.015427708625793457,
+          "l1": 4478907.3498317,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            43690,
+            87381,
+            131071
+          ],
+          "sample_values": [
+            -33.757537841796875,
+            -32.10227966308594,
+            -19.175865173339844,
+            -33.75730514526367,
+            -33.75761032104492,
+            -33.75896453857422,
+            -33.387577056884766,
+            -35.399169921875
+          ]
+        },
+        "decode_0_input": {
+          "shape": [
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.0031141001651917577,
+          "stddev": 0.18515524579159978,
+          "minimum": -0.90268874168396,
+          "maximum": 9.728286743164062,
+          "l1": 145.51918232243042,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            -0.07052405178546906,
+            0.04563545808196068,
+            9.728286743164062,
+            0.029298298060894012,
+            -0.13543221354484558,
+            -0.08919157832860947,
+            -0.04782117158174515,
+            -0.16904446482658386
+          ]
+        },
+        "decode_0_layer_0": {
+          "shape": [
+            1,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.00602948335487478,
+          "stddev": 0.2361866600541307,
+          "minimum": -1.0455769300460815,
+          "maximum": 11.912365913391113,
+          "l1": 219.60650166496634,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            -0.17146456241607666,
+            -0.13480021059513092,
+            11.912365913391113,
+            0.08384545147418976,
+            -0.3083506226539612,
+            -0.09179691970348358,
+            -0.08091564476490021,
+            -0.18568268418312073
+          ]
+        },
+        "decode_0_layer_12": {
+          "shape": [
+            1,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.009745913487374006,
+          "stddev": 0.4590675835161865,
+          "minimum": -1.6674795150756836,
+          "maximum": 18.43767547607422,
+          "l1": 672.4836268723011,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            1.7997689247131348,
+            6.737653732299805,
+            18.43767547607422,
+            0.30675429105758667,
+            -0.4657294452190399,
+            0.1251772940158844,
+            -0.26247841119766235,
+            -0.28739410638809204
+          ]
+        },
+        "decode_0_layer_25": {
+          "shape": [
+            1,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.11322032362659229,
+          "stddev": 9.446108139537428,
+          "minimum": -292.751953125,
+          "maximum": 209.16571044921875,
+          "l1": 10725.689380131662,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            3.524496078491211,
+            209.16571044921875,
+            -292.751953125,
+            9.364338874816895,
+            20.066749572753906,
+            3.2846627235412598,
+            0.19769135117530823,
+            -3.981092929840088
+          ]
+        },
+        "decode_0_norm": {
+          "shape": [
+            1,
+            3072
+          ],
+          "source_dtype": "float32",
+          "mean": 0.0446415170796494,
+          "stddev": 2.3160732514131976,
+          "minimum": -24.089555740356445,
+          "maximum": 30.61749267578125,
+          "l1": 3420.35235254452,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            1024,
+            2048,
+            3071
+          ],
+          "sample_values": [
+            0.8860872387886047,
+            30.61749267578125,
+            -24.089555740356445,
+            3.035771608352661,
+            5.210897922515869,
+            1.1137315034866333,
+            0.07455184310674667,
+            -1.3301161527633667
+          ]
+        },
+        "decode_0_logits": {
+          "shape": [
+            131072
+          ],
+          "source_dtype": "float32",
+          "mean": -33.61401242834745,
+          "stddev": 1.3981900366949787,
+          "minimum": -40.62798309326172,
+          "maximum": -0.01035010814666748,
+          "l1": 4405855.837008357,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            43690,
+            87381,
+            131071
+          ],
+          "sample_values": [
+            -33.48413848876953,
+            -31.54422950744629,
+            -19.645221710205078,
+            -33.4839973449707,
+            -33.484527587890625,
+            -32.951961517333984,
+            -32.934913635253906,
+            -34.91707992553711
+          ]
+        },
+        "final_logits": {
+          "shape": [
+            131072
+          ],
+          "source_dtype": "float32",
+          "mean": -32.2212409319709,
+          "stddev": 1.3064532161891909,
+          "minimum": -38.65882110595703,
+          "maximum": -0.8058254718780518,
+          "l1": 4223302.491435289,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            43690,
+            87381,
+            131071
+          ],
+          "sample_values": [
+            -32.25270080566406,
+            -30.795921325683594,
+            -9.447128295898438,
+            -32.25250244140625,
+            -32.25240707397461,
+            -31.651275634765625,
+            -31.67725372314453,
+            -33.427268981933594
+          ]
+        },
+        "decoder_layer_0_cache_keys": {
+          "shape": [
+            1,
+            8,
+            216,
+            128
+          ],
+          "source_dtype": "float32",
+          "mean": 0.00255396358065948,
+          "stddev": 1.289467470653078,
+          "minimum": -9.487302780151367,
+          "maximum": 9.350237846374512,
+          "l1": 213140.72977874847,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            73728,
+            147456,
+            221183
+          ],
+          "sample_values": [
+            -1.6447491645812988,
+            1.4259326457977295,
+            0.04302838072180748,
+            0.725514829158783,
+            1.7732458114624023,
+            1.765985131263733,
+            3.924452304840088,
+            -0.8208118081092834
+          ]
+        },
+        "decoder_layer_0_cache_values": {
+          "shape": [
+            1,
+            8,
+            216,
+            128
+          ],
+          "source_dtype": "float32",
+          "mean": 0.00018141652126905887,
+          "stddev": 0.0464963341855721,
+          "minimum": -1.09368097782135,
+          "maximum": 1.5369459390640259,
+          "l1": 7173.369958530266,
+          "sample_indices": [
+            0,
+            1,
+            2,
+            7,
+            31,
+            73728,
+            147456,
+            221183
+          ],
+          "sample_values": [
+            -0.008705036714673042,
+            -0.02974606305360794,
+            0.018388189375400543,
+            0.0326445996761322,
+            0.005560094490647316,
+            -0.012830551713705063,
+            0.007755353581160307,
+            -0.008529057726264
+          ]
+        }
+      },
+      "capabilities": {
+        "delay_conditioning": true,
+        "decoder": true,
+        "decoder_kv_cache": true,
+        "tekken_decode": true,
+        "greedy_transcription": true,
+        "streaming_session": false
+      }
+    },
+    "parity": {
+      "status": "ok",
+      "exact_token_parity": true,
+      "exact_text_parity": true,
+      "sample_absolute_tolerance": 0.0005,
+      "aggregate_relative_tolerance": 0.0005,
+      "maximum_sample_absolute_error": 0.000244140625,
+      "maximum_aggregate_relative_error": 0.00020858440715676278
+    },
+    "performance": {
+      "inference_elapsed_ms": 3559.590334,
+      "real_time_factor": 0.26683585712143926,
+      "peak_memory_bytes": 5069112500
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18963264,
+    "rust_executable_bytes": 411536,
+    "mlx_metallib_bytes": 130164152
+  },
+  "limitations": [
+    "The exact transcript is a development-fixture parity result against mlx-audio; the fixture gold transcript remains unverified, so this is not WER or quality evidence.",
+    "The Rust transcribe entry point consumes complete PCM and returns one final transcript; the bounded feed/step session does not yet execute this model graph incrementally.",
+    "Greedy decoding currently returns text and token evidence without segment or word timestamps.",
+    "Peak memory includes simultaneously materialized encoder and decoder weights and has not yet been optimized."
+  ],
+  "next_gate": "Integrate the proven model graph with the bounded feed/step lifecycle, emit incremental transcript updates, and preserve backpressure/cancellation before claiming live streaming."
+}

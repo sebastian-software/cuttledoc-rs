@@ -12,6 +12,7 @@
     "artifacts",
     "architecture",
     "expected_layout",
+    "batch_contract",
     "adapter_contract"
   ],
   "properties": {
@@ -114,6 +115,53 @@
         }
       }
     },
+    "batch_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_rate_hz",
+        "sample_format",
+        "channel_count",
+        "input_semantics",
+        "generation",
+        "tokenizer",
+        "output",
+        "capabilities"
+      ],
+      "properties": {
+        "sample_rate_hz": {
+          "const": 16000
+        },
+        "sample_format": {
+          "const": "f32le"
+        },
+        "channel_count": {
+          "const": 1
+        },
+        "input_semantics": {
+          "const": "complete-audio-buffer"
+        },
+        "generation": {
+          "const": "greedy"
+        },
+        "tokenizer": {
+          "const": "tekken"
+        },
+        "output": {
+          "const": "final-text-and-token-evidence"
+        },
+        "capabilities": {
+          "const": {
+            "delay_conditioning": true,
+            "decoder": true,
+            "decoder_kv_cache": true,
+            "transcription": true,
+            "streaming_session": false,
+            "timestamps": false
+          }
+        }
+      }
+    },
     "adapter_contract": {
       "type": "object",
       "additionalProperties": false,
@@ -172,7 +220,8 @@
             "sliding_window_attention": true,
             "adapter_projection": true,
             "decoder": false,
-            "transcription": false
+            "transcription": false,
+            "streaming_session": false
           }
         }
       }
