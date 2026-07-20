@@ -22,6 +22,15 @@ unsafe extern "C" {
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
+    fn cuttledoc_voxtral_mlx_probe_audio_frontend(
+        model_directory: *const c_char,
+        audio: *const f32,
+        audio_len: usize,
+        transcription_delay_ms: i32,
+        device_kind: i32,
+        json_out: *mut *mut c_char,
+        error_out: *mut *mut c_char,
+    ) -> i32;
     fn cuttledoc_voxtral_mlx_session_create(
         model_directory: *const c_char,
         device_kind: i32,
@@ -79,11 +88,61 @@ fn run() -> Result<(), String> {
     let arguments = env::args().skip(1).collect::<Vec<_>>();
     match arguments.as_slice() {
         [command, model_directory] if command == "inspect" => inspect(model_directory),
+        [command, model_directory, pcm_path, delay_ms, device] if command == "frontend" => {
+            frontend(model_directory, pcm_path, delay_ms, device)
+        }
         [command, model_directory, pcm_path, device] if command == "contract" => {
             contract(model_directory, pcm_path, device)
         }
         _ => Err(usage()),
     }
+}
+
+fn frontend(
+    model_directory: &str,
+    pcm_path: &str,
+    delay_ms: &str,
+    device: &str,
+) -> Result<(), String> {
+    let model_directory = c_string(model_directory, "model path")?;
+    let audio = read_audio(pcm_path)?;
+    let delay_ms = delay_ms
+        .parse::<i32>()
+        .map_err(|error| format!("delay must be a positive integer: {error}"))?;
+    if delay_ms <= 0 {
+        return Err("delay must be positive".to_owned());
+    }
+    let device_kind = parse_device(device)?;
+    let mut json = ptr::null_mut();
+    let mut error = ptr::null_mut();
+    let status = unsafe {
+        cuttledoc_voxtral_mlx_probe_audio_frontend(
+            model_directory.as_ptr(),
+            audio.as_ptr(),
+            audio.len(),
+            delay_ms,
+            device_kind,
+            &mut json,
+            &mut error,
+        )
+    };
+    let response = Response {
+        status,
+        json: take_string(json),
+        error: take_string(error),
+    };
+    if response.status != OK {
+        return Err(response.error.unwrap_or_else(|| {
+            format!("MLX frontend returned status {status} without a message")
+        }));
+    }
+    println!(
+        "{}",
+        response
+            .json
+            .ok_or_else(|| "MLX frontend returned no JSON".to_owned())?
+    );
+    Ok(())
 }
 
 fn inspect(model_directory: &str) -> Result<(), String> {
@@ -461,5 +520,5 @@ fn take_string(value: *mut c_char) -> Option<String> {
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx frontend MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
 }

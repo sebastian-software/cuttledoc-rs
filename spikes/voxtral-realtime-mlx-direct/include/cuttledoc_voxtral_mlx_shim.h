@@ -29,6 +29,16 @@ int32_t cuttledoc_voxtral_mlx_inspect_model(const char *model_directory,
                                              char **error_out);
 
 /*
+ * Runs the actual Voxtral offline-streaming pad, log-mel, and causal Conv1d
+ * stem through official MLX and returns numerical fingerprints. This parity
+ * gate still stops before the 32-layer causal encoder and decoder.
+ */
+int32_t cuttledoc_voxtral_mlx_probe_audio_frontend(
+    const char *model_directory, const float *audio, size_t audio_len,
+    int32_t transcription_delay_ms, int32_t device_kind, char **json_out,
+    char **error_out);
+
+/*
  * Creates the repository-owned streaming task boundary. max_pending_samples
  * is the hard caller-visible queue capacity. max_ingest_samples_per_step is
  * the maximum snapshot a single step may remove and evaluate through MLX.
