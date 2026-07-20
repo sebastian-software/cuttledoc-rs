@@ -12,8 +12,8 @@ The first committed vertical slice proves the artifact boundary:
 2. `CuttledocQwen3MlxShim.cpp` opens `model.safetensors` with the official MLX
    C++ loader and validates the expected 1,005-tensor architecture, BF16 audio
    tower, and 197 affine 8-bit text modules.
-3. `rust/main.rs` calls that implementation through a two-function C ABI,
-   copies the JSON into Rust-owned memory, and releases the C allocation.
+3. `rust/main.rs` calls that implementation through a narrow C ABI, copies the
+   JSON into Rust-owned memory, and releases the C allocation.
 
 No MLX array, operator, device, or model object crosses the ABI. This slice does
 not yet claim transcript parity.
@@ -45,6 +45,12 @@ The sixth vertical slice continues greedy decoding to either Qwen end token,
 maps base-vocabulary symbols back through the byte-level decoder, and returns a
 UTF-8 transcript. The pinned fixture matches all 61 reference tokens and the
 complete reference text exactly.
+
+The seventh vertical slice runs the direct adapter across 15 professional
+audiobook fixtures in five languages. The eighth adds a reusable
+create/transcribe/cancel/destroy session boundary with Rust-owned results,
+stable status codes, cross-thread official MLX streams, and cooperative
+cancellation at natural synchronous evaluation boundaries.
 
 ## Pinned inputs
 
@@ -153,6 +159,32 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   gpu
 ```
 
+Run three complete handle lifecycles with two transcriptions each:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  lifecycle \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  en \
+  gpu \
+  3 \
+  2
+```
+
+Exercise concurrent-use rejection and cooperative cancellation:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  cancel \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  en \
+  gpu
+```
+
 Compare its JSON output with the pinned reference oracle:
 
 ```sh
@@ -181,6 +213,17 @@ node scripts/validate-qwen3-mlx-decoder.mjs \
   --actual /absolute/path/to/direct-decoder-result.json
 ```
 
+The lifecycle validator checks every repeated transcript exactly and requires
+the stable invalid-argument, busy, and cancelled status codes:
+
+```sh
+node scripts/validate-qwen3-mlx-lifecycle.mjs \
+  --oracle \
+  benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.decoder-en.json \
+  --lifecycle /absolute/path/to/lifecycle-result.json \
+  --cancellation /absolute/path/to/cancellation-result.json
+```
+
 The validator requires exact shapes, feature length, chunk boundaries, sample
 positions, encoder length, and attention windows. It allows `2e-6` sampled
 absolute error through `conv_out`, `1e-5` through the full encoder, and `2e-5`
@@ -189,5 +232,9 @@ direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Add task lifecycle, cancellation, and bounded streaming behavior.
-2. Add held-out audiobook and professional-podcast coverage.
+1. Integrate the proven task ABI behind the Rust engine abstraction without
+   exposing its native handle.
+2. Add held-out audiobook and professional-podcast coverage, German first.
+3. Measure the pruned release artifact and clean-host materialization cost.
+4. Treat incremental audio input, timestamps, and forced alignment as explicit
+   capabilities; the current Qwen adapter is final-result batch ASR.

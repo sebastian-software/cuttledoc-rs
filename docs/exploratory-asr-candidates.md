@@ -17,7 +17,7 @@ the official MLX core?
 | [Canary 1B Flash](https://huggingface.co/nvidia/canary-1b-flash/tree/2b6e4d2dacb11cc1b1724de31bb48fe68c26c12e) | CC-BY-4.0 | NeMo; NVIDIA-oriented | blocked: Safetensors exist, but no accepted Apple runtime and no Portuguese coverage |
 | [Canary-Qwen 2.5B](https://huggingface.co/nvidia/canary-qwen-2.5b/tree/b1469e1bba1cfe140205529c79c434ca47180960) | CC-BY-4.0 | NeMo 2.5+; Linux/NVIDIA | blocked: English-only, larger, and no accepted Apple runtime |
 | [Nemotron 3.5 ASR Streaming 0.6B](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/tree/f3d333391852ba876df169dcc9ba902d25b6ab0b) | OpenMDW-1.1 | NeMo 26.06 and Transformers 5.13+; official integration lists Linux/NVIDIA | blocked: custom-license disposition and accepted Apple runtime both missing |
-| [Qwen3-ASR 0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B/tree/5eb144179a02acc5e5ba31e748d22b0cf3e303b0) | Apache-2.0 | official Transformers/vLLM Python stack | measured end to end through the repository-owned adapter over official MLX; advance lifecycle and packaging gates |
+| [Qwen3-ASR 0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B/tree/5eb144179a02acc5e5ba31e748d22b0cf3e303b0) | Apache-2.0 | official Transformers/vLLM Python stack | measured end to end through the repository-owned adapter over official MLX; lifecycle/cancellation accepted, advance corpus and packaging gates |
 | [Qwen3-ASR 1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B/tree/7278e1e70fe206f11671096ffdd38061171dd6e5) | Apache-2.0 | official Transformers/vLLM Python stack | blocked until the shared 0.6B architecture has an accepted Apple boundary |
 | [Voxtral Mini 3B](https://huggingface.co/mistralai/Voxtral-Mini-3B-2507/tree/3060fe34b35ba5d44202ce9ff3c097642914f8f3) | Apache-2.0 | vLLM 0.10+ or Transformers; about 9.5 GB GPU memory | blocked: no accepted Apple runtime; owned port is materially larger than Qwen 0.6B |
 | [Voxtral Mini 4B Realtime](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add) | Apache-2.0 | vLLM realtime endpoint; at least 16 GB GPU memory | blocked: community MLX path is reference-only; owned 4B port follows a smaller adapter proof |
@@ -88,10 +88,13 @@ official word timestamps require the separate Qwen3-ForcedAligner 0.6B.
 Qwen3-ASR 0.6B is now the third candidate through a bounded repository-owned
 C++ adapter over official MLX. The direct path reproduces the pinned exact
 transcript and 12/15 broader audiobook texts, with deterministic EOS completion
-across 45 fresh-process runs. The remaining acceptance work is cancellation
-between decoder steps, bounded streaming updates, repeated in-session
-materialization measurements, and a documented release artifact budget—without
-importing `mlx-audio` or another community runtime.
+across 45 fresh-process runs. Its reusable session then reproduced the pinned
+transcript in six of six calls across three complete lifecycles and returned
+stable invalid-argument, busy, and cancelled statuses. The remaining product
+work is held-out target-domain coverage, common-engine integration, explicit
+batch-versus-streaming capabilities, clean materialization measurements, and a
+documented release artifact budget—without importing `mlx-audio` or another
+community runtime.
 
 Do not broaden the implementation to Qwen 1.7B or Voxtral until the smaller
 adapter demonstrates that the architecture and release cost are maintainable.

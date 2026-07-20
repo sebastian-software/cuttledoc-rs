@@ -217,8 +217,10 @@ The adapter worker absorbs each runtime's actual ownership:
 - Apple Speech remains on its Swift actor. Its blocking C entry points run on a
   blocking worker, while result callbacks are copied immediately into
   Rust-owned updates.
-- The current direct MLX adapter serializes entry because its default device is
-  process-global. Its synchronous graph is not preempted mid-evaluation.
+- The current direct Qwen/MLX adapter serializes entry and reuses explicit
+  thread-crossing official MLX streams. Its synchronous graph is not preempted
+  mid-evaluation; cancellation is observed after prefill or the next decoder
+  step.
 
 Future evidence may permit higher CoreML concurrency, but it widens an
 execution capability rather than changing the public engine type.

@@ -70,7 +70,7 @@ and [MLX architecture](https://ml-explore.github.io/mlx/).
 | STT | CoreML through an internal Rust adapter | `objc2-core-ml`: accepted, bounded; adapter: repository-owned | A real compiled model completed 100 create/predict/drop cycles; named inputs/outputs and bounded autorelease ownership are proven. | A complete ASR graph, scoped buffer API, typed errors, async cancellation, observed compute plan, quality, and distribution remain. Native objects are neither `Send` nor `Sync`. | Continue only as an owned-worker CoreML ASR candidate under the common benchmark. |
 | STT | whisper.cpp plus CoreML/Metal | Repository-owned boundary candidate | Mature compatibility path for the existing Whisper baseline; upstream owns specialized decode/runtime work. | Exact build/options, model pairing, artifact cost, concurrency, and maintenance surface remain unmeasured here. | Keep for the bakeoff/compatibility backend; do not add a generic Rust wrapper. |
 | STT | Apple SpeechAnalyzer / SpeechTranscriber | Advance as first-class bakeoff candidate through repository-owned Swift C ABI | Real PCM streaming, 27 volatile replacements plus one final, word timestamps/confidence, dynamic locales, asset install/reservation/release, and cancellation are proven. | Stable shipped bundle identity, opaque system model revision/size, clean cold start, energy, repeated variance, and broader quality remain. | Include in the common bakeoff with dynamic capabilities and system-managed provisioning. |
-| STT or text generation | Official MLX via owned C++ adapter | Advance as third first-class foundation; repository-owned boundary | Real Whisper Tiny frontend, encoder, decoder, tokenizer, and timestamp path on CPU and Metal; reference-matched text, repeated lifecycle, pinned conversion, and unchanged encoder source across two MLX releases. | Broader multilingual quality, long audio, streaming, clean cold start, energy, KV cache, cancellation plumbing, and artifact pruning remain unproven. | Continue under the common benchmark contract; use #12 selectively for stronger MLX-native ASR candidates. |
+| STT or text generation | Official MLX via owned C++ adapter | Advance as third first-class foundation; repository-owned boundary | Whisper Tiny proves CPU/Metal portability across two MLX releases; Qwen3-ASR proves a quantized 28-layer decoder, owned KV cache, multilingual audiobook quality, repeated Rust lifecycle, and cooperative cancellation. | Held-out podcasts, long audio, incremental input, aligned timestamps, clean cold start, energy, and pruned release packaging remain unproven. | Integrate the bounded task ABI behind the common engine, then continue the target-domain benchmark. |
 | STT or text generation | official `mlx-c` | Optional reference/control only | A secondary C-level check for a specific allocation, stream, or interface uncertainty. | No GitHub releases; every use must bind an audited commit to its MLX revision. C API use does not make a model integration smaller or safer by itself. | Use only when it answers a stated #6 question; never make it a product dependency by default. |
 | STT or text generation | `mlx-rs`, OminiX-MLX, `mlx-node` | Reference only | Prior art, model-format clues, test vectors, and benchmark hypotheses. | Their wrappers/runtime ownership cannot silently become Cargo, build, or distribution dependencies. | Do not import. |
 | Text generation | Remote HTTP provider | Repository-owned product adapter | Straightforward text-generation/enhancement path with no embedded native model runtime; preserves separate task ownership. | Credentials, network/error semantics, cost, latency, privacy, and API/model lifecycle must be evaluated independently from STT. | #7, after the common contracts are shaped. |
@@ -209,10 +209,20 @@ end-to-end text matches the pinned official Python reference and scores 5.26%
 WER on the first fixture; warm GPU task time was about 115.8 ms. The v0.32.0
 runtime package was an 18.7 MB shim plus 130.2 MB metallib. NPY weights must
 load on CPU before copying to GPU, and current default-device use is
-process-serialized. Broader quality, long audio, streaming, clean cold start,
-energy, cancellation plumbing, KV cache, and artifact pruning remain. Exact
-evidence is in
-[`docs/spikes/mlx-direct.md`](spikes/mlx-direct.md).
+process-serialized.
+
+The 2026-07-20 Qwen3-ASR follow-up then exercised all 18 audio and 28 quantized
+text layers, a repository-owned KV cache, exact greedy transcript decoding, and
+15 multilingual audiobook fixtures. Its session ABI uses explicit
+thread-crossing official MLX streams and returned stable invalid-argument,
+busy, and cancelled statuses while preserving six of six exact repeated
+transcripts. Cancellation is cooperative after a synchronous graph or decoder
+step, not mid-kernel preemption. Held-out podcasts, long audio, incremental
+input, aligned timestamps, clean cold start, energy, and release pruning
+remain. Exact evidence is in
+[`docs/spikes/mlx-direct.md`](spikes/mlx-direct.md)
+and
+[`docs/spikes/qwen3-mlx-direct.md`](spikes/qwen3-mlx-direct.md).
 
 ## Next selection rule
 

@@ -163,16 +163,21 @@ timestamp detail, and streaming behavior.
 
 ## Next measurement order
 
-1. Complete lifecycle, cancellation, streaming, and packaging gates for the
-   now end-to-end Qwen3-ASR 0.6B C++ adapter over official MLX under
-   [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17). The
-   direct adapter completed the 15-fixture audiobook pilot with 10.96% macro
-   WER and matched the reference text on 12/15 clips. Keep the community
-   runtime as reference-only. See the
+1. Treat the end-to-end Qwen3-ASR 0.6B spike under
+   [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) as
+   complete. The direct adapter completed the 15-fixture audiobook pilot with
+   10.96% macro WER, matched the reference text on 12/15 clips, and passed
+   repeated Rust-owned lifecycle, exact transcript, busy, error, and
+   cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
-2. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
+2. Acquire held-out German-first professional-podcast material and independent
+   audiobook works, then rerun Apple, Whisper, direct Qwen, and Parakeet on the
+   identical language/domain cells.
+3. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
    selected Apple-primary and Whisper-fallback architecture.
-3. Record the backend selection in an ADR, then begin the smallest Phase 1 /
+4. Record the backend selection in an ADR, then begin the smallest Phase 1 /
    Phase 2 vertical slice justified by this evidence.
-4. Treat alternating energy and clean-host cold starts as release-threshold
+5. Evaluate the frozen postprocessing prompt/model tuples on the held-out raw
+   outputs; never fold corrected text into the raw backend ranking.
+6. Treat alternating energy and clean-host cold starts as release-threshold
    follow-ups rather than reopening the runtime selection.

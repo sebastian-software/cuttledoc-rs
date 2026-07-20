@@ -1,13 +1,13 @@
 # Direct Qwen3-ASR adapter over official MLX
 
 **Status:** Issue
-[#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) is in
-progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
-complete. All 18 audio transformer layers also match the reference oracle;
-the tokenizer/prompt/audio-embedding boundary matches as well. The complete
-28-layer decoder and KV cache reproduce the first two greedy decisions and the
-full pinned transcript exactly. The direct path has also completed the
-15-fixture multilingual audiobook pilot.
+[#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) acceptance
+criteria are complete. The repository-owned path loads the pinned model,
+executes the frontend, 18-layer audio encoder, prompt, 28-layer decoder and KV
+cache directly on official MLX, reproduces the full pinned transcript, has
+completed the 15-fixture multilingual audiobook pilot, and now exposes a
+reusable Rust-owned task lifecycle with stable error and cancellation
+semantics.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -210,12 +210,57 @@ engine.
 The checked raw result is
 [`benchmarks/raw/phase0.qwen3-mlx-direct.audiobook-pilot-1/result.json`](../../benchmarks/raw/phase0.qwen3-mlx-direct.audiobook-pilot-1/result.json).
 
-## Remaining product gates
+## Milestone 8: Rust-owned lifecycle and cancellation
 
-1. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
-   memory measurements after materialization, and artifact pruning evidence.
-2. Extend the development set with held-out audiobook and professional-podcast
-   audio before setting language-specific selection thresholds.
+Commit `825ceaaed0ca6dfd97bc7a950cb1644df288a7ce` adds the narrow task
+boundary required by the spike:
+
+- `create` owns the model arrays and the official MLX stream context;
+- `transcribe` accepts caller-owned PCM and returns copied JSON;
+- `cancel` is thread-safe and cooperative;
+- `destroy` waits for an active call before releasing native state; and
+- stable status codes distinguish success (`0`), invalid arguments (`1`),
+  runtime errors (`2`), cancellation (`3`), and concurrent use (`4`).
+
+MLX 0.32 keeps normal default streams thread-local. The adapter therefore
+creates one official thread-crossing CPU stream and one Metal stream, reuses
+them process-wide, and protects them with the existing runtime mutex. One
+transcription may be active per handle. This avoids pretending that lazy MLX
+arrays created on one Rust worker can be evaluated on another without an
+explicit stream boundary.
+
+Three complete create/destroy cycles with two calls per handle produced six of
+six exact matches with the pinned 61-token transcript. The same run measured:
+
+| Observation | Result |
+| --- | ---: |
+| exact repeated transcripts | 6 / 6 |
+| mean create | 14.100 ms |
+| mean destroy | 26.238 ms |
+| mean first call per handle | 711.022 ms |
+| mean second call on the same handle | 583.393 ms |
+| invalid-argument status | 1 |
+| concurrent-use status | 4 |
+| cancelled status | 3 |
+| cancel signal to returned status | 238.522 ms |
+
+The timing is development evidence, not a production throughput benchmark.
+Cancellation does not preempt an in-flight Metal kernel or synchronous MLX
+graph. The recorded call observed its atomic signal immediately after decoder
+prefill; subsequent generation checks it after every decoder step.
+
+The checked raw evidence is
+[`benchmarks/raw/phase0.qwen3-mlx-direct.lifecycle-1/result.json`](../../benchmarks/raw/phase0.qwen3-mlx-direct.lifecycle-1/result.json).
+
+## Follow-up product gates
+
+1. Put the proven handle behind the common Rust engine abstraction and its
+   awaited shutdown contract.
+2. Extend the corpus with held-out audiobook and professional-podcast audio,
+   German first, before setting language-specific selection thresholds.
+3. Measure clean-host materialization, energy, and the pruned release artifact.
+4. Keep batch/final-only output explicit. Incremental audio input, word
+   timestamps, and forced alignment require separate capability work.
 
 The order matters: comparing encoder tensors first prevents frontend or
 attention-layout errors from being misdiagnosed as generation or tokenizer
