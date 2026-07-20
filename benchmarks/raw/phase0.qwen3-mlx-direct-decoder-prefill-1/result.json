@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.qwen3-mlx-direct-decoder-prefill-1",
+  "captured_at": "2026-07-20T15:07:11Z",
+  "source_revision": "3d949041585c2708ed999850dff90f7adae454c5",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/17",
+  "measurement_scope": "Repository-owned prompt prefill and two cached greedy decoder positions through all 28 quantized Qwen3 text layers on official MLX C++. This proves decoder and KV-cache parity boundaries, not full transcript parity or repeated performance.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "fixture": {
+    "id": "audiobook-en-2277-149874-0000",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+    "pcm_samples": 248080,
+    "sample_rate_hz": 16000
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.decoder-en.json",
+    "probe": {
+      "status": "ok",
+      "boundary": "official-mlx-cpp",
+      "stage": "qwen3-decoder-prefill",
+      "device": "gpu",
+      "pcm_samples": 248080,
+      "language": "en",
+      "prompt_length": 220,
+      "cache_offset_after_prefill": 220,
+      "first_token": 6217,
+      "second_token": 10810,
+      "elapsed_ms": 354.25729100000001,
+      "peak_memory_bytes": 1918491576,
+      "prefill": {
+        "hidden": {
+          "shape": [1, 1, 1024],
+          "source_dtype": "bfloat16",
+          "mean": 0.10072174668312073,
+          "stddev": 5.3551160443390486,
+          "minimum": -30.875,
+          "maximum": 52.5,
+          "l1": 3427.4055480957031,
+          "sample_indices": [0, 1, 2, 7, 31, 341, 682, 1023],
+          "sample_values": [-2.34375, 47.5, 0.125, 52.5, 1.2578125, 8.9375, -2.453125, -0.490234375]
+        },
+        "logits": {
+          "shape": [1, 151936],
+          "source_dtype": "bfloat16",
+          "mean": -6.986699818372224,
+          "stddev": 4.7375657809491161,
+          "minimum": -26.25,
+          "maximum": 26.25,
+          "l1": 1125473.3282299042,
+          "sample_indices": [0, 1, 2, 7, 31, 50645, 101290, 151935],
+          "sample_values": [3.40625, 10.1875, 5.1875, 9, 6.09375, -8.75, -2.921875, -8.5]
+        },
+        "layer_0_keys": {
+          "shape": [1, 8, 220, 128],
+          "source_dtype": "bfloat16",
+          "mean": 0.25011994335575516,
+          "stddev": 22.503070017010376,
+          "minimum": -458,
+          "maximum": 466,
+          "l1": 811086.72234472632,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [2.515625, 2.234375, 1.6640625, 0.15625, 0.1279296875, -0.5390625, 1.890625, 0.000621795654296875]
+        },
+        "layer_0_values": {
+          "shape": [1, 8, 220, 128],
+          "source_dtype": "bfloat16",
+          "mean": -0.00086927791972729292,
+          "stddev": 0.10102977498443683,
+          "minimum": -1.9296875,
+          "maximum": 1.6171875,
+          "l1": 17185.740523338318,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [0.095703125, 0.1220703125, -0.09326171875, 0.033203125, 0.20703125, -0.078125, 0.06396484375, 0.037353515625]
+        },
+        "layer_27_keys": {
+          "shape": [1, 8, 220, 128],
+          "source_dtype": "bfloat16",
+          "mean": 0.024216180311486823,
+          "stddev": 2.8486431434907993,
+          "minimum": -39.25,
+          "maximum": 37.75,
+          "l1": 304120.77133154869,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [-0.002685546875, -0.00531005859375, -0.000044345855712890625, -0.0194091796875, -0.0274658203125, -4.875, -1.0703125, 0.51171875]
+        },
+        "layer_27_values": {
+          "shape": [1, 8, 220, 128],
+          "source_dtype": "bfloat16",
+          "mean": -0.11039700372652574,
+          "stddev": 6.7301077311825663,
+          "minimum": -50.5,
+          "maximum": 44.5,
+          "l1": 1161489.0844116211,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [0.173828125, 0.0380859375, 0.13671875, -0.1796875, 0.12158203125, -0.8515625, -1.515625, -1.734375]
+        }
+      },
+      "second_step": {
+        "hidden": {
+          "shape": [1, 1, 1024],
+          "source_dtype": "bfloat16",
+          "mean": 0.16012114286422729,
+          "stddev": 4.7566276250828592,
+          "minimum": -12.8125,
+          "maximum": 61.75,
+          "l1": 3489.2079467773438,
+          "sample_indices": [0, 1, 2, 7, 31, 341, 682, 1023],
+          "sample_values": [3.28125, 61.75, 0.103515625, -7.09375, -3.78125, 4.625, 6.84375, -0.71875]
+        },
+        "logits": {
+          "shape": [1, 151936],
+          "source_dtype": "bfloat16",
+          "mean": -5.5172888260890227,
+          "stddev": 4.4717357549919106,
+          "minimum": -30.125,
+          "maximum": 26.75,
+          "l1": 924305.20294046402,
+          "sample_indices": [0, 1, 2, 7, 31, 50645, 101290, 151935],
+          "sample_values": [7.40625, 9.3125, 5.78125, 4.71875, 3.625, -4.96875, -0.79296875, -7.28125]
+        }
+      },
+      "first_top_tokens": [
+        {"token": 6217, "logit": 26.25},
+        {"token": 44, "logit": 25.75},
+        {"token": 54213, "logit": 25.75},
+        {"token": 8441, "logit": 20.625},
+        {"token": 35312, "logit": 19.875},
+        {"token": 45, "logit": 19.375},
+        {"token": 36411, "logit": 19.125},
+        {"token": 16413, "logit": 18.75},
+        {"token": 63495, "logit": 18.5},
+        {"token": 17897, "logit": 18.375}
+      ],
+      "second_top_tokens": [
+        {"token": 10810, "logit": 26.75},
+        {"token": 88, "logit": 25},
+        {"token": 285, "logit": 24},
+        {"token": 3834, "logit": 23.25},
+        {"token": 4873, "logit": 23.125},
+        {"token": 4412, "logit": 22.125},
+        {"token": 77, "logit": 21.25},
+        {"token": 3437, "logit": 21},
+        {"token": 25151, "logit": 20.875},
+        {"token": 7751, "logit": 20.5}
+      ]
+    },
+    "parity": {
+      "status": "ok",
+      "exact_first_token": true,
+      "exact_second_token": true,
+      "exact_cache_offset": true,
+      "exact_layer_0_cache_samples": true,
+      "first_top_10_overlap": 10,
+      "second_top_10_overlap": 9,
+      "maximum_sample_absolute_error": 0.5,
+      "maximum_aggregate_relative_error": 0.030532386957450617
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18919440,
+    "rust_probe_bytes": 555976
+  },
+  "next_gate": "Decode greedily to an end token and require exact generated-token and transcript parity on the pinned fixture."
+}
