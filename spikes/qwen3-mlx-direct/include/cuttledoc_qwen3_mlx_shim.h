@@ -39,6 +39,15 @@ int32_t cuttledoc_qwen3_mlx_probe_audio_encoder(
     const char *model_directory, const float *audio, size_t audio_len,
     int32_t device_kind, char **json_out, char **error_out);
 
+/*
+ * Builds the Qwen ASR prompt, dequantizes the prompt token embeddings, and
+ * replaces every audio-pad row with the corresponding encoder feature.
+ */
+int32_t cuttledoc_qwen3_mlx_probe_prompt_embeddings(
+    const char *model_directory, const float *audio, size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out);
+
 void cuttledoc_qwen3_mlx_free_string(char *value);
 
 #ifdef __cplusplus

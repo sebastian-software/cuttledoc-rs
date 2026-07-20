@@ -30,6 +30,12 @@ positions, the ragged block-attention mask, all 18 audio transformer layers,
 and the final 1,024-dimensional audio features. The pinned fixture produces
 202 audio tokens and the exact reference windows `[0, 104, 202]`.
 
+The fourth vertical slice owns the Qwen byte-level BPE vocabulary and merge
+table, builds the exact ASR chat prompt, dequantizes the affine 8-bit token
+embeddings with official MLX, and replaces every audio-pad embedding with the
+corresponding direct encoder feature. No Transformers tokenizer is required by
+the direct runtime.
+
 ## Pinned inputs
 
 - official MLX `v0.32.0`,
@@ -100,6 +106,18 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   gpu
 ```
 
+Run the complete tokenizer/prompt/audio-embedding merge:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  prompt \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  en \
+  gpu
+```
+
 Compare its JSON output with the pinned reference oracle:
 
 ```sh
@@ -107,6 +125,15 @@ node scripts/validate-qwen3-mlx-frontend.mjs \
   --oracle \
   benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.encoder.json \
   --actual /absolute/path/to/direct-frontend-result.json
+```
+
+The prompt boundary has a separate exact validator:
+
+```sh
+node scripts/validate-qwen3-mlx-prompt.mjs \
+  --oracle \
+  benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.prompt-en.json \
+  --actual /absolute/path/to/direct-prompt-result.json
 ```
 
 The validator requires exact shapes, feature length, chunk boundaries, sample
@@ -117,7 +144,6 @@ direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Implement tokenizer/prompt assembly, audio-token replacement, and the
-   quantized 28-layer Qwen3 decoder with KV caching.
+1. Implement the quantized 28-layer Qwen3 decoder with KV caching.
 2. Require exact transcript parity on one fixture before running the
    multilingual audiobook matrix.

@@ -4,7 +4,8 @@
 [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) is in
 progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
 complete. All 18 audio transformer layers also match the reference oracle;
-tokenizer and decoder parity remain open.
+the tokenizer/prompt/audio-embedding boundary matches as well. Decoder parity
+remains open.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -101,11 +102,31 @@ One development parity run took 506.203 ms on Metal and reported a
 materialization inside the probe and establish functional boundaries; they are
 not yet the repeated end-to-end performance measurement.
 
+## Milestone 4: prompt and mixed audio/text embeddings
+
+The repository-owned adapter now parses the pinned 151,643-entry Qwen
+vocabulary and 151,387 BPE merges, applies the GPT/Qwen byte mapping, and
+constructs the model's ASR chat prompt without Transformers. For the English
+fixture it produces exactly the reference's 220 token IDs:
+
+- nine prefix tokens through `<|audio_start|>`;
+- 202 `<|audio_pad|>` tokens at positions 9 through 210;
+- nine suffix tokens ending in `language en<asr_text>`.
+
+It then gathers the packed 8-bit embedding rows, dequantizes them with
+official `mx::dequantize`, casts the direct audio features to BF16, and
+replaces the 202 placeholder rows. The token sequence, audio positions, and
+all 24 sampled BF16 values across token embeddings, audio features, and merged
+inputs are exact matches. The largest aggregate relative difference is
+5.2991e-6 and comes from the already measured frontend FFT variance.
+
+The Metal development probe took 381.677 ms after adapter construction and
+reported a 1,766,258,540-byte MLX peak. This is still a parity probe with lazy
+materialization, not the final repeated decoder performance result.
+
 ## Remaining parity gates
 
-1. Implement the Qwen tokenizer and prompt layout, replace audio-pad token
-   embeddings, and run the 28-layer quantized decoder with a repository-owned
-   KV cache.
+1. Run the 28-layer quantized decoder with a repository-owned KV cache.
 2. Require exact transcript parity on one fixture before adding the direct
    adapter to the multilingual audiobook matrix.
 3. Add task lifecycle, cancellation checkpoints, bounded streaming updates,

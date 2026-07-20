@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -6,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <mutex>
@@ -42,6 +44,12 @@ constexpr std::size_t kAudioHeads = 14;
 constexpr std::size_t kAudioHeadDimension = kAudioState / kAudioHeads;
 constexpr std::size_t kAudioEncoderLayers = 18;
 constexpr float kAudioLayerNormEpsilon = 1e-5f;
+constexpr int32_t kImStartToken = 151644;
+constexpr int32_t kImEndToken = 151645;
+constexpr int32_t kAudioStartToken = 151669;
+constexpr int32_t kAudioEndToken = 151670;
+constexpr int32_t kAudioPadToken = 151676;
+constexpr int32_t kAsrTextToken = 151704;
 
 std::mutex runtime_mutex;
 
@@ -299,6 +307,14 @@ std::vector<float> make_slaney_mel_filters() {
 }
 
 std::string fingerprint_json(const mx::array &value, mx::Device device) {
+  std::string source_dtype = "other";
+  if (value.dtype() == mx::float32) {
+    source_dtype = "float32";
+  } else if (value.dtype() == mx::bfloat16) {
+    source_dtype = "bfloat16";
+  } else if (value.dtype() == mx::float16) {
+    source_dtype = "float16";
+  }
   auto materialized =
       mx::contiguous(mx::astype(value, mx::float32, device), false, device);
   mx::eval(materialized);
@@ -340,7 +356,7 @@ std::string fingerprint_json(const mx::array &value, mx::Device device) {
 
   std::ostringstream json;
   json << std::setprecision(17) << "{\"shape\":" << shape_string(materialized)
-       << ",\"source_dtype\":\"float32\",\"mean\":" << mean
+       << ",\"source_dtype\":\"" << source_dtype << "\",\"mean\":" << mean
        << ",\"stddev\":"
        << std::sqrt(squared_difference_sum / static_cast<double>(count))
        << ",\"minimum\":" << minimum << ",\"maximum\":" << maximum
@@ -362,11 +378,341 @@ std::string fingerprint_json(const mx::array &value, mx::Device device) {
   return json.str();
 }
 
+void append_utf8(std::string &output, std::uint32_t codepoint) {
+  if (codepoint <= 0x7f) {
+    output.push_back(static_cast<char>(codepoint));
+  } else if (codepoint <= 0x7ff) {
+    output.push_back(static_cast<char>(0xc0 | (codepoint >> 6)));
+    output.push_back(static_cast<char>(0x80 | (codepoint & 0x3f)));
+  } else if (codepoint <= 0xffff) {
+    output.push_back(static_cast<char>(0xe0 | (codepoint >> 12)));
+    output.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
+    output.push_back(static_cast<char>(0x80 | (codepoint & 0x3f)));
+  } else {
+    output.push_back(static_cast<char>(0xf0 | (codepoint >> 18)));
+    output.push_back(static_cast<char>(0x80 | ((codepoint >> 12) & 0x3f)));
+    output.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
+    output.push_back(static_cast<char>(0x80 | (codepoint & 0x3f)));
+  }
+}
+
+int hexadecimal_digit(char value) {
+  if (value >= '0' && value <= '9') {
+    return value - '0';
+  }
+  if (value >= 'a' && value <= 'f') {
+    return value - 'a' + 10;
+  }
+  if (value >= 'A' && value <= 'F') {
+    return value - 'A' + 10;
+  }
+  throw std::runtime_error("invalid hexadecimal digit in vocab.json");
+}
+
+std::uint32_t parse_json_code_unit(std::string_view input,
+                                   std::size_t &position) {
+  if (position + 4 > input.size()) {
+    throw std::runtime_error("truncated Unicode escape in vocab.json");
+  }
+  std::uint32_t value = 0;
+  for (std::size_t index = 0; index < 4; ++index) {
+    value = (value << 4) |
+            static_cast<std::uint32_t>(hexadecimal_digit(input[position++]));
+  }
+  return value;
+}
+
+std::string parse_json_string(std::string_view input, std::size_t &position) {
+  if (position >= input.size() || input[position++] != '"') {
+    throw std::runtime_error("expected JSON string in vocab.json");
+  }
+  std::string output;
+  while (position < input.size()) {
+    const auto current = input[position++];
+    if (current == '"') {
+      return output;
+    }
+    if (current != '\\') {
+      output.push_back(current);
+      continue;
+    }
+    if (position >= input.size()) {
+      throw std::runtime_error("truncated escape in vocab.json");
+    }
+    switch (const auto escaped = input[position++]) {
+    case '"':
+    case '\\':
+    case '/':
+      output.push_back(escaped);
+      break;
+    case 'b':
+      output.push_back('\b');
+      break;
+    case 'f':
+      output.push_back('\f');
+      break;
+    case 'n':
+      output.push_back('\n');
+      break;
+    case 'r':
+      output.push_back('\r');
+      break;
+    case 't':
+      output.push_back('\t');
+      break;
+    case 'u': {
+      auto codepoint = parse_json_code_unit(input, position);
+      if (codepoint >= 0xd800 && codepoint <= 0xdbff) {
+        if (position + 2 > input.size() || input[position] != '\\' ||
+            input[position + 1] != 'u') {
+          throw std::runtime_error("unpaired high surrogate in vocab.json");
+        }
+        position += 2;
+        const auto low = parse_json_code_unit(input, position);
+        if (low < 0xdc00 || low > 0xdfff) {
+          throw std::runtime_error("invalid low surrogate in vocab.json");
+        }
+        codepoint =
+            0x10000 + ((codepoint - 0xd800) << 10) + (low - 0xdc00);
+      }
+      append_utf8(output, codepoint);
+      break;
+    }
+    default:
+      throw std::runtime_error("unsupported escape in vocab.json");
+    }
+  }
+  throw std::runtime_error("unterminated JSON string in vocab.json");
+}
+
+void skip_json_whitespace(std::string_view input, std::size_t &position) {
+  while (position < input.size() &&
+         (input[position] == ' ' || input[position] == '\n' ||
+          input[position] == '\r' || input[position] == '\t')) {
+    ++position;
+  }
+}
+
+std::unordered_map<std::string, int32_t>
+load_vocabulary(const std::filesystem::path &path) {
+  std::ifstream stream(path, std::ios::binary);
+  if (!stream) {
+    throw std::runtime_error("missing tokenizer vocabulary: " + path.string());
+  }
+  const std::string input((std::istreambuf_iterator<char>(stream)),
+                          std::istreambuf_iterator<char>());
+  std::size_t position = 0;
+  skip_json_whitespace(input, position);
+  if (position >= input.size() || input[position++] != '{') {
+    throw std::runtime_error("vocab.json must contain an object");
+  }
+  std::unordered_map<std::string, int32_t> vocabulary;
+  while (true) {
+    skip_json_whitespace(input, position);
+    if (position < input.size() && input[position] == '}') {
+      ++position;
+      break;
+    }
+    const auto token = parse_json_string(input, position);
+    skip_json_whitespace(input, position);
+    if (position >= input.size() || input[position++] != ':') {
+      throw std::runtime_error("expected ':' in vocab.json");
+    }
+    skip_json_whitespace(input, position);
+    if (position >= input.size() || input[position] < '0' ||
+        input[position] > '9') {
+      throw std::runtime_error("expected integer token id in vocab.json");
+    }
+    int32_t token_id = 0;
+    while (position < input.size() && input[position] >= '0' &&
+           input[position] <= '9') {
+      token_id = token_id * 10 + (input[position++] - '0');
+    }
+    if (!vocabulary.emplace(token, token_id).second) {
+      throw std::runtime_error("duplicate token in vocab.json");
+    }
+    skip_json_whitespace(input, position);
+    if (position < input.size() && input[position] == ',') {
+      ++position;
+      continue;
+    }
+    if (position < input.size() && input[position] == '}') {
+      ++position;
+      break;
+    }
+    throw std::runtime_error("expected ',' or '}' in vocab.json");
+  }
+  if (vocabulary.size() != 151'643) {
+    throw std::runtime_error("unexpected base vocabulary size: " +
+                             std::to_string(vocabulary.size()));
+  }
+  return vocabulary;
+}
+
+std::string pair_key(const std::string &left, const std::string &right) {
+  std::string key;
+  key.reserve(left.size() + right.size() + 1);
+  key.append(left);
+  key.push_back('\0');
+  key.append(right);
+  return key;
+}
+
+class QwenTokenizer {
+public:
+  explicit QwenTokenizer(const std::filesystem::path &model_directory)
+      : vocabulary_(load_vocabulary(model_directory / "vocab.json")),
+        byte_symbols_(make_byte_symbols()) {
+    std::ifstream merges(model_directory / "merges.txt");
+    if (!merges) {
+      throw std::runtime_error("missing tokenizer merges: " +
+                               (model_directory / "merges.txt").string());
+    }
+    std::string line;
+    std::size_t rank = 0;
+    while (std::getline(merges, line)) {
+      if (line.empty() || line.starts_with("#version:")) {
+        continue;
+      }
+      const auto separator = line.find(' ');
+      if (separator == std::string::npos || separator == 0 ||
+          separator + 1 >= line.size()) {
+        throw std::runtime_error("invalid tokenizer merge line");
+      }
+      merge_ranks_[pair_key(line.substr(0, separator),
+                            line.substr(separator + 1))] = rank++;
+    }
+    if (rank != 151'387 || merge_ranks_.size() != 151'387) {
+      throw std::runtime_error(
+          "unexpected tokenizer merge layout: lines=" + std::to_string(rank) +
+          ", unique=" + std::to_string(merge_ranks_.size()));
+    }
+  }
+
+  std::vector<int32_t> build_asr_prompt(std::size_t audio_tokens,
+                                        std::string_view language) const {
+    if (language.empty()) {
+      throw std::runtime_error("language must be non-empty");
+    }
+    std::vector<int32_t> tokens;
+    tokens.reserve(audio_tokens + 18);
+    tokens.push_back(kImStartToken);
+    append_piece(tokens, "system");
+    append_piece(tokens, "\n");
+    tokens.push_back(kImEndToken);
+    append_piece(tokens, "\n");
+    tokens.push_back(kImStartToken);
+    append_piece(tokens, "user");
+    append_piece(tokens, "\n");
+    tokens.push_back(kAudioStartToken);
+    tokens.insert(tokens.end(), audio_tokens, kAudioPadToken);
+    tokens.push_back(kAudioEndToken);
+    tokens.push_back(kImEndToken);
+    append_piece(tokens, "\n");
+    tokens.push_back(kImStartToken);
+    append_piece(tokens, "assistant");
+    append_piece(tokens, "\n");
+    append_piece(tokens, "language");
+    append_piece(tokens, " " + std::string(language));
+    tokens.push_back(kAsrTextToken);
+    return tokens;
+  }
+
+private:
+  static std::array<std::string, 256> make_byte_symbols() {
+    std::vector<int> bytes;
+    for (int value = '!'; value <= '~'; ++value) {
+      bytes.push_back(value);
+    }
+    for (int value = 0xa1; value <= 0xac; ++value) {
+      bytes.push_back(value);
+    }
+    for (int value = 0xae; value <= 0xff; ++value) {
+      bytes.push_back(value);
+    }
+    std::vector<std::uint32_t> codepoints(bytes.begin(), bytes.end());
+    std::array<bool, 256> included{};
+    for (const auto value : bytes) {
+      included[static_cast<std::size_t>(value)] = true;
+    }
+    std::uint32_t extra = 0;
+    for (int value = 0; value < 256; ++value) {
+      if (!included[static_cast<std::size_t>(value)]) {
+        bytes.push_back(value);
+        codepoints.push_back(256 + extra++);
+      }
+    }
+    std::array<std::string, 256> symbols;
+    for (std::size_t index = 0; index < bytes.size(); ++index) {
+      append_utf8(symbols[static_cast<std::size_t>(bytes[index])],
+                  codepoints[index]);
+    }
+    return symbols;
+  }
+
+  void append_piece(std::vector<int32_t> &output,
+                    const std::string &piece) const {
+    const auto cached = cache_.find(piece);
+    if (cached != cache_.end()) {
+      output.insert(output.end(), cached->second.begin(), cached->second.end());
+      return;
+    }
+    std::vector<std::string> word;
+    word.reserve(piece.size());
+    for (const auto byte : piece) {
+      word.push_back(byte_symbols_[static_cast<unsigned char>(byte)]);
+    }
+    while (word.size() > 1) {
+      auto best_rank = std::numeric_limits<std::size_t>::max();
+      std::string best_pair;
+      for (std::size_t index = 0; index + 1 < word.size(); ++index) {
+        const auto key = pair_key(word[index], word[index + 1]);
+        const auto found = merge_ranks_.find(key);
+        if (found != merge_ranks_.end() && found->second < best_rank) {
+          best_rank = found->second;
+          best_pair = key;
+        }
+      }
+      if (best_pair.empty()) {
+        break;
+      }
+      std::vector<std::string> merged;
+      for (std::size_t index = 0; index < word.size();) {
+        if (index + 1 < word.size() &&
+            pair_key(word[index], word[index + 1]) == best_pair) {
+          merged.push_back(word[index] + word[index + 1]);
+          index += 2;
+        } else {
+          merged.push_back(word[index++]);
+        }
+      }
+      word = std::move(merged);
+    }
+    std::vector<int32_t> encoded;
+    encoded.reserve(word.size());
+    for (const auto &symbol : word) {
+      const auto found = vocabulary_.find(symbol);
+      if (found == vocabulary_.end()) {
+        throw std::runtime_error("BPE result is absent from vocab.json");
+      }
+      encoded.push_back(found->second);
+    }
+    cache_.emplace(piece, encoded);
+    output.insert(output.end(), encoded.begin(), encoded.end());
+  }
+
+  std::unordered_map<std::string, int32_t> vocabulary_;
+  std::unordered_map<std::string, std::size_t> merge_ranks_;
+  std::array<std::string, 256> byte_symbols_;
+  mutable std::unordered_map<std::string, std::vector<int32_t>> cache_;
+};
+
 class Qwen3AudioEncoder {
 public:
   Qwen3AudioEncoder(const std::filesystem::path &model_directory,
                     mx::Device device)
-      : device_(device), mel_filters_(make_slaney_mel_filters()) {
+      : model_directory_(model_directory), device_(device),
+        mel_filters_(make_slaney_mel_filters()) {
     auto [loaded_weights, metadata] = mx::load_safetensors(
         (model_directory / "model.safetensors").string(), mx::Device::cpu);
     static_cast<void>(metadata);
@@ -392,6 +738,9 @@ public:
              {"audio_tower.proj1.bias", {896}},
              {"audio_tower.proj2.weight", {1024, 896}},
              {"audio_tower.proj2.bias", {1024}},
+             {"model.embed_tokens.weight", {151936, 256}},
+             {"model.embed_tokens.scales", {151936, 16}},
+             {"model.embed_tokens.biases", {151936, 16}},
          }) {
       expect_shape(weights_, name, shape);
     }
@@ -610,6 +959,103 @@ public:
     return json.str();
   }
 
+  std::string probe_prompt(const float *audio, std::size_t audio_len,
+                           std::string_view language) const {
+    const auto started = std::chrono::steady_clock::now();
+    const auto audio_features = encode_audio_features(audio, audio_len);
+    const auto audio_token_count =
+        static_cast<std::size_t>(audio_features.shape(0));
+    const QwenTokenizer tokenizer(model_directory_);
+    const auto token_ids =
+        tokenizer.build_asr_prompt(audio_token_count, language);
+    const auto token_array =
+        mx::array(token_ids.begin(), {1, static_cast<int>(token_ids.size())});
+
+    const auto quantized_weights =
+        mx::take(weight("model.embed_tokens.weight"), token_array, 0, device_);
+    const auto scales =
+        mx::take(weight("model.embed_tokens.scales"), token_array, 0, device_);
+    const auto biases =
+        mx::take(weight("model.embed_tokens.biases"), token_array, 0, device_);
+    const auto token_embeddings = mx::dequantize(
+        quantized_weights, scales, biases, 64, 8, "affine", std::nullopt,
+        std::nullopt, device_);
+    const auto audio_features_bfloat16 =
+        mx::astype(audio_features, token_embeddings.dtype(), device_);
+
+    const auto flat_embeddings =
+        mx::squeeze(token_embeddings, 0, device_);
+    std::vector<mx::array> merged_rows;
+    merged_rows.reserve(token_ids.size());
+    std::vector<std::size_t> audio_token_indices;
+    std::size_t audio_index = 0;
+    for (std::size_t token_index = 0; token_index < token_ids.size();
+         ++token_index) {
+      if (token_ids[token_index] == kAudioPadToken) {
+        if (audio_index >= audio_token_count) {
+          throw std::runtime_error(
+              "prompt contains more audio tokens than encoder features");
+        }
+        merged_rows.push_back(mx::take(audio_features_bfloat16,
+                                       static_cast<int>(audio_index++), 0,
+                                       device_));
+        audio_token_indices.push_back(token_index);
+      } else {
+        merged_rows.push_back(mx::take(flat_embeddings,
+                                       static_cast<int>(token_index), 0,
+                                       device_));
+      }
+    }
+    if (audio_index != audio_token_count) {
+      throw std::runtime_error(
+          "prompt contains fewer audio tokens than encoder features");
+    }
+    const auto inputs_embeds =
+        mx::expand_dims(mx::stack(merged_rows, 0, device_), 0, device_);
+
+    const auto token_embeddings_fingerprint =
+        fingerprint_json(token_embeddings, device_);
+    const auto audio_features_fingerprint =
+        fingerprint_json(audio_features_bfloat16, device_);
+    const auto inputs_embeds_fingerprint =
+        fingerprint_json(inputs_embeds, device_);
+    const auto elapsed =
+        std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - started)
+            .count();
+
+    std::ostringstream json;
+    json << std::setprecision(17)
+         << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+         << "\"stage\":\"qwen3-prompt-embeddings\","
+         << "\"device\":\""
+         << (device_ == mx::Device::gpu ? "gpu" : "cpu") << "\","
+         << "\"pcm_samples\":" << audio_len << ",\"language\":\""
+         << json_escape(language) << "\",\"num_audio_tokens\":"
+         << audio_token_count << ",\"prompt_length\":" << token_ids.size()
+         << ",\"token_ids\":[";
+    for (std::size_t index = 0; index < token_ids.size(); ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << token_ids[index];
+    }
+    json << "],\"audio_token_indices\":[";
+    for (std::size_t index = 0; index < audio_token_indices.size(); ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << audio_token_indices[index];
+    }
+    json << "],\"elapsed_ms\":" << elapsed << ",\"peak_memory_bytes\":"
+         << mx::get_peak_memory()
+         << ",\"fingerprints\":{\"token_embeddings\":"
+         << token_embeddings_fingerprint
+         << ",\"audio_features_bfloat16\":" << audio_features_fingerprint
+         << ",\"inputs_embeds\":" << inputs_embeds_fingerprint << "}}";
+    return json.str();
+  }
+
 private:
   const mx::array &weight(const std::string &name) const {
     const auto found = weights_.find(name);
@@ -722,6 +1168,66 @@ private:
                   prefix + "fc2");
   }
 
+  mx::array encode_audio_features(const float *audio,
+                                  std::size_t audio_len) const {
+    const auto features = log_mel(audio, audio_len);
+    std::vector<std::size_t> chunk_lengths;
+    const auto chunks = make_chunks(features, chunk_lengths);
+    auto hidden = mx::expand_dims(chunks, 3, device_);
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d1.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d1.bias"));
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d2.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d2.bias"));
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d3.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d3.bias"));
+    const auto batch_size = hidden.shape(0);
+    const auto frequency = hidden.shape(1);
+    const auto frames = hidden.shape(2);
+    const auto channels = hidden.shape(3);
+    hidden =
+        mx::reshape(mx::transpose(hidden, {0, 2, 3, 1}, device_),
+                    {batch_size, frames, channels * frequency}, device_);
+    hidden =
+        mx::matmul(hidden,
+                   mx::transpose(weight("audio_tower.conv_out.weight"), device_),
+                   device_);
+    hidden = hidden + mx::expand_dims(positional_embedding(frames), 0, device_);
+
+    std::vector<mx::array> valid_chunks;
+    std::size_t sequence_length = 0;
+    for (std::size_t index = 0; index < chunk_lengths.size(); ++index) {
+      const auto valid_length = (chunk_lengths[index] + 7) / 8;
+      sequence_length += valid_length;
+      auto chunk = mx::slice(
+          hidden, {static_cast<int>(index), 0, 0},
+          {static_cast<int>(index + 1), static_cast<int>(valid_length),
+           static_cast<int>(kAudioState)},
+          {1, 1, 1}, device_);
+      valid_chunks.push_back(mx::squeeze(chunk, 0, device_));
+    }
+    hidden = mx::concatenate(std::move(valid_chunks), 0, device_);
+
+    const auto attention_window = static_cast<std::size_t>(frames) * 8;
+    std::vector<std::size_t> attention_windows{0};
+    for (std::size_t position = 0; position < sequence_length;) {
+      position = std::min(position + attention_window, sequence_length);
+      attention_windows.push_back(position);
+    }
+    const auto attention_mask =
+        make_attention_mask(sequence_length, attention_windows);
+    hidden = mx::expand_dims(hidden, 0, device_);
+    for (std::size_t layer = 0; layer < kAudioEncoderLayers; ++layer) {
+      hidden = encoder_layer(hidden, layer, attention_mask);
+    }
+    hidden = mx::squeeze(hidden, 0, device_);
+    hidden = layer_norm(hidden, "audio_tower.ln_post");
+    hidden = gelu(linear(hidden, "audio_tower.proj1"));
+    return linear(hidden, "audio_tower.proj2");
+  }
+
   mx::array gelu(const mx::array &input) const {
     const auto one = mx::array(1.0f, input.dtype());
     const auto inverse_sqrt_two =
@@ -815,6 +1321,7 @@ private:
     return mx::stack(chunks, 0, device_);
   }
 
+  std::filesystem::path model_directory_;
   mx::Device device_;
   std::unordered_map<std::string, mx::array> weights_;
   std::vector<float> mel_filters_;
@@ -930,6 +1437,47 @@ extern "C" int32_t cuttledoc_qwen3_mlx_probe_audio_encoder(
     return fail(error.what(), error_out);
   } catch (...) {
     return fail("MLX raised a non-standard exception in the audio encoder",
+                error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_qwen3_mlx_probe_prompt_embeddings(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || language == nullptr ||
+      json_out == nullptr) {
+    return fail(
+        "model_directory, audio, language, and json_out must be non-null",
+        error_out);
+  }
+
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      return fail("requested MLX device is not available", error_out);
+    }
+    mx::set_default_device(device);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    const Qwen3AudioEncoder model(model_directory, device);
+    const auto json = model.probe_prompt(audio, audio_len, language);
+    *json_out = strdup(json.c_str());
+    if (*json_out == nullptr) {
+      return fail("could not allocate JSON result", error_out);
+    }
+    return 0;
+  } catch (const std::exception &error) {
+    return fail(error.what(), error_out);
+  } catch (...) {
+    return fail("MLX raised a non-standard exception in prompt embedding",
                 error_out);
   }
 }

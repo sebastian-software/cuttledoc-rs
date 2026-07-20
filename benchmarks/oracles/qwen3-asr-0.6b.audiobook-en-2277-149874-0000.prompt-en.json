@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "oracle": "mlx-audio Qwen3-ASR prompt reference",
+  "purpose": "development parity oracle for issue #17; not a quality result",
+  "runtime": {
+    "mlx": "0.32.0",
+    "mlx_audio": "0.4.5",
+    "mlx_lm": "0.31.3",
+    "transformers": "5.12.1"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "fixture": {
+    "id": "audiobook-en-2277-149874-0000",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+    "pcm_samples": 248080,
+    "sample_rate_hz": 16000
+  },
+  "language": "en",
+  "num_audio_tokens": 202,
+  "prompt_length": 220,
+  "token_ids_sha256": "2a2d6c5bb68c6165a38dcab40fc67bc46035db84ef9f246c344cf8ba85055149",
+  "token_layout": {
+    "prefix": [151644, 8948, 198, 151645, 198, 151644, 872, 198, 151669],
+    "audio_token_id": 151676,
+    "audio_token_count": 202,
+    "suffix": [151670, 151645, 198, 151644, 77091, 198, 11528, 662, 151704]
+  },
+  "audio_token_range": {
+    "start": 9,
+    "end_exclusive": 211
+  },
+  "fingerprints": {
+    "token_embeddings": {
+      "shape": [1, 220, 1024],
+      "source_dtype": "mlx.core.bfloat16",
+      "float32_sha256": "326cff15ff130be8a3e708e65be75a47fa70c80877044ea130f58678995e52e6",
+      "mean": -0.00019346494439312004,
+      "stddev": 0.011406214751634409,
+      "minimum": -0.09716796875,
+      "maximum": 0.0966796875,
+      "l1": 1702.0736994743347,
+      "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+      "sample_values": [-0.0078125, -0.09716796875, 0.016357421875, 0.0693359375, -0.0025787353515625, 0.01153564453125, -0.0120849609375, -0.006011962890625]
+    },
+    "audio_features_bfloat16": {
+      "shape": [202, 1024],
+      "source_dtype": "mlx.core.bfloat16",
+      "float32_sha256": "5b9dc34888750a4d30b3aac41b7f1b327cbc25c906911774d0484573a51c2e30",
+      "mean": 0.0010513214624237176,
+      "stddev": 0.018574408385800916,
+      "minimum": -0.1162109375,
+      "maximum": 0.1396484375,
+      "l1": 2989.7684288155288,
+      "sample_indices": [0, 1, 2, 7, 31, 68949, 137898, 206847],
+      "sample_values": [-0.0206298828125, -0.01556396484375, -0.040283203125, 0.007598876953125, -0.0101318359375, -0.01348876953125, -0.016357421875, -0.00848388671875]
+    },
+    "inputs_embeds": {
+      "shape": [1, 220, 1024],
+      "source_dtype": "mlx.core.bfloat16",
+      "float32_sha256": "b22d0b0b2d6b3d64515732e862121d9bcf178c3bd20cac644edc159d150242e9",
+      "mean": 0.0009578632914037206,
+      "stddev": 0.019055607326401037,
+      "minimum": -0.1162109375,
+      "maximum": 0.1396484375,
+      "l1": 3323.5044007431716,
+      "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+      "sample_values": [-0.0078125, -0.09716796875, 0.016357421875, 0.0693359375, -0.0025787353515625, 0.0005340576171875, -0.003875732421875, -0.006011962890625]
+    }
+  }
+}
