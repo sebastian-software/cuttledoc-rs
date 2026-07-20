@@ -131,6 +131,55 @@ function validateManifest(manifest) {
   return { errors, ids };
 }
 
+function validateSourceCandidates(registry) {
+  const errors = [];
+  if (registry.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(registry.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (!Array.isArray(registry.target_languages) ||
+      registry.target_languages.length === 0 ||
+      new Set(registry.target_languages).size !== registry.target_languages.length) {
+    errors.push('target_languages must be a non-empty unique array');
+  }
+  if (!Array.isArray(registry.sources) || registry.sources.length === 0) {
+    errors.push('sources must be a non-empty array');
+  }
+  const ids = new Set();
+  const statuses = new Set([
+    'active-diagnostic',
+    'selected-for-acquisition',
+    'selected-pending-rights-review',
+    'selected-as-domain-bridge',
+    'acquisition-required',
+  ]);
+  for (const source of registry.sources ?? []) {
+    if (!(source.id?.length > 0)) errors.push('source id must be a non-empty string');
+    if (ids.has(source.id)) errors.push(`duplicate source id: ${source.id}`);
+    ids.add(source.id);
+    if (!statuses.has(source.status)) errors.push(`${source.id}: invalid status`);
+    for (const field of ['domains', 'languages']) {
+      if (!Array.isArray(source[field]) ||
+          source[field].length === 0 ||
+          new Set(source[field]).size !== source[field].length) {
+        errors.push(`${source.id}: ${field} must be a non-empty unique array`);
+      }
+    }
+    if (source.source_revision !== null &&
+        !(source.source_revision?.length > 0)) {
+      errors.push(`${source.id}: source_revision must be a string or null`);
+    }
+    for (const field of ['license', 'redistribution', 'decision']) {
+      if (!(source[field]?.length > 0)) {
+        errors.push(`${source.id}: ${field} must be a non-empty string`);
+      }
+    }
+  }
+  return errors;
+}
+
 function arrayEquals(left, right) {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
@@ -375,10 +424,15 @@ async function readJson(path) {
 }
 
 const manifestPath = join(repoRoot, 'benchmarks/fixtures/manifest.json');
+const sourceCandidatesPath = join(
+  repoRoot,
+  'benchmarks/fixtures/source-candidates.json',
+);
 const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/run.schema.json'),
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
+  join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);
@@ -389,6 +443,7 @@ for (const path of schemaPaths) {
 
 const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
+const sourceCandidates = await readJson(sourceCandidatesPath);
 const requestedRun = process.argv.indexOf('--run');
 const runPaths = requestedRun >= 0
   ? [resolve(process.cwd(), process.argv[requestedRun + 1])]
@@ -398,6 +453,11 @@ const runPaths = requestedRun >= 0
       .map((name) => join(repoRoot, 'benchmarks/runs', name));
 
 const failures = manifestValidation.errors.map((error) => `${manifestPath}: ${error}`);
+failures.push(
+  ...validateSourceCandidates(sourceCandidates).map(
+    (error) => `${sourceCandidatesPath}: ${error}`,
+  ),
+);
 const runs = [];
 for (const path of runPaths) {
   const run = await readJson(path);
@@ -452,6 +512,13 @@ if (process.argv.includes('--self-test')) {
   if (validateAggregate(invalidAggregate, manifest, '<aggregate-self-test>').length === 0) {
     failures.push('validator self-test failed to reject an aggregate with a divergent summary');
   }
+  const invalidSourceCandidates = structuredClone(sourceCandidates);
+  invalidSourceCandidates.sources.push(
+    structuredClone(invalidSourceCandidates.sources[0]),
+  );
+  if (validateSourceCandidates(invalidSourceCandidates).length === 0) {
+    failures.push('validator self-test failed to reject duplicate source ids');
+  }
 }
 
 if (failures.length > 0) {
@@ -461,5 +528,6 @@ if (failures.length > 0) {
 
 console.log(
   `benchmark data: ${manifest.fixtures.length} fixture(s), ${runs.length} run record(s), ` +
-  `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), schema ${schemaVersion}`,
+  `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
+  `${sourceCandidates.sources.length} source candidate(s), schema ${schemaVersion}`,
 );

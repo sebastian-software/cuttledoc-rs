@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_date": "2026-07-20",
+  "target_languages": [
+    "de-DE",
+    "en-US",
+    "es-419",
+    "fr-FR",
+    "pt-BR"
+  ],
+  "sources": [
+    {
+      "id": "fleurs",
+      "status": "active-diagnostic",
+      "domains": [
+        "short-read"
+      ],
+      "languages": [
+        "de-DE",
+        "en-US",
+        "es-419",
+        "fr-FR",
+        "pt-BR"
+      ],
+      "source_revision": "google/fleurs@07bf13d2c724f7ec17d768316d9b85214b3b64f3",
+      "current_fixture_revision": "cuttledoc@50b2d2d617fabce18a23f624fab4745ea1a792c4",
+      "license": "CC-BY-4.0",
+      "redistribution": "allowed-with-attribution",
+      "decision": "Retain as the fast multilingual integration gate and expand to ten clips per language; do not use it as a podcast or audiobook proxy."
+    },
+    {
+      "id": "multilingual-librispeech",
+      "status": "selected-for-acquisition",
+      "domains": [
+        "audiobook"
+      ],
+      "languages": [
+        "de-DE",
+        "en-US",
+        "es",
+        "fr-FR",
+        "pt"
+      ],
+      "source_revision": "OpenSLR SLR94 snapshot accessed 2026-07-20",
+      "dataset_version": "MLS release published through OpenSLR SLR94",
+      "license": "CC-BY-4.0",
+      "redistribution": "allowed-with-attribution",
+      "decision": "Select speaker- and book-stratified dev/test excerpts in all five language families; audit the Spanish and Portuguese regional varieties rather than treating them as es-419 or pt-BR, and pin archive plus normalized fixture hashes during acquisition."
+    },
+    {
+      "id": "gigaspeech",
+      "status": "selected-pending-rights-review",
+      "domains": [
+        "podcast",
+        "audiobook"
+      ],
+      "languages": [
+        "en-US"
+      ],
+      "source_revision": "SpeechColab/GigaSpeech@44289e4bb6d65291456cf94de495ea83668d1df1",
+      "dataset_version": "1.0.0",
+      "license": "Apache-2.0 repository; underlying audio remains source-specific",
+      "redistribution": "local-required-until-source-review",
+      "decision": "Use professionally annotated evaluation excerpts for English after per-source rights review; never infer audio redistribution rights from the repository license."
+    },
+    {
+      "id": "voxpopuli",
+      "status": "selected-as-domain-bridge",
+      "domains": [
+        "professional-speech"
+      ],
+      "languages": [
+        "de-DE",
+        "en-US",
+        "es-ES",
+        "fr-FR"
+      ],
+      "source_revision": "facebookresearch/voxpopuli@f7a3bb98d664e1d031763ec4f7639c4a530c64e9",
+      "dataset_version": "archived upstream snapshot",
+      "license": "CC0 data; CC-BY-NC-4.0 code and pretrained models",
+      "redistribution": "data-allowed-subject-to-European-Parliament-legal-notice",
+      "decision": "Use only as a professional-speech robustness bridge. It is not a podcast substitute, and the upstream corpus has no transcribed Portuguese partition."
+    },
+    {
+      "id": "cuttledoc-professional-podcast-gold",
+      "status": "acquisition-required",
+      "domains": [
+        "podcast"
+      ],
+      "languages": [
+        "de-DE",
+        "en-US",
+        "es-419",
+        "fr-FR",
+        "pt-BR"
+      ],
+      "source_revision": null,
+      "license": "per-source permission, permissive Creative Commons, public domain, or user-provided",
+      "redistribution": "denied-by-default",
+      "decision": "Build a German-first, human-verified held-out set from at least three independent shows per language; keep audio local unless redistribution is explicitly licensed."
+    }
+  ]
+}

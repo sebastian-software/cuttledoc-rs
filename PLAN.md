@@ -287,11 +287,14 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Open and execute the bounded Qwen3-ASR 0.6B adapter follow-up directly over
+1. Establish the language-by-domain quality protocol: preserve the historical
+   correction evidence, add severity-aware alignments, expand the FLEURS
+   variance set, and acquire audiobook plus professional-podcast gold data.
+2. Open and execute the bounded Qwen3-ASR 0.6B adapter follow-up directly over
    official MLX; the community runtime remains an external oracle only.
-2. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
+3. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
-3. Finish #9 with Node 22 plus packed-artifact CI gates.
+4. Finish #9 with Node 22 plus packed-artifact CI gates.
 4. Record the selected first ASR backend and fallback in an ADR, then scaffold
    only the Phase 1 crates justified by that decision.
 5. Complete #7 independently with an evidence-backed embedded-LLM

@@ -82,6 +82,14 @@ Those ten quality fixtures are pinned in the manifest with source, reference,
 and normalized-PCM digests. They expose language-path failures quickly; they
 are not statistically sufficient for a final model-quality ranking.
 
+The target benchmark design is language- and domain-aware. See
+[`docs/asr-benchmark-design.md`](../docs/asr-benchmark-design.md) and the
+machine-readable
+[`source-candidates.json`](fixtures/source-candidates.json). FLEURS remains a
+short-read integration gate; audiobook and professional-podcast cells are
+reported separately, with independent-source grouping and human-verified gold
+transcripts.
+
 Run one candidate across the bounded set and write its immutable aggregate
 outside the repository before review:
 
