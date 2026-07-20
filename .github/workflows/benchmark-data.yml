@@ -5,6 +5,8 @@ on:
     paths:
       - "benchmarks/**"
       - "scripts/fetch-audiobook-pilot.mjs"
+      - "scripts/import-asr-aggregate.mjs"
+      - "scripts/analyze-asr-errors.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - ".github/workflows/benchmark-data.yml"
   push:
@@ -12,6 +14,8 @@ on:
     paths:
       - "benchmarks/**"
       - "scripts/fetch-audiobook-pilot.mjs"
+      - "scripts/import-asr-aggregate.mjs"
+      - "scripts/analyze-asr-errors.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - ".github/workflows/benchmark-data.yml"
 
@@ -29,3 +33,14 @@ jobs:
         run: >-
           node scripts/analyze-asr-errors.mjs
           --check benchmarks/analysis/phase0.multilingual-fleurs-10-1.errors.json
+      - name: Verify deterministic audiobook ASR error analysis
+        run: >-
+          node scripts/analyze-asr-errors.mjs
+          --input benchmarks/raw/phase0.whisper.audiobook-pilot-1/result.json
+          --input benchmarks/raw/phase0.apple-speech.audiobook-pilot-1/result.json
+          --input benchmarks/raw/phase0.parakeet.audiobook-pilot-1/result.json
+          --input benchmarks/raw/phase0.qwen3-asr-0.6b-mlx-reference.audiobook-pilot-1/result.json
+          --fixture-manifest benchmarks/fixtures/audiobook-pilot.json
+          --analysis-id phase0-audiobook-pilot-error-analysis-1
+          --caveat "Three already-inspected development clips per language; dataset transcripts are unverified and error classes are not population estimates."
+          --check benchmarks/analysis/phase0.audiobook-pilot-1.errors.json

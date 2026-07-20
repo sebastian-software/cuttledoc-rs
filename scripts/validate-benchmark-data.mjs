@@ -656,6 +656,12 @@ function validateAggregate(aggregate, manifest, path) {
 
 async function validateMatrix(matrix, manifest, path) {
   const errors = [];
+  const qualityFixtures = manifest.fixtures.filter(
+    (fixture) => fixture.purpose === 'quality',
+  );
+  const eligibleFixtures = qualityFixtures.length > 0
+    ? qualityFixtures
+    : manifest.fixtures;
   if (matrix.schema_version !== schemaVersion) errors.push(`schema_version must be ${schemaVersion}`);
   if (!(matrix.matrix_id?.length > 0)) errors.push('matrix_id must be a non-empty string');
   if (!/^[0-9a-f]{40}$/.test(matrix.source_revision ?? '')) errors.push('source_revision must be a 40-character Git SHA');
@@ -669,8 +675,10 @@ async function validateMatrix(matrix, manifest, path) {
     errors.push('fixture_ids must be unique');
   }
   for (const fixtureId of matrix.fixture_ids ?? []) {
-    const fixture = manifest.fixtures.find((item) => item.id === fixtureId);
-    if (!fixture || fixture.purpose !== 'quality') errors.push(`${fixtureId}: matrix fixture must be a quality fixture`);
+    const fixture = eligibleFixtures.find((item) => item.id === fixtureId);
+    if (!fixture) {
+      errors.push(`${fixtureId}: matrix fixture is not eligible`);
+    }
   }
   if (!arrayEquals(matrix.procedure?.fixture_order ?? [], matrix.fixture_ids ?? [])) {
     errors.push('procedure.fixture_order must equal fixture_ids');
@@ -854,7 +862,17 @@ const matrices = [];
 for (const path of matrixPaths) {
   const matrix = await readJson(path);
   matrices.push(matrix);
-  failures.push(...await validateMatrix(matrix, manifest, path));
+  const matrixManifest = aggregateManifests.get(
+    matrix.fixture_manifest_revision,
+  );
+  if (!matrixManifest) {
+    failures.push(
+      `${path}: unknown fixture manifest revision ` +
+      `${matrix.fixture_manifest_revision}`,
+    );
+    continue;
+  }
+  failures.push(...await validateMatrix(matrix, matrixManifest, path));
 }
 
 const rawDirectory = join(repoRoot, 'benchmarks/raw');

@@ -64,7 +64,43 @@ Splits are grouped by complete source work or episode:
 
 Clips from one episode or book cannot cross these groups. The ten current
 FLEURS fixtures have already influenced the design and are therefore
-development data only.
+development data only. The 15 audiobook-pilot clips and their ASR outputs have
+also now been inspected and are development-only.
+
+## Error-conditioned prompts
+
+The audiobook pilot provides a first concrete error profile, not acceptance
+gold. Across its 15 clips, the boundary-preserving review alignment finds 23
+Whisper edits, 43 Apple edits, 54 Parakeet edits, and 60 Qwen/MLX-reference
+edits. The differences are highly language-specific: Whisper has two Spanish
+review edits but nine Portuguese edits; Apple has five German edits but 15
+Spanish edits; Qwen has four French edits but 24 Portuguese edits.
+
+Prompt tuning therefore starts from explicit, backend/language/domain error
+classes rather than “make this transcript better.” For each development
+alignment:
+
+1. human review separates reference conventions, benign orthography, and real
+   content errors;
+2. recurring correctable classes become bounded prompt instructions;
+3. names, numbers, dates, units, terminology, and negations become protected
+   spans unless product evidence marks the exact span suspect;
+4. every proposed lexical change declares its matched error class and evidence;
+5. unmatched edits are rejected, even when they sound stylistically better;
+6. prompt gains are reported as edit precision and regression rate per
+   language/backend, not only as average WER reduction.
+
+Examples already visible in the pilot include hyphen boundaries, contractions,
+historical accents and inflections, number words versus digits, and proper-name
+spellings alongside genuine substitutions and omissions. A free proofreading
+prompt cannot safely distinguish those without audio or external context. The
+surface-only prompt handles punctuation and capitalization; the conservative
+profile may address only reviewed recurring classes; targeted-spans mode is
+reserved for product-available confidence, alternatives, or glossary evidence.
+
+The dataset transcripts remain unverified, so their alignments may shape the
+prompt taxonomy but cannot label an edit beneficial or harmful. That requires
+human-verified verbatim and evaluation references first.
 
 ## Measurements
 

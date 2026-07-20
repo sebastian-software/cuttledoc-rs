@@ -75,6 +75,48 @@ Dataset transcripts are useful lexical references but remain
 `dataset-transcript-unverified`: they must be checked against the exact audio
 before semantic error severity or postprocessing acceptance is reported.
 
+### Development-pilot ASR results
+
+All four candidates ran sequentially on identical digest-checked PCM with one
+discarded warm-up and two measured repetitions. The immutable matrix is
+[`phase0.audiobook-pilot-1.json`](../benchmarks/matrices/phase0.audiobook-pilot-1.json);
+the deterministic word alignments are in
+[`phase0.audiobook-pilot-1.errors.json`](../benchmarks/analysis/phase0.audiobook-pilot-1.errors.json).
+
+| Candidate | Recorded macro WER | Boundary-review WER | Mean RTF |
+| --- | ---: | ---: | ---: |
+| Whisper large-v3-turbo/CoreML | 4.49% | 3.77% | 0.0569 |
+| Apple SpeechTranscriber | 7.18% | 7.08% | 0.0174 |
+| Parakeet TDT 0.6B/CoreML | 8.90% | 8.56% | 0.0211 |
+| Qwen3-ASR 0.6B/MLX reference | 11.14% | 10.53% | 0.0305 |
+
+The boundary-review view keeps apostrophes inside words while treating
+hyphens, dashes, and slashes as boundaries. It removes obvious scoring
+collisions such as `one-floor` versus `one floor`; it does not judge semantic
+equivalence or repair the unverified references.
+
+| Language | Whisper | Apple | Parakeet | Qwen/MLX |
+| --- | ---: | ---: | ---: | ---: |
+| German | 2.52% | 3.70% | 11.50% | 9.88% |
+| English | 3.81% | 4.10% | 4.28% | 4.28% |
+| Spanish | 1.21% | 12.01% | 7.40% | 12.34% |
+| French | 3.33% | 3.70% | 9.70% | 3.42% |
+| Portuguese | 7.99% | 11.91% | 9.95% | 22.74% |
+
+These numbers reject a single language-agnostic quality claim, but they do not
+yet justify language routing. Whisper leads every language after the limited
+boundary normalization, while Apple is close on German, English, and French
+and remains materially faster with real incremental word-timestamp updates.
+Portuguese is the weakest cell for every candidate except Parakeet relative to
+its own other languages. Qwen's strong French result and weak Portuguese row
+show why its direct MLX adapter should be evaluated, not selected or rejected,
+on a global mean.
+
+Manual gold review comes next. Examples already show contractions, historical
+spelling, diacritics, number forms, and proper names mixed with real content
+errors. Until those are separated, the table is a development signal rather
+than an accuracy claim.
+
 The initial acquisition target per language and target domain is at least 30
 minutes from three independent works or episodes and three speakers. Clips from
 one episode are correlated: confidence intervals and train/tune/test boundaries
@@ -162,6 +204,7 @@ are useful hypotheses, not an acceptance result for Cuttledoc 3.
 5. Add GigaSpeech English podcast material and a legally reviewed,
    German-first curated podcast set.
 6. Re-run Apple, Whisper, Qwen, and Parakeet on identical cells before defining
-   language-specific routing.
+   language-specific routing. The compact development pass is complete; the
+   target-size held-out pass remains open.
 7. Evaluate Gemma and other correction models only on the resulting real raw
    outputs.

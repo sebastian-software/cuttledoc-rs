@@ -13,12 +13,38 @@ const { values } = parseArgs({
     input: { type: 'string', multiple: true },
     output: { type: 'string' },
     check: { type: 'string' },
+    'analysis-id': {
+      type: 'string',
+      default: 'phase0-multilingual-fleurs-error-analysis-1',
+    },
+    'fixture-manifest': { type: 'string' },
+    caveat: { type: 'string' },
   },
 });
 
+const fixtureManifest = values['fixture-manifest']
+  ? JSON.parse(await readFile(resolve(values['fixture-manifest']), 'utf8'))
+  : null;
+const fixtureMetadata = new Map(
+  (fixtureManifest?.fixtures ?? []).map((fixture) => [fixture.id, fixture]),
+);
+const analysisContext = {
+  analysisId: values['analysis-id'],
+  sourceDataset: fixtureManifest
+    ? [...new Set(fixtureManifest.fixtures.map((fixture) => fixture.dataset))]
+        .join(' + ')
+    : 'FLEURS',
+  sourceDomain: fixtureManifest?.domain ?? 'short-read',
+  caveat: values.caveat ??
+    'One source and two fixtures per language; error classes are integration evidence, not population estimates.',
+  surfaceMetricsReason: fixtureManifest
+    ? 'The selected dataset transcripts are not human-verified punctuation and capitalization gold.'
+    : 'The current FLEURS references are normalized recognition text rather than verified punctuation and capitalization gold.',
+  fixtureMetadata,
+};
 const inputPaths = values.input?.map((path) => resolve(path)) ??
   await discoverAggregatePaths();
-const report = await buildReport(inputPaths);
+const report = await buildReport(inputPaths, analysisContext);
 
 if (values.check) {
   const checkedPath = resolve(values.check);
@@ -49,7 +75,8 @@ async function discoverAggregatePaths() {
     try {
       const value = JSON.parse(await readFile(path, 'utf8'));
       if (typeof value.matrix_run_id === 'string' &&
-          Array.isArray(value.results)) {
+          Array.isArray(value.results) &&
+          value.fixture_manifest_revision === 'phase0-multilingual-asr-1') {
         paths.push(path);
       }
     } catch (error) {
@@ -59,7 +86,7 @@ async function discoverAggregatePaths() {
   return paths.sort();
 }
 
-async function buildReport(paths) {
+async function buildReport(paths, analysisContext) {
   const sources = [];
   const candidates = [];
   for (const path of paths) {
@@ -77,7 +104,7 @@ async function buildReport(paths) {
       captured_at: aggregate.captured_at,
       candidate_id: aggregate.candidate.id,
     });
-    candidates.push(analyzeCandidate(aggregate));
+    candidates.push(analyzeCandidate(aggregate, analysisContext));
   }
   if (candidates.length === 0) {
     throw new Error('no multilingual aggregate inputs found');
@@ -85,7 +112,7 @@ async function buildReport(paths) {
 
   return {
     schema_version: '1.0.0',
-    analysis_id: 'phase0-multilingual-fleurs-error-analysis-1',
+    analysis_id: analysisContext.analysisId,
     source_captured_through: sources
       .map((source) => source.captured_at)
       .filter(Boolean)
@@ -111,11 +138,10 @@ async function buildReport(paths) {
       },
     },
     dimensions: {
-      source_dataset: 'FLEURS',
-      source_domain: 'short-read',
+      source_dataset: analysisContext.sourceDataset,
+      source_domain: analysisContext.sourceDomain,
       languages: languageOrder,
-      caveat:
-        'One source and two fixtures per language; error classes are integration evidence, not population estimates.',
+      caveat: analysisContext.caveat,
     },
     review_contract: {
       classifications: [
@@ -134,15 +160,16 @@ async function buildReport(paths) {
     },
     surface_metrics: {
       available: false,
-      reason:
-        'The current FLEURS references are normalized recognition text rather than verified punctuation and capitalization gold.',
+      reason: analysisContext.surfaceMetricsReason,
     },
     candidates,
   };
 }
 
-function analyzeCandidate(aggregate) {
-  const fixtures = aggregate.results.map((result) => analyzeFixture(result));
+function analyzeCandidate(aggregate, analysisContext) {
+  const fixtures = aggregate.results.map(
+    (result) => analyzeFixture(result, analysisContext),
+  );
   return {
     id: aggregate.candidate.id,
     model: aggregate.candidate.model,
@@ -169,7 +196,7 @@ function analyzeCandidate(aggregate) {
   };
 }
 
-function analyzeFixture(result) {
+function analyzeFixture(result, analysisContext) {
   const recordedReference = recordedWords(result.reference_text);
   const recordedHypothesis = recordedWords(result.text);
   const recordedAlignment = align(recordedReference, recordedHypothesis);
@@ -219,8 +246,10 @@ function analyzeFixture(result) {
   return {
     fixture_id: result.fixture_id,
     language: result.requested_language,
-    source_dataset: 'FLEURS',
-    source_domain: 'short-read',
+    source_dataset:
+      analysisContext.fixtureMetadata.get(result.fixture_id)?.dataset ??
+      analysisContext.sourceDataset,
+    source_domain: analysisContext.sourceDomain,
     reference_text: result.reference_text,
     hypothesis_text: result.text,
     recorded: {

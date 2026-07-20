@@ -125,6 +125,12 @@ The same manifest selection works for `whisper`, `parakeet`, and
 float PCM; runtime-specific environment variables remain the ones documented
 for the original matrix.
 
+The checked-in development results are summarized in
+[`matrices/phase0.audiobook-pilot-1.json`](matrices/phase0.audiobook-pilot-1.json).
+Raw transcripts and repetitions remain under
+[`raw`](raw/), and the language-specific, boundary-preserving edit report is
+[`analysis/phase0.audiobook-pilot-1.errors.json`](analysis/phase0.audiobook-pilot-1.errors.json).
+
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in
 [`postprocessing/cuttledoc-v2-snapshot.json`](postprocessing/cuttledoc-v2-snapshot.json).

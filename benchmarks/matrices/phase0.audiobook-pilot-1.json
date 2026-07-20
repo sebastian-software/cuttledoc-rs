@@ -1,0 +1,294 @@
+{
+  "schema_version": "1.0.0",
+  "matrix_id": "phase0.audiobook-pilot-1",
+  "captured_at": "2026-07-20T11:38:41.166Z",
+  "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
+  "fixture_manifest_revision": "audiobook-pilot-1",
+  "fixture_ids": [
+    "audiobook-de-10870_10823_000000",
+    "audiobook-de-4001_2999_000089",
+    "audiobook-de-135_82_000105",
+    "audiobook-en-2277-149874-0000",
+    "audiobook-en-6313-76958-0021",
+    "audiobook-en-2428-83705-0002",
+    "audiobook-es-10367_10282_000000",
+    "audiobook-es-3473_1378_000097",
+    "audiobook-es-3796_2162_000017",
+    "audiobook-fr-1591_1028_000000",
+    "audiobook-fr-7142_2432_000097",
+    "audiobook-fr-5830_4703_000012",
+    "audiobook-pt-12710_10229_000000",
+    "audiobook-pt-13069_13511_000032",
+    "audiobook-pt-6549_4272_000000"
+  ],
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "procedure": {
+    "repetitions": 2,
+    "fixture_order": [
+      "audiobook-de-10870_10823_000000",
+      "audiobook-de-4001_2999_000089",
+      "audiobook-de-135_82_000105",
+      "audiobook-en-2277-149874-0000",
+      "audiobook-en-6313-76958-0021",
+      "audiobook-en-2428-83705-0002",
+      "audiobook-es-10367_10282_000000",
+      "audiobook-es-3473_1378_000097",
+      "audiobook-es-3796_2162_000017",
+      "audiobook-fr-1591_1028_000000",
+      "audiobook-fr-7142_2432_000097",
+      "audiobook-fr-5830_4703_000012",
+      "audiobook-pt-12710_10229_000000",
+      "audiobook-pt-13069_13511_000032",
+      "audiobook-pt-6549_4272_000000"
+    ],
+    "quality_normalization": "Unicode lowercase; punctuation and whitespace removed consistently with phase-0 single-fixture records",
+    "cold_load": "First candidate-specific create or initialize value in a fresh process; system and model caches were not cleared",
+    "warm_inference": "Mean complete inference after one discarded candidate-specific warm-up",
+    "energy": "Not captured in this breadth pass; use the alternating powermetrics procedure documented in benchmarks/README.md"
+  },
+  "candidates": [
+    {
+      "id": "whisper-large-v3-turbo-coreml-whispercpp",
+      "raw_artifact": "benchmarks/raw/phase0.whisper.audiobook-pilot-1/result.json",
+      "quality": {
+        "macro_wer": 0.044900264301524814,
+        "macro_cer": 0.011769889648927927,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.02515365120407137,
+            "macro_cer": 0.00679360587960505
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.059477124183006526,
+            "macro_cer": 0.014239172327407621
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.012121212121212121,
+            "macro_cer": 0.0012674271229404308
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.047718253968253965,
+            "macro_cer": 0.017489323537754127
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.08003108003108003,
+            "macro_cer": 0.01905991937693241
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 816.2489667333332,
+        "minimum_cold_load_ms": 795.263542,
+        "maximum_cold_load_ms": 927.581,
+        "mean_warm_inference_ms": 832.3358680666664,
+        "mean_real_time_factor": 0.056941561092349276
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 1949319168,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": 2899675450,
+        "binary_size_bytes": 2172752
+      },
+      "streaming": {
+        "supported": false,
+        "mean_first_result_ms": null,
+        "timestamps": "segment"
+      },
+      "disposition": "primary"
+    },
+    {
+      "id": "apple-speechtranscriber",
+      "raw_artifact": "benchmarks/raw/phase0.apple-speech.audiobook-pilot-1/result.json",
+      "quality": {
+        "macro_wer": 0.0717936564884818,
+        "macro_cer": 0.024336892076741137,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.03701480592236894,
+            "macro_cer": 0.011017041137523066
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.04101307189542484,
+            "macro_cer": 0.035976819065054365
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.12009569377990431,
+            "macro_cer": 0.0306652435478514
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.0373015873015873,
+            "macro_cer": 0.011710900578067012
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.12354312354312354,
+            "macro_cer": 0.03231445605520984
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 775.8994137333333,
+        "minimum_cold_load_ms": 99.017166,
+        "maximum_cold_load_ms": 1398.477292,
+        "mean_warm_inference_ms": 255.4811237333334,
+        "mean_real_time_factor": 0.017413832580217666
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 23511040,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": 50.29137636666666,
+        "timestamps": "word"
+      },
+      "disposition": "fallback"
+    },
+    {
+      "id": "parakeet-tdt-0.6b-v3-coreml",
+      "raw_artifact": "benchmarks/raw/phase0.parakeet.audiobook-pilot-1/result.json",
+      "quality": {
+        "macro_wer": 0.0889987540838934,
+        "macro_cer": 0.030718284343290762,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.11498958557782087,
+            "macro_cer": 0.044891945182763626
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.04281045751633986,
+            "macro_cer": 0.01182532800179859
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.07395002658160553,
+            "macro_cer": 0.010205921881326095
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.09980158730158732,
+            "macro_cer": 0.0652470167827195
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.11344211344211345,
+            "macro_cer": 0.02142120986784601
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 207.8811888666667,
+        "minimum_cold_load_ms": 198.41616700000003,
+        "maximum_cold_load_ms": 261.600084,
+        "mean_warm_inference_ms": 315.27843599999994,
+        "mean_real_time_factor": 0.021130280692523113
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 154238976,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": 1899782094,
+        "binary_size_bytes": 133472
+      },
+      "streaming": {
+        "supported": false,
+        "mean_first_result_ms": null,
+        "timestamps": "segment"
+      },
+      "disposition": "compatibility-baseline"
+    },
+    {
+      "id": "qwen3-asr-0.6b-mlx-reference",
+      "raw_artifact": "benchmarks/raw/phase0.qwen3-asr-0.6b-mlx-reference.audiobook-pilot-1/result.json",
+      "quality": {
+        "macro_wer": 0.1113685691427841,
+        "macro_cer": 0.030466800641370407,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.09883953581432574,
+            "macro_cer": 0.028094359419660625
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.08202614379084967,
+            "macro_cer": 0.013719267395737983
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.12344497607655502,
+            "macro_cer": 0.01733964714206847
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.03472222222222222,
+            "macro_cer": 0.013962295808914296
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.21780996780996778,
+            "macro_cer": 0.07921843344047065
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 939.158211,
+        "minimum_cold_load_ms": 911.304417,
+        "maximum_cold_load_ms": 1021.456458,
+        "mean_warm_inference_ms": 451.80923879999995,
+        "mean_real_time_factor": 0.030502732762752456
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 1244020736,
+        "runtime_peak_memory_bytes": 2068225000,
+        "model_size_bytes": 1010776466,
+        "binary_size_bytes": 402617370
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": 147.0353833,
+        "timestamps": "unknown"
+      },
+      "disposition": "research"
+    }
+  ],
+  "recommendation": {
+    "primary": "whisper-large-v3-turbo-coreml-whispercpp",
+    "fallback": "apple-speechtranscriber",
+    "research": [
+      "qwen3-asr-0.6b-mlx-reference"
+    ],
+    "rationale": [
+      "Whisper is the quality hypothesis for professionally recorded audiobooks: it has the lowest raw macro WER at 4.49% and leads German, Spanish, and Portuguese in this development pilot.",
+      "Apple remains the product-default and streaming hypothesis: it leads English, nearly matches the best French result, emits word timestamps, and uses far less measured process memory than the bundled model candidates.",
+      "Parakeet is competitive with Apple on English and faster than Whisper, but this pilot does not show a quality or streaming advantage for the remaining languages.",
+      "Qwen on MLX remains a first-class research candidate despite the current reference-path score. It leads French, proves the desired MLX platform direction, and still requires a repository-owned direct adapter before product selection."
+    ]
+  },
+  "limitations": [
+    "This is a development pilot of three already-inspected clips per language, not a held-out or statistically powered benchmark.",
+    "Dataset transcripts have not yet been human-verified against the exact audio and include historical spelling, hyphenation, contractions, and number-form conventions that raw WER may count as lexical errors.",
+    "Spanish and Portuguese regional locales are unverified; no es-419 or pt-BR quality claim follows from these rows.",
+    "The matrix ranks raw ASR only. It does not yet measure punctuation, capitalization, critical semantic errors, or the constrained LLM correction prompts.",
+    "Energy was not measured, cold loads used warm system caches, and candidate order was not alternated."
+  ]
+}
