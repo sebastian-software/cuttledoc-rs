@@ -20,6 +20,21 @@ probe emits owned JSON so the common harness can preserve transcripts, model
 load, warm inference, first-token latency, process and MLX peak memory, and the
 append-only token update stream.
 
+For the repository-owned official-MLX port, the same disposable environment
+can export deterministic encoder boundary fingerprints:
+
+```sh
+python spikes/qwen3-mlx-reference/export_encoder_oracle.py \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le
+```
+
+The checked-in first parity oracle is
+[`benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.encoder.json`](../../benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.encoder.json).
+It records shapes, float32 digests, and aggregate statistics from the log-Mel
+input through the final audio embeddings. It is development evidence, not an
+additional product dependency or quality result.
+
 Create the disposable reference environment and model outside the repository:
 
 ```sh

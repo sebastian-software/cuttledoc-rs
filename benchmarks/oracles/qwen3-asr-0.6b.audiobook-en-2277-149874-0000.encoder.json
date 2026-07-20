@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0.0",
+  "oracle": "mlx-audio Qwen3-ASR reference",
+  "purpose": "development parity oracle for issue #17; not a quality result",
+  "runtime": {
+    "mlx": "0.32.0",
+    "mlx_audio": "0.4.5",
+    "mlx_lm": "0.31.3",
+    "transformers": "5.12.1",
+    "numpy": "2.5.1"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "fixture": {
+    "id": "audiobook-en-2277-149874-0000",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+    "pcm_samples": 248080,
+    "sample_rate_hz": 16000
+  },
+  "feature_length": 1550,
+  "chunk_lengths": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    50
+  ],
+  "aftercnn_length": 202,
+  "num_audio_tokens": 202,
+  "attention_windows": [
+    0,
+    104,
+    202
+  ],
+  "fingerprints": {
+    "input_features": {
+      "shape": [1, 128, 1550],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "97d43b1463615a196ed2e3701cbf2f18887610518fec80aa447904f28fb73e62",
+      "mean": -0.06426466365164567,
+      "stddev": 0.43818888780577187,
+      "minimum": -0.7808587551116943,
+      "maximum": 1.2191412448883057,
+      "l1": 73251.28915947676
+    },
+    "conv2d1": {
+      "shape": [16, 64, 50, 480],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "3294d169cc91fbebe0c6297ab62c382a1d44b8db1ea7c0a7f628cc5584d73063",
+      "mean": 0.006804561032643522,
+      "stddev": 0.06592505453613749,
+      "minimum": -0.1699712723493576,
+      "maximum": 2.689983367919922,
+      "l1": 780694.6975230296
+    },
+    "conv2d2": {
+      "shape": [16, 32, 25, 480],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "6b435d940bfeb8f70f7ebf5db5a7c0b8d1cca9237d3644671707ebba72d98246",
+      "mean": -0.0148580527168578,
+      "stddev": 0.16676615151150986,
+      "minimum": -0.1699712872505188,
+      "maximum": 4.307588577270508,
+      "l1": 643782.0823818867
+    },
+    "conv2d3": {
+      "shape": [16, 16, 13, 480],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "210c5691d60eaae7bbb8b3dc549629e1e798f5268006a8583704bce917d4a4dc",
+      "mean": -0.05030090219276547,
+      "stddev": 0.15053779192881322,
+      "minimum": -0.1699712872505188,
+      "maximum": 2.8312506675720215,
+      "l1": 188149.21200781091
+    },
+    "conv_out": {
+      "shape": [16, 13, 896],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "5c49e2b181f76e6bcc6613289e5869a880210c405a8012594ebefbadd95d9ad5",
+      "mean": 0.015996146847133526,
+      "stddev": 0.6609500681773215,
+      "minimum": -4.112111568450928,
+      "maximum": 4.662498474121094,
+      "l1": 98983.41849699989
+    },
+    "encoder_input": {
+      "shape": [202, 896],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "62bafa48f3d7a60d27d344b138becd9eb7acad6641aaa8fb12aa62e495c506fc",
+      "mean": 0.48417332386246487,
+      "stddev": 0.5679626363575879,
+      "minimum": -4.268004417419434,
+      "maximum": 5.657861709594727,
+      "l1": 108339.39859140763
+    },
+    "encoder_layer_0": {
+      "shape": [1, 202, 896],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "7e792817b268ee9299e4a5e2fbdb7bdf3dfe2a180cca801ddbeba588a88b916f",
+      "mean": 0.4896273783949295,
+      "stddev": 0.49924099749595124,
+      "minimum": -3.854670286178589,
+      "maximum": 8.938150405883789,
+      "l1": 100079.3088672692
+    },
+    "encoder_layer_17": {
+      "shape": [1, 202, 896],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "5a38da40183e70f8df40f67055dd0bd9c2b756033014cbad8d79bbe3e5620803",
+      "mean": 0.4453194672294499,
+      "stddev": 0.9142577822529211,
+      "minimum": -5.688783645629883,
+      "maximum": 30.31588363647461,
+      "l1": 113195.19642246701
+    },
+    "audio_features": {
+      "shape": [202, 1024],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "b4b8e637ef66f822715af3d9a9a09d38358682a1994fc1345278a138f8fc9bb9",
+      "mean": 0.0010512807681037687,
+      "stddev": 0.018574485010808963,
+      "minimum": -0.11642784625291824,
+      "maximum": 0.13940653204917908,
+      "l1": 2989.7918480251374
+    }
+  }
+}
