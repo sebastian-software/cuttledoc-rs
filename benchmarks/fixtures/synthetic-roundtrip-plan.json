@@ -108,12 +108,12 @@
       "id": "qwen3-tts-0.6b-customvoice-mlx-audio",
       "role": "primary-open-mlx-candidate",
       "runtime": "Blaizzy/mlx-audio over official Apple MLX",
-      "model": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16",
+      "model": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16@6415d95f88be018ff9e46813119dc3bc12261328",
       "integration": "pinned Python reference runner; direct repository-owned MLX boundary evaluated after measurements",
       "source_url": "https://github.com/Blaizzy/mlx-audio",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
-      "license": "MIT runtime; Apache-2.0 upstream Qwen3-TTS model family; converted artifact license and revision must be verified before execution",
-      "status": "selected-pending-model-artifact-pin",
+      "license": "MIT runtime; Apache-2.0 model artifact; every file is byte-counted and SHA-256 pinned in spikes/qwen3-tts-mlx-reference/model-manifest.json",
+      "status": "selected-artifact-pinned-pending-reference-run",
       "locales": [
         "de-DE",
         "en-US"

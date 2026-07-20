@@ -144,6 +144,11 @@ execution therefore remains an explicit productization gate.
    behavior are recorded.
 3. Pin the converted Qwen3-TTS artifact and build the `mlx-audio` reference
    runner at the selected commit.
+   **Artifact complete:** revision `6415d95f88be018ff9e46813119dc3bc12261328`,
+   its 2.49 GB snapshot, every file digest, the runtime revision, and the
+   cross-lingual German generation contract are frozen in
+   [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
+   The executable reference run remains in progress.
 4. Run the two local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.

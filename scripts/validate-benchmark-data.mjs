@@ -821,6 +821,85 @@ function validateTtsRun(run, selection) {
   return errors;
 }
 
+function validateQwen3TtsModelManifest(modelManifest, plan, selection) {
+  const errors = [];
+  const expectedId = 'qwen3-tts-12hz-0.6b-customvoice-mlx-bf16';
+  const expectedCandidateId = 'qwen3-tts-0.6b-customvoice-mlx-audio';
+  if (modelManifest.id !== expectedId || modelManifest.task !== 'tts') {
+    errors.push('id and task must identify the Qwen3-TTS MLX reference');
+  }
+  for (const revision of [
+    modelManifest.source?.observed_revision,
+    modelManifest.conversion?.revision,
+    modelManifest.reference_runtime?.revision,
+  ]) {
+    if (!/^[0-9a-f]{40}$/.test(revision ?? '')) {
+      errors.push(`invalid pinned revision: ${revision}`);
+    }
+  }
+  if (modelManifest.source?.license !== 'Apache-2.0' ||
+      modelManifest.conversion?.license !== 'Apache-2.0' ||
+      modelManifest.reference_runtime?.license !== 'MIT' ||
+      !(modelManifest.source?.provenance_limit?.length > 0)) {
+    errors.push('licenses and the conversion provenance limit must be explicit');
+  }
+  if (!modelManifest.source?.supported_languages?.includes('German') ||
+      modelManifest.generation_contract?.locale !== 'de-DE' ||
+      modelManifest.generation_contract?.language !== 'German' ||
+      modelManifest.generation_contract?.cross_lingual !== true ||
+      modelManifest.generation_contract?.instruction !== null ||
+      modelManifest.generation_contract?.sample_rate_hz !== 24000) {
+    errors.push(
+      'generation contract must preserve the German cross-lingual diagnostic',
+    );
+  }
+
+  const passage = selection.sources
+    .flatMap((source) => source.passages)
+    .find((item) => item.id === modelManifest.generation_contract?.passage_id);
+  if (!passage) {
+    errors.push('generation contract passage is not in the synthetic selection');
+  }
+
+  const artifactPaths = new Set();
+  let artifactBytes = 0;
+  for (const artifact of modelManifest.artifacts ?? []) {
+    if (!(artifact.path?.length > 0) || artifactPaths.has(artifact.path)) {
+      errors.push(`invalid or duplicate artifact path: ${artifact.path}`);
+    }
+    artifactPaths.add(artifact.path);
+    if (!(Number.isInteger(artifact.bytes) && artifact.bytes > 0) ||
+        !/^[0-9a-f]{64}$/.test(artifact.sha256 ?? '')) {
+      errors.push(`${artifact.path}: invalid byte count or SHA-256`);
+    }
+    artifactBytes += artifact.bytes ?? 0;
+  }
+  for (const requiredPath of [
+    'config.json',
+    'model.safetensors',
+    'speech_tokenizer/model.safetensors',
+    'tokenizer_config.json',
+  ]) {
+    if (!artifactPaths.has(requiredPath)) {
+      errors.push(`missing required model artifact: ${requiredPath}`);
+    }
+  }
+  if (artifactBytes !== modelManifest.conversion?.snapshot_bytes) {
+    errors.push('artifact bytes do not equal conversion.snapshot_bytes');
+  }
+
+  const candidate = plan.tts_candidates.find(
+    (item) => item.id === expectedCandidateId,
+  );
+  if (!candidate ||
+      !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
+      candidate.source_revision !== modelManifest.reference_runtime?.revision ||
+      candidate.status !== 'selected-artifact-pinned-pending-reference-run') {
+    errors.push('synthetic plan does not reference the pinned model and runtime');
+  }
+  return errors;
+}
+
 function validateSourceRightsReview(
   review,
   sourceCandidates,
@@ -1622,6 +1701,10 @@ const appleTtsRunPath = join(
   repoRoot,
   'benchmarks/raw/phase5.apple-tts.synthetic-de-origin-1/result.json',
 );
+const qwen3TtsModelManifestPath = join(
+  repoRoot,
+  'spikes/qwen3-tts-mlx-reference/model-manifest.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -1644,6 +1727,10 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-selection.schema.json'),
   join(repoRoot, 'benchmarks/schema/tts-run.schema.json'),
+  join(
+    repoRoot,
+    'spikes/qwen3-tts-mlx-reference/model-manifest.schema.json',
+  ),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
@@ -1666,6 +1753,7 @@ const syntheticRoundtripSelection = await readJson(
   syntheticRoundtripSelectionPath,
 );
 const appleTtsRun = await readJson(appleTtsRunPath);
+const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -1714,6 +1802,13 @@ failures.push(
   ...validateTtsRun(appleTtsRun, syntheticRoundtripSelection).map(
     (error) => `${appleTtsRunPath}: ${error}`,
   ),
+);
+failures.push(
+  ...validateQwen3TtsModelManifest(
+    qwen3TtsModelManifest,
+    syntheticRoundtripPlan,
+    syntheticRoundtripSelection,
+  ).map((error) => `${qwen3TtsModelManifestPath}: ${error}`),
 );
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
@@ -1871,6 +1966,19 @@ if (process.argv.includes('--self-test')) {
     syntheticRoundtripSelection,
   ).length === 0) {
     failures.push('validator self-test failed to reject divergent TTS audio metrics');
+  }
+  const invalidQwen3TtsModelManifest = structuredClone(
+    qwen3TtsModelManifest,
+  );
+  invalidQwen3TtsModelManifest.artifacts[0].bytes += 1;
+  if (validateQwen3TtsModelManifest(
+    invalidQwen3TtsModelManifest,
+    syntheticRoundtripPlan,
+    syntheticRoundtripSelection,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent Qwen3-TTS snapshot bytes',
+    );
   }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
   invalidRightsReview.disposition = 'accepted';

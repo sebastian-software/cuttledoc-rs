@@ -1,0 +1,164 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "qwen3-tts-12hz-0.6b-customvoice-mlx-bf16",
+  "task": "tts",
+  "source": {
+    "repository": "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
+    "observed_revision": "85e237c12c027371202489a0ec509ded67b5e4b5",
+    "license": "Apache-2.0",
+    "supported_languages": [
+      "Chinese",
+      "English",
+      "Japanese",
+      "Korean",
+      "German",
+      "French",
+      "Russian",
+      "Portuguese",
+      "Spanish",
+      "Italian"
+    ],
+    "provenance_limit": "The converted model card names this repository but does not identify its exact source commit. The observed revision pins capability and license evidence; it is not asserted to be the conversion input."
+  },
+  "conversion": {
+    "repository": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16",
+    "revision": "6415d95f88be018ff9e46813119dc3bc12261328",
+    "license": "Apache-2.0",
+    "format": "MLX BF16 safetensors",
+    "conversion_tool": "mlx-audio",
+    "conversion_tool_version": "0.3.0",
+    "parameter_count": 905788672,
+    "weight_bytes": 2493919642,
+    "snapshot_bytes": 2498419405
+  },
+  "reference_runtime": {
+    "repository": "Blaizzy/mlx-audio",
+    "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "version": "0.4.5",
+    "license": "MIT",
+    "boundary": "Pinned Python reference runner over official Apple MLX"
+  },
+  "generation_contract": {
+    "passage_id": "synthetic-de-origin",
+    "locale": "de-DE",
+    "language": "German",
+    "speaker": "Ryan",
+    "speaker_native_language": "English",
+    "cross_lingual": true,
+    "instruction": null,
+    "seed": 0,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.1,
+    "max_tokens": 1200,
+    "sample_rate_hz": 24000,
+    "rationale": "The model supports German but exposes no native German preset voice. Ryan is fixed for the first cross-lingual German diagnostic; the result must not be generalized to every speaker."
+  },
+  "artifacts": [
+    {
+      "path": ".gitattributes",
+      "bytes": 1519,
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1068,
+      "sha256": "f369c93e29f650284cb043b5334cfa29ea191236f5f500bfb46dc0fceeb96d40"
+    },
+    {
+      "path": "config.json",
+      "bytes": 5853,
+      "sha256": "69c1b78421a5e408b5e91a74a9995213546613ffe2a1d87a00c7743900ead6ee"
+    },
+    {
+      "path": "generation_config.json",
+      "bytes": 245,
+      "sha256": "f1b90b4513f3b34c62851049e2492d7b4c5940daf1276f89c82b8ef04127f3aa"
+    },
+    {
+      "path": "merges.txt",
+      "bytes": 1671839,
+      "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 1811626550,
+      "sha256": "e6eb20e645c5a28ee66bf8434edb5b67a5f151530dab63afe22787d71bcf5382"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "bytes": 32289,
+      "sha256": "1b1e10fb201a65a1b24991cf8f6800d785441ad9ca0ad83828d6bf00f6d5e8ec"
+    },
+    {
+      "path": "preprocessor_config.json",
+      "bytes": 127,
+      "sha256": "efdde1022ea9d76928bf7a9cd53139138f5ba2e466e837f08f6105ab1af1c119"
+    },
+    {
+      "path": "speech_tokenizer/config.json",
+      "bytes": 2336,
+      "sha256": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167"
+    },
+    {
+      "path": "speech_tokenizer/configuration.json",
+      "bytes": 76,
+      "sha256": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd"
+    },
+    {
+      "path": "speech_tokenizer/model.safetensors",
+      "bytes": 682293092,
+      "sha256": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258"
+    },
+    {
+      "path": "speech_tokenizer/preprocessor_config.json",
+      "bytes": 234,
+      "sha256": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 7344,
+      "sha256": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670"
+    },
+    {
+      "path": "vocab.json",
+      "bytes": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  ],
+  "architecture": {
+    "model_type": "custom_voice",
+    "model_size": "0b6",
+    "sample_rate_hz": 24000,
+    "talker_layers": 28,
+    "talker_hidden_size": 1024,
+    "talker_attention_heads": 16,
+    "talker_key_value_heads": 8,
+    "speakers": [
+      "Serena",
+      "Vivian",
+      "Uncle_Fu",
+      "Ryan",
+      "Aiden",
+      "Ono_Anna",
+      "Sohee",
+      "Eric",
+      "Dylan"
+    ],
+    "language_ids": [
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian",
+      "beijing_dialect",
+      "sichuan_dialect"
+    ]
+  }
+}
