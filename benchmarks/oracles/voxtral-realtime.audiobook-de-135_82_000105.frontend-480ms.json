@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "oracle": "mlx-audio Voxtral Realtime frontend reference",
+  "purpose": "development parity oracle for issue #19; not a transcript or quality result",
+  "runtime": {
+    "mlx": "0.32.0",
+    "mlx_audio": "0.4.5",
+    "numpy": "2.3.5"
+  },
+  "model": {
+    "source": "mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "conversion": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "artifact_sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+  },
+  "fixture": {
+    "id": "audiobook-de-135_82_000105",
+    "pcm_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+    "pcm_samples": 213440,
+    "sample_rate_hz": 16000
+  },
+  "padding": {
+    "transcription_delay_ms": 480,
+    "delay_tokens": 6,
+    "left_pad_tokens": 32,
+    "left_pad_samples": 40960,
+    "alignment_pad_samples": 320,
+    "right_pad_tokens": 17,
+    "right_pad_samples": 22080,
+    "padded_samples": 276480
+  },
+  "mel_frames": 1728,
+  "front_truncation_frames": 0,
+  "fingerprints": {
+    "mel_filters": {
+      "shape": [201, 128],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "d0d42c7ac3c70186feff9d78382f133c6c25fdb04f4861d49a490af18d69bb4d",
+      "mean": 0.00012402773669136245,
+      "stddev": 0.0014602106611416358,
+      "minimum": 0,
+      "maximum": 0.04168175533413887,
+      "l1": 3.190985609595373,
+      "sample_indices": [0, 1, 2, 7, 31, 8576, 17152, 25727],
+      "sample_values": [0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    "log_mel": {
+      "shape": [128, 1728],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "f61498833b70bbab899b1820b7e8d71f769087903182bf2bdf2c3c92905e81b6",
+      "mean": -0.1694168749007211,
+      "stddev": 0.47665438250247477,
+      "minimum": -0.625,
+      "maximum": 1.3741155862808228,
+      "l1": 99072.4607295394,
+      "sample_indices": [0, 1, 2, 7, 31, 73728, 147456, 221183],
+      "sample_values": [-0.625, -0.625, -0.625, -0.625, -0.625, 0.5012208819389343, -0.41841959953308105, -0.625]
+    },
+    "conv0_gelu": {
+      "shape": [1, 1728, 1280],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "ef839d0f49ae41023f52a51e596de73d223c95907a4414e88b4369bab79f96a0",
+      "mean": 0.011978273512240647,
+      "stddev": 0.06261716114456793,
+      "minimum": -0.1699712723493576,
+      "maximum": 1.1439266204833984,
+      "l1": 91986.1428054395,
+      "sample_indices": [0, 1, 2, 7, 31, 737280, 1474560, 2211839],
+      "sample_values": [0.022710522636771202, 0.018199725076556206, -0.014524456113576889, 0.011488521471619606, -0.02732742764055729, 0.012670530006289482, 0.062154918909072876, -0.00899304449558258]
+    },
+    "conv1_pretrunc_gelu": {
+      "shape": [864, 1280],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "8294e60eb65e691393f6f0a662830017791feedb801688f4736ddd1c915d559c",
+      "mean": 0.02189923159513808,
+      "stddev": 0.1548041907662052,
+      "minimum": -0.1699712574481964,
+      "maximum": 5.189394474029541,
+      "l1": 62046.48549174888,
+      "sample_indices": [0, 1, 2, 7, 31, 368640, 737280, 1105919],
+      "sample_values": [0.036014266312122345, -0.16036754846572876, -0.00499721709638834, -0.14058823883533478, 0.3293404281139374, -0.021500086411833763, -0.0705556869506836, -0.014965852722525597]
+    },
+    "conv_stem": {
+      "shape": [864, 1280],
+      "source_dtype": "mlx.core.float32",
+      "float32_sha256": "8294e60eb65e691393f6f0a662830017791feedb801688f4736ddd1c915d559c",
+      "mean": 0.02189923159513808,
+      "stddev": 0.1548041907662052,
+      "minimum": -0.1699712574481964,
+      "maximum": 5.189394474029541,
+      "l1": 62046.48549174888,
+      "sample_indices": [0, 1, 2, 7, 31, 368640, 737280, 1105919],
+      "sample_values": [0.036014266312122345, -0.16036754846572876, -0.00499721709638834, -0.14058823883533478, 0.3293404281139374, -0.021500086411833763, -0.0705556869506836, -0.014965852722525597]
+    }
+  },
+  "capabilities": {
+    "mel_frontend": true,
+    "causal_conv_stem": true,
+    "causal_encoder": false,
+    "transcription": false
+  }
+}

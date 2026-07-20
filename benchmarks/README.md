@@ -192,9 +192,13 @@ scripts/run-voxtral-mlx-direct-spike.sh
 Its checked-in
 [`boundary record`](raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json)
 machine-checks the pinned model layout, bounded 80 ms feed/320 ms step
-contract, backpressure, and cancellation. It deliberately records
-`transcription: false`; the current MLX fingerprint is lifecycle evidence, not
-an ASR-quality result.
+contract, backpressure, and cancellation. The separate
+[`frontend result`](raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json)
+matches the pinned
+[`Python oracle`](oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json)
+through offline-streaming padding, log-mel extraction, and both causal Conv1d
+stages. Both records deliberately keep `transcription: false`: the next parity
+gate is the 32-layer causal encoder, so neither record is an ASR-quality result.
 
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in

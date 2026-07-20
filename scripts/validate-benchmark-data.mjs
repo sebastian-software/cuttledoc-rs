@@ -1125,6 +1125,9 @@ function validateVoxtralRealtimeDirectModelManifest(
       contract?.capabilities?.bounded_ingestion !== true ||
       contract?.capabilities?.backpressure !== true ||
       contract?.capabilities?.cancellation !== true ||
+      contract?.capabilities?.mel_frontend !== true ||
+      contract?.capabilities?.causal_conv_stem !== true ||
+      contract?.capabilities?.causal_encoder !== false ||
       contract?.capabilities?.transcription !== false) {
     errors.push('direct Voxtral boundary contract must remain explicit and bounded');
   }
@@ -1225,6 +1228,145 @@ function validateVoxtralRealtimeDirectBoundary(
         modelManifest.conversion?.weight_bytes ||
       !run.limitations?.some((item) => item.includes('No transcript'))) {
     errors.push('direct boundary capabilities must not overclaim transcription');
+  }
+  return errors;
+}
+
+function validateVoxtralRealtimeDirectFrontend(
+  run,
+  oracle,
+  modelManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
+      run.issue !==
+        'https://github.com/sebastian-software/cuttledoc-rs/issues/19' ||
+      run.model?.source !== oracle.model?.source ||
+      run.model?.conversion !== oracle.model?.conversion ||
+      run.model?.artifact_sha256 !== oracle.model?.artifact_sha256 ||
+      !run.toolchain?.mlx?.revision?.endsWith(
+        modelManifest.official_runtime?.revision,
+      )) {
+    errors.push('direct frontend identity must pin source, model, and MLX');
+  }
+  if (!fixture ||
+      run.fixture?.id !== fixture.id ||
+      run.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.pcm_samples !== fixture.normalized.sample_count ||
+      run.fixture?.sample_rate_hz !== 16000 ||
+      run.fixture?.gold_status !== fixture.gold_status ||
+      oracle.fixture?.id !== fixture.id ||
+      oracle.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      oracle.fixture?.pcm_samples !== fixture.normalized.sample_count) {
+    errors.push('direct frontend must use the pinned audiobook fixture');
+  }
+
+  const result = run.result;
+  const probe = result?.probe;
+  if (result?.status !== 'ok' ||
+      result?.reference_oracle !==
+        'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json' ||
+      probe?.status !== 'ok' ||
+      probe?.boundary !== 'official-mlx-cpp' ||
+      probe?.stage !== 'voxtral-audio-frontend' ||
+      probe?.device !== 'gpu' ||
+      probe?.pcm_samples !== fixture?.normalized.sample_count ||
+      !(probe?.elapsed_ms > 0) ||
+      !(probe?.peak_memory_bytes > 0)) {
+    errors.push('direct frontend probe must record successful official-MLX GPU work');
+  }
+  for (const field of [
+    'transcription_delay_ms',
+    'delay_tokens',
+    'left_pad_tokens',
+    'left_pad_samples',
+    'alignment_pad_samples',
+    'right_pad_tokens',
+    'right_pad_samples',
+    'padded_samples',
+  ]) {
+    if (probe?.padding?.[field] !== oracle.padding?.[field]) {
+      errors.push(`direct frontend padding.${field} differs from oracle`);
+    }
+  }
+  if (probe?.mel_frames !== oracle.mel_frames ||
+      probe?.front_truncation_frames !== oracle.front_truncation_frames ||
+      probe?.capabilities?.mel_frontend !== true ||
+      probe?.capabilities?.causal_conv_stem !== true ||
+      probe?.capabilities?.causal_encoder !== false ||
+      probe?.capabilities?.transcription !== false ||
+      oracle.capabilities?.causal_encoder !== false ||
+      oracle.capabilities?.transcription !== false) {
+    errors.push('direct frontend shapes and capability ceiling must match oracle');
+  }
+
+  let maximumSampleAbsoluteError = 0;
+  let maximumAggregateRelativeError = 0;
+  for (const stage of [
+    'mel_filters',
+    'log_mel',
+    'conv0_gelu',
+    'conv1_pretrunc_gelu',
+    'conv_stem',
+  ]) {
+    const expected = oracle.fingerprints?.[stage];
+    const observed = probe?.fingerprints?.[stage];
+    if (!expected || !observed ||
+        !arrayEquals(expected.shape ?? [], observed.shape ?? []) ||
+        !arrayEquals(
+          expected.sample_indices ?? [],
+          observed.sample_indices ?? [],
+        ) ||
+        expected.sample_values?.length !== observed.sample_values?.length) {
+      errors.push(`${stage}: direct frontend fingerprint identity differs`);
+      continue;
+    }
+    for (let index = 0; index < expected.sample_values.length; index += 1) {
+      maximumSampleAbsoluteError = Math.max(
+        maximumSampleAbsoluteError,
+        Math.abs(observed.sample_values[index] - expected.sample_values[index]),
+      );
+    }
+    for (const field of ['mean', 'stddev', 'minimum', 'maximum', 'l1']) {
+      const relativeError = Math.abs(observed[field] - expected[field]) /
+        Math.max(Math.abs(expected[field]), 1e-12);
+      maximumAggregateRelativeError = Math.max(
+        maximumAggregateRelativeError,
+        relativeError,
+      );
+    }
+  }
+  const parity = result?.parity;
+  if (parity?.status !== 'ok' ||
+      parity?.sample_absolute_tolerance !== 2e-6 ||
+      parity?.aggregate_relative_tolerance !== 2e-5 ||
+      maximumSampleAbsoluteError > parity.sample_absolute_tolerance ||
+      maximumAggregateRelativeError > parity.aggregate_relative_tolerance ||
+      Math.abs(
+        parity.maximum_sample_absolute_error - maximumSampleAbsoluteError,
+      ) > 1e-15 ||
+      Math.abs(
+        parity.maximum_aggregate_relative_error -
+          maximumAggregateRelativeError,
+      ) > 1e-15) {
+    errors.push('direct frontend parity must be derived within pinned tolerances');
+  }
+  if (result?.cpu_smoke?.status !== 'ok' ||
+      result?.cpu_smoke?.mel_frames !== oracle.mel_frames ||
+      result?.cpu_smoke?.conv_stem_frames !== 864 ||
+      !(result?.cpu_smoke?.elapsed_ms > 0) ||
+      !(result?.cpu_smoke?.peak_memory_bytes > 0) ||
+      !(run.artifacts?.shim_dylib_bytes > 0) ||
+      !(run.artifacts?.rust_probe_bytes > 0) ||
+      !(run.artifacts?.mlx_metallib_bytes > 0) ||
+      !run.limitations?.some((item) => item.includes('No token'))) {
+    errors.push('direct frontend CPU/artifact evidence and limits must be explicit');
   }
   return errors;
 }
@@ -2721,6 +2863,14 @@ const voxtralRealtimeDirectBoundaryPath = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json',
 );
+const voxtralRealtimeDirectFrontendOraclePath = join(
+  repoRoot,
+  'benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json',
+);
+const voxtralRealtimeDirectFrontendPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -2813,6 +2963,12 @@ const voxtralRealtimeDirectModelManifest = await readJson(
 );
 const voxtralRealtimeDirectBoundary = await readJson(
   voxtralRealtimeDirectBoundaryPath,
+);
+const voxtralRealtimeDirectFrontendOracle = await readJson(
+  voxtralRealtimeDirectFrontendOraclePath,
+);
+const voxtralRealtimeDirectFrontend = await readJson(
+  voxtralRealtimeDirectFrontendPath,
 );
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -2992,6 +3148,14 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     audiobookPilot,
   ).map((error) => `${voxtralRealtimeDirectBoundaryPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralRealtimeDirectFrontend(
+    voxtralRealtimeDirectFrontend,
+    voxtralRealtimeDirectFrontendOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralRealtimeDirectFrontendPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -3239,6 +3403,20 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject an unbounded direct Voxtral step',
     );
   }
+  const invalidVoxtralDirectFrontend = structuredClone(
+    voxtralRealtimeDirectFrontend,
+  );
+  invalidVoxtralDirectFrontend.result.probe.capabilities.causal_encoder = true;
+  if (validateVoxtralRealtimeDirectFrontend(
+    invalidVoxtralDirectFrontend,
+    voxtralRealtimeDirectFrontendOracle,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject a false direct Voxtral encoder capability',
+    );
+  }
   const invalidVoxtralRealtimeAggregate = structuredClone(
     voxtralRealtime480,
   );
@@ -3320,7 +3498,7 @@ console.log(
   `3 measured TTS diagnostics, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
-  `1 direct Voxtral boundary record, ` +
+  `1 direct Voxtral boundary record, 1 direct Voxtral frontend parity record, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

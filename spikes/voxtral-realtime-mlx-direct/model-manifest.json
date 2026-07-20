@@ -112,6 +112,9 @@
       "bounded_ingestion": true,
       "backpressure": true,
       "cancellation": true,
+      "mel_frontend": true,
+      "causal_conv_stem": true,
+      "causal_encoder": false,
       "transcription": false
     }
   }

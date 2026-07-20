@@ -9,6 +9,7 @@ fixture=${CUTTLEDOC_VOXTRAL_PCM_FIXTURE:-/tmp/cuttledoc-audiobook-pilot/de-135_8
 build_dir=${CUTTLEDOC_VOXTRAL_BUILD_DIR:-/private/tmp/cuttledoc-voxtral-mlx-direct-build}
 build_home=${CUTTLEDOC_VOXTRAL_BUILD_HOME:-/private/tmp/cuttledoc-mlx-build-home}
 expected_mlx_commit=7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247
+frontend_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json"
 
 if [[ ! -d "$source_dir/.git" ]]; then
   echo "missing official MLX checkout: $source_dir" >&2
@@ -57,6 +58,14 @@ rustc \
 
 echo "MODEL"
 "$build_dir/cuttledoc-voxtral-mlx" inspect "$model_dir"
+echo "FRONTEND"
+frontend_result="$build_dir/voxtral-frontend-480ms.json"
+"$build_dir/cuttledoc-voxtral-mlx" \
+  frontend "$model_dir" "$fixture" 480 gpu >"$frontend_result"
+cat "$frontend_result"
+node "$root/scripts/validate-voxtral-mlx-frontend.mjs" \
+  --oracle "$frontend_oracle" \
+  --actual "$frontend_result"
 echo "CONTRACT"
 "$build_dir/cuttledoc-voxtral-mlx" contract "$model_dir" "$fixture" gpu
 echo "ARTIFACTS"

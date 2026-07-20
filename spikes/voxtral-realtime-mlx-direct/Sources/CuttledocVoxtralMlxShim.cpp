@@ -324,7 +324,9 @@ std::string model_json(const LoadedModel &model) {
        << model.uint32_count << "},\"affine_4bit_modules\":"
        << model.quantized_module_count
        << ",\"capabilities\":{\"bounded_ingestion\":true,"
-       << "\"cancellation\":true,\"transcription\":false}}";
+       << "\"cancellation\":true,\"mel_frontend\":true,"
+       << "\"causal_conv_stem\":true,\"causal_encoder\":false,"
+       << "\"transcription\":false}}";
   return json.str();
 }
 

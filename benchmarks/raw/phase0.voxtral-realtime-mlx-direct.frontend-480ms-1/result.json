@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.voxtral-realtime-mlx-direct.frontend-480ms-1",
+  "captured_at": "2026-07-20T20:46:34Z",
+  "source_revision": "9dfa40badd7fb213882974fe3eb25bb1e8965f78",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/19",
+  "measurement_scope": "Repository-owned Voxtral offline-streaming padding, 128-bin log-mel frontend, and two causal Conv1d stem stages executed through official MLX C++. This is frontend-parity evidence, not a causal-encoder, transcript, or quality result.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "conversion": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e",
+    "artifact_sha256": "6f59b425d8a1ceb2de795454558be63937cf75b59f9c9bc77accd85aaf32af05"
+  },
+  "fixture": {
+    "id": "audiobook-de-135_82_000105",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+    "pcm_samples": 213440,
+    "sample_rate_hz": 16000,
+    "gold_status": "dataset-transcript-unverified"
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned Rust/C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json",
+    "probe": {
+      "status": "ok",
+      "boundary": "official-mlx-cpp",
+      "stage": "voxtral-audio-frontend",
+      "device": "gpu",
+      "pcm_samples": 213440,
+      "padding": {
+        "transcription_delay_ms": 480,
+        "delay_tokens": 6,
+        "left_pad_tokens": 32,
+        "left_pad_samples": 40960,
+        "alignment_pad_samples": 320,
+        "right_pad_tokens": 17,
+        "right_pad_samples": 22080,
+        "padded_samples": 276480
+      },
+      "mel_frames": 1728,
+      "front_truncation_frames": 0,
+      "elapsed_ms": 150.783042,
+      "peak_memory_bytes": 64237136,
+      "fingerprints": {
+        "mel_filters": {
+          "shape": [201, 128],
+          "source_dtype": "float32",
+          "mean": 0.0001240277332016078,
+          "stddev": 0.0014602108422957288,
+          "minimum": 0,
+          "maximum": 0.04168174788355827,
+          "l1": 3.1909855198109653,
+          "sample_indices": [0, 1, 2, 7, 31, 8576, 17152, 25727],
+          "sample_values": [0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "log_mel": {
+          "shape": [128, 1728],
+          "source_dtype": "float32",
+          "mean": -0.16941690045523164,
+          "stddev": 0.476654388749377,
+          "minimum": -0.625,
+          "maximum": 1.3741155862808228,
+          "l1": 99072.46461331844,
+          "sample_indices": [0, 1, 2, 7, 31, 73728, 147456, 221183],
+          "sample_values": [-0.625, -0.625, -0.625, -0.625, -0.625, 0.5012214183807373, -0.4184199571609497, -0.625]
+        },
+        "conv0_gelu": {
+          "shape": [1, 1728, 1280],
+          "source_dtype": "float32",
+          "mean": 0.01197827544157328,
+          "stddev": 0.06261716606161791,
+          "minimum": -0.16997121274471283,
+          "maximum": 1.143926739692688,
+          "l1": 91986.1511268191,
+          "sample_indices": [0, 1, 2, 7, 31, 737280, 1474560, 2211839],
+          "sample_values": [0.022710522636771202, 0.018199725076556206, -0.014524456113576889, 0.011488521471619606, -0.02732742764055729, 0.012670484371483326, 0.062154725193977356, -0.00899304449558258]
+        },
+        "conv1_pretrunc_gelu": {
+          "shape": [864, 1280],
+          "source_dtype": "float32",
+          "mean": 0.02189923957342291,
+          "stddev": 0.15480421580820136,
+          "minimum": -0.16997121274471283,
+          "maximum": 5.189393043518066,
+          "l1": 62046.490545981665,
+          "sample_indices": [0, 1, 2, 7, 31, 368640, 737280, 1105919],
+          "sample_values": [0.036014266312122345, -0.16036751866340637, -0.004997228737920523, -0.14058822393417358, 0.3293404281139374, -0.021500462666153908, -0.07055574655532837, -0.014965852722525597]
+        },
+        "conv_stem": {
+          "shape": [864, 1280],
+          "source_dtype": "float32",
+          "mean": 0.02189923957342291,
+          "stddev": 0.15480421580820136,
+          "minimum": -0.16997121274471283,
+          "maximum": 5.189393043518066,
+          "l1": 62046.490545981665,
+          "sample_indices": [0, 1, 2, 7, 31, 368640, 737280, 1105919],
+          "sample_values": [0.036014266312122345, -0.16036751866340637, -0.004997228737920523, -0.14058822393417358, 0.3293404281139374, -0.021500462666153908, -0.07055574655532837, -0.014965852722525597]
+        }
+      },
+      "capabilities": {
+        "mel_frontend": true,
+        "causal_conv_stem": true,
+        "causal_encoder": false,
+        "transcription": false
+      }
+    },
+    "parity": {
+      "status": "ok",
+      "sample_absolute_tolerance": 0.000002,
+      "aggregate_relative_tolerance": 0.00002,
+      "maximum_sample_absolute_error": 5.364418029785156e-7,
+      "maximum_aggregate_relative_error": 3.643180262622351e-7
+    },
+    "cpu_smoke": {
+      "status": "ok",
+      "elapsed_ms": 46.219833,
+      "peak_memory_bytes": 86371924,
+      "mel_frames": 1728,
+      "conv_stem_frames": 864
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18807232,
+    "rust_probe_bytes": 411312,
+    "mlx_metallib_bytes": 130164152
+  },
+  "limitations": [
+    "The probe stops after the causal Conv1d stem; it does not execute any of the 32 encoder transformer layers.",
+    "No token, transcript, WER, first-text latency, or end-to-end model-memory claim follows from this frontend result."
+  ],
+  "next_gate": "Match the 32-layer causal encoder, sliding-window attention, RoPE positions, cache behavior, normalization, and 4x adapter projection."
+}

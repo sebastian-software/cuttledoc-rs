@@ -208,12 +208,24 @@ under 80 ms production. The official-MLX sum-of-squares fingerprint matched a
 CPU control within `1.24e-8` relative error. Cancellation, closed-input,
 needs-audio, and done states also returned their pinned statuses.
 
+The next direct milestone now executes the exact offline-streaming padding,
+128-bin log-mel frontend, and both causal Conv1d/GELU stages with official MLX
+and the pinned model weights. On the same fixture at 480 ms delay, it produces
+1,728 mel frames and 864 width-1,280 stem vectors. Five intermediate
+fingerprints match the pinned Python oracle with a maximum sampled absolute
+error of `5.36e-7` and a maximum aggregate relative error of `3.64e-7`, below
+the fixed `2e-6` and `2e-5` tolerances. The shape also matches in a CPU smoke
+run.
+
 The machine-readable
-[`boundary record`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json)
-explicitly keeps `transcription: false`. This is a lifecycle and model-layout
-milestone, not frontend, encoder, token, transcript, WER, or first-text-latency
-evidence. Those claims require staged numerical parity with the existing
-Python oracle through the same repository-owned session.
+[`boundary record`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json),
+[`frontend oracle`](../benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json),
+and
+[`frontend result`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.frontend-480ms-1/result.json)
+all explicitly keep `transcription: false`. The result stops before the
+32-layer causal encoder; it is not token, transcript, WER, or first-text-latency
+evidence. Those claims require the remaining staged parity gates through the
+same repository-owned session.
 
 ## Artifact and license pins
 
