@@ -38,13 +38,14 @@ const supportedCandidates = new Set([
   'mlx',
   'apple-speech',
   'parakeet',
+  'qwen3-mlx-direct',
   'qwen3-mlx-reference',
   'whisper',
 ]);
 if (!supportedCandidates.has(values.candidate)) {
   throw new Error(
     '--candidate must be mlx, apple-speech, parakeet, ' +
-    'qwen3-mlx-reference, or whisper',
+    'qwen3-mlx-direct, qwen3-mlx-reference, or whisper',
   );
 }
 const candidate = values.candidate;
@@ -113,6 +114,8 @@ const record = {
     warm_inference:
       candidate === 'apple-speech'
         ? 'Mean complete streamed inference over fresh processes after one discarded process warm-up'
+        : candidate === 'qwen3-mlx-direct'
+          ? 'Mean adapter-reported complete inference across fresh processes after one discarded filesystem/Metal-cache warm-up'
         : 'Mean complete inference inside the initialized engine after one discarded warm-up',
     energy:
       'Not captured in this breadth pass; the alternating powermetrics procedure remains separate',
@@ -141,9 +144,98 @@ async function runCandidate(fixture, pcmPath) {
       return runLegacy(fixture, pcmPath);
     case 'qwen3-mlx-reference':
       return runQwen3MlxReference(fixture, pcmPath);
+    case 'qwen3-mlx-direct':
+      return runQwen3MlxDirect(fixture, pcmPath);
     default:
       throw new Error(`unsupported candidate: ${candidate}`);
   }
+}
+
+async function runQwen3MlxDirect(fixture, pcmPath) {
+  const probe = requiredEnvironment('CUTTLEDOC_QWEN3_DIRECT_PROBE');
+  const modelDirectory = requiredEnvironment('CUTTLEDOC_QWEN3_MODEL_DIR');
+  const libraryDirectory = dirname(probe);
+  const language = languageCode(fixture.language);
+  const runs = [];
+  for (let index = 0; index < repetitions + 1; index += 1) {
+    const timed = timedCommand(
+      probe,
+      ['transcribe', modelDirectory, pcmPath, language, 'gpu'],
+      {
+        env: {
+          ...process.env,
+          DYLD_LIBRARY_PATH: libraryDirectory,
+        },
+      },
+    );
+    runs.push({
+      ...JSON.parse(timed.stdout.trim()),
+      process_wall_ms: timed.wallMs,
+      maximum_resident_set_bytes: timed.maximumResidentSetBytes,
+    });
+  }
+  const measured = runs.slice(1);
+  const representative = measured.at(-1);
+  const binarySizeBytes =
+    (await stat(probe)).size +
+    (await stat(join(libraryDirectory, 'libcuttledoc_qwen3_mlx_shim.dylib')))
+      .size +
+    (await stat(join(libraryDirectory, 'mlx.metallib'))).size;
+
+  return resultRecord({
+    fixture,
+    text: representative.text,
+    reportedLanguage: language,
+    runtimeLocaleRequested: language,
+    coldLoadMs: Math.max(runs[0].process_wall_ms - runs[0].elapsed_ms, 0),
+    warmInferenceMs: mean(
+      measured.map((sample) => sample.elapsed_ms),
+    ),
+    peakMemoryBytes: Math.max(
+      ...measured.map((sample) => sample.maximum_resident_set_bytes),
+    ),
+    runtimePeakMemoryBytes: Math.max(
+      ...measured.map((sample) => sample.peak_memory_bytes),
+    ),
+    modelSizeBytes: await directorySize(modelDirectory),
+    binarySizeBytes,
+    streaming: {
+      supported: false,
+      first_result_ms: null,
+      update_count: 1,
+      volatile_update_count: 0,
+      final_update_count: 1,
+      revoke_count: 0,
+      timestamps: 'none',
+    },
+    segments: [
+      {
+        start_seconds: 0,
+        end_seconds: fixtureDurationMs(fixture) / 1000,
+        text: representative.text,
+      },
+    ],
+    repetitions: measured.map((sample) => ({
+      process_wall_ms: sample.process_wall_ms,
+      inference_ms: sample.elapsed_ms,
+      peak_memory_bytes: sample.peak_memory_bytes,
+      prompt_tokens: sample.prompt_length,
+      generation_tokens: sample.generation_tokens,
+      finish_reason: sample.finish_reason,
+      stop_token: sample.stop_token,
+      text: sample.text,
+    })),
+    warmup: {
+      process_wall_ms: runs[0].process_wall_ms,
+      inference_ms: runs[0].elapsed_ms,
+      peak_memory_bytes: runs[0].peak_memory_bytes,
+      prompt_tokens: runs[0].prompt_length,
+      generation_tokens: runs[0].generation_tokens,
+      finish_reason: runs[0].finish_reason,
+      stop_token: runs[0].stop_token,
+      text: runs[0].text,
+    },
+  });
 }
 
 async function runQwen3MlxReference(fixture, pcmPath) {
@@ -821,6 +913,17 @@ function candidateMetadata(name) {
         license:
           'Apache-2.0 official model and converted artifact; MIT mlx-audio and official MLX',
       };
+    case 'qwen3-mlx-direct':
+      return {
+        id: 'qwen3-asr-0.6b-mlx-direct',
+        model:
+          'mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f; converted from Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0',
+        runtime:
+          'repository-owned Qwen3-ASR task adapter over official MLX 0.32.0@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247',
+        boundary: 'repository-owned C++ task ABI called from Rust',
+        license:
+          'Apache-2.0 official model and converted artifact; MIT official MLX',
+      };
     case 'whisper':
       return {
         id: 'whisper-large-v3-turbo-coreml-whispercpp',
@@ -838,12 +941,15 @@ function candidateMetadata(name) {
 }
 
 function timedCommand(command, arguments_, options = {}) {
+  const started = process.hrtime.bigint();
   const result = spawnSync('/usr/bin/time', ['-l', command, ...arguments_], {
     cwd: options.cwd ?? repoRoot,
     env: options.env ?? process.env,
     encoding: 'utf8',
     maxBuffer: options.maxBuffer ?? 128 * 1024 * 1024,
   });
+  const wallMs =
+    Number(process.hrtime.bigint() - started) / 1_000_000;
   if (result.status !== 0) {
     throw new Error(
       `${command} failed with ${result.status}\n${result.stdout}\n${result.stderr}`,
@@ -864,6 +970,7 @@ function timedCommand(command, arguments_, options = {}) {
   return {
     stdout: result.stdout,
     stderr: result.stderr,
+    wallMs,
     maximumResidentSetBytes,
   };
 }
