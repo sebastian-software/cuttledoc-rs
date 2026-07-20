@@ -74,6 +74,9 @@ Run that true-input streaming experiment with 80 ms, wall-clock-paced chunks:
 bash scripts/run-voxtral-realtime-streaming.sh
 ```
 
+Set `CUTTLEDOC_VOXTRAL_STREAMING_CHUNK_MS=320` to run the coarser-chunk
+backpressure control against the same delays and repeated lifecycle.
+
 The probe deliberately distinguishes the available API from measured
 semantics. It records every append delta against both wall time and the amount
 of audio fed, endpoint finalization, step duration and scheduling lateness. It

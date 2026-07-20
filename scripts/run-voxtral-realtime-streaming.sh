@@ -10,6 +10,7 @@ fixture_dir=${CUTTLEDOC_VOXTRAL_STREAMING_FIXTURE_DIR:-/tmp/cuttledoc-audiobook-
 fixture_id=${CUTTLEDOC_VOXTRAL_STREAMING_FIXTURE_ID:-audiobook-de-135_82_000105}
 output=${CUTTLEDOC_VOXTRAL_STREAMING_OUTPUT:-/tmp/cuttledoc-voxtral-realtime-streaming.json}
 repetitions=${CUTTLEDOC_VOXTRAL_STREAMING_REPETITIONS:-2}
+chunk_ms=${CUTTLEDOC_VOXTRAL_STREAMING_CHUNK_MS:-80}
 
 if [[ ! -d "$model_dir" ]]; then
   echo "Model directory not found: $model_dir" >&2
@@ -25,7 +26,7 @@ fi
   "$fixture_id" \
   --delay-ms 480 \
   --delay-ms 2400 \
-  --chunk-ms 80 \
+  --chunk-ms "$chunk_ms" \
   --max-decode-tokens 16 \
   --max-tokens 4096 \
   --repetitions "$repetitions" \
