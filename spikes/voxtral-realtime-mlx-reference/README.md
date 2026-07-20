@@ -67,3 +67,17 @@ change by source, and the German FLEURS errors are dominated by token
 boundaries rather than character changes. The next experiment must feed audio
 incrementally and record first, stable, and final output plus cancellation and
 repeated lifecycle behavior.
+
+Run that true-input streaming experiment with 80 ms, wall-clock-paced chunks:
+
+```sh
+bash scripts/run-voxtral-realtime-streaming.sh
+```
+
+The probe deliberately distinguishes the available API from measured
+semantics. It records every append delta against both wall time and the amount
+of audio fed, endpoint finalization, step duration and scheduling lateness. It
+also inspects the session for cancellation and finalization methods, abandons
+one prefix session, and then runs repeated complete lifecycles. Dropping a
+Python session reference is only an abandonment smoke test; it must not be
+reported as cooperative cancellation.
