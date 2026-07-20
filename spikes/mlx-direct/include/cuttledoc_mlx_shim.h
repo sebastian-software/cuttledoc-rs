@@ -15,6 +15,7 @@ extern "C" {
  * cuttledoc_mlx_free_string.
  *
  * device_kind: 0 = CPU, 1 = GPU.
+ * language: explicit ISO 639-1 code supported by the task adapter.
  */
 void *cuttledoc_mlx_whisper_create(const char *model_directory,
                                    int32_t device_kind, char **error_out);
@@ -23,7 +24,8 @@ int32_t cuttledoc_mlx_whisper_describe(void *handle, char **json_out,
                                        char **error_out);
 
 int32_t cuttledoc_mlx_whisper_transcribe(void *handle, const float *audio,
-                                         size_t audio_len, char **json_out,
+                                         size_t audio_len,
+                                         const char *language, char **json_out,
                                          char **error_out);
 
 void cuttledoc_mlx_whisper_destroy(void *handle);

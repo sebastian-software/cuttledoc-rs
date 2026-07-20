@@ -11,18 +11,20 @@ void *cuttledoc_mlx_whisper_create(
 
 int32_t cuttledoc_mlx_whisper_transcribe(
     void *handle, const float *audio, size_t audio_len,
-    char **json_out, char **error_out);
+    const char *language, char **json_out, char **error_out);
 
 void cuttledoc_mlx_whisper_destroy(void *handle);
 ```
 
-The input is mono f32 PCM at 16 kHz. The adapter pads it to Whisper's 30-second
-window, computes the pinned 80-bin log-Mel frontend, evaluates both
-convolutions and all four audio blocks, then runs the four-layer
-autoregressive text decoder with the official multilingual vocabulary and
-timestamp-token rules. It returns Rust-owned transcript text, tokens, segment
-times, timing, and memory evidence. CPU uses the official reference-compatible
-Float32 path; Metal uses Float16.
+The input is mono f32 PCM at 16 kHz plus an explicit ISO 639-1 language code.
+The bounded spike surface accepts `en`, `de`, `es`, `fr`, and `pt`; unsupported
+or absent values are errors rather than an implicit English fallback. The
+adapter pads audio to Whisper's 30-second window, computes the pinned 80-bin
+log-Mel frontend, evaluates both convolutions and all four audio blocks, then
+runs the four-layer autoregressive text decoder with the official multilingual
+vocabulary and timestamp-token rules. It returns Rust-owned transcript text,
+tokens, segment times, timing, and memory evidence. CPU uses the official
+reference-compatible Float32 path; Metal uses Float16.
 
 ## Pinned inputs
 
@@ -49,6 +51,15 @@ CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx \
   bash scripts/run-mlx-direct-spike.sh
 ```
 
+Select another fixture and its matching language explicitly:
+
+```sh
+CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx \
+  CUTTLEDOC_MLX_LANGUAGE=de \
+  CUTTLEDOC_MLX_FIXTURE=../cuttledoc/packages/cuttledoc/fixtures/fleurs-de-000.ogg \
+  bash scripts/run-mlx-direct-spike.sh
+```
+
 The runner requires Xcode's Metal Toolchain, CMake, Rust, FFmpeg, `curl`, and
 `unzip`. It builds for macOS 14, statically links MLX into the shim, colocates
 `mlx.metallib`, adds an executable-relative RPATH to the probe, normalizes the
@@ -72,6 +83,9 @@ real FLEURS fixture, and runs repeated CPU and GPU lifecycles. Set
 - Encoder execution is synchronous; autoregressive decoding provides a natural
   cancellation checkpoint between tokens. Long-audio chunking and streaming
   updates remain production work.
+- Language choice is Rust-owned task input. Only its numeric Whisper language
+  token enters the model prefix; language detection remains a separate product
+  capability decision.
 - `mlx-c` remains an optional control for a named uncertainty. The real model
   path did not reveal one, so no second product dependency was added.
 

@@ -6,6 +6,7 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 source_dir=${CUTTLEDOC_MLX_SOURCE_DIR:?set CUTTLEDOC_MLX_SOURCE_DIR to MLX v0.31.2 or v0.32.0}
 model_dir=${CUTTLEDOC_MLX_MODEL_DIR:-"$HOME/.cache/cuttledoc-rs/mlx-whisper-tiny"}
 source_fixture=${CUTTLEDOC_MLX_FIXTURE:-"$root/../cuttledoc/packages/cuttledoc/fixtures/fleurs-en-000.ogg"}
+language=${CUTTLEDOC_MLX_LANGUAGE:-en}
 lifecycle_count=${CUTTLEDOC_MLX_LIFECYCLES:-3}
 runs_per_lifecycle=${CUTTLEDOC_MLX_RUNS_PER_LIFECYCLE:-2}
 actual_commit=$(git -C "$source_dir" rev-parse HEAD)
@@ -74,6 +75,7 @@ rustc \
 echo "UPSTREAM"
 echo "mlx_release=$mlx_release"
 echo "mlx_commit=$actual_commit"
+echo "language=$language"
 
 for device in cpu gpu; do
   if [[ "$device" == "cpu" ]]; then
@@ -86,6 +88,7 @@ for device in cpu gpu; do
     "$model_dir" \
     "$fixture" \
     "$device" \
+    "$language" \
     "$lifecycle_count" \
     "$runs_per_lifecycle"
 done

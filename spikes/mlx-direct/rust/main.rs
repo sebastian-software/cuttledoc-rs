@@ -20,6 +20,7 @@ unsafe extern "C" {
         handle: *mut c_void,
         audio: *const f32,
         audio_len: usize,
+        language: *const c_char,
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
@@ -59,6 +60,7 @@ fn run() -> Result<(), String> {
         "gpu" => 1,
         _ => return Err("device must be cpu or gpu".to_owned()),
     };
+    let language = arguments.next().ok_or_else(usage)?;
     let lifecycle_count = arguments
         .next()
         .map(|value| value.parse::<usize>())
@@ -87,6 +89,8 @@ fn run() -> Result<(), String> {
 
     let model_directory = CString::new(model_directory)
         .map_err(|_| "model path contains an embedded NUL byte".to_owned())?;
+    let language =
+        CString::new(language).map_err(|_| "language contains an embedded NUL byte".to_owned())?;
     let mut sessions = Vec::with_capacity(lifecycle_count);
     for _ in 0..lifecycle_count {
         let load_started = Instant::now();
@@ -104,6 +108,7 @@ fn run() -> Result<(), String> {
                     session.0,
                     audio.as_ptr(),
                     audio.len(),
+                    language.as_ptr(),
                     json,
                     error,
                 )
@@ -124,7 +129,8 @@ fn run() -> Result<(), String> {
     }
 
     print!(
-        "{{\"device\":\"{device_name}\",\"pcm_samples\":{},\"lifecycle_count\":{lifecycle_count},\"runs_per_lifecycle\":{runs_per_lifecycle},\"sessions\":[",
+        "{{\"device\":\"{device_name}\",\"language\":\"{}\",\"pcm_samples\":{},\"lifecycle_count\":{lifecycle_count},\"runs_per_lifecycle\":{runs_per_lifecycle},\"sessions\":[",
+        language.to_string_lossy(),
         audio.len()
     );
     for (session_index, session) in sessions.iter().enumerate() {
@@ -148,7 +154,7 @@ fn run() -> Result<(), String> {
 }
 
 fn usage() -> String {
-    "usage: cuttledoc-mlx-whisper MODEL_DIR PCM_F32LE cpu|gpu [LIFECYCLES] [RUNS_PER_LIFECYCLE]"
+    "usage: cuttledoc-mlx-whisper MODEL_DIR PCM_F32LE cpu|gpu en|de|es|fr|pt [LIFECYCLES] [RUNS_PER_LIFECYCLE]"
         .to_owned()
 }
 

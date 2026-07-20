@@ -68,6 +68,12 @@ must have a reproducible `local-required` acquisition path. `partial` and
 invented metrics. Raw tool output belongs below `benchmarks/raw/<run-id>/`; summaries in
 `docs/model-evaluation.md` are derived evidence, not the source of truth.
 
+The initial multilingual breadth set is intentionally bounded to two FLEURS
+test samples in each of `en_us`, `de_de`, `es_419`, `fr_fr`, and `pt_br`.
+Those ten quality fixtures are pinned in the manifest with source, reference,
+and normalized-PCM digests. They expose language-path failures quickly; they
+are not statistically sufficient for a final model-quality ranking.
+
 ## Fixture rules
 
 - Record exact provenance, artifact license, language, normalization, and hash.

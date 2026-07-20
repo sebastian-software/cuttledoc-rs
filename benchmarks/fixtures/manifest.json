@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "phase0-real-asr-1",
+  "revision": "phase0-multilingual-asr-1",
   "fixtures": [
     {
       "id": "apple-say-en-us-smoke",
@@ -41,6 +41,213 @@
       "materialization": {
         "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-en-000.ogg > /tmp/fleurs-en-000.ogg",
         "notes": "The manifest SHA-256 covers the exact normalized f32le 16 kHz mono PCM consumed by every runner (168960 samples), not the Opus source. Source OGG SHA-256: 3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c. Reference file SHA-256: 94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-en-us-test-001",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "en-US",
+      "reference_text": "all nouns alongside the word sie for you always begin with a capital letter even in the middle of a sentence",
+      "duration_ms": 8760,
+      "sha256": "09ac8c736dd46dea89f492226152bd58517b9d91d245f6f27d66d546055ca458",
+      "provenance": {
+        "source": "google/fleurs en_us test split, sample 1; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-en-001.ogg > /tmp/fleurs-en-001.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 140160 samples. Source OGG SHA-256: 1b4506c4b2d1b4f7bf34f9df6726e0aaef5736c4231d9a535dd4780be44c43c9. Reference file SHA-256: 78c17c59439ff7b484261f19ff7d1d49f854910035fe3b0b922297037ae285ee."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-de-de-test-000",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "de-DE",
+      "reference_text": "für die besten aussichten auf hongkong sollten sie die insel verlassen und zum gegenüberliegenden ufer von kowloon fahren",
+      "duration_ms": 17940,
+      "sha256": "c5589cf2339fdb9e50a5bf8920d88fcef5db3a8018e31a2b8e6f25be1cebed65",
+      "provenance": {
+        "source": "google/fleurs de_de test split, sample 0; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-de-000.ogg > /tmp/fleurs-de-000.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 287040 samples. Source OGG SHA-256: 9c491a9e769848f3ed63e06d014ab25faa338697b3da8ebc41e18f59a2120b4f. Reference file SHA-256: 4237bd708880e23cb963ae50f79921d14662fdbe2feb835e3de260fe599c8840."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-de-de-test-001",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "de-DE",
+      "reference_text": "er griff auch alles an was ins wasser kam selbst ein großer dinosaurier wie der t rex war ihm nicht gewachsen",
+      "duration_ms": 11160,
+      "sha256": "f66a74f5111199337921cb914bc691a5fff6f412c22715765af7dfec9d8596b8",
+      "provenance": {
+        "source": "google/fleurs de_de test split, sample 1; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-de-001.ogg > /tmp/fleurs-de-001.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 178560 samples. Source OGG SHA-256: 70d282fdca8bdf26b24e16d26e0346e80dcd0a71212bb880e97cdb4a98e1cbda. Reference file SHA-256: ff0bf75d8a640b871a5f629ca6694f8eaea1b693d08405912955e10cddbaca54."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-es-419-test-000",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "es-419",
+      "reference_text": "se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo de clima extremo en el área que visitan dado que ello puede afectar sus planes de viaje",
+      "duration_ms": 12840,
+      "sha256": "be1f4f5f3cbca7955af521d8989b5472fc73693cb8a4c6725b641db9f1449ee4",
+      "provenance": {
+        "source": "google/fleurs es_419 test split, sample 0; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-es-000.ogg > /tmp/fleurs-es-000.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 205440 samples. Source OGG SHA-256: 4f28948cba8727379a11f1217d50e9a277465a28777c0bdf52e9dd7da4068300. Reference file SHA-256: b76d911c9d600bafe831fd283e7c55dfc36be588211521ace07970a897644bf4."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-es-419-test-001",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "es-419",
+      "reference_text": "el uso adecuado de los blogs «puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de internet pueden definir sus posturas en el contexto de los escritos de otros además de establecer sus perspectivas sobre temas específicos» oravec 2002",
+      "duration_ms": 21360,
+      "sha256": "ba8b6699d7a9e24f43c1fbdf896d784450dcb8d97160fa30d6d58ffeaa5633ac",
+      "provenance": {
+        "source": "google/fleurs es_419 test split, sample 1; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-es-001.ogg > /tmp/fleurs-es-001.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 341760 samples. Source OGG SHA-256: 56ef868ed25dc8bfca4f14ee76f080a4024a74bc9d431a4211c70d3183322c54. Reference file SHA-256: 7aeddf7e522afb5bca2e2390a5bcd542c915bad758847cd32c25e0ef1d97a369."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-fr-fr-test-000",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "fr-FR",
+      "reference_text": "l'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant",
+      "duration_ms": 10200,
+      "sha256": "47a286e8dde628597fd5f885fc7179d062d2c9b0752008e2003dce350787a21a",
+      "provenance": {
+        "source": "google/fleurs fr_fr test split, sample 0; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-fr-000.ogg > /tmp/fleurs-fr-000.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 163200 samples. Source OGG SHA-256: 0e5c56fee9864764bd8692a607fe4f6e5d85f575cf9b27e8d7bfb37d2cf7205e. Reference file SHA-256: bb5c63974d229c750d09f355f558952970b534b7851b5a71f598ac7a3e209700."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-fr-fr-test-001",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "fr-FR",
+      "reference_text": "nous sommes d'accord avec la déclaration de l'usoc comité olympique des états-unis selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation",
+      "duration_ms": 23400,
+      "sha256": "9f45eecaaab7fabef4bebc499bc9ada5f3f882ca5d75b8543880280b23a1d907",
+      "provenance": {
+        "source": "google/fleurs fr_fr test split, sample 1; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-fr-001.ogg > /tmp/fleurs-fr-001.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 374400 samples. Source OGG SHA-256: 86a66127b1cbb8bbd442aa83de559aa574ec9e208fb244c6081b7f85666efbf6. Reference file SHA-256: 3f6d1fdfb25ddae35bdd1e8ef09fdc940c58618064caaa6d02b68420dbc2532f."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-pt-br-test-000",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "pt-BR",
+      "reference_text": "segundo informações ele estava na casa dos 20 anos em uma declaração bieber disse que embora eu não estivesse presente nem diretamente envolvido neste trágico incidente meus pensamentos e orações estão com a família da vítima",
+      "duration_ms": 17760,
+      "sha256": "e2b4eeba0a6f62b37f9f9ee575489e1a4cfec190ac2653bd9c8bec230b7e4a76",
+      "provenance": {
+        "source": "google/fleurs pt_br test split, sample 0; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-pt-000.ogg > /tmp/fleurs-pt-000.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 284160 samples. Source OGG SHA-256: ec5bd9d2a6b0fdfec1780b770f9634694da7bf5cfdc4e40bbf5aa19ce5572654. Reference file SHA-256: 06c6457a7da5cd8b5473a60ff1dcf8f84facdff90dd4e9c98c7d681705794ef9."
+      },
+      "normalization": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "sample_format": "f32"
+      }
+    },
+    {
+      "id": "fleurs-pt-br-test-001",
+      "purpose": "quality",
+      "availability": "external",
+      "language": "pt-BR",
+      "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
+      "duration_ms": 13620,
+      "sha256": "65710ac69f000d4720df1bceeee2313244610efad65118497daeece9efeda70d",
+      "provenance": {
+        "source": "google/fleurs pt_br test split, sample 1; imported by cuttledoc commit 50b2d2d617fabce18a23f624fab4745ea1a792c4",
+        "license": "CC-BY-4.0",
+        "redistributable": true
+      },
+      "materialization": {
+        "command": "git -C ../cuttledoc show 50b2d2d617fabce18a23f624fab4745ea1a792c4:packages/cuttledoc/fixtures/fleurs-pt-001.ogg > /tmp/fleurs-pt-001.ogg",
+        "notes": "Normalized f32le 16 kHz mono: 217920 samples. Source OGG SHA-256: e9e7cc143e4fc8ccadbb13a1999e8710232897dbe91d81cd55850c319fbf5959. Reference file SHA-256: da1d3c5c4c882a2617ee2cd3ea4d429021225329e4c85df6e49694df7f58b4d6."
       },
       "normalization": {
         "sample_rate_hz": 16000,

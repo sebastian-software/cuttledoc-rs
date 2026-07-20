@@ -44,7 +44,6 @@ constexpr float kLayerNormEpsilon = 1e-5f;
 
 constexpr int32_t kEndOfText = 50'257;
 constexpr int32_t kStartOfTranscript = 50'258;
-constexpr int32_t kEnglish = 50'259;
 constexpr int32_t kTranscribe = 50'359;
 constexpr int32_t kTimestampBegin = 50'364;
 constexpr int32_t kMergeableTokenCount = 50'257;
@@ -63,6 +62,26 @@ struct DecodedTranscript {
   std::vector<int32_t> tokens;
   std::vector<TranscriptSegment> segments;
 };
+
+int32_t language_token(std::string_view language) {
+  if (language == "en") {
+    return 50'259;
+  }
+  if (language == "de") {
+    return 50'261;
+  }
+  if (language == "es") {
+    return 50'262;
+  }
+  if (language == "fr") {
+    return 50'265;
+  }
+  if (language == "pt") {
+    return 50'267;
+  }
+  throw std::invalid_argument(
+      "language must be one of: en, de, es, fr, pt");
+}
 
 std::string decode_base64(std::string_view encoded) {
   static constexpr std::string_view alphabet =
@@ -268,7 +287,8 @@ public:
     return json.str();
   }
 
-  std::string transcribe(const float *audio, std::size_t audio_len) const {
+  std::string transcribe(const float *audio, std::size_t audio_len,
+                         std::string_view language) const {
     if (audio == nullptr) {
       throw std::invalid_argument("audio must be non-null");
     }
@@ -277,14 +297,16 @@ public:
           "audio must contain between 1 and 480000 mono f32 samples");
     }
 
+    const auto selected_language_token = language_token(language);
     mx::set_default_device(device_);
     mx::reset_peak_memory();
     const auto started_at = std::chrono::steady_clock::now();
     auto encoded = encode_audio(log_mel(audio, audio_len));
     mx::eval(encoded);
     const auto encoder_finished_at = std::chrono::steady_clock::now();
-    const auto transcript =
-        decode_audio(encoded, static_cast<double>(audio_len) / kSampleRate);
+    const auto transcript = decode_audio(
+        encoded, static_cast<double>(audio_len) / kSampleRate,
+        selected_language_token);
     const auto finished_at = std::chrono::steady_clock::now();
 
     const auto encoder_ms = std::chrono::duration<double, std::milli>(
@@ -301,7 +323,7 @@ public:
     json << std::fixed << std::setprecision(3) << "{\"mlx_version\":\""
          << mx::version() << "\","
          << "\"device\":\"" << device_name() << "\","
-         << "\"language\":\"en\","
+         << "\"language\":\"" << json_escape(language) << "\","
          << "\"input_samples\":" << audio_len << ","
          << "\"audio_duration_seconds\":"
          << static_cast<double>(audio_len) / kSampleRate << ","
@@ -797,10 +819,11 @@ private:
   }
 
   DecodedTranscript decode_audio(const mx::array &audio_features,
-                                 double audio_duration_seconds) const {
+                                 double audio_duration_seconds,
+                                 int32_t selected_language_token) const {
     std::vector<int32_t> context = {
         kStartOfTranscript,
-        kEnglish,
+        selected_language_token,
         kTranscribe,
     };
     std::vector<int32_t> generated;
@@ -949,6 +972,7 @@ extern "C" int32_t cuttledoc_mlx_whisper_describe(void *handle, char **json_out,
 extern "C" int32_t cuttledoc_mlx_whisper_transcribe(void *handle,
                                                     const float *audio,
                                                     std::size_t audio_len,
+                                                    const char *language,
                                                     char **json_out,
                                                     char **error_out) {
   if (error_out != nullptr) {
@@ -957,11 +981,14 @@ extern "C" int32_t cuttledoc_mlx_whisper_transcribe(void *handle,
   if (json_out != nullptr) {
     *json_out = nullptr;
   }
+  if (language == nullptr) {
+    return fail("language must be non-null", error_out);
+  }
   try {
     std::scoped_lock lock(runtime_mutex);
     auto *encoder = as_encoder(handle);
     mx::set_default_device(encoder->device());
-    return copy_json(encoder->transcribe(audio, audio_len), json_out,
+    return copy_json(encoder->transcribe(audio, audio_len, language), json_out,
                      error_out);
   } catch (const std::exception &error) {
     return fail(error.what(), error_out);

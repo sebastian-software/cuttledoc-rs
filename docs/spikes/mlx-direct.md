@@ -1,9 +1,9 @@
-# Direct official MLX result (#6)
+# Direct official MLX result (#6, #15)
 
 **Status:** #6 and #15 complete; advance official MLX as the third first-class
 inference foundation. Broader selection evidence remains in #4 and #12.
 
-**Evidence date:** 2026-07-17.
+**Evidence date:** 2026-07-20.
 
 **Runnable artifact:** [`spikes/mlx-direct`](../../spikes/mlx-direct/).
 
@@ -185,6 +185,10 @@ performance evidence.
   or operator handle. The future private Rust adapter needs safe ownership,
   typed errors, cancellation checks between decoder steps, and a worker proxy;
   it does not need a general MLX binding.
+- Language is now explicit Rust-owned task input. The bounded adapter maps
+  `en`, `de`, `es`, `fr`, and `pt` to the pinned Whisper language tokens and
+  rejects missing or unsupported values instead of silently defaulting to
+  English.
 
 ## Disposition and next proof
 
