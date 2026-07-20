@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/benchmark-matrix-1.0.0.json",
+  "title": "Cuttledoc benchmark matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "matrix_id",
+    "captured_at",
+    "source_revision",
+    "fixture_manifest_revision",
+    "fixture_ids",
+    "host",
+    "procedure",
+    "candidates",
+    "recommendation",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "matrix_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "source_revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "fixture_manifest_revision": { "type": "string", "minLength": 1 },
+    "fixture_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "chip", "memory_bytes", "os", "architecture", "power_state"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "chip": { "type": "string", "minLength": 1 },
+        "memory_bytes": { "type": "integer", "minimum": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "architecture": { "const": "arm64" },
+        "power_state": { "enum": ["ac", "battery", "unknown"] }
+      }
+    },
+    "procedure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repetitions",
+        "fixture_order",
+        "quality_normalization",
+        "cold_load",
+        "warm_inference",
+        "energy"
+      ],
+      "properties": {
+        "repetitions": { "type": "integer", "minimum": 1 },
+        "fixture_order": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "quality_normalization": { "type": "string", "minLength": 1 },
+        "cold_load": { "type": "string", "minLength": 1 },
+        "warm_inference": { "type": "string", "minLength": 1 },
+        "energy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/candidate" }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "fallback", "research", "rationale"],
+      "properties": {
+        "primary": { "type": "string", "minLength": 1 },
+        "fallback": { "type": "string", "minLength": 1 },
+        "research": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "rationale": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "nullableNumber": { "type": ["number", "null"], "minimum": 0 },
+    "nullableInteger": { "type": ["integer", "null"], "minimum": 0 },
+    "languageMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixture_count", "macro_wer", "macro_cer"],
+      "properties": {
+        "fixture_count": { "type": "integer", "minimum": 1 },
+        "macro_wer": { "type": "number", "minimum": 0 },
+        "macro_cer": { "type": "number", "minimum": 0 }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "raw_artifact",
+        "quality",
+        "timing",
+        "resources",
+        "streaming",
+        "disposition"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "raw_artifact": { "type": "string", "minLength": 1 },
+        "quality": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["macro_wer", "macro_cer", "by_language"],
+          "properties": {
+            "macro_wer": { "type": "number", "minimum": 0 },
+            "macro_cer": { "type": "number", "minimum": 0 },
+            "by_language": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/languageMetric" }
+            }
+          }
+        },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mean_cold_load_ms",
+            "minimum_cold_load_ms",
+            "maximum_cold_load_ms",
+            "mean_warm_inference_ms",
+            "mean_real_time_factor"
+          ],
+          "properties": {
+            "mean_cold_load_ms": { "type": "number", "minimum": 0 },
+            "minimum_cold_load_ms": { "type": "number", "minimum": 0 },
+            "maximum_cold_load_ms": { "type": "number", "minimum": 0 },
+            "mean_warm_inference_ms": { "type": "number", "minimum": 0 },
+            "mean_real_time_factor": { "type": "number", "minimum": 0 }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maximum_peak_memory_bytes",
+            "runtime_peak_memory_bytes",
+            "model_size_bytes",
+            "binary_size_bytes"
+          ],
+          "properties": {
+            "maximum_peak_memory_bytes": { "type": "integer", "minimum": 0 },
+            "runtime_peak_memory_bytes": { "$ref": "#/$defs/nullableInteger" },
+            "model_size_bytes": { "$ref": "#/$defs/nullableInteger" },
+            "binary_size_bytes": { "$ref": "#/$defs/nullableInteger" }
+          }
+        },
+        "streaming": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["supported", "mean_first_result_ms", "timestamps"],
+          "properties": {
+            "supported": { "type": "boolean" },
+            "mean_first_result_ms": { "$ref": "#/$defs/nullableNumber" },
+            "timestamps": { "enum": ["none", "segment", "word", "unknown"] }
+          }
+        },
+        "disposition": {
+          "enum": ["primary", "fallback", "compatibility-baseline", "research"]
+        }
+      }
+    }
+  }
+}

@@ -73,12 +73,12 @@ Evidence snapshot: 2026-07-20.
 | --- | --- | --- |
 | Dependency policy and runtime matrix (#10, #2) | Complete | Apply the accepted policy to each newly selected production pin. |
 | Capability-oriented API and ownership (#8) | Complete | Check the provisional types against the first real vertical slice. |
-| CoreML feasibility (#5) | Foundation proven | A complete ASR graph, typed adapter errors, cancellation boundary, and common benchmark remain. |
-| Apple Speech feasibility (#11) | Foundation proven | Broader fixture quality, clean cold start, energy, and shipped executable identity remain selection evidence. |
+| CoreML feasibility (#5) | Foundation proven | A complete repository-owned ASR graph, typed adapter errors, and cancellation boundary remain; the legacy CoreML paths now have common benchmark evidence. |
+| Apple Speech feasibility (#11) | Foundation proven | The multilingual benchmark is complete; shipped executable identity, clean-host cold start, and energy remain productization evidence. |
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
 | End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
-| Mandatory ASR benchmark (#4) | Partial | Expand the fixture set, make measurements comparable, and recommend a first backend plus fallback. |
-| Exploratory ASR sweep (#12) | Open | Use it selectively to find a stronger end-to-end MLX ASR path; breadth must not block #4. |
+| Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
+| Exploratory ASR sweep (#12) | In progress | Run a bounded stronger-model check, prioritizing an MLX-compatible path; record precise blockers without reopening the completed mandatory comparison. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Open | Run one bounded transcript-enhancement experiment and record adopt/defer. |
 
@@ -287,8 +287,8 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Complete #4/#12 with a multilingual fixture set and comparable cold, warm,
-   memory, energy, and quality evidence.
+1. Complete the bounded #12 stronger-model check, prioritizing an
+   MLX-compatible candidate and precise blockers over a broad wrapper survey.
 2. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 3. Finish #9 with Node 22 plus packed-artifact CI gates.

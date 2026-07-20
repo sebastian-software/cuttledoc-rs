@@ -1,0 +1,778 @@
+{
+  "schema_version": "1.0.0",
+  "matrix_run_id": "phase0.mlx.multilingual-fleurs-10-1",
+  "captured_at": "2026-07-20T10:12:57.697Z",
+  "source_revision": "254356ef94f3833d7dae40f68e6633de55af17dd",
+  "fixture_manifest_revision": "phase0-multilingual-asr-1",
+  "candidate": {
+    "id": "mlx-whisper-tiny",
+    "model": "mlx-community/whisper-tiny@78c52ab98ca87f570bc57ad852e15ef7060f9f76",
+    "runtime": "official MLX v0.32.0@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+    "boundary": "repository-owned C++ task ABI called from Rust",
+    "license": "MIT source model and official converter; pinned converted model card has no structured license field"
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "procedure": {
+    "fixture_count": 10,
+    "repetitions": 2,
+    "fixture_order": [
+      "fleurs-en-us-test-000",
+      "fleurs-en-us-test-001",
+      "fleurs-de-de-test-000",
+      "fleurs-de-de-test-001",
+      "fleurs-es-419-test-000",
+      "fleurs-es-419-test-001",
+      "fleurs-fr-fr-test-000",
+      "fleurs-fr-fr-test-001",
+      "fleurs-pt-br-test-000",
+      "fleurs-pt-br-test-001"
+    ],
+    "quality_normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 single-fixture records",
+    "cold_load": "First candidate-specific create/initialize value in a fresh process; system and model caches are not cleared",
+    "warm_inference": "Mean complete inference inside the initialized engine after one discarded warm-up",
+    "energy": "Not captured in this breadth pass; the alternating powermetrics procedure remains separate"
+  },
+  "summary": {
+    "macro_wer": 0.26241612350245336,
+    "macro_cer": 0.076058202974202,
+    "mean_warm_inference_ms": 284.75755,
+    "mean_real_time_factor": 0.01841406763070184,
+    "maximum_peak_memory_bytes": 130580480,
+    "by_language": {
+      "en": {
+        "fixture_count": 2,
+        "macro_wer": 0.12155388471177944,
+        "macro_cer": 0.04026374859708193
+      },
+      "de": {
+        "fixture_count": 2,
+        "macro_wer": 0.4126984126984127,
+        "macro_cer": 0.06255401901469318
+      },
+      "es": {
+        "fixture_count": 2,
+        "macro_wer": 0.1940500338066261,
+        "macro_cer": 0.047173010087310334
+      },
+      "fr": {
+        "fixture_count": 2,
+        "macro_wer": 0.24561403508771928,
+        "macro_cer": 0.09419152276295134
+      },
+      "pt": {
+        "fixture_count": 2,
+        "macro_wer": 0.3381642512077294,
+        "macro_cer": 0.13610871440897326
+      }
+    }
+  },
+  "results": [
+    {
+      "fixture_id": "fleurs-en-us-test-000",
+      "requested_language": "en",
+      "runtime_locale_requested": "en",
+      "reported_language": "en",
+      "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+      "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years.",
+      "quality": {
+        "wer": 0.05263157894736842,
+        "cer": 0.012345679012345678
+      },
+      "timing": {
+        "audio_duration_ms": 10560,
+        "cold_load_ms": 93.451,
+        "warm_inference_ms": 136.998,
+        "real_time_factor": 0.012973295454545454
+      },
+      "resources": {
+        "peak_memory_bytes": 108314624,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 7.24,
+          "text": "However, due to the slow communication channels, styles in the West could lag behind by"
+        },
+        {
+          "start_seconds": 7.24,
+          "end_seconds": 8.62,
+          "text": "25 to 30 years."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 179.944,
+        "inference_ms": 179.922,
+        "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 132.866,
+          "inference_ms": 132.842,
+          "encoder_ms": 10.174,
+          "decoder_ms": 122.668,
+          "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years."
+        },
+        {
+          "wall_ms": 141.251,
+          "inference_ms": 141.154,
+          "encoder_ms": 10.301,
+          "decoder_ms": 130.853,
+          "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-en-us-test-001",
+      "requested_language": "en",
+      "runtime_locale_requested": "en",
+      "reported_language": "en",
+      "reference_text": "all nouns alongside the word sie for you always begin with a capital letter even in the middle of a sentence",
+      "text": "All now is alongside the world's safe for you, always begin with a capital letter, even in the middle of a sentence.",
+      "quality": {
+        "wer": 0.19047619047619047,
+        "cer": 0.06818181818181818
+      },
+      "timing": {
+        "audio_duration_ms": 8760,
+        "cold_load_ms": 66.831,
+        "warm_inference_ms": 149.97500000000002,
+        "real_time_factor": 0.01712043378995434
+      },
+      "resources": {
+        "peak_memory_bytes": 110510080,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 8,
+          "text": "All now is alongside the world's safe for you, always begin with a capital letter, even in the middle of a sentence."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 180.284,
+        "inference_ms": 180.258,
+        "text": "All now is alongside the world's safe for you, always begin with a capital letter, even in the middle of a sentence."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 144.212,
+          "inference_ms": 144.193,
+          "encoder_ms": 8.863,
+          "decoder_ms": 135.33,
+          "text": "All now is alongside the world's safe for you, always begin with a capital letter, even in the middle of a sentence."
+        },
+        {
+          "wall_ms": 155.784,
+          "inference_ms": 155.757,
+          "encoder_ms": 12.043,
+          "decoder_ms": 143.714,
+          "text": "All now is alongside the world's safe for you, always begin with a capital letter, even in the middle of a sentence."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-de-de-test-000",
+      "requested_language": "de",
+      "runtime_locale_requested": "de",
+      "reported_language": "de",
+      "reference_text": "für die besten aussichten auf hongkong sollten sie die insel verlassen und zum gegenüberliegenden ufer von kowloon fahren",
+      "text": "Für die besten Aussichtern auf Hong Kong sollten sie die Insel verlassen und zum Gegenüber die in den Ufer von Kovloom fahren.",
+      "quality": {
+        "wer": 0.4444444444444444,
+        "cer": 0.057692307692307696
+      },
+      "timing": {
+        "audio_duration_ms": 17940,
+        "cold_load_ms": 68.048,
+        "warm_inference_ms": 198.9085,
+        "real_time_factor": 0.01108743032329989
+      },
+      "resources": {
+        "peak_memory_bytes": 110215168,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 9.6,
+          "text": "Für die besten Aussichtern auf Hong Kong sollten sie die Insel verlassen und zum"
+        },
+        {
+          "start_seconds": 9.6,
+          "end_seconds": 13.84,
+          "text": "Gegenüber die in den Ufer von Kovloom fahren."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 206.75,
+        "inference_ms": 206.724,
+        "text": "Für die besten Aussichtern auf Hong Kong sollten sie die Insel verlassen und zum Gegenüber die in den Ufer von Kovloom fahren."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 181.494,
+          "inference_ms": 181.469,
+          "encoder_ms": 8.196,
+          "decoder_ms": 173.273,
+          "text": "Für die besten Aussichtern auf Hong Kong sollten sie die Insel verlassen und zum Gegenüber die in den Ufer von Kovloom fahren."
+        },
+        {
+          "wall_ms": 216.374,
+          "inference_ms": 216.348,
+          "encoder_ms": 9.682,
+          "decoder_ms": 206.666,
+          "text": "Für die besten Aussichtern auf Hong Kong sollten sie die Insel verlassen und zum Gegenüber die in den Ufer von Kovloom fahren."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-de-de-test-001",
+      "requested_language": "de",
+      "runtime_locale_requested": "de",
+      "reported_language": "de",
+      "reference_text": "er griff auch alles an was ins wasser kam selbst ein großer dinosaurier wie der t rex war ihm nicht gewachsen",
+      "text": "Ergriff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wieder T-Rex bei einem nicht gewachsen.",
+      "quality": {
+        "wer": 0.38095238095238093,
+        "cer": 0.06741573033707865
+      },
+      "timing": {
+        "audio_duration_ms": 11160,
+        "cold_load_ms": 66.163,
+        "warm_inference_ms": 175.684,
+        "real_time_factor": 0.015742293906810034
+      },
+      "resources": {
+        "peak_memory_bytes": 108937216,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5,
+          "text": "Ergriff auch alles an, was ins Wasser kam."
+        },
+        {
+          "start_seconds": 5,
+          "end_seconds": 9,
+          "text": "Selbst ein großer Dinosaurier wieder T-Rex bei einem nicht gewachsen."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 200.458,
+        "inference_ms": 200.436,
+        "text": "Ergriff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wieder T-Rex bei einem nicht gewachsen."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 164.503,
+          "inference_ms": 164.482,
+          "encoder_ms": 9.091,
+          "decoder_ms": 155.392,
+          "text": "Ergriff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wieder T-Rex bei einem nicht gewachsen."
+        },
+        {
+          "wall_ms": 186.909,
+          "inference_ms": 186.886,
+          "encoder_ms": 8.592,
+          "decoder_ms": 178.294,
+          "text": "Ergriff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wieder T-Rex bei einem nicht gewachsen."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-es-419-test-000",
+      "requested_language": "es",
+      "runtime_locale_requested": "es",
+      "reported_language": "es",
+      "reference_text": "se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo de clima extremo en el área que visitan dado que ello puede afectar sus planes de viaje",
+      "text": "Se recomienda en faticamente a los viajeros que se informen sobre cualquier rijo del clima extremo en el área que visitan, dado que ellos puede afectar sus planes de viaje.",
+      "quality": {
+        "wer": 0.1724137931034483,
+        "cer": 0.0425531914893617
+      },
+      "timing": {
+        "audio_duration_ms": 12840,
+        "cold_load_ms": 69.3,
+        "warm_inference_ms": 244.83100000000002,
+        "real_time_factor": 0.019067834890965734
+      },
+      "resources": {
+        "peak_memory_bytes": 111394816,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 12,
+          "text": "Se recomienda en faticamente a los viajeros que se informen sobre cualquier rijo del clima extremo en el área que visitan, dado que ellos puede afectar sus planes de viaje."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 275.497,
+        "inference_ms": 275.472,
+        "text": "Se recomienda en faticamente a los viajeros que se informen sobre cualquier rijo del clima extremo en el área que visitan, dado que ellos puede afectar sus planes de viaje."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 251.007,
+          "inference_ms": 250.981,
+          "encoder_ms": 11.068,
+          "decoder_ms": 239.913,
+          "text": "Se recomienda en faticamente a los viajeros que se informen sobre cualquier rijo del clima extremo en el área que visitan, dado que ellos puede afectar sus planes de viaje."
+        },
+        {
+          "wall_ms": 238.707,
+          "inference_ms": 238.681,
+          "encoder_ms": 13.411,
+          "decoder_ms": 225.27,
+          "text": "Se recomienda en faticamente a los viajeros que se informen sobre cualquier rijo del clima extremo en el área que visitan, dado que ellos puede afectar sus planes de viaje."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-es-419-test-001",
+      "requested_language": "es",
+      "runtime_locale_requested": "es",
+      "reported_language": "es",
+      "reference_text": "el uso adecuado de los blogs «puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de internet pueden definir sus posturas en el contexto de los escritos de otros además de establecer sus perspectivas sobre temas específicos» oravec 2002",
+      "text": "El uso de cuadro de los blocs pueden poderáralos alumnos para que sean más analíticos y críticos, a través de la respuesta activa a los contenidos de internet, pueden definir sus posturas en el contexto de los escritos de otros, además establecer sus perspectivos sobre temas específicos. Ahora vecte 2002.",
+      "quality": {
+        "wer": 0.21568627450980393,
+        "cer": 0.05179282868525897
+      },
+      "timing": {
+        "audio_duration_ms": 21360,
+        "cold_load_ms": 67.352,
+        "warm_inference_ms": 523.1365000000001,
+        "real_time_factor": 0.024491409176029967
+      },
+      "resources": {
+        "peak_memory_bytes": 125714432,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 6.4,
+          "text": "El uso de cuadro de los blocs pueden poderáralos alumnos para que sean más analíticos"
+        },
+        {
+          "start_seconds": 6.4,
+          "end_seconds": 11.4,
+          "text": "y críticos, a través de la respuesta activa a los contenidos de internet, pueden definir"
+        },
+        {
+          "start_seconds": 11.4,
+          "end_seconds": 16.84,
+          "text": "sus posturas en el contexto de los escritos de otros, además establecer sus perspectivos"
+        },
+        {
+          "start_seconds": 16.84,
+          "end_seconds": 18.88,
+          "text": "sobre temas específicos."
+        },
+        {
+          "start_seconds": 18.88,
+          "end_seconds": 20,
+          "text": "Ahora vecte 2002."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 491.602,
+        "inference_ms": 491.57,
+        "text": "El uso de cuadro de los blocs pueden poderáralos alumnos para que sean más analíticos y críticos, a través de la respuesta activa a los contenidos de internet, pueden definir sus posturas en el contexto de los escritos de otros, además establecer sus perspectivos sobre temas específicos. Ahora vecte 2002."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 545.233,
+          "inference_ms": 545.19,
+          "encoder_ms": 11.878,
+          "decoder_ms": 533.312,
+          "text": "El uso de cuadro de los blocs pueden poderáralos alumnos para que sean más analíticos y críticos, a través de la respuesta activa a los contenidos de internet, pueden definir sus posturas en el contexto de los escritos de otros, además establecer sus perspectivos sobre temas específicos. Ahora vecte 2002."
+        },
+        {
+          "wall_ms": 501.122,
+          "inference_ms": 501.083,
+          "encoder_ms": 11.916,
+          "decoder_ms": 489.167,
+          "text": "El uso de cuadro de los blocs pueden poderáralos alumnos para que sean más analíticos y críticos, a través de la respuesta activa a los contenidos de internet, pueden definir sus posturas en el contexto de los escritos de otros, además establecer sus perspectivos sobre temas específicos. Ahora vecte 2002."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-fr-fr-test-000",
+      "requested_language": "fr",
+      "runtime_locale_requested": "fr",
+      "reported_language": "fr",
+      "reference_text": "l'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant",
+      "text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela était causé par un incendimalveillant.",
+      "quality": {
+        "wer": 0.21052631578947367,
+        "cer": 0.06593406593406594
+      },
+      "timing": {
+        "audio_duration_ms": 10200,
+        "cold_load_ms": 64.688,
+        "warm_inference_ms": 176.7445,
+        "real_time_factor": 0.017327892156862743
+      },
+      "resources": {
+        "peak_memory_bytes": 110804992,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela était causé par un incendimalveillant."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 209.179,
+        "inference_ms": 209.152,
+        "text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela était causé par un incendimalveillant."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 168.449,
+          "inference_ms": 168.426,
+          "encoder_ms": 8.434,
+          "decoder_ms": 159.992,
+          "text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela était causé par un incendimalveillant."
+        },
+        {
+          "wall_ms": 185.085,
+          "inference_ms": 185.063,
+          "encoder_ms": 9.135,
+          "decoder_ms": 175.928,
+          "text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela était causé par un incendimalveillant."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-fr-fr-test-001",
+      "requested_language": "fr",
+      "runtime_locale_requested": "fr",
+      "reported_language": "fr",
+      "reference_text": "nous sommes d'accord avec la déclaration de l'usoc comité olympique des états-unis selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation",
+      "text": "Nous sommes d'accord avec la déclaration de Luzok, comité au lamping des États-Unis. Celui-là, les intérêts de nos attlettes et de nos clums ainsi que de leur sport pour tête-tête en mieux servir. Cela peut être fait en adent de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'elle a révecation d'accreditation.",
+      "quality": {
+        "wer": 0.2807017543859649,
+        "cer": 0.12244897959183673
+      },
+      "timing": {
+        "audio_duration_ms": 23400,
+        "cold_load_ms": 64.731,
+        "warm_inference_ms": 593.7115,
+        "real_time_factor": 0.025372286324786324
+      },
+      "resources": {
+        "peak_memory_bytes": 130580480,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5.24,
+          "text": "Nous sommes d'accord avec la déclaration de Luzok,"
+        },
+        {
+          "start_seconds": 5.24,
+          "end_seconds": 7.04,
+          "text": "comité au lamping des États-Unis."
+        },
+        {
+          "start_seconds": 7.04,
+          "end_seconds": 9.96,
+          "text": "Celui-là, les intérêts de nos attlettes et de nos clums"
+        },
+        {
+          "start_seconds": 9.96,
+          "end_seconds": 13,
+          "text": "ainsi que de leur sport pour tête-tête en mieux servir."
+        },
+        {
+          "start_seconds": 13,
+          "end_seconds": 15.44,
+          "text": "Cela peut être fait en adent de l'avant"
+        },
+        {
+          "start_seconds": 15.44,
+          "end_seconds": 17.8,
+          "text": "et en procédant plutôt à des changements significatifs"
+        },
+        {
+          "start_seconds": 17.8,
+          "end_seconds": 19.36,
+          "text": "au sein de notre organisation,"
+        },
+        {
+          "start_seconds": 19.36,
+          "end_seconds": 21,
+          "text": "qu'elle a révecation d'accreditation."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 651.649,
+        "inference_ms": 651.596,
+        "text": "Nous sommes d'accord avec la déclaration de Luzok, comité au lamping des États-Unis. Celui-là, les intérêts de nos attlettes et de nos clums ainsi que de leur sport pour tête-tête en mieux servir. Cela peut être fait en adent de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'elle a révecation d'accreditation."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 689.94,
+          "inference_ms": 689.888,
+          "encoder_ms": 10.721,
+          "decoder_ms": 679.167,
+          "text": "Nous sommes d'accord avec la déclaration de Luzok, comité au lamping des États-Unis. Celui-là, les intérêts de nos attlettes et de nos clums ainsi que de leur sport pour tête-tête en mieux servir. Cela peut être fait en adent de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'elle a révecation d'accreditation."
+        },
+        {
+          "wall_ms": 497.574,
+          "inference_ms": 497.535,
+          "encoder_ms": 6.632,
+          "decoder_ms": 490.903,
+          "text": "Nous sommes d'accord avec la déclaration de Luzok, comité au lamping des États-Unis. Celui-là, les intérêts de nos attlettes et de nos clums ainsi que de leur sport pour tête-tête en mieux servir. Cela peut être fait en adent de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'elle a révecation d'accreditation."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-pt-br-test-000",
+      "requested_language": "pt",
+      "runtime_locale_requested": "pt",
+      "reported_language": "pt",
+      "reference_text": "segundo informações ele estava na casa dos 20 anos em uma declaração bieber disse que embora eu não estivesse presente nem diretamente envolvido neste trágico incidente meus pensamentos e orações estão com a família da vítima",
+      "text": "Segundo informações, eles estavam na casa dos 20 anos. Em uma declaração Biber disse que, embora eu não tivesse presente, nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima.",
+      "quality": {
+        "wer": 0.1111111111111111,
+        "cer": 0.02631578947368421
+      },
+      "timing": {
+        "audio_duration_ms": 17760,
+        "cold_load_ms": 64.805,
+        "warm_inference_ms": 384.977,
+        "real_time_factor": 0.021676632882882883
+      },
+      "resources": {
+        "peak_memory_bytes": 122699776,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 4.4,
+          "text": "Segundo informações, eles estavam na casa dos 20 anos."
+        },
+        {
+          "start_seconds": 4.4,
+          "end_seconds": 10,
+          "text": "Em uma declaração Biber disse que, embora eu não tivesse presente,"
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 13.6,
+          "text": "nem diretamente envolvido neste trágico incidente,"
+        },
+        {
+          "start_seconds": 13.6,
+          "end_seconds": 17.2,
+          "text": "meus pensamentos e orações estão com a família da vítima."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 350.837,
+        "inference_ms": 350.802,
+        "text": "Segundo informações, eles estavam na casa dos 20 anos. Em uma declaração Biber disse que, embora eu não tivesse presente, nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 370.048,
+          "inference_ms": 370.02,
+          "encoder_ms": 10.701,
+          "decoder_ms": 359.319,
+          "text": "Segundo informações, eles estavam na casa dos 20 anos. Em uma declaração Biber disse que, embora eu não tivesse presente, nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima."
+        },
+        {
+          "wall_ms": 399.966,
+          "inference_ms": 399.934,
+          "encoder_ms": 13.479,
+          "decoder_ms": 386.456,
+          "text": "Segundo informações, eles estavam na casa dos 20 anos. Em uma declaração Biber disse que, embora eu não tivesse presente, nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-pt-br-test-001",
+      "requested_language": "pt",
+      "runtime_locale_requested": "pt",
+      "reported_language": "pt",
+      "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
+      "text": "Construida pelos egípios nos séculos três antes de Cristo, a grande pirâmide é uma das muitas grandes estruturas da pirâmide e de costumidas para fomar faraós mortos.",
+      "quality": {
+        "wer": 0.5652173913043478,
+        "cer": 0.2459016393442623
+      },
+      "timing": {
+        "audio_duration_ms": 13620,
+        "cold_load_ms": 66.509,
+        "warm_inference_ms": 262.6095,
+        "real_time_factor": 0.01928116740088106
+      },
+      "resources": {
+        "peak_memory_bytes": 111935488,
+        "runtime_peak_memory_bytes": 285849296,
+        "model_size_bytes": 74418182,
+        "binary_size_bytes": 148839360
+      },
+      "streaming": {
+        "supported": false,
+        "first_result_ms": null,
+        "update_count": 1,
+        "volatile_update_count": 0,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "segment"
+      },
+      "segments": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 9.48,
+          "text": "Construida pelos egípios nos séculos três antes de Cristo, a grande pirâmide é uma das muitas grandes estruturas da pirâmide"
+        },
+        {
+          "start_seconds": 9.48,
+          "end_seconds": 12.48,
+          "text": "e de costumidas para fomar faraós mortos."
+        }
+      ],
+      "warmup": {
+        "wall_ms": 282.137,
+        "inference_ms": 282.11,
+        "text": "Construida pelos egípios nos séculos três antes de Cristo, a grande pirâmide é uma das muitas grandes estruturas da pirâmide e de costumidas para fomar faraós mortos."
+      },
+      "repetitions": [
+        {
+          "wall_ms": 268.12,
+          "inference_ms": 268.096,
+          "encoder_ms": 8.376,
+          "decoder_ms": 259.72,
+          "text": "Construida pelos egípios nos séculos três antes de Cristo, a grande pirâmide é uma das muitas grandes estruturas da pirâmide e de costumidas para fomar faraós mortos."
+        },
+        {
+          "wall_ms": 257.147,
+          "inference_ms": 257.123,
+          "encoder_ms": 10.239,
+          "decoder_ms": 246.884,
+          "text": "Construida pelos egípios nos séculos três antes de Cristo, a grande pirâmide é uma das muitas grandes estruturas da pirâmide e de costumidas para fomar faraós mortos."
+        }
+      ]
+    }
+  ]
+}

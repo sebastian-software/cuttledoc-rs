@@ -1,0 +1,2424 @@
+{
+  "schema_version": "1.0.0",
+  "matrix_run_id": "phase0.apple-speech.multilingual-fleurs-10-1",
+  "captured_at": "2026-07-20T10:11:23.983Z",
+  "source_revision": "254356ef94f3833d7dae40f68e6633de55af17dd",
+  "fixture_manifest_revision": "phase0-multilingual-asr-1",
+  "candidate": {
+    "id": "apple-speechtranscriber",
+    "model": "macOS system-managed SpeechTranscriber assets",
+    "runtime": "macOS SpeechAnalyzer through a repository-owned Swift C ABI",
+    "boundary": "repository-owned Swift task ABI called from Rust",
+    "license": "Apple platform asset; not redistributed"
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "procedure": {
+    "fixture_count": 10,
+    "repetitions": 2,
+    "fixture_order": [
+      "fleurs-en-us-test-000",
+      "fleurs-en-us-test-001",
+      "fleurs-de-de-test-000",
+      "fleurs-de-de-test-001",
+      "fleurs-es-419-test-000",
+      "fleurs-es-419-test-001",
+      "fleurs-fr-fr-test-000",
+      "fleurs-fr-fr-test-001",
+      "fleurs-pt-br-test-000",
+      "fleurs-pt-br-test-001"
+    ],
+    "quality_normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 single-fixture records",
+    "cold_load": "First candidate-specific create/initialize value in a fresh process; system and model caches are not cleared",
+    "warm_inference": "Mean complete streamed inference over fresh processes after one discarded process warm-up",
+    "energy": "Not captured in this breadth pass; the alternating powermetrics procedure remains separate"
+  },
+  "summary": {
+    "macro_wer": 0.07575318009578433,
+    "macro_cer": 0.033458277415178254,
+    "mean_warm_inference_ms": 189.46522285,
+    "mean_real_time_factor": 0.013588005981002122,
+    "maximum_peak_memory_bytes": 24002560,
+    "by_language": {
+      "en": {
+        "fixture_count": 2,
+        "macro_wer": 0.07393483709273183,
+        "macro_cer": 0.023218294051627383
+      },
+      "de": {
+        "fixture_count": 2,
+        "macro_wer": 0.07539682539682539,
+        "macro_cer": 0.019230769230769232
+      },
+      "es": {
+        "fixture_count": 2,
+        "macro_wer": 0.06152805949966193,
+        "macro_cer": 0.02924472323472069
+      },
+      "fr": {
+        "fixture_count": 2,
+        "macro_wer": 0.017543859649122806,
+        "macro_cer": 0.011904761904761904
+      },
+      "pt": {
+        "fixture_count": 2,
+        "macro_wer": 0.1503623188405797,
+        "macro_cer": 0.08369283865401209
+      }
+    }
+  },
+  "results": [
+    {
+      "fixture_id": "fleurs-en-us-test-000",
+      "requested_language": "en",
+      "runtime_locale_requested": "en-US",
+      "reported_language": "en_US",
+      "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+      "text": "However,  due  to  the  slow  communication  channels,  styles  in  the  West  could  lag  behind  by  25  to  30  years.",
+      "quality": {
+        "wer": 0.05263157894736842,
+        "cer": 0.012345679012345678
+      },
+      "timing": {
+        "audio_duration_ms": 10560,
+        "cold_load_ms": 156.002667,
+        "warm_inference_ms": 190.33697949999998,
+        "real_time_factor": 0.01802433517992424
+      },
+      "resources": {
+        "peak_memory_bytes": 22052864,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 27.621271,
+        "update_count": 28,
+        "volatile_update_count": 27,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 0.991,
+          "end_ms": 1620,
+          "start_ms": 0,
+          "text": "However,"
+        },
+        {
+          "confidence": 0.971,
+          "end_ms": 2160,
+          "start_ms": 1620,
+          "text": " due"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 2340,
+          "start_ms": 2160,
+          "text": " to"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 2520,
+          "start_ms": 2340,
+          "text": " the"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 2640,
+          "start_ms": 2520,
+          "text": " slow"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 3240,
+          "start_ms": 2640,
+          "text": " communication"
+        },
+        {
+          "confidence": 0.977,
+          "end_ms": 4080,
+          "start_ms": 3240,
+          "text": " channels,"
+        },
+        {
+          "confidence": 0.854,
+          "end_ms": 4800,
+          "start_ms": 4080,
+          "text": " styles"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5220,
+          "start_ms": 4800,
+          "text": " in"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5340,
+          "start_ms": 5220,
+          "text": " the"
+        },
+        {
+          "confidence": 0.764,
+          "end_ms": 5520,
+          "start_ms": 5340,
+          "text": " West"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 5940,
+          "start_ms": 5520,
+          "text": " could"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 6300,
+          "start_ms": 5940,
+          "text": " lag"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 6600,
+          "start_ms": 6300,
+          "text": " behind"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7200,
+          "start_ms": 6600,
+          "text": " by"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 7920,
+          "start_ms": 7200,
+          "text": " 25"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 8100,
+          "start_ms": 7920,
+          "text": " to"
+        },
+        {
+          "confidence": 0.992,
+          "end_ms": 8280,
+          "start_ms": 8100,
+          "text": " 30"
+        },
+        {
+          "confidence": 0.958,
+          "end_ms": 8880,
+          "start_ms": 8280,
+          "text": " years."
+        }
+      ],
+      "warmup": {
+        "create_ms": 156.002667,
+        "inference_ms": 206.378625,
+        "first_result_ms": 37.676709,
+        "text": "However,  due  to  the  slow  communication  channels,  styles  in  the  West  could  lag  behind  by  25  to  30  years."
+      },
+      "repetitions": [
+        {
+          "create_ms": 107.33975,
+          "inference_ms": 188.410209,
+          "first_result_ms": 27.450667,
+          "update_count": 28,
+          "text": "However,  due  to  the  slow  communication  channels,  styles  in  the  West  could  lag  behind  by  25  to  30  years."
+        },
+        {
+          "create_ms": 107.574042,
+          "inference_ms": 192.26375,
+          "first_result_ms": 27.791875,
+          "update_count": 28,
+          "text": "However,  due  to  the  slow  communication  channels,  styles  in  the  West  could  lag  behind  by  25  to  30  years."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-en-us-test-001",
+      "requested_language": "en",
+      "runtime_locale_requested": "en-US",
+      "reported_language": "en_US",
+      "reference_text": "all nouns alongside the word sie for you always begin with a capital letter even in the middle of a sentence",
+      "text": "All  nouns  alongside  the  world  safe  for  you  always  begin  with  a  capital  letter,  even  in  the  middle  of  a  sentence.",
+      "quality": {
+        "wer": 0.09523809523809523,
+        "cer": 0.03409090909090909
+      },
+      "timing": {
+        "audio_duration_ms": 8760,
+        "cold_load_ms": 104.204542,
+        "warm_inference_ms": 190.72691650000002,
+        "real_time_factor": 0.021772479052511416
+      },
+      "resources": {
+        "peak_memory_bytes": 21725184,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 26.805125,
+        "update_count": 28,
+        "volatile_update_count": 27,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 0.914,
+          "end_ms": 780,
+          "start_ms": 0,
+          "text": "All"
+        },
+        {
+          "confidence": 0.903,
+          "end_ms": 1320,
+          "start_ms": 780,
+          "text": " nouns"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 1860,
+          "start_ms": 1320,
+          "text": " alongside"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 2100,
+          "start_ms": 1860,
+          "text": " the"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 2220,
+          "start_ms": 2100,
+          "text": " world"
+        },
+        {
+          "confidence": 0.634,
+          "end_ms": 2700,
+          "start_ms": 2220,
+          "text": " safe"
+        },
+        {
+          "confidence": 0.99,
+          "end_ms": 3000,
+          "start_ms": 2700,
+          "text": " for"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 3240,
+          "start_ms": 3000,
+          "text": " you"
+        },
+        {
+          "confidence": 0.988,
+          "end_ms": 4020,
+          "start_ms": 3240,
+          "text": " always"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4560,
+          "start_ms": 4020,
+          "text": " begin"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 4740,
+          "start_ms": 4560,
+          "text": " with"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 4980,
+          "start_ms": 4740,
+          "text": " a"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 5160,
+          "start_ms": 4980,
+          "text": " capital"
+        },
+        {
+          "confidence": 0.619,
+          "end_ms": 5940,
+          "start_ms": 5160,
+          "text": " letter,"
+        },
+        {
+          "confidence": 0.947,
+          "end_ms": 6360,
+          "start_ms": 5940,
+          "text": " even"
+        },
+        {
+          "confidence": 0.986,
+          "end_ms": 6600,
+          "start_ms": 6360,
+          "text": " in"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 6660,
+          "start_ms": 6600,
+          "text": " the"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 6780,
+          "start_ms": 6660,
+          "text": " middle"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 7020,
+          "start_ms": 6780,
+          "text": " of"
+        },
+        {
+          "confidence": 0.957,
+          "end_ms": 7200,
+          "start_ms": 7020,
+          "text": " a"
+        },
+        {
+          "confidence": 0.942,
+          "end_ms": 8040,
+          "start_ms": 7200,
+          "text": " sentence."
+        }
+      ],
+      "warmup": {
+        "create_ms": 104.204542,
+        "inference_ms": 188.610708,
+        "first_result_ms": 27.159708,
+        "text": "All  nouns  alongside  the  world  safe  for  you  always  begin  with  a  capital  letter,  even  in  the  middle  of  a  sentence."
+      },
+      "repetitions": [
+        {
+          "create_ms": 103.32725,
+          "inference_ms": 188.916875,
+          "first_result_ms": 26.299,
+          "update_count": 28,
+          "text": "All  nouns  alongside  the  world  safe  for  you  always  begin  with  a  capital  letter,  even  in  the  middle  of  a  sentence."
+        },
+        {
+          "create_ms": 106.904334,
+          "inference_ms": 192.536958,
+          "first_result_ms": 27.31125,
+          "update_count": 28,
+          "text": "All  nouns  alongside  the  world  safe  for  you  always  begin  with  a  capital  letter,  even  in  the  middle  of  a  sentence."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-de-de-test-000",
+      "requested_language": "de",
+      "runtime_locale_requested": "de-DE",
+      "reported_language": "de_DE",
+      "reference_text": "für die besten aussichten auf hongkong sollten sie die insel verlassen und zum gegenüberliegenden ufer von kowloon fahren",
+      "text": "Für  die  besten  Aussichten  auf  Hongkong  sollten  Sie  die  Insel  verlassen  und  zum  gegenüberliegenden  Ufer.  von  Kwlum  fahren.",
+      "quality": {
+        "wer": 0.05555555555555555,
+        "cer": 0.038461538461538464
+      },
+      "timing": {
+        "audio_duration_ms": 17940,
+        "cold_load_ms": 679.089875,
+        "warm_inference_ms": 163.232854,
+        "real_time_factor": 0.009098821293199555
+      },
+      "resources": {
+        "peak_memory_bytes": 23085056,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 63.051249999999996,
+        "update_count": 31,
+        "volatile_update_count": 30,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 1,
+          "end_ms": 4560,
+          "start_ms": 3300,
+          "text": "Für"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4800,
+          "start_ms": 4560,
+          "text": " die"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5100,
+          "start_ms": 4800,
+          "text": " besten"
+        },
+        {
+          "confidence": 0.985,
+          "end_ms": 5880,
+          "start_ms": 5100,
+          "text": " Aussichten"
+        },
+        {
+          "confidence": 0.987,
+          "end_ms": 6300,
+          "start_ms": 5880,
+          "text": " auf"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 6900,
+          "start_ms": 6300,
+          "text": " Hongkong"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 7560,
+          "start_ms": 6900,
+          "text": " sollten"
+        },
+        {
+          "confidence": 0.758,
+          "end_ms": 7860,
+          "start_ms": 7560,
+          "text": " Sie"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8100,
+          "start_ms": 7860,
+          "text": " die"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8340,
+          "start_ms": 8100,
+          "text": " Insel"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 9000,
+          "start_ms": 8340,
+          "text": " verlassen"
+        },
+        {
+          "confidence": 0.981,
+          "end_ms": 9540,
+          "start_ms": 9000,
+          "text": " und"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 9840,
+          "start_ms": 9540,
+          "text": " zum"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 11040,
+          "start_ms": 9840,
+          "text": " gegenüberliegenden"
+        },
+        {
+          "confidence": 0.98,
+          "end_ms": 11520,
+          "start_ms": 11040,
+          "text": " Ufer."
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 12420,
+          "start_ms": 11520,
+          "text": " von"
+        },
+        {
+          "confidence": 0.457,
+          "end_ms": 13200,
+          "start_ms": 12420,
+          "text": " Kwlum"
+        },
+        {
+          "confidence": 0.977,
+          "end_ms": 14280,
+          "start_ms": 13200,
+          "text": " fahren."
+        }
+      ],
+      "warmup": {
+        "create_ms": 679.089875,
+        "inference_ms": 153.921959,
+        "first_result_ms": 60.735792,
+        "text": "Für  die  besten  Aussichten  auf  Hongkong  sollten  Sie  die  Insel  verlassen  und  zum  gegenüberliegenden  Ufer.  von  Kwlum  fahren."
+      },
+      "repetitions": [
+        {
+          "create_ms": 668.6095,
+          "inference_ms": 163.411042,
+          "first_result_ms": 63.628917,
+          "update_count": 31,
+          "text": "Für  die  besten  Aussichten  auf  Hongkong  sollten  Sie  die  Insel  verlassen  und  zum  gegenüberliegenden  Ufer.  von  Kwlum  fahren."
+        },
+        {
+          "create_ms": 687.507083,
+          "inference_ms": 163.054666,
+          "first_result_ms": 62.473583,
+          "update_count": 31,
+          "text": "Für  die  besten  Aussichten  auf  Hongkong  sollten  Sie  die  Insel  verlassen  und  zum  gegenüberliegenden  Ufer.  von  Kwlum  fahren."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-de-de-test-001",
+      "requested_language": "de",
+      "runtime_locale_requested": "de-DE",
+      "reported_language": "de_DE",
+      "reference_text": "er griff auch alles an was ins wasser kam selbst ein großer dinosaurier wie der t rex war ihm nicht gewachsen",
+      "text": "Er  griff  auch  alles  an,  was  ins  Wasser  kam.  Selbst  ein  großer  Dinosaurier  wie  der  T-Rex  war  ihm  nicht  gewachsen.",
+      "quality": {
+        "wer": 0.09523809523809523,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 11160,
+        "cold_load_ms": 671.483,
+        "warm_inference_ms": 152.033729,
+        "real_time_factor": 0.01362309399641577
+      },
+      "resources": {
+        "peak_memory_bytes": 21921792,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 58.97225,
+        "update_count": 32,
+        "volatile_update_count": 31,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 0.999,
+          "end_ms": 2460,
+          "start_ms": 1200,
+          "text": "Er"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 2760,
+          "start_ms": 2460,
+          "text": " griff"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 3000,
+          "start_ms": 2760,
+          "text": " auch"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 3240,
+          "start_ms": 3000,
+          "text": " alles"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 3900,
+          "start_ms": 3240,
+          "text": " an,"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4080,
+          "start_ms": 3900,
+          "text": " was"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 4320,
+          "start_ms": 4080,
+          "text": " ins"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 4560,
+          "start_ms": 4320,
+          "text": " Wasser"
+        },
+        {
+          "confidence": 0.931,
+          "end_ms": 5460,
+          "start_ms": 4560,
+          "text": " kam."
+        },
+        {
+          "confidence": 0.913,
+          "end_ms": 5700,
+          "start_ms": 5460,
+          "text": " Selbst"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 6000,
+          "start_ms": 5700,
+          "text": " ein"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 6180,
+          "start_ms": 6000,
+          "text": " großer"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 7020,
+          "start_ms": 6180,
+          "text": " Dinosaurier"
+        },
+        {
+          "confidence": 0.979,
+          "end_ms": 7260,
+          "start_ms": 7020,
+          "text": " wie"
+        },
+        {
+          "confidence": 0.744,
+          "end_ms": 7380,
+          "start_ms": 7260,
+          "text": " der"
+        },
+        {
+          "confidence": 0.842,
+          "end_ms": 7860,
+          "start_ms": 7380,
+          "text": " T-Rex"
+        },
+        {
+          "confidence": 0.992,
+          "end_ms": 8100,
+          "start_ms": 7860,
+          "text": " war"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 8220,
+          "start_ms": 8100,
+          "text": " ihm"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 8400,
+          "start_ms": 8220,
+          "text": " nicht"
+        },
+        {
+          "confidence": 0.986,
+          "end_ms": 9120,
+          "start_ms": 8400,
+          "text": " gewachsen."
+        }
+      ],
+      "warmup": {
+        "create_ms": 671.483,
+        "inference_ms": 149.805375,
+        "first_result_ms": 58.055417,
+        "text": "Er  griff  auch  alles  an,  was  ins  Wasser  kam.  Selbst  ein  großer  Dinosaurier  wie  der  T-Rex  war  ihm  nicht  gewachsen."
+      },
+      "repetitions": [
+        {
+          "create_ms": 674.321167,
+          "inference_ms": 153.799458,
+          "first_result_ms": 59.485583,
+          "update_count": 32,
+          "text": "Er  griff  auch  alles  an,  was  ins  Wasser  kam.  Selbst  ein  großer  Dinosaurier  wie  der  T-Rex  war  ihm  nicht  gewachsen."
+        },
+        {
+          "create_ms": 675.609625,
+          "inference_ms": 150.268,
+          "first_result_ms": 58.458917,
+          "update_count": 32,
+          "text": "Er  griff  auch  alles  an,  was  ins  Wasser  kam.  Selbst  ein  großer  Dinosaurier  wie  der  T-Rex  war  ihm  nicht  gewachsen."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-es-419-test-000",
+      "requested_language": "es",
+      "runtime_locale_requested": "es-MX",
+      "reported_language": "es_MX",
+      "reference_text": "se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo de clima extremo en el área que visitan dado que ello puede afectar sus planes de viaje",
+      "text": "Se  recomienda  enfáticamente  a  los  viajeros  que  se  informen  sobre  cualquier  riesgo  del  clima  extremo  en  el  área  que  visitan,  dado  que  ello  pueda  afectar  sus  planes  de  vida.  viaje",
+      "quality": {
+        "wer": 0.10344827586206896,
+        "cer": 0.0425531914893617
+      },
+      "timing": {
+        "audio_duration_ms": 12840,
+        "cold_load_ms": 1611.316334,
+        "warm_inference_ms": 166.119958,
+        "real_time_factor": 0.012937691433021807
+      },
+      "resources": {
+        "peak_memory_bytes": 22315008,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 59.493333,
+        "update_count": 47,
+        "volatile_update_count": 46,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 1,
+          "end_ms": 2280,
+          "start_ms": 1020,
+          "text": "Se"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 2820,
+          "start_ms": 2280,
+          "text": " recomienda"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 3600,
+          "start_ms": 2820,
+          "text": " enfáticamente"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 3900,
+          "start_ms": 3600,
+          "text": " a"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4020,
+          "start_ms": 3900,
+          "text": " los"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 4440,
+          "start_ms": 4020,
+          "text": " viajeros"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4680,
+          "start_ms": 4440,
+          "text": " que"
+        },
+        {
+          "confidence": 0.968,
+          "end_ms": 4860,
+          "start_ms": 4680,
+          "text": " se"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5280,
+          "start_ms": 4860,
+          "text": " informen"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 5760,
+          "start_ms": 5280,
+          "text": " sobre"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 6180,
+          "start_ms": 5760,
+          "text": " cualquier"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 6660,
+          "start_ms": 6180,
+          "text": " riesgo"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 6840,
+          "start_ms": 6660,
+          "text": " del"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 7080,
+          "start_ms": 6840,
+          "text": " clima"
+        },
+        {
+          "confidence": 0.918,
+          "end_ms": 7800,
+          "start_ms": 7080,
+          "text": " extremo"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8220,
+          "start_ms": 7800,
+          "text": " en"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8340,
+          "start_ms": 8220,
+          "text": " el"
+        },
+        {
+          "confidence": 0.981,
+          "end_ms": 8580,
+          "start_ms": 8340,
+          "text": " área"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8760,
+          "start_ms": 8580,
+          "text": " que"
+        },
+        {
+          "confidence": 0.98,
+          "end_ms": 9480,
+          "start_ms": 8760,
+          "text": " visitan,"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 9780,
+          "start_ms": 9480,
+          "text": " dado"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 9960,
+          "start_ms": 9780,
+          "text": " que"
+        },
+        {
+          "confidence": 0.988,
+          "end_ms": 10140,
+          "start_ms": 9960,
+          "text": " ello"
+        },
+        {
+          "confidence": 0.654,
+          "end_ms": 10440,
+          "start_ms": 10140,
+          "text": " pueda"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 10860,
+          "start_ms": 10440,
+          "text": " afectar"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 11040,
+          "start_ms": 10860,
+          "text": " sus"
+        },
+        {
+          "confidence": 0.977,
+          "end_ms": 11220,
+          "start_ms": 11040,
+          "text": " planes"
+        },
+        {
+          "confidence": 0.843,
+          "end_ms": 11340,
+          "start_ms": 11220,
+          "text": " de"
+        },
+        {
+          "confidence": 0.599,
+          "end_ms": 11520,
+          "start_ms": 11340,
+          "text": " vida."
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 11820,
+          "start_ms": 11520,
+          "text": " viaje"
+        }
+      ],
+      "warmup": {
+        "create_ms": 1611.316334,
+        "inference_ms": 177.133084,
+        "first_result_ms": 67.501417,
+        "text": "Se  recomienda  enfáticamente  a  los  viajeros  que  se  informen  sobre  cualquier  riesgo  del  clima  extremo  en  el  área  que  visitan,  dado  que  ello  pueda  afectar  sus  planes  de  vida.  viaje"
+      },
+      "repetitions": [
+        {
+          "create_ms": 1077.657625,
+          "inference_ms": 165.02025,
+          "first_result_ms": 60.702458,
+          "update_count": 47,
+          "text": "Se  recomienda  enfáticamente  a  los  viajeros  que  se  informen  sobre  cualquier  riesgo  del  clima  extremo  en  el  área  que  visitan,  dado  que  ello  pueda  afectar  sus  planes  de  vida.  viaje"
+        },
+        {
+          "create_ms": 1077.246792,
+          "inference_ms": 167.219666,
+          "first_result_ms": 58.284208,
+          "update_count": 47,
+          "text": "Se  recomienda  enfáticamente  a  los  viajeros  que  se  informen  sobre  cualquier  riesgo  del  clima  extremo  en  el  área  que  visitan,  dado  que  ello  pueda  afectar  sus  planes  de  vida.  viaje"
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-es-419-test-001",
+      "requested_language": "es",
+      "runtime_locale_requested": "es-MX",
+      "reported_language": "es_MX",
+      "reference_text": "el uso adecuado de los blogs «puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de internet pueden definir sus posturas en el contexto de los escritos de otros además de establecer sus perspectivas sobre temas específicos» oravec 2002",
+      "text": "El  uso  adecuado  de  los  blogs  puede  empoderar  a  los  alumnos  para  que  sean  más  analíticos  y  críticos  a  través  de  la  respuesta  activa  a  los  contenidos  de  internet.  Pueden  definir  sus  posturas  en  el  contexto  de  los  escritos  de  otros,  además  de  establecer  sus  perspectivas  sobre  temas  específicos.  Obek,  2002.",
+      "quality": {
+        "wer": 0.0196078431372549,
+        "cer": 0.01593625498007968
+      },
+      "timing": {
+        "audio_duration_ms": 21360,
+        "cold_load_ms": 1327.817583,
+        "warm_inference_ms": 250.38654150000002,
+        "real_time_factor": 0.011722216362359551
+      },
+      "resources": {
+        "peak_memory_bytes": 23887872,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 58.02875,
+        "update_count": 86,
+        "volatile_update_count": 84,
+        "final_update_count": 2,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 1,
+          "end_ms": 1920,
+          "start_ms": 660,
+          "text": "El"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 2100,
+          "start_ms": 1920,
+          "text": " uso"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 2580,
+          "start_ms": 2100,
+          "text": " adecuado"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 2760,
+          "start_ms": 2580,
+          "text": " de"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 2880,
+          "start_ms": 2760,
+          "text": " los"
+        },
+        {
+          "confidence": 0.984,
+          "end_ms": 3300,
+          "start_ms": 2880,
+          "text": " blogs"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 3720,
+          "start_ms": 3300,
+          "text": " puede"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 4260,
+          "start_ms": 3720,
+          "text": " empoderar"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4440,
+          "start_ms": 4260,
+          "text": " a"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 4560,
+          "start_ms": 4440,
+          "text": " los"
+        },
+        {
+          "confidence": 0.844,
+          "end_ms": 4980,
+          "start_ms": 4560,
+          "text": " alumnos"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 5220,
+          "start_ms": 4980,
+          "text": " para"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 5340,
+          "start_ms": 5220,
+          "text": " que"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 5520,
+          "start_ms": 5340,
+          "text": " sean"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5760,
+          "start_ms": 5520,
+          "text": " más"
+        },
+        {
+          "confidence": 0.992,
+          "end_ms": 6420,
+          "start_ms": 5760,
+          "text": " analíticos"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 6660,
+          "start_ms": 6420,
+          "text": " y"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7140,
+          "start_ms": 6660,
+          "text": " críticos"
+        },
+        {
+          "confidence": 0.871,
+          "end_ms": 7860,
+          "start_ms": 7140,
+          "text": " a"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8040,
+          "start_ms": 7860,
+          "text": " través"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8220,
+          "start_ms": 8040,
+          "text": " de"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 8340,
+          "start_ms": 8220,
+          "text": " la"
+        },
+        {
+          "confidence": 0.918,
+          "end_ms": 8640,
+          "start_ms": 8340,
+          "text": " respuesta"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 9060,
+          "start_ms": 8640,
+          "text": " activa"
+        },
+        {
+          "confidence": 0.966,
+          "end_ms": 9300,
+          "start_ms": 9060,
+          "text": " a"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 9420,
+          "start_ms": 9300,
+          "text": " los"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 9840,
+          "start_ms": 9420,
+          "text": " contenidos"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 10020,
+          "start_ms": 9840,
+          "text": " de"
+        },
+        {
+          "confidence": 0.744,
+          "end_ms": 10620,
+          "start_ms": 10020,
+          "text": " internet."
+        },
+        {
+          "confidence": 0.482,
+          "end_ms": 11220,
+          "start_ms": 10620,
+          "text": " Pueden"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 11520,
+          "start_ms": 11220,
+          "text": " definir"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 11820,
+          "start_ms": 11520,
+          "text": " sus"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 12240,
+          "start_ms": 11820,
+          "text": " posturas"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 12540,
+          "start_ms": 12240,
+          "text": " en"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 12720,
+          "start_ms": 12540,
+          "text": " el"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 13200,
+          "start_ms": 12720,
+          "text": " contexto"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 13440,
+          "start_ms": 13200,
+          "text": " de"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 13560,
+          "start_ms": 13440,
+          "text": " los"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 13980,
+          "start_ms": 13560,
+          "text": " escritos"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 14160,
+          "start_ms": 13980,
+          "text": " de"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 14760,
+          "start_ms": 14160,
+          "text": " otros,"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15180,
+          "start_ms": 14760,
+          "text": " además"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15360,
+          "start_ms": 15180,
+          "text": " de"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15840,
+          "start_ms": 15360,
+          "text": " establecer"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 16080,
+          "start_ms": 15840,
+          "text": " sus"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 16620,
+          "start_ms": 16080,
+          "text": " perspectivas"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 17160,
+          "start_ms": 16620,
+          "text": " sobre"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 17460,
+          "start_ms": 17160,
+          "text": " temas"
+        },
+        {
+          "confidence": 0.904,
+          "end_ms": 18600,
+          "start_ms": 17760,
+          "text": " específicos."
+        },
+        {
+          "confidence": 0.545,
+          "end_ms": 19680,
+          "start_ms": 18600,
+          "text": " Obek,"
+        },
+        {
+          "confidence": 0.991,
+          "end_ms": 20220,
+          "start_ms": 19680,
+          "text": " 2002."
+        }
+      ],
+      "warmup": {
+        "create_ms": 1327.817583,
+        "inference_ms": 246.895083,
+        "first_result_ms": 57.246833,
+        "text": "El  uso  adecuado  de  los  blogs  puede  empoderar  a  los  alumnos  para  que  sean  más  analíticos  y  críticos  a  través  de  la  respuesta  activa  a  los  contenidos  de  internet.  Pueden  definir  sus  posturas  en  el  contexto  de  los  escritos  de  otros,  además  de  establecer  sus  perspectivas  sobre  temas  específicos.  Obek,  2002."
+      },
+      "repetitions": [
+        {
+          "create_ms": 1090.188125,
+          "inference_ms": 252.426666,
+          "first_result_ms": 57.908083,
+          "update_count": 86,
+          "text": "El  uso  adecuado  de  los  blogs  puede  empoderar  a  los  alumnos  para  que  sean  más  analíticos  y  críticos  a  través  de  la  respuesta  activa  a  los  contenidos  de  internet.  Pueden  definir  sus  posturas  en  el  contexto  de  los  escritos  de  otros,  además  de  establecer  sus  perspectivas  sobre  temas  específicos.  Obek,  2002."
+        },
+        {
+          "create_ms": 1348.019292,
+          "inference_ms": 248.346417,
+          "first_result_ms": 58.149417,
+          "update_count": 86,
+          "text": "El  uso  adecuado  de  los  blogs  puede  empoderar  a  los  alumnos  para  que  sean  más  analíticos  y  críticos  a  través  de  la  respuesta  activa  a  los  contenidos  de  internet.  Pueden  definir  sus  posturas  en  el  contexto  de  los  escritos  de  otros,  además  de  establecer  sus  perspectivas  sobre  temas  específicos.  Obek,  2002."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-fr-fr-test-000",
+      "requested_language": "fr",
+      "runtime_locale_requested": "fr-FR",
+      "reported_language": "fr_FR",
+      "reference_text": "l'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant",
+      "text": "L'accident  a  eu  lieu  en  terrain  montagneux,  et  il  semblerait  que  cela  ait  été  causé  par  un  incendie  malveillant.",
+      "quality": {
+        "wer": 0,
+        "cer": 0
+      },
+      "timing": {
+        "audio_duration_ms": 10200,
+        "cold_load_ms": 1087.587958,
+        "warm_inference_ms": 135.7145205,
+        "real_time_factor": 0.013305345147058823
+      },
+      "resources": {
+        "peak_memory_bytes": 21725184,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 53.8669785,
+        "update_count": 34,
+        "volatile_update_count": 33,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 1,
+          "end_ms": 2820,
+          "start_ms": 1140,
+          "text": "L'accident"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3180,
+          "start_ms": 2820,
+          "text": " a"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3300,
+          "start_ms": 3180,
+          "text": " eu"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3480,
+          "start_ms": 3300,
+          "text": " lieu"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 3780,
+          "start_ms": 3480,
+          "text": " en"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 3960,
+          "start_ms": 3780,
+          "text": " terrain"
+        },
+        {
+          "confidence": 0.869,
+          "end_ms": 5040,
+          "start_ms": 3960,
+          "text": " montagneux,"
+        },
+        {
+          "confidence": 0.976,
+          "end_ms": 5100,
+          "start_ms": 5040,
+          "text": " et"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 5340,
+          "start_ms": 5100,
+          "text": " il"
+        },
+        {
+          "confidence": 0.983,
+          "end_ms": 5820,
+          "start_ms": 5340,
+          "text": " semblerait"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 5940,
+          "start_ms": 5820,
+          "text": " que"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 6180,
+          "start_ms": 5940,
+          "text": " cela"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 6540,
+          "start_ms": 6180,
+          "text": " ait"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 6780,
+          "start_ms": 6540,
+          "text": " été"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7260,
+          "start_ms": 6780,
+          "text": " causé"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7440,
+          "start_ms": 7260,
+          "text": " par"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 7680,
+          "start_ms": 7440,
+          "text": " un"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 8220,
+          "start_ms": 7680,
+          "text": " incendie"
+        },
+        {
+          "confidence": 0.987,
+          "end_ms": 9060,
+          "start_ms": 8220,
+          "text": " malveillant."
+        }
+      ],
+      "warmup": {
+        "create_ms": 1087.587958,
+        "inference_ms": 139.271875,
+        "first_result_ms": 55.26775,
+        "text": "L'accident  a  eu  lieu  en  terrain  montagneux,  et  il  semblerait  que  cela  ait  été  causé  par  un  incendie  malveillant."
+      },
+      "repetitions": [
+        {
+          "create_ms": 1054.836875,
+          "inference_ms": 135.437375,
+          "first_result_ms": 54.115416,
+          "update_count": 34,
+          "text": "L'accident  a  eu  lieu  en  terrain  montagneux,  et  il  semblerait  que  cela  ait  été  causé  par  un  incendie  malveillant."
+        },
+        {
+          "create_ms": 1328.806041,
+          "inference_ms": 135.991666,
+          "first_result_ms": 53.618541,
+          "update_count": 34,
+          "text": "L'accident  a  eu  lieu  en  terrain  montagneux,  et  il  semblerait  que  cela  ait  été  causé  par  un  incendie  malveillant."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-fr-fr-test-001",
+      "requested_language": "fr",
+      "runtime_locale_requested": "fr-FR",
+      "reported_language": "fr_FR",
+      "reference_text": "nous sommes d'accord avec la déclaration de l'usoc comité olympique des états-unis selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation",
+      "text": "Nous  sommes  d'accord  avec  la  déclaration  de  l'USO,  comité  olympique  des  États-Unis,  selon  laquelle  les  intérêts  de  nos  athlètes  et  de  nos  clubs,  ainsi  que  de  leur  sport  pour  être  mieux  servis.  Cela  peut  être  fait  en  allant  de  l'avant  et  en  procédant  plutôt  à  des  changements  significatifs  au  sein  de  notre  organisation  qu'à  la  révocation  d'accréditation",
+      "quality": {
+        "wer": 0.03508771929824561,
+        "cer": 0.023809523809523808
+      },
+      "timing": {
+        "audio_duration_ms": 23400,
+        "cold_load_ms": 1045.385958,
+        "warm_inference_ms": 283.53481250000004,
+        "real_time_factor": 0.01211687232905983
+      },
+      "resources": {
+        "peak_memory_bytes": 24002560,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 59.198916499999996,
+        "update_count": 99,
+        "volatile_update_count": 98,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 1,
+          "end_ms": 3180,
+          "start_ms": 1920,
+          "text": "Nous"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3360,
+          "start_ms": 3180,
+          "text": " sommes"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3720,
+          "start_ms": 3360,
+          "text": " d'accord"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 3900,
+          "start_ms": 3720,
+          "text": " avec"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4080,
+          "start_ms": 3900,
+          "text": " la"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 4500,
+          "start_ms": 4080,
+          "text": " déclaration"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 4680,
+          "start_ms": 4500,
+          "text": " de"
+        },
+        {
+          "confidence": 0.591,
+          "end_ms": 5400,
+          "start_ms": 4680,
+          "text": " l'USO,"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 5820,
+          "start_ms": 5400,
+          "text": " comité"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 6360,
+          "start_ms": 5820,
+          "text": " olympique"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 6540,
+          "start_ms": 6360,
+          "text": " des"
+        },
+        {
+          "confidence": 0.919,
+          "end_ms": 7260,
+          "start_ms": 6540,
+          "text": " États-Unis,"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7560,
+          "start_ms": 7260,
+          "text": " selon"
+        },
+        {
+          "confidence": 0.986,
+          "end_ms": 7920,
+          "start_ms": 7560,
+          "text": " laquelle"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 8160,
+          "start_ms": 7920,
+          "text": " les"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 8460,
+          "start_ms": 8160,
+          "text": " intérêts"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 8640,
+          "start_ms": 8460,
+          "text": " de"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 8760,
+          "start_ms": 8640,
+          "text": " nos"
+        },
+        {
+          "confidence": 0.991,
+          "end_ms": 9180,
+          "start_ms": 8760,
+          "text": " athlètes"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 9360,
+          "start_ms": 9180,
+          "text": " et"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 9540,
+          "start_ms": 9360,
+          "text": " de"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 9720,
+          "start_ms": 9540,
+          "text": " nos"
+        },
+        {
+          "confidence": 0.908,
+          "end_ms": 10200,
+          "start_ms": 9720,
+          "text": " clubs,"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 10440,
+          "start_ms": 10200,
+          "text": " ainsi"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 10620,
+          "start_ms": 10440,
+          "text": " que"
+        },
+        {
+          "confidence": 0.984,
+          "end_ms": 10740,
+          "start_ms": 10620,
+          "text": " de"
+        },
+        {
+          "confidence": 0.634,
+          "end_ms": 10920,
+          "start_ms": 10740,
+          "text": " leur"
+        },
+        {
+          "confidence": 0.859,
+          "end_ms": 11100,
+          "start_ms": 10920,
+          "text": " sport"
+        },
+        {
+          "confidence": 0.958,
+          "end_ms": 11760,
+          "start_ms": 11100,
+          "text": " pour"
+        },
+        {
+          "confidence": 0.445,
+          "end_ms": 12000,
+          "start_ms": 11760,
+          "text": " être"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 12480,
+          "start_ms": 12000,
+          "text": " mieux"
+        },
+        {
+          "confidence": 0.878,
+          "end_ms": 13200,
+          "start_ms": 12480,
+          "text": " servis."
+        },
+        {
+          "confidence": 0.894,
+          "end_ms": 13560,
+          "start_ms": 13200,
+          "text": " Cela"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 13860,
+          "start_ms": 13560,
+          "text": " peut"
+        },
+        {
+          "confidence": 0.977,
+          "end_ms": 14040,
+          "start_ms": 13860,
+          "text": " être"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 14280,
+          "start_ms": 14040,
+          "text": " fait"
+        },
+        {
+          "confidence": 0.992,
+          "end_ms": 14640,
+          "start_ms": 14280,
+          "text": " en"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15000,
+          "start_ms": 14640,
+          "text": " allant"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15120,
+          "start_ms": 15000,
+          "text": " de"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 15420,
+          "start_ms": 15120,
+          "text": " l'avant"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 15600,
+          "start_ms": 15420,
+          "text": " et"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 15780,
+          "start_ms": 15600,
+          "text": " en"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 16260,
+          "start_ms": 15780,
+          "text": " procédant"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 16500,
+          "start_ms": 16260,
+          "text": " plutôt"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 16680,
+          "start_ms": 16500,
+          "text": " à"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 16860,
+          "start_ms": 16680,
+          "text": " des"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 17160,
+          "start_ms": 16860,
+          "text": " changements"
+        },
+        {
+          "confidence": 0.871,
+          "end_ms": 17880,
+          "start_ms": 17160,
+          "text": " significatifs"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 18120,
+          "start_ms": 17880,
+          "text": " au"
+        },
+        {
+          "confidence": 0.991,
+          "end_ms": 18300,
+          "start_ms": 18120,
+          "text": " sein"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 18420,
+          "start_ms": 18300,
+          "text": " de"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 18600,
+          "start_ms": 18420,
+          "text": " notre"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 19140,
+          "start_ms": 18600,
+          "text": " organisation"
+        },
+        {
+          "confidence": 0.986,
+          "end_ms": 19680,
+          "start_ms": 19140,
+          "text": " qu'à"
+        },
+        {
+          "confidence": 0.991,
+          "end_ms": 19800,
+          "start_ms": 19680,
+          "text": " la"
+        },
+        {
+          "confidence": 0.988,
+          "end_ms": 20160,
+          "start_ms": 19800,
+          "text": " révocation"
+        },
+        {
+          "confidence": 0.997,
+          "end_ms": 20820,
+          "start_ms": 20160,
+          "text": " d'accréditation"
+        }
+      ],
+      "warmup": {
+        "create_ms": 1045.385958,
+        "inference_ms": 268.83875,
+        "first_result_ms": 60.3915,
+        "text": "Nous  sommes  d'accord  avec  la  déclaration  de  l'USO,  comité  olympique  des  États-Unis,  selon  laquelle  les  intérêts  de  nos  athlètes  et  de  nos  clubs,  ainsi  que  de  leur  sport  pour  être  mieux  servis.  Cela  peut  être  fait  en  allant  de  l'avant  et  en  procédant  plutôt  à  des  changements  significatifs  au  sein  de  notre  organisation  qu'à  la  révocation  d'accréditation"
+      },
+      "repetitions": [
+        {
+          "create_ms": 1077.29325,
+          "inference_ms": 282.681708,
+          "first_result_ms": 58.845208,
+          "update_count": 99,
+          "text": "Nous  sommes  d'accord  avec  la  déclaration  de  l'USO,  comité  olympique  des  États-Unis,  selon  laquelle  les  intérêts  de  nos  athlètes  et  de  nos  clubs,  ainsi  que  de  leur  sport  pour  être  mieux  servis.  Cela  peut  être  fait  en  allant  de  l'avant  et  en  procédant  plutôt  à  des  changements  significatifs  au  sein  de  notre  organisation  qu'à  la  révocation  d'accréditation"
+        },
+        {
+          "create_ms": 1351.359667,
+          "inference_ms": 284.387917,
+          "first_result_ms": 59.552625,
+          "update_count": 99,
+          "text": "Nous  sommes  d'accord  avec  la  déclaration  de  l'USO,  comité  olympique  des  États-Unis,  selon  laquelle  les  intérêts  de  nos  athlètes  et  de  nos  clubs,  ainsi  que  de  leur  sport  pour  être  mieux  servis.  Cela  peut  être  fait  en  allant  de  l'avant  et  en  procédant  plutôt  à  des  changements  significatifs  au  sein  de  notre  organisation  qu'à  la  révocation  d'accréditation"
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-pt-br-test-000",
+      "requested_language": "pt",
+      "runtime_locale_requested": "pt-BR",
+      "reported_language": "pt_BR",
+      "reference_text": "segundo informações ele estava na casa dos 20 anos em uma declaração bieber disse que embora eu não estivesse presente nem diretamente envolvido neste trágico incidente meus pensamentos e orações estão com a família da vítima",
+      "text": "Segundo  informações  ele  estava  na  casa  dos  vinte  anos  em  uma  declaração  Bieber  disse  que  embora  eu  não  tivesse  presente  nem  diretamente  envolvido.ido  neste  trágico  incidente,  meus  pensamentos  e  orações  estão  com  a  família  da  vítima.",
+      "quality": {
+        "wer": 0.08333333333333333,
+        "cer": 0.05263157894736842
+      },
+      "timing": {
+        "audio_duration_ms": 17760,
+        "cold_load_ms": 1058.904542,
+        "warm_inference_ms": 195.201896,
+        "real_time_factor": 0.010991097747747747
+      },
+      "resources": {
+        "peak_memory_bytes": 23101440,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 56.467625,
+        "update_count": 55,
+        "volatile_update_count": 53,
+        "final_update_count": 2,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 0.999,
+          "end_ms": 1080,
+          "start_ms": 0,
+          "text": "Segundo"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 1740,
+          "start_ms": 1080,
+          "text": " informações"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 2460,
+          "start_ms": 1740,
+          "text": " ele"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 2700,
+          "start_ms": 2460,
+          "text": " estava"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 2940,
+          "start_ms": 2700,
+          "text": " na"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 3120,
+          "start_ms": 2940,
+          "text": " casa"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 3420,
+          "start_ms": 3120,
+          "text": " dos"
+        },
+        {
+          "confidence": 0.714,
+          "end_ms": 3780,
+          "start_ms": 3420,
+          "text": " vinte"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 3960,
+          "start_ms": 3780,
+          "text": " anos"
+        },
+        {
+          "confidence": 0.843,
+          "end_ms": 5340,
+          "start_ms": 3960,
+          "text": " em"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 5520,
+          "start_ms": 5340,
+          "text": " uma"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 6000,
+          "start_ms": 5520,
+          "text": " declaração"
+        },
+        {
+          "confidence": 0.874,
+          "end_ms": 6840,
+          "start_ms": 6000,
+          "text": " Bieber"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 7140,
+          "start_ms": 6840,
+          "text": " disse"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 7380,
+          "start_ms": 7140,
+          "text": " que"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 8040,
+          "start_ms": 7380,
+          "text": " embora"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 8400,
+          "start_ms": 8040,
+          "text": " eu"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 8640,
+          "start_ms": 8400,
+          "text": " não"
+        },
+        {
+          "confidence": 0.825,
+          "end_ms": 9120,
+          "start_ms": 8640,
+          "text": " tivesse"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 9660,
+          "start_ms": 9120,
+          "text": " presente"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 10500,
+          "start_ms": 9660,
+          "text": " nem"
+        },
+        {
+          "confidence": 0.99,
+          "end_ms": 11100,
+          "start_ms": 10500,
+          "text": " diretamente"
+        },
+        {
+          "confidence": 0.897,
+          "end_ms": 11760,
+          "start_ms": 11100,
+          "text": " envolvido.ido"
+        },
+        {
+          "confidence": 0.983,
+          "end_ms": 12180,
+          "start_ms": 11760,
+          "text": " neste"
+        },
+        {
+          "confidence": 0.962,
+          "end_ms": 12660,
+          "start_ms": 12180,
+          "text": " trágico"
+        },
+        {
+          "confidence": 0.785,
+          "end_ms": 13740,
+          "start_ms": 12660,
+          "text": " incidente,"
+        },
+        {
+          "confidence": 0.991,
+          "end_ms": 14160,
+          "start_ms": 13980,
+          "text": " meus"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 14640,
+          "start_ms": 14160,
+          "text": " pensamentos"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 14880,
+          "start_ms": 14640,
+          "text": " e"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 15300,
+          "start_ms": 14880,
+          "text": " orações"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15600,
+          "start_ms": 15300,
+          "text": " estão"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 15840,
+          "start_ms": 15600,
+          "text": " com"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 16020,
+          "start_ms": 15840,
+          "text": " a"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 16200,
+          "start_ms": 16020,
+          "text": " família"
+        },
+        {
+          "confidence": 1,
+          "end_ms": 16500,
+          "start_ms": 16200,
+          "text": " da"
+        },
+        {
+          "confidence": 0.98,
+          "end_ms": 17340,
+          "start_ms": 16500,
+          "text": " vítima."
+        }
+      ],
+      "warmup": {
+        "create_ms": 1058.904542,
+        "inference_ms": 193.312542,
+        "first_result_ms": 56.156625,
+        "text": "Segundo  informações  ele  estava  na  casa  dos  vinte  anos  em  uma  declaração  Bieber  disse  que  embora  eu  não  tivesse  presente  nem  diretamente  envolvido.ido  neste  trágico  incidente,  meus  pensamentos  e  orações  estão  com  a  família  da  vítima."
+      },
+      "repetitions": [
+        {
+          "create_ms": 1374.984042,
+          "inference_ms": 195.704,
+          "first_result_ms": 55.320375,
+          "update_count": 55,
+          "text": "Segundo  informações  ele  estava  na  casa  dos  vinte  anos  em  uma  declaração  Bieber  disse  que  embora  eu  não  tivesse  presente  nem  diretamente  envolvido.ido  neste  trágico  incidente,  meus  pensamentos  e  orações  estão  com  a  família  da  vítima."
+        },
+        {
+          "create_ms": 1082.626375,
+          "inference_ms": 194.699792,
+          "first_result_ms": 57.614875,
+          "update_count": 55,
+          "text": "Segundo  informações  ele  estava  na  casa  dos  vinte  anos  em  uma  declaração  Bieber  disse  que  embora  eu  não  tivesse  presente  nem  diretamente  envolvido.ido  neste  trágico  incidente,  meus  pensamentos  e  orações  estão  com  a  família  da  vítima."
+        }
+      ]
+    },
+    {
+      "fixture_id": "fleurs-pt-br-test-001",
+      "requested_language": "pt",
+      "runtime_locale_requested": "pt-BR",
+      "reported_language": "pt_BR",
+      "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
+      "text": "Construída  pelos  egípcios  no  século  XI  antes  de  Cristo  a  Grande  pirâmide  é  uma  das  muitas  grandes  estruturas  da  pirâmide  construídas  para  honrar  faraós  mortos.",
+      "quality": {
+        "wer": 0.21739130434782608,
+        "cer": 0.11475409836065574
+      },
+      "timing": {
+        "audio_duration_ms": 13620,
+        "cold_load_ms": 1366.045416,
+        "warm_inference_ms": 167.36402099999998,
+        "real_time_factor": 0.012288107268722466
+      },
+      "resources": {
+        "peak_memory_bytes": 22396928,
+        "runtime_peak_memory_bytes": null,
+        "model_size_bytes": null,
+        "binary_size_bytes": 950776
+      },
+      "streaming": {
+        "supported": true,
+        "first_result_ms": 57.942896000000005,
+        "update_count": 47,
+        "volatile_update_count": 46,
+        "final_update_count": 1,
+        "revoke_count": 0,
+        "timestamps": "word"
+      },
+      "segments": [
+        {
+          "confidence": 0.994,
+          "end_ms": 2400,
+          "start_ms": 840,
+          "text": "Construída"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 2700,
+          "start_ms": 2400,
+          "text": " pelos"
+        },
+        {
+          "confidence": 0.993,
+          "end_ms": 3300,
+          "start_ms": 2700,
+          "text": " egípcios"
+        },
+        {
+          "confidence": 0.998,
+          "end_ms": 3600,
+          "start_ms": 3300,
+          "text": " no"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 3780,
+          "start_ms": 3600,
+          "text": " século"
+        },
+        {
+          "confidence": 0.166,
+          "end_ms": 4260,
+          "start_ms": 3780,
+          "text": " XI"
+        },
+        {
+          "confidence": 0.463,
+          "end_ms": 4560,
+          "start_ms": 4260,
+          "text": " antes"
+        },
+        {
+          "confidence": 0.709,
+          "end_ms": 4860,
+          "start_ms": 4560,
+          "text": " de"
+        },
+        {
+          "confidence": 0.363,
+          "end_ms": 5220,
+          "start_ms": 4860,
+          "text": " Cristo"
+        },
+        {
+          "confidence": 0.988,
+          "end_ms": 5820,
+          "start_ms": 5220,
+          "text": " a"
+        },
+        {
+          "confidence": 0.736,
+          "end_ms": 6000,
+          "start_ms": 5820,
+          "text": " Grande"
+        },
+        {
+          "confidence": 0.841,
+          "end_ms": 6660,
+          "start_ms": 6000,
+          "text": " pirâmide"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 7020,
+          "start_ms": 6660,
+          "text": " é"
+        },
+        {
+          "confidence": 0.995,
+          "end_ms": 7200,
+          "start_ms": 7020,
+          "text": " uma"
+        },
+        {
+          "confidence": 0.973,
+          "end_ms": 7440,
+          "start_ms": 7200,
+          "text": " das"
+        },
+        {
+          "confidence": 0.955,
+          "end_ms": 7680,
+          "start_ms": 7440,
+          "text": " muitas"
+        },
+        {
+          "confidence": 0.977,
+          "end_ms": 8040,
+          "start_ms": 7680,
+          "text": " grandes"
+        },
+        {
+          "confidence": 0.999,
+          "end_ms": 8760,
+          "start_ms": 8040,
+          "text": " estruturas"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 9000,
+          "start_ms": 8760,
+          "text": " da"
+        },
+        {
+          "confidence": 0.984,
+          "end_ms": 9600,
+          "start_ms": 9000,
+          "text": " pirâmide"
+        },
+        {
+          "confidence": 0.989,
+          "end_ms": 10260,
+          "start_ms": 9600,
+          "text": " construídas"
+        },
+        {
+          "confidence": 0.996,
+          "end_ms": 10560,
+          "start_ms": 10260,
+          "text": " para"
+        },
+        {
+          "confidence": 0.774,
+          "end_ms": 11220,
+          "start_ms": 10560,
+          "text": " honrar"
+        },
+        {
+          "confidence": 0.917,
+          "end_ms": 12000,
+          "start_ms": 11220,
+          "text": " faraós"
+        },
+        {
+          "confidence": 0.994,
+          "end_ms": 12900,
+          "start_ms": 12000,
+          "text": " mortos."
+        }
+      ],
+      "warmup": {
+        "create_ms": 1366.045416,
+        "inference_ms": 173.457875,
+        "first_result_ms": 60.076875,
+        "text": "Construída  pelos  egípcios  no  século  XI  antes  de  Cristo  a  Grande  pirâmide  é  uma  das  muitas  grandes  estruturas  da  pirâmide  construídas  para  honrar  faraós  mortos."
+      },
+      "repetitions": [
+        {
+          "create_ms": 1044.488041,
+          "inference_ms": 167.091917,
+          "first_result_ms": 57.480792,
+          "update_count": 47,
+          "text": "Construída  pelos  egípcios  no  século  XI  antes  de  Cristo  a  Grande  pirâmide  é  uma  das  muitas  grandes  estruturas  da  pirâmide  construídas  para  honrar  faraós  mortos."
+        },
+        {
+          "create_ms": 1088.022875,
+          "inference_ms": 167.636125,
+          "first_result_ms": 58.405,
+          "update_count": 47,
+          "text": "Construída  pelos  egípcios  no  século  XI  antes  de  Cristo  a  Grande  pirâmide  é  uma  das  muitas  grandes  estruturas  da  pirâmide  construídas  para  honrar  faraós  mortos."
+        }
+      ]
+    }
+  ]
+}

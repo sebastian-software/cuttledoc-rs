@@ -60,13 +60,17 @@ Replace `--backend`, `--module-dir`, and model options with the Whisper values
 from its run record for that baseline. `--output` is important because native
 diagnostics from a legacy addon may otherwise share stdout with the result.
 
-A run is one immutable JSON document. `measured` records require a hashed,
-provenance-audited quality fixture, complete quality/timing/resource metrics,
-host RAM, and at least one raw artifact. Non-redistributable quality fixtures
-must have a reproducible `local-required` acquisition path. `partial` and
-`blocked` records require a precise explanation and may not silently supply
-invented metrics. Raw tool output belongs below `benchmarks/raw/<run-id>/`; summaries in
-`docs/model-evaluation.md` are derived evidence, not the source of truth.
+A single-fixture run is one immutable JSON document. `measured` records require
+a hashed, provenance-audited quality fixture, complete
+quality/timing/resource metrics, host RAM, and at least one raw artifact.
+Non-redistributable quality fixtures must have a reproducible `local-required`
+acquisition path. `partial` and `blocked` records require a precise explanation
+and may not silently supply invented metrics. Raw tool output belongs below
+`benchmarks/raw/<run-id>/`.
+Comparable aggregate decisions belong below `benchmarks/matrices/`; the
+validator derives and cross-checks their metrics against the linked raw
+artifacts. `docs/model-evaluation.md` is explanatory evidence, not the source
+of truth.
 
 The initial multilingual breadth set is intentionally bounded to two FLEURS
 test samples in each of `en_us`, `de_de`, `es_419`, `fr_fr`, and `pt_br`.
