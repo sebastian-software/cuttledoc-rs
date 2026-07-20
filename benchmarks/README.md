@@ -90,6 +90,13 @@ short-read integration gate; audiobook and professional-podcast cells are
 reported separately, with independent-source grouping and human-verified gold
 transcripts.
 
+Historical Cuttledoc 2 transcript-correction evidence is preserved as a
+digest-pinned aggregate in
+[`postprocessing/cuttledoc-v2-snapshot.json`](postprocessing/cuttledoc-v2-snapshot.json).
+Its TTS and real-ASR experiments, language splits, missing results, and legacy
+normalization limitations are documented in
+[`docs/postprocessing-evaluation.md`](../docs/postprocessing-evaluation.md).
+
 Run one candidate across the bounded set and write its immutable aggregate
 outside the repository before review:
 

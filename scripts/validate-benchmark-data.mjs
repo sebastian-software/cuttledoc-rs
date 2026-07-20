@@ -180,6 +180,126 @@ function validateSourceCandidates(registry) {
   return errors;
 }
 
+function validatePostprocessingSnapshot(snapshot) {
+  const errors = [];
+  if (snapshot.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(snapshot.snapshot_id?.length > 0)) {
+    errors.push('snapshot_id must be a non-empty string');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(snapshot.captured_at ?? '')) {
+    errors.push('captured_at must be an ISO date');
+  }
+  if (!/^[0-9a-f]{40}$/.test(
+    snapshot.provenance?.captured_from_source_head ?? '',
+  )) {
+    errors.push('provenance.captured_from_source_head must be a Git SHA');
+  }
+
+  const artifactIds = new Set();
+  for (const artifact of snapshot.provenance?.artifacts ?? []) {
+    if (artifactIds.has(artifact.experiment_id)) {
+      errors.push(`duplicate provenance artifact: ${artifact.experiment_id}`);
+    }
+    artifactIds.add(artifact.experiment_id);
+    for (const field of ['result_sha256', 'script_sha256']) {
+      if (!/^[0-9a-f]{64}$/.test(artifact[field] ?? '')) {
+        errors.push(`${artifact.experiment_id}: ${field} must be SHA-256`);
+      }
+    }
+    if (!/^[0-9a-f]{40}$/.test(artifact.script_revision ?? '')) {
+      errors.push(`${artifact.experiment_id}: script_revision must be a Git SHA`);
+    }
+    if (!Number.isInteger(artifact.result_record_count) ||
+        artifact.result_record_count <= 0) {
+      errors.push(`${artifact.experiment_id}: result_record_count must be positive`);
+    }
+  }
+
+  const experimentIds = new Set();
+  for (const experiment of snapshot.experiments ?? []) {
+    if (experimentIds.has(experiment.id)) {
+      errors.push(`duplicate postprocessing experiment: ${experiment.id}`);
+    }
+    experimentIds.add(experiment.id);
+    if (!artifactIds.has(experiment.id)) {
+      errors.push(`${experiment.id}: missing provenance artifact`);
+    }
+    if (!Array.isArray(experiment.languages) ||
+        experiment.languages.length === 0 ||
+        new Set(experiment.languages).size !== experiment.languages.length) {
+      errors.push(`${experiment.id}: languages must be a non-empty unique array`);
+    }
+    if (!(experiment.normalization?.source_expression?.length > 0) ||
+        !(experiment.normalization?.limitation?.length > 0)) {
+      errors.push(`${experiment.id}: normalization evidence is required`);
+    }
+
+    const modelIds = new Set();
+    for (const model of experiment.models ?? []) {
+      if (modelIds.has(model.id)) {
+        errors.push(`${experiment.id}: duplicate model ${model.id}`);
+      }
+      modelIds.add(model.id);
+      if (!Number.isInteger(model.sample_count) || model.sample_count <= 0) {
+        errors.push(`${experiment.id}/${model.id}: sample_count must be positive`);
+      }
+      if (!Number.isInteger(model.worsened_count) ||
+          model.worsened_count < 0 ||
+          model.worsened_count > model.sample_count) {
+        errors.push(`${experiment.id}/${model.id}: worsened_count is invalid`);
+      }
+      for (const field of ['wer_before', 'wer_after']) {
+        if (!isMetric(model[field]) || model[field] === null) {
+          errors.push(`${experiment.id}/${model.id}: ${field} must be a metric`);
+        }
+      }
+      const languageEntries = Object.entries(model.by_language ?? {});
+      if (!arrayEquals(
+        languageEntries.map(([language]) => language),
+        experiment.languages,
+      )) {
+        errors.push(`${experiment.id}/${model.id}: language order or coverage differs`);
+        continue;
+      }
+      const sampleCount = languageEntries.reduce(
+        (sum, [, value]) => sum + value.sample_count,
+        0,
+      );
+      const worsenedCount = languageEntries.reduce(
+        (sum, [, value]) => sum + value.worsened_count,
+        0,
+      );
+      if (sampleCount !== model.sample_count) {
+        errors.push(`${experiment.id}/${model.id}: language sample counts differ`);
+      }
+      if (worsenedCount !== model.worsened_count) {
+        errors.push(`${experiment.id}/${model.id}: language regression counts differ`);
+      }
+      for (const field of ['wer_before', 'wer_after']) {
+        const weighted = languageEntries.reduce(
+          (sum, [, value]) => sum + value[field] * value.sample_count,
+          0,
+        ) / sampleCount;
+        if (Math.abs(weighted - model[field]) > 1e-12) {
+          errors.push(`${experiment.id}/${model.id}: ${field} differs from languages`);
+        }
+      }
+    }
+    if (modelIds.size === 0) {
+      errors.push(`${experiment.id}: models must be non-empty`);
+    }
+  }
+  if (!arrayEquals([...artifactIds], [...experimentIds])) {
+    errors.push('provenance artifact and experiment ids must match');
+  }
+  if (!Array.isArray(snapshot.conclusions) || snapshot.conclusions.length === 0) {
+    errors.push('conclusions must be non-empty');
+  }
+  return errors;
+}
+
 function arrayEquals(left, right) {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
@@ -428,11 +548,16 @@ const sourceCandidatesPath = join(
   repoRoot,
   'benchmarks/fixtures/source-candidates.json',
 );
+const postprocessingSnapshotPath = join(
+  repoRoot,
+  'benchmarks/postprocessing/cuttledoc-v2-snapshot.json',
+);
 const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/run.schema.json'),
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
+  join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);
@@ -444,6 +569,7 @@ for (const path of schemaPaths) {
 const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
+const postprocessingSnapshot = await readJson(postprocessingSnapshotPath);
 const requestedRun = process.argv.indexOf('--run');
 const runPaths = requestedRun >= 0
   ? [resolve(process.cwd(), process.argv[requestedRun + 1])]
@@ -456,6 +582,11 @@ const failures = manifestValidation.errors.map((error) => `${manifestPath}: ${er
 failures.push(
   ...validateSourceCandidates(sourceCandidates).map(
     (error) => `${sourceCandidatesPath}: ${error}`,
+  ),
+);
+failures.push(
+  ...validatePostprocessingSnapshot(postprocessingSnapshot).map(
+    (error) => `${postprocessingSnapshotPath}: ${error}`,
   ),
 );
 const runs = [];
@@ -519,6 +650,11 @@ if (process.argv.includes('--self-test')) {
   if (validateSourceCandidates(invalidSourceCandidates).length === 0) {
     failures.push('validator self-test failed to reject duplicate source ids');
   }
+  const invalidPostprocessing = structuredClone(postprocessingSnapshot);
+  invalidPostprocessing.experiments[0].models[0].sample_count += 1;
+  if (validatePostprocessingSnapshot(invalidPostprocessing).length === 0) {
+    failures.push('validator self-test failed to reject divergent language counts');
+  }
 }
 
 if (failures.length > 0) {
@@ -529,5 +665,7 @@ if (failures.length > 0) {
 console.log(
   `benchmark data: ${manifest.fixtures.length} fixture(s), ${runs.length} run record(s), ` +
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
-  `${sourceCandidates.sources.length} source candidate(s), schema ${schemaVersion}`,
+  `${sourceCandidates.sources.length} source candidate(s), ` +
+  `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
+  `schema ${schemaVersion}`,
 );

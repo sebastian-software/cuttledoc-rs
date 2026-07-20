@@ -1,0 +1,211 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_id": "cuttledoc-v2-postprocessing-2026-07-20",
+  "captured_at": "2026-07-20",
+  "provenance": {
+    "source_repository": "https://github.com/sebastian-software/cuttledoc",
+    "captured_from_source_head": "e0c587883f1fdf67d521f8e0b3c216b22d91fda6",
+    "result_tracking": "The source checkout ignores packages/llm/results/, so the result artifacts have hashes but no producing Git commit.",
+    "artifacts": [
+      {
+        "experiment_id": "tts-generated",
+        "result_path": "packages/llm/results/benchmark-tts.json",
+        "result_sha256": "3472399bf51609b7db7baabea518d986126cfaa946c9ae7585bf873de0a7e882",
+        "result_tracked": false,
+        "result_record_count": 50,
+        "script_path": "packages/llm/scripts/benchmark-tts.ts",
+        "script_revision": "60bfb91a76a9627dc8ff3847863bfd74563d785b",
+        "script_sha256": "c1833fee01064735dc1aaf1770dcf9c0f3e35d18893cbf805d90aebdf9181900"
+      },
+      {
+        "experiment_id": "real-parakeet",
+        "result_path": "packages/llm/results/benchmark-real.json",
+        "result_sha256": "076ca7732c8f1c0abe32d736211f7a8336f8abedc31adfa3e6586b0a307da565",
+        "result_tracked": false,
+        "result_record_count": 198,
+        "script_path": "packages/llm/scripts/benchmark-real.ts",
+        "script_revision": "6570b81c0995249fff5179e24fd643a5f2373344",
+        "script_sha256": "31d5cfd375d81e1d8a787b9af5ed4c13b211f0f0994e79be569ff51fa56b1501"
+      }
+    ]
+  },
+  "experiments": [
+    {
+      "id": "tts-generated",
+      "fixture_kind": "Two ElevenLabs TTS samples per language, transcribed by Parakeet",
+      "languages": [
+        "de",
+        "en",
+        "es",
+        "fr",
+        "pt"
+      ],
+      "normalization": {
+        "source_expression": ".replace(/[^\\w\\s\\u00C0-\\u017F]/g, \"\")",
+        "limitation": "Preserves a bounded Latin accented range, not arbitrary Unicode letters."
+      },
+      "models": [
+        {
+          "id": "gemma3n:e4b",
+          "sample_count": 10,
+          "wer_before": 0.056331987152053245,
+          "wer_after": 0.03334791892398521,
+          "worsened_count": 0,
+          "by_language": {
+            "de": { "sample_count": 2, "wer_before": 0.06672443674176776, "wer_after": 0.025996533795493937, "worsened_count": 0 },
+            "en": { "sample_count": 2, "wer_before": 0.05538922155688623, "wer_after": 0.027694610778443114, "worsened_count": 0 },
+            "es": { "sample_count": 2, "wer_before": 0.03523238380809595, "wer_after": 0.021739130434782608, "worsened_count": 0 },
+            "fr": { "sample_count": 2, "wer_before": 0.06446540880503145, "wer_after": 0.05267295597484277, "worsened_count": 0 },
+            "pt": { "sample_count": 2, "wer_before": 0.059848484848484845, "wer_after": 0.038636363636363635, "worsened_count": 0 }
+          }
+        },
+        {
+          "id": "gemma3n:e2b",
+          "sample_count": 10,
+          "wer_before": 0.056331987152053245,
+          "wer_after": 0.03582425122464641,
+          "worsened_count": 1,
+          "by_language": {
+            "de": { "sample_count": 2, "wer_before": 0.06672443674176776, "wer_after": 0.032062391681109186, "worsened_count": 0 },
+            "en": { "sample_count": 2, "wer_before": 0.05538922155688623, "wer_after": 0.026946107784431135, "worsened_count": 0 },
+            "es": { "sample_count": 2, "wer_before": 0.03523238380809595, "wer_after": 0.025487256371814093, "worsened_count": 0 },
+            "fr": { "sample_count": 2, "wer_before": 0.06446540880503145, "wer_after": 0.060534591194968554, "worsened_count": 1 },
+            "pt": { "sample_count": 2, "wer_before": 0.059848484848484845, "wer_after": 0.03409090909090909, "worsened_count": 0 }
+          }
+        },
+        {
+          "id": "qwen3:8b",
+          "sample_count": 10,
+          "wer_before": 0.056331987152053245,
+          "wer_after": 0.11669934061203349,
+          "worsened_count": 3,
+          "by_language": {
+            "de": { "sample_count": 2, "wer_before": 0.06672443674176776, "wer_after": 0.2590987868284229, "worsened_count": 2 },
+            "en": { "sample_count": 2, "wer_before": 0.05538922155688623, "wer_after": 0.020958083832335328, "worsened_count": 0 },
+            "es": { "sample_count": 2, "wer_before": 0.03523238380809595, "wer_after": 0.017991004497751123, "worsened_count": 0 },
+            "fr": { "sample_count": 2, "wer_before": 0.06446540880503145, "wer_after": 0.05817610062893082, "worsened_count": 0 },
+            "pt": { "sample_count": 2, "wer_before": 0.059848484848484845, "wer_after": 0.22727272727272727, "worsened_count": 1 }
+          }
+        },
+        {
+          "id": "phi4:14b",
+          "sample_count": 10,
+          "wer_before": 0.056331987152053245,
+          "wer_after": 0.028038309088927273,
+          "worsened_count": 0,
+          "by_language": {
+            "de": { "sample_count": 2, "wer_before": 0.06672443674176776, "wer_after": 0.012998266897746967, "worsened_count": 0 },
+            "en": { "sample_count": 2, "wer_before": 0.05538922155688623, "wer_after": 0.03143712574850299, "worsened_count": 0 },
+            "es": { "sample_count": 2, "wer_before": 0.03523238380809595, "wer_after": 0.01199400299850075, "worsened_count": 0 },
+            "fr": { "sample_count": 2, "wer_before": 0.06446540880503145, "wer_after": 0.05345911949685535, "worsened_count": 0 },
+            "pt": { "sample_count": 2, "wer_before": 0.059848484848484845, "wer_after": 0.030303030303030304, "worsened_count": 0 }
+          }
+        },
+        {
+          "id": "mistral-nemo",
+          "sample_count": 10,
+          "wer_before": 0.056331987152053245,
+          "wer_after": 0.03234193065497653,
+          "worsened_count": 0,
+          "by_language": {
+            "de": { "sample_count": 2, "wer_before": 0.06672443674176776, "wer_after": 0.021663778162911613, "worsened_count": 0 },
+            "en": { "sample_count": 2, "wer_before": 0.05538922155688623, "wer_after": 0.027694610778443114, "worsened_count": 0 },
+            "es": { "sample_count": 2, "wer_before": 0.03523238380809595, "wer_after": 0.01874062968515742, "worsened_count": 0 },
+            "fr": { "sample_count": 2, "wer_before": 0.06446540880503145, "wer_after": 0.05345911949685535, "worsened_count": 0 },
+            "pt": { "sample_count": 2, "wer_before": 0.059848484848484845, "wer_after": 0.040151515151515146, "worsened_count": 0 }
+          }
+        }
+      ],
+      "limitations": [
+        "Synthetic TTS is not representative of professionally produced podcasts or audiobooks.",
+        "Two samples per language cannot establish a safe per-language correction policy."
+      ]
+    },
+    {
+      "id": "real-parakeet",
+      "fixture_kind": "Ten FLEURS fixtures per language using cached real Parakeet ASR output",
+      "languages": [
+        "de",
+        "en",
+        "es",
+        "fr",
+        "pt"
+      ],
+      "normalization": {
+        "source_expression": ".replace(/[^\\w\\s]/g, \"\")",
+        "limitation": "JavaScript \\w is ASCII-oriented here, so accented letters are removed and multilingual WER is biased."
+      },
+      "models": [
+        {
+          "id": "phi4:14b",
+          "sample_count": 50,
+          "wer_before": 0.06784555616556473,
+          "wer_after": 0.14593338207024098,
+          "worsened_count": 21,
+          "by_language": {
+            "de": { "sample_count": 10, "wer_before": 0.05288784815639036, "wer_after": 0.05551124600037642, "worsened_count": 3 },
+            "en": { "sample_count": 10, "wer_before": 0.05454346092503988, "wer_after": 0.16151315789473683, "worsened_count": 7 },
+            "es": { "sample_count": 10, "wer_before": 0.04526774077947021, "wer_after": 0.13850338486219077, "worsened_count": 4 },
+            "fr": { "sample_count": 10, "wer_before": 0.11698834369764603, "wer_after": 0.2009288523933567, "worsened_count": 3 },
+            "pt": { "sample_count": 10, "wer_before": 0.06954038726927722, "wer_after": 0.17321026920054436, "worsened_count": 4 }
+          }
+        },
+        {
+          "id": "gpt-oss:20b",
+          "sample_count": 48,
+          "wer_before": 0.06803446732614292,
+          "wer_after": 0.06724890260246912,
+          "worsened_count": 6,
+          "by_language": {
+            "de": { "sample_count": 9, "wer_before": 0.04866326562831252, "wer_after": 0.024853741818788706, "worsened_count": 0 },
+            "en": { "sample_count": 10, "wer_before": 0.05454346092503988, "wer_after": 0.08299043062200957, "worsened_count": 3 },
+            "es": { "sample_count": 10, "wer_before": 0.04526774077947021, "wer_after": 0.03747163883044473, "worsened_count": 0 },
+            "fr": { "sample_count": 9, "wer_before": 0.12601879458468607, "wer_after": 0.11764272620861768, "worsened_count": 1 },
+            "pt": { "sample_count": 10, "wer_before": 0.06954038726927722, "wer_after": 0.07408584181473174, "worsened_count": 2 }
+          }
+        },
+        {
+          "id": "qwen2.5:7b",
+          "sample_count": 50,
+          "wer_before": 0.06784555616556473,
+          "wer_after": 0.220221051906666,
+          "worsened_count": 23,
+          "by_language": {
+            "de": { "sample_count": 10, "wer_before": 0.05288784815639036, "wer_after": 0.06946432723286944, "worsened_count": 3 },
+            "en": { "sample_count": 10, "wer_before": 0.05454346092503988, "wer_after": 0.10827181590339485, "worsened_count": 7 },
+            "es": { "sample_count": 10, "wer_before": 0.04526774077947021, "wer_after": 0.16080065613997177, "worsened_count": 4 },
+            "fr": { "sample_count": 10, "wer_before": 0.11698834369764603, "wer_after": 0.36529401993355476, "worsened_count": 4 },
+            "pt": { "sample_count": 10, "wer_before": 0.06954038726927722, "wer_after": 0.397274440323539, "worsened_count": 5 }
+          }
+        },
+        {
+          "id": "mistral:7b",
+          "sample_count": 50,
+          "wer_before": 0.06784555616556473,
+          "wer_after": 0.5085977226849867,
+          "worsened_count": 41,
+          "by_language": {
+            "de": { "sample_count": 10, "wer_before": 0.05288784815639036, "wer_after": 0.28686180430776587, "worsened_count": 8 },
+            "en": { "sample_count": 10, "wer_before": 0.05454346092503988, "wer_after": 0.2519677033492823, "worsened_count": 7 },
+            "es": { "sample_count": 10, "wer_before": 0.04526774077947021, "wer_after": 0.7773951972320434, "worsened_count": 10 },
+            "fr": { "sample_count": 10, "wer_before": 0.11698834369764603, "wer_after": 0.40584090957086005, "worsened_count": 7 },
+            "pt": { "sample_count": 10, "wer_before": 0.06954038726927722, "wer_after": 0.8209229989649819, "worsened_count": 9 }
+          }
+        }
+      ],
+      "missing_results": [
+        "gemma3n:e4b is listed by the tracked script but has no completed row in the 198-record result artifact."
+      ],
+      "limitations": [
+        "The ASCII-oriented normalization makes the stored multilingual WER values non-comparable to Cuttledoc 3.",
+        "All fixtures still come from FLEURS and do not cover the target podcast or audiobook domains."
+      ]
+    }
+  ],
+  "conclusions": [
+    "Correction quality is language-, source-, and model-specific.",
+    "An aggregate WER improvement does not prove that individual transcripts or languages are safe.",
+    "Gemma 3n E4B remains a hypothesis from the synthetic run and needs a real Cuttledoc 3 evaluation.",
+    "Raw ASR output must remain available and corrected output must pass semantic-regression gates."
+  ]
+}
