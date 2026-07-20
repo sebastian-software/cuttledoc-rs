@@ -302,6 +302,7 @@ def main() -> None:
         "environment": {
             "python": sys.version.split()[0],
             "packages": {
+                "mistral-common": package_version("mistral-common"),
                 "mlx": package_version("mlx"),
                 "mlx-audio": package_version("mlx-audio"),
                 "mlx-lm": package_version("mlx-lm"),

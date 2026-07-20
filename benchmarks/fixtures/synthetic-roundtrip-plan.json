@@ -129,7 +129,7 @@
       "source_url": "https://huggingface.co/mlx-community/Voxtral-4B-TTS-2603-mlx-4bit",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
       "license": "CC-BY-NC-4.0 model and supplied voice references; MIT reference runtime; reference evaluation only under the repository dependency policy",
-      "status": "artifact-pinned-pending-reference-run",
+      "status": "measured-reference-run-pending-listening-and-controls",
       "locales": [
         "de-DE",
         "en-US"

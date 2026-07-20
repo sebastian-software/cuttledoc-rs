@@ -973,7 +973,8 @@ function validateVoxtralTtsModelManifest(modelManifest, plan, selection) {
   if (!candidate ||
       !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
       candidate.source_revision !== modelManifest.reference_runtime?.revision ||
-      candidate.status !== 'artifact-pinned-pending-reference-run' ||
+      candidate.status !==
+        'measured-reference-run-pending-listening-and-controls' ||
       !candidate.license.includes('CC-BY-NC-4.0')) {
     errors.push('synthetic plan must pin Voxtral and keep it reference-only');
   }
@@ -1188,6 +1189,248 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
       run.conclusion?.quality_decision_ready !== false ||
       !(run.conclusion?.next?.length > 0)) {
     errors.push('conclusion must keep the quality and public API provisional');
+  }
+  return errors;
+}
+
+function validateVoxtralTtsRun(run, selection, modelManifest) {
+  const errors = [];
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
+      run.selection_revision !== selection.revision ||
+      run.purpose !== 'development-diagnostic') {
+    errors.push('run identity must pin the source and diagnostic selection');
+  }
+  if (run.candidate?.id !== 'voxtral-tts-4b-mlx-audio' ||
+      run.candidate?.task !== 'tts' ||
+      run.candidate?.model?.revision !== modelManifest.conversion.revision ||
+      run.candidate?.model?.license !== modelManifest.conversion.license ||
+      run.candidate?.model?.snapshot_bytes !==
+        modelManifest.conversion.snapshot_bytes ||
+      run.candidate?.runtime?.revision !==
+        modelManifest.reference_runtime.revision ||
+      run.candidate?.runtime?.version !==
+        modelManifest.reference_runtime.version ||
+      run.candidate?.runtime?.license !== modelManifest.reference_runtime.license) {
+    errors.push('candidate must match the pinned Voxtral model and runtime');
+  }
+  if (run.candidate?.voice?.name !==
+        modelManifest.generation_contract.speaker ||
+      run.candidate?.voice?.native_language !==
+        modelManifest.generation_contract.speaker_native_language ||
+      run.candidate?.voice?.cross_lingual !== false) {
+    errors.push('voice must preserve the fixed native-German contract');
+  }
+  if (run.host?.architecture !== 'arm64' ||
+      !(run.host?.memory_bytes > 0) ||
+      !(run.host?.chip?.length > 0) ||
+      !(run.host?.os?.length > 0) ||
+      !(run.host?.execution_context?.length > 0)) {
+    errors.push('host must record the Apple Silicon execution context');
+  }
+
+  const selected = selection.sources
+    .flatMap((source) => source.passages.map((passage) => ({
+      source,
+      passage,
+    })))
+    .find(({ passage }) => passage.id === run.input?.passage_id);
+  if (!selected ||
+      run.input?.source_id !== selected.source.id ||
+      run.input?.locale !== selected.source.locale ||
+      run.input?.character_count !== selected.passage.character_count ||
+      run.input?.text_sha256 !== selected.passage.spoken_sha256 ||
+      run.input?.license !== selected.source.license) {
+    errors.push('TTS input metadata differs from the passage selection');
+  }
+  if (run.procedure?.repetitions !== 1 ||
+      run.procedure?.stream !== false ||
+      JSON.stringify(run.procedure?.generation) !==
+        JSON.stringify(modelManifest.generation_contract) ||
+      !(run.procedure?.command?.includes(
+        'scripts/run-voxtral-tts-mlx-reference.sh',
+      )) ||
+      !(run.procedure?.raw_audio?.includes('local-required')) ||
+      !arrayEquals(
+        run.procedure?.raw_artifacts ?? [],
+        ['audio.f32le', 'audio.pcm16.wav', 'result.json'],
+      )) {
+    errors.push('procedure must preserve the pinned local Voxtral run');
+  }
+
+  const audio = run.result?.audio;
+  if (run.result?.status !== 'measured' ||
+      audio?.sample_format !== 'f32le' ||
+      audio?.sample_rate_hz !==
+        modelManifest.generation_contract.sample_rate_hz ||
+      audio?.channel_count !== 1 ||
+      !(Number.isInteger(audio?.sample_count) && audio.sample_count > 0) ||
+      audio?.byte_count !== audio?.sample_count * 4 ||
+      !/^[0-9a-f]{64}$/.test(audio?.sha256 ?? '') ||
+      audio?.non_finite_sample_count !== 0 ||
+      !(audio?.minimum_sample >= -1 && audio.minimum_sample <= 1) ||
+      !(audio?.maximum_sample >= -1 && audio.maximum_sample <= 1) ||
+      !(audio?.rms > 0 && audio.rms <= 1)) {
+    errors.push('audio must be measured finite digest-pinned mono f32 PCM');
+  }
+  const expectedDuration = audio?.sample_count * 1_000 / audio?.sample_rate_hz;
+  if (!Number.isFinite(audio?.duration_ms) ||
+      Math.abs(audio.duration_ms - expectedDuration) > 1e-9) {
+    errors.push('audio duration diverges from PCM metadata');
+  }
+
+  const timing = run.result?.timing;
+  const expectedRtf = timing?.complete_synthesis_ms / audio?.duration_ms;
+  if (!(timing?.model_load_ms > 0) ||
+      !(timing?.first_audio_ms > 0) ||
+      !(timing?.complete_synthesis_ms >= timing?.first_audio_ms) ||
+      !(Number.isInteger(timing?.output_count) && timing.output_count > 0) ||
+      !(Number.isInteger(timing?.token_count) && timing.token_count > 0) ||
+      !Number.isFinite(timing?.real_time_factor) ||
+      Math.abs(timing.real_time_factor - expectedRtf) > 1e-12) {
+    errors.push('timing metrics or real-time factor are inconsistent');
+  }
+  const runtimeOutput = run.result?.runtime_output ?? [];
+  if (runtimeOutput.length !== timing?.output_count ||
+      runtimeOutput.reduce((sum, output) => sum + output.sample_count, 0) !==
+        audio?.sample_count ||
+      runtimeOutput.reduce((sum, output) => sum + output.token_count, 0) !==
+        timing?.token_count ||
+      runtimeOutput.some(
+        (output) =>
+          output.sample_rate_hz !== audio?.sample_rate_hz ||
+          output.is_streaming_chunk !== false,
+      )) {
+    errors.push('runtime output does not reconcile with audio and timing');
+  }
+  if (run.result?.termination?.reached_max_tokens !== false ||
+      run.result?.termination?.configured_max_tokens !==
+        modelManifest.generation_contract.max_tokens ||
+      timing?.token_count >= run.result?.termination?.configured_max_tokens) {
+    errors.push('generation must stop before the configured token limit');
+  }
+  if (!(run.result?.resources?.maximum_resident_set_size_bytes > 0) ||
+      !(run.result?.resources?.mlx_peak_memory_bytes > 0) ||
+      run.result?.resources?.model_snapshot_bytes !==
+        modelManifest.conversion.snapshot_bytes) {
+    errors.push('resource metrics must include process, MLX, and model size');
+  }
+
+  const contentChecks = run.result?.asr_content_checks;
+  const normalizedAudio = contentChecks?.normalized_audio;
+  if (contentChecks?.status !== 'complete-with-level-control' ||
+      normalizedAudio?.sample_format !== 'f32le' ||
+      normalizedAudio?.sample_rate_hz !== 16000 ||
+      normalizedAudio?.channel_count !== 1 ||
+      normalizedAudio?.byte_count !== normalizedAudio?.sample_count * 4 ||
+      normalizedAudio?.duration_ms !== audio?.duration_ms ||
+      !/^[0-9a-f]{64}$/.test(normalizedAudio?.sha256 ?? '')) {
+    errors.push('content checks must pin the shared 16 kHz ASR input');
+  }
+  const expectedContentChecks = new Map([
+    ['apple-speechtranscriber', [18, 106, 45, 698]],
+    ['whisper-large-v3-turbo-coreml-whispercpp', [9, 103, 32, 676]],
+    ['parakeet-tdt-0.6b-v3-coreml', [64, 76, 306, 502]],
+    ['qwen3-asr-0.6b-mlx-direct', [12, 104, 34, 703]],
+  ]);
+  const measuredChecks = contentChecks?.backends ?? [];
+  if (measuredChecks.length !== expectedContentChecks.size ||
+      new Set(measuredChecks.map((check) => check.backend?.id)).size !==
+        measuredChecks.length) {
+    errors.push('content checks must contain four unique measured backends');
+  }
+  for (const check of measuredChecks) {
+    const transcript = check.transcript;
+    const transcriptDigest = createHash('sha256')
+      .update(transcript?.text ?? '')
+      .digest('hex');
+    if (!(transcript?.text?.length > 0) ||
+        transcript?.sha256 !== transcriptDigest ||
+        !(transcript?.segment_count > 0) ||
+        transcript?.update_count !==
+          transcript?.final_update_count + transcript?.volatile_update_count ||
+        transcript?.revoke_count !== 0) {
+      errors.push(
+        `${check.backend?.id ?? 'unknown'} transcript metadata is inconsistent`,
+      );
+    }
+    const expected = expectedContentChecks.get(check.backend?.id);
+    const quality = check.quality;
+    if (!expected ||
+        quality?.word_edits !== expected[0] ||
+        quality?.reference_word_count !== 103 ||
+        quality?.hypothesis_word_count !== expected[1] ||
+        Math.abs(
+          quality?.wer - quality?.word_edits / quality?.reference_word_count,
+        ) > 1e-15 ||
+        quality?.character_edits !== expected[2] ||
+        quality?.reference_character_count !== 692 ||
+        quality?.hypothesis_character_count !== expected[3] ||
+        Math.abs(
+          quality?.cer -
+            quality?.character_edits / quality?.reference_character_count,
+        ) > 1e-15) {
+      errors.push(
+        `${check.backend?.id ?? 'unknown'} WER or CER is not derivable`,
+      );
+    }
+    const asrTiming = check.timing;
+    if (!(asrTiming?.complete_inference_ms > 0) ||
+        Math.abs(
+          asrTiming?.real_time_factor -
+            asrTiming?.complete_inference_ms / audio?.duration_ms,
+        ) > 1e-15) {
+      errors.push(`${check.backend?.id ?? 'unknown'} timing is inconsistent`);
+    }
+  }
+
+  const levelControl = contentChecks?.level_control;
+  const controlAudio = levelControl?.audio;
+  const expectedLevelControl = new Map([
+    ['apple-speechtranscriber', [15, 47]],
+    ['whisper-large-v3-turbo-coreml-whispercpp', [9, 32]],
+    ['parakeet-tdt-0.6b-v3-coreml', [48, 179]],
+    ['qwen3-asr-0.6b-mlx-direct', [13, 37]],
+  ]);
+  if (levelControl?.gain_db !== 12 ||
+      controlAudio?.sample_format !== 'f32le' ||
+      controlAudio?.sample_rate_hz !== 16000 ||
+      controlAudio?.sample_count !== normalizedAudio?.sample_count ||
+      controlAudio?.byte_count !== normalizedAudio?.byte_count ||
+      controlAudio?.duration_ms !== normalizedAudio?.duration_ms ||
+      controlAudio?.clipped_sample_count !== 0 ||
+      !(controlAudio?.rms > 0) ||
+      !/^[0-9a-f]{64}$/.test(controlAudio?.sha256 ?? '') ||
+      levelControl?.backends?.length !== expectedLevelControl.size) {
+    errors.push('level control must pin clipping-free +12 dB audio');
+  }
+  for (const check of levelControl?.backends ?? []) {
+    const expected = expectedLevelControl.get(check.id);
+    if (!expected ||
+        check.word_edits !== expected[0] ||
+        Math.abs(check.wer - check.word_edits / 103) > 1e-15 ||
+        check.character_edits !== expected[1] ||
+        Math.abs(check.cer - check.character_edits / 692) > 1e-15 ||
+        !/^[0-9a-f]{64}$/.test(check.transcript_sha256 ?? '')) {
+      errors.push(`${check.id ?? 'unknown'} level control is inconsistent`);
+    }
+  }
+  if (contentChecks?.comparison?.completed_backend_count !== 4 ||
+      contentChecks?.comparison?.expected_backend_count !== 4 ||
+      !arrayEquals(
+        contentChecks?.comparison?.remaining_backends ?? [],
+        [],
+      )) {
+    errors.push('content-check matrix must complete all four ASR backends');
+  }
+  if (run.environment?.packages?.['mistral-common'] !== '1.10.0' ||
+      run.conclusion?.reference_path_proven !== true ||
+      run.conclusion?.public_contract_accepted !== false ||
+      run.conclusion?.production_dependency_eligible !== false ||
+      run.conclusion?.quality_decision_ready !== false ||
+      !(run.conclusion?.next?.length > 0)) {
+    errors.push('conclusion must keep licensing, quality, and API provisional');
   }
   return errors;
 }
@@ -1997,6 +2240,10 @@ const qwen3TtsRunPath = join(
   repoRoot,
   'benchmarks/raw/phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1/result.json',
 );
+const voxtralTtsRunPath = join(
+  repoRoot,
+  'benchmarks/raw/phase5.voxtral-tts-4b-mlx-reference.synthetic-de-origin-1/result.json',
+);
 const qwen3TtsModelManifestPath = join(
   repoRoot,
   'spikes/qwen3-tts-mlx-reference/model-manifest.json',
@@ -2054,6 +2301,7 @@ const syntheticRoundtripSelection = await readJson(
 );
 const appleTtsRun = await readJson(appleTtsRunPath);
 const qwen3TtsRun = await readJson(qwen3TtsRunPath);
+const voxtralTtsRun = await readJson(voxtralTtsRunPath);
 const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
 const voxtralTtsModelManifest = await readJson(voxtralTtsModelManifestPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
@@ -2125,6 +2373,13 @@ failures.push(
     syntheticRoundtripSelection,
     qwen3TtsModelManifest,
   ).map((error) => `${qwen3TtsRunPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralTtsRun(
+    voxtralTtsRun,
+    syntheticRoundtripSelection,
+    voxtralTtsModelManifest,
+  ).map((error) => `${voxtralTtsRunPath}: ${error}`),
 );
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
@@ -2321,6 +2576,18 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject divergent Voxtral TTS snapshot bytes',
     );
   }
+  const invalidVoxtralTtsRun = structuredClone(voxtralTtsRun);
+  invalidVoxtralTtsRun.result.asr_content_checks.level_control.backends[0]
+    .word_edits += 1;
+  if (validateVoxtralTtsRun(
+    invalidVoxtralTtsRun,
+    syntheticRoundtripSelection,
+    voxtralTtsModelManifest,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent Voxtral level control',
+    );
+  }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
   invalidRightsReview.disposition = 'accepted';
   if (validateSourceRightsReview(
@@ -2359,7 +2626,7 @@ console.log(
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
-  `2 measured TTS diagnostics, ` +
+  `3 measured TTS diagnostics, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +

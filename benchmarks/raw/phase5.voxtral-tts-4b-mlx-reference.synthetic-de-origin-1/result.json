@@ -1,0 +1,402 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.voxtral-tts-4b-mlx-reference.synthetic-de-origin-1",
+  "captured_at": "2026-07-20T18:36:19.250640Z",
+  "source_revision": "61ddf5c9715796f9309a5ef278610fe2f3de858d",
+  "selection_revision": "synthetic-roundtrip-passages-1",
+  "purpose": "development-diagnostic",
+  "candidate": {
+    "id": "voxtral-tts-4b-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Voxtral-4B-TTS-2603-mlx-4bit",
+      "revision": "f98fc91b9cb5adc7dab56102c690458276c14c6a",
+      "license": "CC-BY-NC-4.0",
+      "snapshot_bytes": 2542800411
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "name": "de_female",
+      "language": "German",
+      "native_language": "German",
+      "cross_lingual": false
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-origin",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "locale": "de-DE",
+    "character_count": 811,
+    "text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "passage_id": "synthetic-de-origin",
+      "locale": "de-DE",
+      "speaker": "de_female",
+      "speaker_native_language": "German",
+      "cross_lingual": false,
+      "seed": 0,
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "top_k": 50,
+      "max_tokens": 1200,
+      "sample_rate_hz": 24000,
+      "rationale": "Voxtral exposes native German male and female voice references. The female preset is fixed for the first German diagnostic so the comparison does not confound the model with cross-lingual English voice behavior."
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "CUTTLEDOC_VOXTRAL_TTS_MODEL_DIR=/local/model CUTTLEDOC_TTS_TEXT_DIR=/local/passages CUTTLEDOC_VOXTRAL_TTS_OUTPUT_DIR=/local/output bash scripts/run-voxtral-tts-mlx-reference.sh",
+    "raw_audio": "local-required; not checked into Git; CC-BY-SA input and CC-BY-NC model handling required",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1319040,
+      "byte_count": 5276160,
+      "duration_ms": 54960,
+      "sha256": "d09a7be807f6c3243284ad7c5ba544c279c3a66e454c975167a0cfbe85776ac2",
+      "minimum_sample": -0.2403378188610077,
+      "maximum_sample": 0.1743142157793045,
+      "rms": 0.010682682408234055,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1865.704875,
+      "first_audio_ms": 17481.575041,
+      "complete_synthesis_ms": 18059.56475,
+      "real_time_factor": 0.32859470069141195,
+      "output_count": 1,
+      "token_count": 687
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 2917335040,
+      "mlx_peak_memory_bytes": 5567786804,
+      "model_snapshot_bytes": 2542800411
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1319040,
+        "sample_rate_hz": 24000,
+        "token_count": 687,
+        "processing_time_seconds": 17.481511116027832,
+        "mlx_audio_reported_duration_over_processing": 3.1438929755683542,
+        "peak_memory_gb_decimal": 2.997707022,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete-with-level-control",
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 879360,
+        "byte_count": 3517440,
+        "duration_ms": 54960,
+        "sha256": "6e94193a1255dc92e04b1fea3d26d3467fa48f05bb9a65ba54ab55edcb5d8e77"
+      },
+      "backends": [
+        {
+          "captured_at": "2026-07-20T18:38:22.852Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "de",
+            "model": "whisper.cpp@5359861c739e955e79d9a303bcbc70fb988958b1 plus whisper-coreml-models@dd3515371e6b560b63ec275abf020153a45caa60",
+            "runtime": "legacy whisper-coreml@20f619e02b46e64dc819958d3ab83bd029607f0a"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth Summer Research Project und Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs \"Künstliche Intelligenz\" wurde im Laufe der Zeit verschiedentlich diskutiert. Der Computer-Pionier Douglas Engelbart zog bereits 1962 in den Brief \"Intelligence Augmentation\" vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "011c431d513ef4ce295914485bfc0567345380e0adb574f8bbd7b9bc851f5b19",
+            "segment_count": 9,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 103,
+            "word_edits": 9,
+            "wer": 0.08737864077669903,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 676,
+            "character_edits": 32,
+            "cer": 0.046242774566473986
+          },
+          "timing": {
+            "cold_load_ms": 1127.786541,
+            "complete_inference_ms": 1743.054958,
+            "real_time_factor": 0.031714973762736534
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1951907840
+          }
+        },
+        {
+          "captured_at": "2026-07-20T18:38:48.012Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "de",
+            "model": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+            "runtime": "repository-owned Qwen3-ASR task adapter over official MLX 0.32.0@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+          },
+          "transcript": {
+            "text": "Der Begriff \"artificial intelligence\", künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs \"künstliche Intelligenz\" wurde im Laufe der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart suchte bereits 1962 in den Brief \"Intelligence augmentations\" seiner Ansicht nach sei das Ziel, durch geeignete Interpretationspharategmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken und statt jeglichen menschlichen Aufgaben zu automatisieren.",
+            "sha256": "79e2afc6c89a359883d9b2d479f3b472e016ab77d5e030d81deb9b5f60337593",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 12,
+            "wer": 0.11650485436893204,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 703,
+            "character_edits": 34,
+            "cer": 0.049132947976878616
+          },
+          "timing": {
+            "cold_load_ms": 177.0915,
+            "complete_inference_ms": 1985.1047294999998,
+            "real_time_factor": 0.03611908168668122
+          },
+          "resources": {
+            "model_bytes": 1010776466,
+            "binary_bytes": 149817552,
+            "maximum_resident_set_size_bytes": 1168293888,
+            "mlx_peak_memory_bytes": 3220674864
+          }
+        },
+        {
+          "captured_at": "2026-07-20T18:38:07.451Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "de-DE",
+            "model": "macOS system-managed SpeechTranscriber assets",
+            "runtime": "macOS SpeechAnalyzer through a repository-owned Swift C ABI"
+          },
+          "transcript": {
+            "text": "Der  Begriff  Artificial  Intelligence,  künstliche  Intelligenz,  wurde  1955  vom  US-amerikanischen  Informatiker  John  McCarthy  im  Rahmenhmen  eines  Förderantrags  an  die  Rockefeller  Stiftung  für  das  Dart  Summer  Research  Project  und  Artificial  Intelligence  geprägt.  Ein  Forschungsprojekt,  bei  dem  sich  im  Sommer  19 56  eine  Gruppe  von  zehn  Wissenschaftlern  über  ca.  acht  Wochen  mit  der  Thematik  befasste.  Die  Wahl  des  Begriffs  K  künstliche  Intelligenz  wurde  im  Laufe  der  Zeit  verschiedentlich  diskutiert.  Der  Computerpionier  Dou  Engelbert  zog  bereits  1962  in  den  Preff  Intelligence  Auggumentations  Locumentation.  Seiner  Ansicht  nach  sei  das  Ziel,  durch  geeignete  Interaktionsparadigmen,  das  Können  und  Verständnis,  das  mit  dem  Computer  interagierenden  Menschen  zu  verstärken,  anstattlich  menschliche  Aufgaben  zu  automatisieren",
+            "sha256": "3f455f41d081d54a474585e8f8867820572a8a0a44051752f361850cbb60d6f0",
+            "segment_count": 106,
+            "update_count": 210,
+            "final_update_count": 3,
+            "volatile_update_count": 207,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 106,
+            "word_edits": 18,
+            "wer": 0.17475728155339806,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 698,
+            "character_edits": 45,
+            "cer": 0.06502890173410404
+          },
+          "timing": {
+            "cold_load_ms": 789.747625,
+            "first_result_ms": 59.3524375,
+            "complete_inference_ms": 512.70875,
+            "real_time_factor": 0.009328761826783116
+          },
+          "resources": {
+            "binary_bytes": 950776,
+            "maximum_resident_set_size_bytes": 29097984
+          }
+        },
+        {
+          "captured_at": "2026-07-20T18:39:09.024Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "model": "FluidInference/parakeet-tdt-0.6b-v3-coreml@aed02740059203c4a87495924f685de3722ae9ce",
+            "runtime": "legacy parakeet-coreml@3a29d6f80bfa5f95e791d21cfa86a0154806ef47"
+          },
+          "transcript": {
+            "text": "Smith bowl. The begriff artificial intelligence. Künstliche Intelligence wurde 1950 from the US American Informatiker John McCarthy im Rahmen eines Förderantrags on the Rockefeller Stiftung for the Start Math Summer Research Project on Artificial Intelligence gear. Ein Forschungsprojekt. indem sich im Sommer neunzehnhundsechsundfünfzig eine Gruppe von zehn Wissenschaftlern. Well circa acht Wochen. Thematic befastered. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computer Pionier Douglas Engelberg. bereits nineteen zwei sechs.",
+            "sha256": "faf906cdbc74180a4793d5952bc26b77db466231ce1f665d5228082fd1d143b3",
+            "segment_count": 10,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 76,
+            "word_edits": 64,
+            "wer": 0.6213592233009708,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 502,
+            "character_edits": 306,
+            "cer": 0.4421965317919075
+          },
+          "timing": {
+            "cold_load_ms": 330.945166,
+            "complete_inference_ms": 935.9524165000001,
+            "real_time_factor": 0.017029701901382827
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 161038336
+          }
+        }
+      ],
+      "level_control": {
+        "rationale": "The raw Voxtral output is about 15.5 dB quieter by RMS than the Qwen3-TTS diagnostic. A clipping-free +12 dB control isolates level-sensitive ASR and VAD behavior from lexical synthesis errors.",
+        "gain_db": 12,
+        "audio": {
+          "sample_format": "f32le",
+          "sample_rate_hz": 16000,
+          "channel_count": 1,
+          "sample_count": 879360,
+          "byte_count": 3517440,
+          "duration_ms": 54960,
+          "sha256": "3550c9a5a15c14dfd8e79a6c46ac4b4cef5376b2cad7ed544f3edcdbdbf1b2af",
+          "minimum_sample": -0.9574792981147766,
+          "maximum_sample": 0.6969171166419983,
+          "rms": 0.0424991445326394,
+          "clipped_sample_count": 0
+        },
+        "backends": [
+          {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "transcript_sha256": "011c431d513ef4ce295914485bfc0567345380e0adb574f8bbd7b9bc851f5b19",
+            "word_edits": 9,
+            "wer": 0.08737864077669903,
+            "character_edits": 32,
+            "cer": 0.046242774566473986
+          },
+          {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "transcript_sha256": "68c84a8007ab7901bb5326920078c088bd71c65a8db4cc303d19babbb05dbb29",
+            "word_edits": 13,
+            "wer": 0.1262135922330097,
+            "character_edits": 37,
+            "cer": 0.05346820809248555
+          },
+          {
+            "id": "apple-speechtranscriber",
+            "transcript_sha256": "fee3316de6c2833350a3caa3026b698587afd8a13d3eebfce7ff8a1390c6ad21",
+            "word_edits": 15,
+            "wer": 0.14563106796116504,
+            "character_edits": 47,
+            "cer": 0.06791907514450866
+          },
+          {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "transcript_sha256": "43c9b1c2eedc367f52ab224accdf102605c7b23f7ee1317299d3f3f5a453392f",
+            "word_edits": 48,
+            "wer": 0.46601941747572817,
+            "character_edits": 179,
+            "cer": 0.2586705202312139
+          }
+        ]
+      },
+      "comparison": {
+        "completed_backend_count": 4,
+        "expected_backend_count": 4,
+        "remaining_backends": [],
+        "lowest_observed_wer_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+        "observations": [
+          "Whisper omits the first parenthetical 'künstliche Intelligenz' and substitutes 'on' with 'und' plus 'den Begriff' with 'in den Brief'.",
+          "Direct Qwen3-ASR preserves the first parenthetical but reports additional changes including 'zog' to 'suchte', 'den Begriff' to 'in den Brief', and a corrupted technical term.",
+          "Apple Speech and Parakeet are level-sensitive on this unusually quiet signal; Parakeet also truncates the raw-level result after the 1962 sentence.",
+          "The +12 dB control leaves Whisper exactly unchanged and direct Qwen3-ASR near 12% WER. Signal level therefore does not explain the core lexical discrepancy.",
+          "On this one passage, the pinned 4-bit MLX reference has materially lower roundtrip lexical fidelity than the Qwen3-TTS diagnostic. Listening and generation/runtime controls are required before attributing the difference to the model."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mistral-common": "1.10.0",
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.3.5",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [
+      "casual_female",
+      "casual_male",
+      "cheerful_female",
+      "neutral_female",
+      "neutral_male",
+      "pt_male",
+      "pt_female",
+      "nl_male",
+      "nl_female",
+      "it_male",
+      "it_female",
+      "fr_male",
+      "fr_female",
+      "es_male",
+      "es_female",
+      "de_male",
+      "de_female",
+      "ar_male",
+      "hi_male",
+      "hi_female"
+    ],
+    "supported_languages": [
+      "English",
+      "French",
+      "Spanish",
+      "German",
+      "Italian",
+      "Portuguese",
+      "Dutch",
+      "Arabic",
+      "Hindi"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "production_dependency_eligible": false,
+    "quality_decision_ready": false,
+    "license_blocker": "The local model and supplied voice references are CC-BY-NC-4.0; a separate commercial license or API path is required for production use.",
+    "next": "Run a blinded German listening review plus a second seed or sampling control, then compare official BF16 or hosted output to isolate the 4-bit MLX reference from the underlying model."
+  }
+}

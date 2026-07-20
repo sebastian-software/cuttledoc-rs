@@ -160,7 +160,7 @@ The first diagnostic therefore fixes the English-native `Ryan` preset speaking
 German. This is a real cross-lingual limitation to review, not a reason to
 discard the platform or model family.
 
-Three ASR backends have now transcribed the exact same digest-pinned 16 kHz
+Four ASR backends have now transcribed the exact same digest-pinned 16 kHz
 audio:
 
 | Backend | German WER | German CER | Diagnostic observation |
@@ -175,6 +175,42 @@ content and demonstrates why one roundtrip score must not be treated as a TTS
 quality score. All four ASR cells are complete on identical PCM. A blinded
 listening review remains necessary to evaluate pronunciation and prosody and
 to assign any audible residual errors.
+
+## Voxtral TTS MLX reference result
+
+The native-German Voxtral result is
+[`phase5.voxtral-tts-4b-mlx-reference.synthetic-de-origin-1`](../benchmarks/raw/phase5.voxtral-tts-4b-mlx-reference.synthetic-de-origin-1/result.json).
+The pinned 4-bit conversion generated 54.96 seconds of mono 24 kHz f32 PCM at
+source revision `61ddf5c9715796f9309a5ef278610fe2f3de858d`. Loading took
+1.866 seconds, synthesis took 18.060 seconds (conventional RTF 0.329), process
+RSS peaked at 2.92 GB, and MLX reported 5.57 GB of peak allocated memory.
+Generation stopped normally at 687 audio tokens. This reference path is faster
+and materially smaller in MLX peak allocation than the first Qwen3-TTS run,
+but the different output durations prevent a direct speech-rate conclusion.
+
+The output RMS was only 0.0107, compared with 0.0632 for the Qwen diagnostic.
+Every backend therefore also ran against a clipping-free +12 dB control. The
+raw-level matrix is:
+
+| Backend | Voxtral German WER | Voxtral German CER | Qwen German WER | Diagnostic observation |
+| --- | ---: | ---: | ---: | --- |
+| Whisper large-v3-turbo | 8.74% | 4.62% | 1.94% | omits the first German parenthetical and substitutes `on`/`und` plus `den Begriff`/`in den Brief` |
+| Direct Qwen3-ASR 0.6B/MLX | 11.65% | 4.91% | 1.94% | additional verb, phrase, and technical-term changes |
+| Apple Speech | 17.48% | 6.50% | 4.85% | several proper-name and embedded-English errors |
+| Parakeet TDT 0.6B v3 | 62.14% | 44.22% | 8.74% | level-sensitive VAD truncates after the 1962 sentence |
+
+At +12 dB, Parakeet improves to 46.60% WER and Apple to 14.56%. Whisper is
+byte-for-byte unchanged at 8.74%, while direct Qwen3-ASR remains near 12% at
+12.62%. Low signal level therefore explains part of the Parakeet and Apple
+failure, but not the shared lexical discrepancy. On this one passage, the
+pinned 4-bit MLX reference has materially worse roundtrip fidelity than
+Qwen3-TTS despite using a native German voice.
+
+This is not yet a model-family verdict. The remaining causes include 4-bit
+quantization, the MLX reference implementation, the selected preset, and
+stochastic generation. A listening review and second generation control are
+required, followed by BF16 or hosted Voxtral output if practical. The local
+artifact also remains reference-only under CC BY-NC 4.0.
 
 ## Implementation sequence
 
@@ -193,11 +229,16 @@ to assign any audible residual errors.
    [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
    **Reference run complete:** real PCM, timing, resource use, termination, and
    all four ASR content checks are recorded. Listening is still open.
-4. Run the two local/system candidates through all four ASR backends, add the
+4. Run the local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.
+   **Local matrix in progress:** Qwen3-TTS and Voxtral are complete on the
+   German origin passage; Apple and the English/provider cells remain.
 5. Run Voxtral TTS with its native German preset, then add Chatterbox only
    after the runner and report contract are stable.
+   **First diagnostic complete:** the model/runtime artifact, real PCM,
+   timing, resources, four raw-level ASR checks, and a +12 dB level control are
+   recorded. Listening, generation-variance, and BF16/provider controls remain.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.
