@@ -2,8 +2,8 @@
 
 **Status:** Issue
 [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) is in
-progress. The model-artifact and official-MLX load boundary is complete;
-audio-encoder and decoder parity remain open.
+progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
+complete; transformer-block and decoder parity remain open.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -53,18 +53,43 @@ them. It proves that the official C++ loader understands the converted
 artifact and that the owned adapter sees exactly the architecture expected by
 the reference implementation.
 
+## Milestone 2: direct audio frontend and convolution stack
+
+The task adapter now accepts mono 16-kHz float32 PCM through its C ABI,
+computes the 128-bin Slaney-normalized frontend, applies all three Qwen3 Conv2d
+layers and `conv_out`, and returns compact numerical fingerprints to Rust.
+Safetensors loading remains CPU-bound in official MLX; GPU mode performs an
+explicit MLX copy before evaluating the graph on Metal.
+
+For the pinned 248,080-sample audiobook fixture, both direct device modes
+produce the exact reference shape sequence and the exact 16-chunk layout
+(fifteen 100-frame chunks plus one 50-frame chunk). The GPU parity validator
+measured:
+
+| Boundary | Shape | maximum sampled absolute error | maximum aggregate relative error |
+| --- | --- | ---: | ---: |
+| input features | `1 × 128 × 1550` | 2.3842e-7 | 1.5489e-6 |
+| Conv2d 1 | `16 × 64 × 50 × 480` | 1.1176e-8 | 2.6301e-7 |
+| Conv2d 2 | `16 × 32 × 25 × 480` | 3.4273e-7 | 4.9016e-7 |
+| Conv2d 3 | `16 × 16 × 13 × 480` | 2.9802e-7 | 4.2105e-7 |
+| `conv_out` | `16 × 13 × 896` | 1.0431e-6 | 3.0681e-7 |
+
+The byte digests intentionally differ at the frontend: Transformers computes
+its reference spectrogram via NumPy Float64/Complex64, whereas the owned path
+uses MLX Float32/Complex64. The checked tolerances are narrow enough to expose
+layout, padding, filter-bank, activation, or weight errors without pretending
+that different FFT implementations must be byte-identical.
+
 ## Remaining parity gates
 
-1. Pin one real 16-kHz fixture and store compact reference tensors at the
-   feature-extractor and Conv2d boundaries.
-2. Reproduce the 128-bin frontend, three Conv2d stages, and all 18 audio
-   transformer blocks with official MLX operators.
-3. Implement the Qwen tokenizer and prompt layout, replace audio-pad token
+1. Reproduce positional embeddings, ragged block attention, all 18 audio
+   transformer blocks, and the 1,024-dimensional projected audio features.
+2. Implement the Qwen tokenizer and prompt layout, replace audio-pad token
    embeddings, and run the 28-layer quantized decoder with a repository-owned
    KV cache.
-4. Require exact transcript parity on one fixture before adding the direct
+3. Require exact transcript parity on one fixture before adding the direct
    adapter to the multilingual audiobook matrix.
-5. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
+4. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
    memory measurements after materialization, and artifact pruning evidence.
 
 The order matters: comparing encoder tensors first prevents frontend or

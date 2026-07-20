@@ -16,7 +16,14 @@ The first committed vertical slice proves the artifact boundary:
    copies the JSON into Rust-owned memory, and releases the C allocation.
 
 No MLX array, operator, device, or model object crosses the ABI. This slice does
-not yet execute audio or claim transcript parity.
+not yet claim transcript parity.
+
+The second vertical slice executes the repository-owned 128-bin
+Whisper-compatible frontend and the complete Qwen3 Conv2d stack through the
+official MLX C++ operators. It exposes only PCM input and a compact JSON
+fingerprint through the C ABI. Both CPU and GPU modes are supported; the
+safetensors primitive materializes on CPU and the adapter explicitly copies
+the lazy arrays to Metal for GPU execution.
 
 ## Pinned inputs
 
@@ -65,12 +72,35 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   /absolute/path/to/Qwen3-ASR-0.6B-8bit
 ```
 
+Run the frontend/Conv2d parity probe on a mono 16-kHz float32 fixture:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  frontend \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  gpu
+```
+
+Compare its JSON output with the pinned reference oracle:
+
+```sh
+node scripts/validate-qwen3-mlx-frontend.mjs \
+  --oracle \
+  benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.encoder.json \
+  --actual /absolute/path/to/direct-frontend-result.json
+```
+
+The validator requires exact shapes, feature length, chunk boundaries, and
+sample positions. It allows `2e-6` absolute error for sampled values and
+`2e-5` relative error for aggregate statistics because the Transformers
+reference and direct MLX path use different FFT implementations.
+
 ## Next parity gates
 
-1. Match the 128-bin feature extractor and three Conv2d stages against stored
-   oracle tensors for one fixed clip.
-2. Match all 18 audio blocks and the 1,024-dimensional audio embeddings.
-3. Implement tokenizer/prompt assembly, audio-token replacement, and the
+1. Match all 18 audio blocks and the 1,024-dimensional audio embeddings.
+2. Implement tokenizer/prompt assembly, audio-token replacement, and the
    quantized 28-layer Qwen3 decoder with KV caching.
-4. Require exact transcript parity on one fixture before running the
+3. Require exact transcript parity on one fixture before running the
    multilingual audiobook matrix.
