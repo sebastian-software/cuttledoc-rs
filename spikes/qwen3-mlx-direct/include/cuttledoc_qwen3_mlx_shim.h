@@ -30,6 +30,15 @@ int32_t cuttledoc_qwen3_mlx_probe_audio_frontend(
     const char *model_directory, const float *audio, size_t audio_len,
     int32_t device_kind, char **json_out, char **error_out);
 
+/*
+ * Extends the frontend probe through positional embeddings, ragged block
+ * attention, all 18 audio transformer layers, and the final 1024-dimensional
+ * projection.
+ */
+int32_t cuttledoc_qwen3_mlx_probe_audio_encoder(
+    const char *model_directory, const float *audio, size_t audio_len,
+    int32_t device_kind, char **json_out, char **error_out);
+
 void cuttledoc_qwen3_mlx_free_string(char *value);
 
 #ifdef __cplusplus

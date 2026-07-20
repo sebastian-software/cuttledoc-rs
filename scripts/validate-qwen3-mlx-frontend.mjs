@@ -7,13 +7,24 @@ const { oraclePath, actualPath } = parseArguments(process.argv.slice(2));
 const oracle = JSON.parse(await readFile(oraclePath, 'utf8'));
 const actualDocument = JSON.parse(await readFile(actualPath, 'utf8'));
 const actual = actualDocument.result?.probe ?? actualDocument;
-const stages = [
+const frontendStages = [
   'input_features',
   'conv2d1',
   'conv2d2',
   'conv2d3',
   'conv_out',
 ];
+const encoderStages = [
+  ...frontendStages,
+  'encoder_input',
+  'encoder_layer_0',
+  'encoder_layer_17',
+  'audio_features',
+];
+const isEncoder = actual.stage === 'qwen3-audio-encoder';
+const stages = isEncoder ? encoderStages : frontendStages;
+const sampleAbsoluteTolerance = isEncoder ? 1e-5 : 2e-6;
+const aggregateRelativeTolerance = 2e-5;
 const errors = [];
 const comparisons = {};
 
@@ -24,6 +35,17 @@ if (actual.feature_length !== oracle.feature_length) {
 }
 if (!equalArrays(actual.chunk_lengths, oracle.chunk_lengths)) {
   errors.push('chunk_lengths differ from the pinned oracle');
+}
+if (isEncoder && actual.aftercnn_length !== oracle.aftercnn_length) {
+  errors.push(
+    `aftercnn_length: ${actual.aftercnn_length}, expected ${oracle.aftercnn_length}`,
+  );
+}
+if (
+  isEncoder &&
+  !equalArrays(actual.attention_windows, oracle.attention_windows)
+) {
+  errors.push('attention_windows differ from the pinned oracle');
 }
 
 for (const stage of stages) {
@@ -63,14 +85,14 @@ for (const stage of stages) {
     aggregate_relative_errors: aggregateRelativeErrors,
   };
 
-  if (maximumSampleAbsoluteError > 2e-6) {
+  if (maximumSampleAbsoluteError > sampleAbsoluteTolerance) {
     errors.push(
-      `${stage}: maximum sample absolute error ${maximumSampleAbsoluteError} exceeds 2e-6`,
+      `${stage}: maximum sample absolute error ${maximumSampleAbsoluteError} exceeds ${sampleAbsoluteTolerance}`,
     );
   }
-  if (maximumAggregateRelativeError > 2e-5) {
+  if (maximumAggregateRelativeError > aggregateRelativeTolerance) {
     errors.push(
-      `${stage}: maximum aggregate relative error ${maximumAggregateRelativeError} exceeds 2e-5`,
+      `${stage}: maximum aggregate relative error ${maximumAggregateRelativeError} exceeds ${aggregateRelativeTolerance}`,
     );
   }
 }
@@ -80,8 +102,8 @@ const result = {
   oracle: oraclePath,
   actual: actualPath,
   tolerances: {
-    sample_absolute: 2e-6,
-    aggregate_relative: 2e-5,
+    sample_absolute: sampleAbsoluteTolerance,
+    aggregate_relative: aggregateRelativeTolerance,
   },
   comparisons,
   errors,

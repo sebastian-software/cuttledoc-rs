@@ -3,7 +3,8 @@
 **Status:** Issue
 [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) is in
 progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
-complete; transformer-block and decoder parity remain open.
+complete. All 18 audio transformer layers also match the reference oracle;
+tokenizer and decoder parity remain open.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -80,16 +81,34 @@ uses MLX Float32/Complex64. The checked tolerances are narrow enough to expose
 layout, padding, filter-bank, activation, or weight errors without pretending
 that different FFT implementations must be byte-identical.
 
+## Milestone 3: complete direct audio encoder
+
+The direct C++ adapter now reproduces the sinusoidal positions, the Qwen
+ragged block-attention layout, all 18 transformer layers, post-normalization,
+and both output projections. The fixed clip produces exactly 202 tokens and
+the reference attention boundaries `[0, 104, 202]`.
+
+| Boundary | Shape | maximum sampled absolute error | maximum aggregate relative error |
+| --- | --- | ---: | ---: |
+| encoder input | `202 × 896` | 2.7418e-6 | 4.4689e-7 |
+| encoder layer 0 | `1 × 202 × 896` | 3.3081e-6 | 1.4844e-6 |
+| encoder layer 17 | `1 × 202 × 896` | 4.9323e-6 | 3.1458e-7 |
+| projected audio features | `202 × 1024` | 9.5926e-8 | 1.6638e-6 |
+
+One development parity run took 506.203 ms on Metal and reported a
+1,212,305,644-byte MLX peak. The CPU ABI smoke test also completed, in
+508.573 ms with a 488,174,416-byte peak. These single runs include lazy weight
+materialization inside the probe and establish functional boundaries; they are
+not yet the repeated end-to-end performance measurement.
+
 ## Remaining parity gates
 
-1. Reproduce positional embeddings, ragged block attention, all 18 audio
-   transformer blocks, and the 1,024-dimensional projected audio features.
-2. Implement the Qwen tokenizer and prompt layout, replace audio-pad token
+1. Implement the Qwen tokenizer and prompt layout, replace audio-pad token
    embeddings, and run the 28-layer quantized decoder with a repository-owned
    KV cache.
-3. Require exact transcript parity on one fixture before adding the direct
+2. Require exact transcript parity on one fixture before adding the direct
    adapter to the multilingual audiobook matrix.
-4. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
+3. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
    memory measurements after materialization, and artifact pruning evidence.
 
 The order matters: comparing encoder tensors first prevents frontend or

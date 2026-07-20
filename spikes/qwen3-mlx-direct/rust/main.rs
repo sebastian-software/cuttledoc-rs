@@ -18,6 +18,14 @@ unsafe extern "C" {
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
+    fn cuttledoc_qwen3_mlx_probe_audio_encoder(
+        model_directory: *const c_char,
+        audio: *const f32,
+        audio_len: usize,
+        device_kind: i32,
+        json_out: *mut *mut c_char,
+        error_out: *mut *mut c_char,
+    ) -> i32;
     fn cuttledoc_qwen3_mlx_free_string(value: *mut c_char);
 }
 
@@ -33,7 +41,10 @@ fn run() -> Result<(), String> {
     match arguments.as_slice() {
         [model_directory] => inspect(model_directory),
         [command, model_directory, pcm_path, device] if command == "frontend" => {
-            probe_frontend(model_directory, pcm_path, device)
+            probe_audio(model_directory, pcm_path, device, AudioProbe::Frontend)
+        }
+        [command, model_directory, pcm_path, device] if command == "encoder" => {
+            probe_audio(model_directory, pcm_path, device, AudioProbe::Encoder)
         }
         _ => Err(usage()),
     }
@@ -61,7 +72,18 @@ fn inspect(model_directory: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn probe_frontend(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), String> {
+#[derive(Clone, Copy)]
+enum AudioProbe {
+    Frontend,
+    Encoder,
+}
+
+fn probe_audio(
+    model_directory: &str,
+    pcm_path: &str,
+    device: &str,
+    probe: AudioProbe,
+) -> Result<(), String> {
     let model_directory = CString::new(model_directory)
         .map_err(|_| "model path contains an embedded NUL byte".to_owned())?;
     let device_kind = match device {
@@ -82,14 +104,24 @@ fn probe_frontend(model_directory: &str, pcm_path: &str, device: &str) -> Result
     let mut json = ptr::null_mut();
     let mut error = ptr::null_mut();
     let status = unsafe {
-        cuttledoc_qwen3_mlx_probe_audio_frontend(
-            model_directory.as_ptr(),
-            audio.as_ptr(),
-            audio.len(),
-            device_kind,
-            &mut json,
-            &mut error,
-        )
+        match probe {
+            AudioProbe::Frontend => cuttledoc_qwen3_mlx_probe_audio_frontend(
+                model_directory.as_ptr(),
+                audio.as_ptr(),
+                audio.len(),
+                device_kind,
+                &mut json,
+                &mut error,
+            ),
+            AudioProbe::Encoder => cuttledoc_qwen3_mlx_probe_audio_encoder(
+                model_directory.as_ptr(),
+                audio.as_ptr(),
+                audio.len(),
+                device_kind,
+                &mut json,
+                &mut error,
+            ),
+        }
     };
     if status != 0 {
         if !json.is_null() {
@@ -105,7 +137,7 @@ fn probe_frontend(model_directory: &str, pcm_path: &str, device: &str) -> Result
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect encoder MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
 }
 
 fn take_string(value: *mut c_char) -> Option<String> {

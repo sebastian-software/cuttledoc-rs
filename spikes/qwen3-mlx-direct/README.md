@@ -25,6 +25,11 @@ fingerprint through the C ABI. Both CPU and GPU modes are supported; the
 safetensors primitive materializes on CPU and the adapter explicitly copies
 the lazy arrays to Metal for GPU execution.
 
+The third vertical slice extends the same boundary through sinusoidal
+positions, the ragged block-attention mask, all 18 audio transformer layers,
+and the final 1,024-dimensional audio features. The pinned fixture produces
+202 audio tokens and the exact reference windows `[0, 104, 202]`.
+
 ## Pinned inputs
 
 - official MLX `v0.32.0`,
@@ -83,6 +88,18 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   gpu
 ```
 
+Replace `frontend` with `encoder` to run all 18 audio layers and the final
+projection:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  encoder \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  gpu
+```
+
 Compare its JSON output with the pinned reference oracle:
 
 ```sh
@@ -92,15 +109,15 @@ node scripts/validate-qwen3-mlx-frontend.mjs \
   --actual /absolute/path/to/direct-frontend-result.json
 ```
 
-The validator requires exact shapes, feature length, chunk boundaries, and
-sample positions. It allows `2e-6` absolute error for sampled values and
-`2e-5` relative error for aggregate statistics because the Transformers
-reference and direct MLX path use different FFT implementations.
+The validator requires exact shapes, feature length, chunk boundaries, sample
+positions, encoder length, and attention windows. It allows `2e-6` sampled
+absolute error through `conv_out`, `1e-5` through the full encoder, and `2e-5`
+relative error for aggregate statistics because the Transformers reference and
+direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Match all 18 audio blocks and the 1,024-dimensional audio embeddings.
-2. Implement tokenizer/prompt assembly, audio-token replacement, and the
+1. Implement tokenizer/prompt assembly, audio-token replacement, and the
    quantized 28-layer Qwen3 decoder with KV caching.
-3. Require exact transcript parity on one fixture before running the
+2. Require exact transcript parity on one fixture before running the
    multilingual audiobook matrix.

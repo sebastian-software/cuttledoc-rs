@@ -10,6 +10,7 @@
 #include <limits>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -36,6 +37,11 @@ constexpr std::size_t kHopLength = 160;
 constexpr std::size_t kMelBins = 128;
 constexpr std::size_t kFrequencyBins = kFftSize / 2 + 1;
 constexpr std::size_t kConvChunkFrames = 100;
+constexpr std::size_t kAudioState = 896;
+constexpr std::size_t kAudioHeads = 14;
+constexpr std::size_t kAudioHeadDimension = kAudioState / kAudioHeads;
+constexpr std::size_t kAudioEncoderLayers = 18;
+constexpr float kAudioLayerNormEpsilon = 1e-5f;
 
 std::mutex runtime_mutex;
 
@@ -356,10 +362,10 @@ std::string fingerprint_json(const mx::array &value, mx::Device device) {
   return json.str();
 }
 
-class Qwen3AudioFrontend {
+class Qwen3AudioEncoder {
 public:
-  Qwen3AudioFrontend(const std::filesystem::path &model_directory,
-                     mx::Device device)
+  Qwen3AudioEncoder(const std::filesystem::path &model_directory,
+                    mx::Device device)
       : device_(device), mel_filters_(make_slaney_mel_filters()) {
     auto [loaded_weights, metadata] = mx::load_safetensors(
         (model_directory / "model.safetensors").string(), mx::Device::cpu);
@@ -380,8 +386,39 @@ public:
              {"audio_tower.conv2d3.weight", {480, 3, 3, 480}},
              {"audio_tower.conv2d3.bias", {480}},
              {"audio_tower.conv_out.weight", {896, 7680}},
+             {"audio_tower.ln_post.weight", {896}},
+             {"audio_tower.ln_post.bias", {896}},
+             {"audio_tower.proj1.weight", {896, 896}},
+             {"audio_tower.proj1.bias", {896}},
+             {"audio_tower.proj2.weight", {1024, 896}},
+             {"audio_tower.proj2.bias", {1024}},
          }) {
       expect_shape(weights_, name, shape);
+    }
+    for (std::size_t layer = 0; layer < kAudioEncoderLayers; ++layer) {
+      const auto prefix =
+          "audio_tower.layers." + std::to_string(layer) + ".";
+      for (const auto &[suffix, shape] :
+           std::vector<std::pair<std::string, mx::Shape>>{
+               {"self_attn.q_proj.weight", {896, 896}},
+               {"self_attn.q_proj.bias", {896}},
+               {"self_attn.k_proj.weight", {896, 896}},
+               {"self_attn.k_proj.bias", {896}},
+               {"self_attn.v_proj.weight", {896, 896}},
+               {"self_attn.v_proj.bias", {896}},
+               {"self_attn.out_proj.weight", {896, 896}},
+               {"self_attn.out_proj.bias", {896}},
+               {"self_attn_layer_norm.weight", {896}},
+               {"self_attn_layer_norm.bias", {896}},
+               {"fc1.weight", {3584, 896}},
+               {"fc1.bias", {3584}},
+               {"fc2.weight", {896, 3584}},
+               {"fc2.bias", {896}},
+               {"final_layer_norm.weight", {896}},
+               {"final_layer_norm.bias", {896}},
+           }) {
+        expect_shape(weights_, prefix + suffix, shape);
+      }
     }
   }
 
@@ -446,6 +483,133 @@ public:
     return json.str();
   }
 
+  std::string probe_encoder(const float *audio,
+                            std::size_t audio_len) const {
+    const auto started = std::chrono::steady_clock::now();
+    const auto features = log_mel(audio, audio_len);
+    std::vector<std::size_t> chunk_lengths;
+    const auto chunks = make_chunks(features, chunk_lengths);
+
+    auto hidden = mx::expand_dims(chunks, 3, device_);
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d1.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d1.bias"));
+    const auto conv2d1_fingerprint = fingerprint_json(hidden, device_);
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d2.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d2.bias"));
+    const auto conv2d2_fingerprint = fingerprint_json(hidden, device_);
+    hidden = gelu(mx::conv2d(hidden, weight("audio_tower.conv2d3.weight"),
+                             {2, 2}, {1, 1}, {1, 1}, 1, device_) +
+                  weight("audio_tower.conv2d3.bias"));
+    const auto conv2d3_fingerprint = fingerprint_json(hidden, device_);
+
+    const auto batch_size = hidden.shape(0);
+    const auto frequency = hidden.shape(1);
+    const auto frames = hidden.shape(2);
+    const auto channels = hidden.shape(3);
+    hidden =
+        mx::reshape(mx::transpose(hidden, {0, 2, 3, 1}, device_),
+                    {batch_size, frames, channels * frequency}, device_);
+    hidden =
+        mx::matmul(hidden,
+                   mx::transpose(weight("audio_tower.conv_out.weight"), device_),
+                   device_);
+    const auto conv_out_fingerprint = fingerprint_json(hidden, device_);
+
+    hidden = hidden + mx::expand_dims(positional_embedding(frames), 0, device_);
+    std::vector<mx::array> valid_chunks;
+    std::vector<std::size_t> post_convolution_lengths;
+    std::size_t aftercnn_length = 0;
+    for (std::size_t index = 0; index < chunk_lengths.size(); ++index) {
+      const auto valid_length = (chunk_lengths[index] + 7) / 8;
+      post_convolution_lengths.push_back(valid_length);
+      aftercnn_length += valid_length;
+      auto chunk = mx::slice(
+          hidden, {static_cast<int>(index), 0, 0},
+          {static_cast<int>(index + 1), static_cast<int>(valid_length),
+           static_cast<int>(kAudioState)},
+          {1, 1, 1}, device_);
+      valid_chunks.push_back(mx::squeeze(chunk, 0, device_));
+    }
+    hidden = mx::concatenate(std::move(valid_chunks), 0, device_);
+    const auto encoder_input_fingerprint = fingerprint_json(hidden, device_);
+
+    const auto attention_window = static_cast<std::size_t>(frames) * 8;
+    std::vector<std::size_t> attention_windows{0};
+    for (std::size_t position = 0; position < aftercnn_length;) {
+      position = std::min(position + attention_window, aftercnn_length);
+      attention_windows.push_back(position);
+    }
+    const auto attention_mask =
+        make_attention_mask(aftercnn_length, attention_windows);
+
+    hidden = mx::expand_dims(hidden, 0, device_);
+    std::optional<std::string> layer_zero_fingerprint;
+    std::optional<std::string> layer_final_fingerprint;
+    for (std::size_t layer = 0; layer < kAudioEncoderLayers; ++layer) {
+      hidden = encoder_layer(hidden, layer, attention_mask);
+      if (layer == 0) {
+        layer_zero_fingerprint = fingerprint_json(hidden, device_);
+      } else if (layer == kAudioEncoderLayers - 1) {
+        layer_final_fingerprint = fingerprint_json(hidden, device_);
+      }
+    }
+
+    hidden = mx::squeeze(hidden, 0, device_);
+    hidden = layer_norm(hidden, "audio_tower.ln_post");
+    hidden = gelu(linear(hidden, "audio_tower.proj1"));
+    hidden = linear(hidden, "audio_tower.proj2");
+    const auto audio_features_fingerprint = fingerprint_json(hidden, device_);
+
+    std::ostringstream json;
+    json << std::setprecision(17)
+         << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+         << "\"stage\":\"qwen3-audio-encoder\","
+         << "\"device\":\""
+         << (device_ == mx::Device::gpu ? "gpu" : "cpu") << "\","
+         << "\"pcm_samples\":" << audio_len << ",\"feature_length\":"
+         << features.shape(2) << ",\"chunk_lengths\":[";
+    for (std::size_t index = 0; index < chunk_lengths.size(); ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << chunk_lengths[index];
+    }
+    json << "],\"post_convolution_lengths\":[";
+    for (std::size_t index = 0; index < post_convolution_lengths.size();
+         ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << post_convolution_lengths[index];
+    }
+    json << "],\"aftercnn_length\":" << aftercnn_length
+         << ",\"attention_windows\":[";
+    for (std::size_t index = 0; index < attention_windows.size(); ++index) {
+      if (index != 0) {
+        json << ",";
+      }
+      json << attention_windows[index];
+    }
+    const auto elapsed =
+        std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - started)
+            .count();
+    json << "],\"elapsed_ms\":" << elapsed << ",\"peak_memory_bytes\":"
+         << mx::get_peak_memory() << ",\"fingerprints\":{\"input_features\":"
+         << fingerprint_json(features, device_)
+         << ",\"conv2d1\":" << conv2d1_fingerprint
+         << ",\"conv2d2\":" << conv2d2_fingerprint
+         << ",\"conv2d3\":" << conv2d3_fingerprint
+         << ",\"conv_out\":" << conv_out_fingerprint
+         << ",\"encoder_input\":" << encoder_input_fingerprint
+         << ",\"encoder_layer_0\":" << layer_zero_fingerprint.value()
+         << ",\"encoder_layer_17\":" << layer_final_fingerprint.value()
+         << ",\"audio_features\":" << audio_features_fingerprint << "}}";
+    return json.str();
+  }
+
 private:
   const mx::array &weight(const std::string &name) const {
     const auto found = weights_.find(name);
@@ -453,6 +617,109 @@ private:
       throw std::runtime_error("missing required tensor: " + name);
     }
     return found->second;
+  }
+
+  mx::array linear(const mx::array &input, const std::string &prefix) const {
+    return mx::addmm(weight(prefix + ".bias"), input,
+                     mx::transpose(weight(prefix + ".weight"), device_), 1.0f,
+                     1.0f, device_);
+  }
+
+  mx::array layer_norm(const mx::array &input,
+                       const std::string &prefix) const {
+    return mx::fast::layer_norm(input, weight(prefix + ".weight"),
+                                weight(prefix + ".bias"),
+                                kAudioLayerNormEpsilon, device_);
+  }
+
+  mx::array positional_embedding(int sequence_length) const {
+    const auto log_timescale_increment = static_cast<float>(
+        std::log(10'000.0) / (static_cast<double>(kAudioState / 2) - 1.0));
+    const auto inverse_timescales =
+        mx::exp(-log_timescale_increment *
+                    mx::arange(static_cast<int>(kAudioState / 2), mx::float32,
+                               device_),
+                device_);
+    const auto scaled_time =
+        mx::expand_dims(
+            mx::arange(sequence_length, mx::float32, device_), 1, device_) *
+        mx::expand_dims(inverse_timescales, 0, device_);
+    return mx::concatenate(
+        {mx::sin(scaled_time, device_), mx::cos(scaled_time, device_)}, 1,
+        device_);
+  }
+
+  mx::array make_attention_mask(
+      std::size_t sequence_length,
+      const std::vector<std::size_t> &attention_windows) const {
+    std::vector<float> values(sequence_length * sequence_length, -1e9f);
+    for (std::size_t window = 0; window + 1 < attention_windows.size();
+         ++window) {
+      for (auto row = attention_windows[window];
+           row < attention_windows[window + 1]; ++row) {
+        for (auto column = attention_windows[window];
+             column < attention_windows[window + 1]; ++column) {
+          values[row * sequence_length + column] = 0.0f;
+        }
+      }
+    }
+    return mx::array(values.begin(),
+                     {1, 1, static_cast<int>(sequence_length),
+                      static_cast<int>(sequence_length)});
+  }
+
+  mx::array self_attention(const mx::array &input, std::size_t layer,
+                           const mx::array &attention_mask) const {
+    const auto prefix =
+        "audio_tower.layers." + std::to_string(layer) + ".self_attn";
+    const auto batch_size = input.shape(0);
+    const auto sequence_length = input.shape(1);
+    auto query =
+        linear(input, prefix + ".q_proj") *
+        (1.0f / std::sqrt(static_cast<float>(kAudioHeadDimension)));
+    auto key = linear(input, prefix + ".k_proj");
+    auto value = linear(input, prefix + ".v_proj");
+    query = mx::transpose(
+        mx::reshape(query,
+                    {batch_size, sequence_length,
+                     static_cast<int>(kAudioHeads),
+                     static_cast<int>(kAudioHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    key = mx::transpose(
+        mx::reshape(key,
+                    {batch_size, sequence_length,
+                     static_cast<int>(kAudioHeads),
+                     static_cast<int>(kAudioHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    value = mx::transpose(
+        mx::reshape(value,
+                    {batch_size, sequence_length,
+                     static_cast<int>(kAudioHeads),
+                     static_cast<int>(kAudioHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    auto output = mx::fast::scaled_dot_product_attention(
+        query, key, value, 1.0f, "", attention_mask, {}, device_);
+    output = mx::reshape(mx::transpose(output, {0, 2, 1, 3}, device_),
+                         {batch_size, sequence_length,
+                          static_cast<int>(kAudioState)},
+                         device_);
+    return linear(output, prefix + ".out_proj");
+  }
+
+  mx::array encoder_layer(const mx::array &input, std::size_t layer,
+                          const mx::array &attention_mask) const {
+    const auto prefix =
+        "audio_tower.layers." + std::to_string(layer) + ".";
+    auto hidden =
+        input + self_attention(layer_norm(input, prefix + "self_attn_layer_norm"),
+                               layer, attention_mask);
+    return hidden +
+           linear(gelu(linear(layer_norm(hidden, prefix + "final_layer_norm"),
+                              prefix + "fc1")),
+                  prefix + "fc2");
   }
 
   mx::array gelu(const mx::array &input) const {
@@ -614,7 +881,7 @@ extern "C" int32_t cuttledoc_qwen3_mlx_probe_audio_frontend(
     mx::set_default_device(device);
     mx::clear_cache();
     mx::reset_peak_memory();
-    const Qwen3AudioFrontend frontend(model_directory, device);
+    const Qwen3AudioEncoder frontend(model_directory, device);
     const auto json = frontend.probe(audio, audio_len);
     *json_out = strdup(json.c_str());
     if (*json_out == nullptr) {
@@ -625,6 +892,44 @@ extern "C" int32_t cuttledoc_qwen3_mlx_probe_audio_frontend(
     return fail(error.what(), error_out);
   } catch (...) {
     return fail("MLX raised a non-standard exception in the audio frontend",
+                error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_qwen3_mlx_probe_audio_encoder(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    int32_t device_kind, char **json_out, char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || json_out == nullptr) {
+    return fail("model_directory, audio, and json_out must be non-null",
+                error_out);
+  }
+
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      return fail("requested MLX device is not available", error_out);
+    }
+    mx::set_default_device(device);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    const Qwen3AudioEncoder encoder(model_directory, device);
+    const auto json = encoder.probe_encoder(audio, audio_len);
+    *json_out = strdup(json.c_str());
+    if (*json_out == nullptr) {
+      return fail("could not allocate JSON result", error_out);
+    }
+    return 0;
+  } catch (const std::exception &error) {
+    return fail(error.what(), error_out);
+  } catch (...) {
+    return fail("MLX raised a non-standard exception in the audio encoder",
                 error_out);
   }
 }
