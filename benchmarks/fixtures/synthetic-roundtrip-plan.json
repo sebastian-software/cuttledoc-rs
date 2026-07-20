@@ -113,7 +113,7 @@
       "source_url": "https://github.com/Blaizzy/mlx-audio",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
       "license": "MIT runtime; Apache-2.0 model artifact; every file is byte-counted and SHA-256 pinned in spikes/qwen3-tts-mlx-reference/model-manifest.json",
-      "status": "selected-artifact-pinned-pending-reference-run",
+      "status": "measured-reference-run-pending-listening-and-asr-matrix",
       "locales": [
         "de-DE",
         "en-US"

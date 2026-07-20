@@ -15,7 +15,6 @@
     "input",
     "procedure",
     "result",
-    "environment_control",
     "conclusion"
   ],
   "properties": {
@@ -44,9 +43,6 @@
       "required": [
         "id",
         "task",
-        "runtime",
-        "boundary",
-        "model_delivery",
         "voice"
       ],
       "properties": {
@@ -57,7 +53,17 @@
           "const": "tts"
         },
         "runtime": {
-          "$ref": "#/$defs/nonEmptyString"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "$ref": "#/$defs/openObject"
+            }
+          ]
+        },
+        "model": {
+          "$ref": "#/$defs/openObject"
         },
         "boundary": {
           "$ref": "#/$defs/nonEmptyString"
@@ -66,35 +72,10 @@
           "$ref": "#/$defs/nonEmptyString"
         },
         "voice": {
-          "type": "object",
-          "required": [
-            "identifier",
-            "name",
-            "language",
-            "quality_raw_value",
-            "gender_raw_value"
-          ],
-          "properties": {
-            "identifier": {
-              "$ref": "#/$defs/nonEmptyString"
-            },
-            "name": {
-              "$ref": "#/$defs/nonEmptyString"
-            },
-            "language": {
-              "$ref": "#/$defs/nonEmptyString"
-            },
-            "quality_raw_value": {
-              "type": "integer"
-            },
-            "gender_raw_value": {
-              "type": "integer"
-            }
-          },
-          "additionalProperties": false
+          "$ref": "#/$defs/openObject"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "host": {
       "$ref": "#/$defs/openObject"
@@ -111,12 +92,14 @@
         "status",
         "audio",
         "timing",
-        "resources",
-        "lifecycle"
+        "resources"
       ],
       "properties": {
         "status": {
-          "const": "measured"
+          "enum": [
+            "measured",
+            "partial"
+          ]
         },
         "audio": {
           "$ref": "#/$defs/openObject"
@@ -129,11 +112,27 @@
         },
         "lifecycle": {
           "$ref": "#/$defs/openObject"
+        },
+        "runtime_output": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/openObject"
+          }
+        },
+        "termination": {
+          "$ref": "#/$defs/openObject"
+        },
+        "content_check": {
+          "$ref": "#/$defs/openObject"
         }
       },
       "additionalProperties": false
     },
     "environment_control": {
+      "$ref": "#/$defs/openObject"
+    },
+    "environment": {
       "$ref": "#/$defs/openObject"
     },
     "conclusion": {

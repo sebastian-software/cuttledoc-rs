@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1",
+  "captured_at": "2026-07-20T18:03:49.355616Z",
+  "source_revision": "ca4307f0f2ae475ef03e5500d05074fb0cdda943",
+  "selection_revision": "synthetic-roundtrip-passages-1",
+  "purpose": "development-diagnostic",
+  "candidate": {
+    "id": "qwen3-tts-0.6b-customvoice-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16",
+      "revision": "6415d95f88be018ff9e46813119dc3bc12261328",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 2498419405
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "name": "Ryan",
+      "language": "German",
+      "native_language": "English",
+      "cross_lingual": true
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-origin",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "locale": "de-DE",
+    "character_count": 811,
+    "text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "passage_id": "synthetic-de-origin",
+      "locale": "de-DE",
+      "language": "German",
+      "speaker": "Ryan",
+      "speaker_native_language": "English",
+      "cross_lingual": true,
+      "instruction": null,
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "sample_rate_hz": 24000,
+      "rationale": "The model supports German but exposes no native German preset voice. Ryan is fixed for the first cross-lingual German diagnostic; the result must not be generalized to every speaker."
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "CUTTLEDOC_QWEN3_TTS_MODEL_DIR=/local/model CUTTLEDOC_TTS_TEXT_DIR=/local/passages CUTTLEDOC_QWEN3_TTS_OUTPUT_DIR=/local/output bash scripts/run-qwen3-tts-mlx-reference.sh",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1860480,
+      "byte_count": 7441920,
+      "duration_ms": 77520,
+      "sha256": "ec7c19aaa1f7c9aeb1362f2a0259af81ea3599f6aa5876bb07bd833db7bad7b5",
+      "minimum_sample": -0.6680930256843567,
+      "maximum_sample": 0.6466715335845947,
+      "rms": 0.06324205413778436,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 4665.42425,
+      "first_audio_ms": 37438.461084,
+      "complete_synthesis_ms": 39597.457667,
+      "real_time_factor": 0.5108031174793602,
+      "output_count": 1,
+      "token_count": 969
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 2708897792,
+      "mlx_peak_memory_bytes": 13901837585,
+      "model_snapshot_bytes": 2498419405
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1860480,
+        "sample_rate_hz": 24000,
+        "token_count": 969,
+        "processing_time_seconds": 37.43825674057007,
+        "mlx_audio_reported_duration_over_processing": 2.0706092310114226,
+        "peak_memory_gb_decimal": 13.901837585,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "content_check": {
+      "status": "measured-diagnostic",
+      "captured_at": "2026-07-20T18:06:19Z",
+      "backend": {
+        "id": "apple-speechtranscriber",
+        "locale": "de-DE",
+        "execution": "existing repository Rust/Swift spike in a normal host process"
+      },
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1240320,
+        "byte_count": 4961280,
+        "duration_ms": 77520,
+        "sha256": "fc6b9e3f6df3c2f380352809313ed9240cf9613e4c67cc5189b900c4c0d10174"
+      },
+      "transcript": {
+        "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz wurde 1955 vom US-amerikanischen Informatiker. John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmoalth Summer Research Project on Artificial Intelligence geprägt . Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augumentation vor . Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis, das mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+        "sha256": "d3f6b4cf501d2f80b4fa8043dbd4d28ee67da623ea0a947e39b6530a37ea6aef",
+        "final_segment_count": 106,
+        "update_count": 213,
+        "final_update_count": 4,
+        "volatile_update_count": 209,
+        "revoke_count": 0
+      },
+      "quality": {
+        "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+        "reference_word_count": 103,
+        "hypothesis_word_count": 104,
+        "word_edits": 5,
+        "wer": 0.04854368932038835,
+        "reference_character_count": 692,
+        "hypothesis_character_count": 694,
+        "character_edits": 4,
+        "cer": 0.005780346820809248
+      },
+      "timing": {
+        "first_result_ms": 67.274417,
+        "complete_inference_ms": 609.872834,
+        "real_time_factor": 0.00786729662022704
+      },
+      "observations": [
+        "The first ASR pass recovers nearly all lexical content from the generated German audio.",
+        "The lexical differences include Rockefeller-Stiftung versus Rockefeller Stiftung, Dartmouth versus Dartmoalth, Augmentation versus Augumentation, and des versus das.",
+        "The roundtrip alone cannot attribute those differences to TTS pronunciation or ASR recognition; listening and the remaining ASR backends are required."
+      ]
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [
+      "serena",
+      "vivian",
+      "uncle_fu",
+      "ryan",
+      "aiden",
+      "ono_anna",
+      "sohee",
+      "eric",
+      "dylan"
+    ],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Run the normalized audio through Whisper, direct Qwen3-ASR over MLX, and Parakeet, then perform a small blinded German listening review before comparing voices and candidates."
+  }
+}

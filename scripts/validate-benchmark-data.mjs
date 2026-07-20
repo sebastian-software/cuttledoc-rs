@@ -700,7 +700,7 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   return errors;
 }
 
-function validateTtsRun(run, selection) {
+function validateAppleTtsRun(run, selection) {
   const errors = [];
   if (run.schema_version !== schemaVersion) {
     errors.push(`schema_version must be ${schemaVersion}`);
@@ -894,8 +894,196 @@ function validateQwen3TtsModelManifest(modelManifest, plan, selection) {
   if (!candidate ||
       !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
       candidate.source_revision !== modelManifest.reference_runtime?.revision ||
-      candidate.status !== 'selected-artifact-pinned-pending-reference-run') {
+      candidate.status !==
+        'measured-reference-run-pending-listening-and-asr-matrix') {
     errors.push('synthetic plan does not reference the pinned model and runtime');
+  }
+  return errors;
+}
+
+function validateQwen3TtsRun(run, selection, modelManifest) {
+  const errors = [];
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
+      run.selection_revision !== selection.revision ||
+      run.purpose !== 'development-diagnostic') {
+    errors.push('run identity must pin the source and diagnostic selection');
+  }
+  if (run.candidate?.id !== 'qwen3-tts-0.6b-customvoice-mlx-audio' ||
+      run.candidate?.task !== 'tts' ||
+      run.candidate?.model?.revision !== modelManifest.conversion.revision ||
+      run.candidate?.model?.license !== modelManifest.conversion.license ||
+      run.candidate?.model?.snapshot_bytes !==
+        modelManifest.conversion.snapshot_bytes ||
+      run.candidate?.runtime?.revision !==
+        modelManifest.reference_runtime.revision ||
+      run.candidate?.runtime?.version !==
+        modelManifest.reference_runtime.version ||
+      run.candidate?.runtime?.license !== modelManifest.reference_runtime.license) {
+    errors.push('candidate must match the pinned model and reference runtime');
+  }
+  if (run.candidate?.voice?.name !==
+        modelManifest.generation_contract.speaker ||
+      run.candidate?.voice?.language !==
+        modelManifest.generation_contract.language ||
+      run.candidate?.voice?.native_language !==
+        modelManifest.generation_contract.speaker_native_language ||
+      run.candidate?.voice?.cross_lingual !== true) {
+    errors.push('voice must preserve the fixed cross-lingual contract');
+  }
+  if (run.host?.architecture !== 'arm64' ||
+      !(run.host?.memory_bytes > 0) ||
+      !(run.host?.chip?.length > 0) ||
+      !(run.host?.os?.length > 0) ||
+      !(run.host?.execution_context?.length > 0)) {
+    errors.push('host must record the Apple Silicon execution context');
+  }
+
+  const selected = selection.sources
+    .flatMap((source) => source.passages.map((passage) => ({
+      source,
+      passage,
+    })))
+    .find(({ passage }) => passage.id === run.input?.passage_id);
+  if (!selected ||
+      run.input?.source_id !== selected.source.id ||
+      run.input?.locale !== selected.source.locale ||
+      run.input?.character_count !== selected.passage.character_count ||
+      run.input?.text_sha256 !== selected.passage.spoken_sha256 ||
+      run.input?.license !== selected.source.license) {
+    errors.push('TTS input metadata differs from the passage selection');
+  }
+  if (run.procedure?.repetitions !== 1 ||
+      run.procedure?.stream !== false ||
+      JSON.stringify(run.procedure?.generation) !==
+        JSON.stringify(modelManifest.generation_contract) ||
+      !(run.procedure?.command?.includes(
+        'scripts/run-qwen3-tts-mlx-reference.sh',
+      )) ||
+      !(run.procedure?.raw_audio?.includes('local-required')) ||
+      !arrayEquals(
+        run.procedure?.raw_artifacts ?? [],
+        ['audio.f32le', 'audio.pcm16.wav', 'result.json'],
+      )) {
+    errors.push('procedure must preserve the pinned local reference run');
+  }
+
+  if (run.result?.status !== 'measured') {
+    errors.push('result.status must be measured');
+  }
+  const audio = run.result?.audio;
+  if (audio?.sample_format !== 'f32le' ||
+      audio?.sample_rate_hz !==
+        modelManifest.generation_contract.sample_rate_hz ||
+      audio?.channel_count !== 1 ||
+      !(Number.isInteger(audio?.sample_count) && audio.sample_count > 0) ||
+      audio?.byte_count !== audio?.sample_count * 4 ||
+      !/^[0-9a-f]{64}$/.test(audio?.sha256 ?? '') ||
+      audio?.non_finite_sample_count !== 0 ||
+      !(audio?.minimum_sample >= -1 && audio.minimum_sample <= 1) ||
+      !(audio?.maximum_sample >= -1 && audio.maximum_sample <= 1) ||
+      !(audio?.rms > 0 && audio.rms <= 1)) {
+    errors.push('audio must be finite digest-pinned mono f32 PCM');
+  }
+  const expectedDuration = audio?.sample_count * 1_000 / audio?.sample_rate_hz;
+  if (!Number.isFinite(audio?.duration_ms) ||
+      Math.abs(audio.duration_ms - expectedDuration) > 1e-9) {
+    errors.push('audio duration diverges from PCM metadata');
+  }
+
+  const timing = run.result?.timing;
+  const expectedRtf = timing?.complete_synthesis_ms / audio?.duration_ms;
+  if (!(timing?.model_load_ms > 0) ||
+      !(timing?.first_audio_ms > 0) ||
+      !(timing?.complete_synthesis_ms >= timing?.first_audio_ms) ||
+      !(Number.isInteger(timing?.output_count) && timing.output_count > 0) ||
+      !(Number.isInteger(timing?.token_count) && timing.token_count > 0) ||
+      !Number.isFinite(timing?.real_time_factor) ||
+      Math.abs(timing.real_time_factor - expectedRtf) > 1e-12) {
+    errors.push('timing metrics or real-time factor are inconsistent');
+  }
+  const runtimeOutput = run.result?.runtime_output ?? [];
+  if (runtimeOutput.length !== timing?.output_count ||
+      runtimeOutput.reduce((sum, output) => sum + output.sample_count, 0) !==
+        audio?.sample_count ||
+      runtimeOutput.reduce((sum, output) => sum + output.token_count, 0) !==
+        timing?.token_count ||
+      runtimeOutput.some(
+        (output) =>
+          output.sample_rate_hz !== audio?.sample_rate_hz ||
+          output.is_streaming_chunk !== false,
+      )) {
+    errors.push('runtime output does not reconcile with audio and timing');
+  }
+  if (run.result?.termination?.reached_max_tokens !== false ||
+      run.result?.termination?.configured_max_tokens !==
+        modelManifest.generation_contract.max_tokens ||
+      timing?.token_count >= run.result?.termination?.configured_max_tokens) {
+    errors.push('generation must stop before the configured token limit');
+  }
+  if (!(run.result?.resources?.maximum_resident_set_size_bytes > 0) ||
+      !(run.result?.resources?.mlx_peak_memory_bytes > 0) ||
+      run.result?.resources?.model_snapshot_bytes !==
+        modelManifest.conversion.snapshot_bytes) {
+    errors.push('resource metrics must include process, MLX, and model size');
+  }
+
+  const contentCheck = run.result?.content_check;
+  const normalizedAudio = contentCheck?.normalized_audio;
+  if (contentCheck?.status !== 'measured-diagnostic' ||
+      contentCheck?.backend?.id !== 'apple-speechtranscriber' ||
+      contentCheck?.backend?.locale !== 'de-DE' ||
+      normalizedAudio?.sample_format !== 'f32le' ||
+      normalizedAudio?.sample_rate_hz !== 16000 ||
+      normalizedAudio?.channel_count !== 1 ||
+      normalizedAudio?.byte_count !== normalizedAudio?.sample_count * 4 ||
+      normalizedAudio?.duration_ms !== audio?.duration_ms ||
+      !/^[0-9a-f]{64}$/.test(normalizedAudio?.sha256 ?? '')) {
+    errors.push('content check must pin the shared 16 kHz Apple ASR input');
+  }
+  const transcript = contentCheck?.transcript;
+  const transcriptDigest = createHash('sha256')
+    .update(transcript?.text ?? '')
+    .digest('hex');
+  if (!(transcript?.text?.length > 0) ||
+      transcript?.sha256 !== transcriptDigest ||
+      !(transcript?.final_segment_count > 0) ||
+      transcript?.update_count !==
+        transcript?.final_update_count + transcript?.volatile_update_count ||
+      transcript?.revoke_count !== 0) {
+    errors.push('content-check transcript or update counts are inconsistent');
+  }
+  const quality = contentCheck?.quality;
+  if (quality?.word_edits !== 5 ||
+      quality?.reference_word_count !== 103 ||
+      quality?.hypothesis_word_count !== 104 ||
+      Math.abs(
+        quality?.wer - quality?.word_edits / quality?.reference_word_count,
+      ) > 1e-15 ||
+      quality?.character_edits !== 4 ||
+      quality?.reference_character_count !== 692 ||
+      quality?.hypothesis_character_count !== 694 ||
+      Math.abs(
+        quality?.cer -
+          quality?.character_edits / quality?.reference_character_count,
+      ) > 1e-15) {
+    errors.push('content-check WER or CER is not derivable from edit counts');
+  }
+  const asrTiming = contentCheck?.timing;
+  if (!(asrTiming?.first_result_ms > 0) ||
+      !(asrTiming?.complete_inference_ms >= asrTiming?.first_result_ms) ||
+      Math.abs(
+        asrTiming?.real_time_factor -
+          asrTiming?.complete_inference_ms / audio?.duration_ms,
+      ) > 1e-15) {
+    errors.push('content-check ASR timing is inconsistent');
+  }
+  if (run.conclusion?.reference_path_proven !== true ||
+      run.conclusion?.public_contract_accepted !== false ||
+      run.conclusion?.quality_decision_ready !== false ||
+      !(run.conclusion?.next?.length > 0)) {
+    errors.push('conclusion must keep the quality and public API provisional');
   }
   return errors;
 }
@@ -1701,6 +1889,10 @@ const appleTtsRunPath = join(
   repoRoot,
   'benchmarks/raw/phase5.apple-tts.synthetic-de-origin-1/result.json',
 );
+const qwen3TtsRunPath = join(
+  repoRoot,
+  'benchmarks/raw/phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1/result.json',
+);
 const qwen3TtsModelManifestPath = join(
   repoRoot,
   'spikes/qwen3-tts-mlx-reference/model-manifest.json',
@@ -1753,6 +1945,7 @@ const syntheticRoundtripSelection = await readJson(
   syntheticRoundtripSelectionPath,
 );
 const appleTtsRun = await readJson(appleTtsRunPath);
+const qwen3TtsRun = await readJson(qwen3TtsRunPath);
 const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -1799,7 +1992,7 @@ failures.push(
   ).map((error) => `${syntheticRoundtripSelectionPath}: ${error}`),
 );
 failures.push(
-  ...validateTtsRun(appleTtsRun, syntheticRoundtripSelection).map(
+  ...validateAppleTtsRun(appleTtsRun, syntheticRoundtripSelection).map(
     (error) => `${appleTtsRunPath}: ${error}`,
   ),
 );
@@ -1809,6 +2002,13 @@ failures.push(
     syntheticRoundtripPlan,
     syntheticRoundtripSelection,
   ).map((error) => `${qwen3TtsModelManifestPath}: ${error}`),
+);
+failures.push(
+  ...validateQwen3TtsRun(
+    qwen3TtsRun,
+    syntheticRoundtripSelection,
+    qwen3TtsModelManifest,
+  ).map((error) => `${qwen3TtsRunPath}: ${error}`),
 );
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
@@ -1961,7 +2161,7 @@ if (process.argv.includes('--self-test')) {
   }
   const invalidTtsRun = structuredClone(appleTtsRun);
   invalidTtsRun.result.audio.byte_count += 4;
-  if (validateTtsRun(
+  if (validateAppleTtsRun(
     invalidTtsRun,
     syntheticRoundtripSelection,
   ).length === 0) {
@@ -1978,6 +2178,17 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push(
       'validator self-test failed to reject divergent Qwen3-TTS snapshot bytes',
+    );
+  }
+  const invalidQwen3TtsRun = structuredClone(qwen3TtsRun);
+  invalidQwen3TtsRun.result.content_check.quality.word_edits += 1;
+  if (validateQwen3TtsRun(
+    invalidQwen3TtsRun,
+    syntheticRoundtripSelection,
+    qwen3TtsModelManifest,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent Qwen3-TTS content metrics',
     );
   }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
@@ -2018,7 +2229,7 @@ console.log(
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
-  `1 measured TTS diagnostic, ` +
+  `2 measured TTS diagnostics, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +

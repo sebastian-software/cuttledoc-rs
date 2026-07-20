@@ -221,9 +221,18 @@ def main() -> None:
             "generation": contract,
             "stream": False,
             "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+            "command": (
+                "CUTTLEDOC_QWEN3_TTS_MODEL_DIR=/local/model "
+                "CUTTLEDOC_TTS_TEXT_DIR=/local/passages "
+                "CUTTLEDOC_QWEN3_TTS_OUTPUT_DIR=/local/output "
+                "bash scripts/run-qwen3-tts-mlx-reference.sh"
+            ),
             "raw_audio": "local-required; not checked into Git",
-            "raw_audio_path": str(raw_path),
-            "listening_wav_path": str(wav_path),
+            "raw_artifacts": [
+                raw_path.name,
+                wav_path.name,
+                "result.json",
+            ],
         },
         "result": {
             "status": "partial" if terminated_at_limit else "measured",

@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** diagnostic text and Apple TTS lifecycle verified; no roundtrip ASR
-result yet
+**Status:** diagnostic text, Apple TTS lifecycle, and local Qwen3-TTS MLX
+reference verified; first Qwen → Apple Speech content check measured
 
 ## Purpose
 
@@ -133,6 +133,29 @@ quality. The identical binary could enumerate voices but received a platform
 cancel before its first buffer in a restricted process context. Clean packaged
 execution therefore remains an explicit productization gate.
 
+## Qwen3-TTS MLX reference result
+
+The pinned local open-model result is
+[`phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1`](../benchmarks/raw/phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1/result.json).
+Qwen3-TTS generated 77.52 seconds of mono 24 kHz f32 PCM through the pinned
+`mlx-audio` reference at source revision
+`ca4307f0f2ae475ef03e5500d05074fb0cdda943`. Loading took 4.665 seconds,
+synthesis took 39.597 seconds (conventional RTF 0.511), process RSS peaked at
+2.71 GB, and MLX reported 13.90 GB of peak allocated memory. Generation
+stopped normally at 969 audio tokens rather than the 1,200-token limit.
+
+The model supports German but does not provide a native German preset voice.
+The first diagnostic therefore fixes the English-native `Ryan` preset speaking
+German. This is a real cross-lingual limitation to review, not a reason to
+discard the platform or model family.
+
+As an initial content check, the exact normalized audio was transcribed by the
+existing German Apple Speech spike. It recovered the passage at 4.85% lexical
+WER and 0.58% CER. The differences included `Dartmouth`/`Dartmoalth`,
+`Augmentation`/`Augumentation`, `des`/`das`, and tokenization of
+`Rockefeller-Stiftung`. Those mismatches are not yet assigned to TTS or ASR:
+the remaining three ASR backends and a blinded listening review are required.
+
 ## Implementation sequence
 
 1. Materialize and hash the German and English passages from both pinned
@@ -148,7 +171,9 @@ execution therefore remains an explicit productization gate.
    its 2.49 GB snapshot, every file digest, the runtime revision, and the
    cross-lingual German generation contract are frozen in
    [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
-   The executable reference run remains in progress.
+   **Reference run complete:** real PCM, timing, resource use, termination, and
+   the first Apple Speech content check are recorded. Listening and the
+   remaining ASR cells are still open.
 4. Run the two local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.
