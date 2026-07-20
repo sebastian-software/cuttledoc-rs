@@ -30,7 +30,7 @@
     },
     {
       "id": "multilingual-librispeech",
-      "status": "selected-for-acquisition",
+      "status": "active-development-pilot",
       "domains": [
         "audiobook"
       ],
@@ -41,11 +41,26 @@
         "fr-FR",
         "pt"
       ],
-      "source_revision": "OpenSLR SLR94 snapshot accessed 2026-07-20",
-      "dataset_version": "MLS release published through OpenSLR SLR94",
+      "source_revision": "facebook/multilingual_librispeech@2e83e61823b4c47dcbcb1980bb88601274127609",
+      "dataset_version": "MLS release published through OpenSLR SLR94; Hugging Face conversion revision pinned for acquisition",
       "license": "CC-BY-4.0",
       "redistribution": "allowed-with-attribution",
-      "decision": "Select speaker- and book-stratified dev/test excerpts in all five language families; audit the Spanish and Portuguese regional varieties rather than treating them as es-419 or pt-BR, and pin archive plus normalized fixture hashes during acquisition."
+      "decision": "Use the acquired three-speaker development pilot for German, Spanish, French, and Portuguese. Audit the Spanish and Portuguese regional varieties rather than treating them as es-419 or pt-BR; references remain unverified dataset transcripts."
+    },
+    {
+      "id": "librispeech-clean",
+      "status": "active-development-pilot",
+      "domains": [
+        "audiobook"
+      ],
+      "languages": [
+        "en"
+      ],
+      "source_revision": "openslr/librispeech_asr@71cacbfb7e2354c4226d01e70d77d5fca3d04ba1",
+      "dataset_version": "LibriSpeech ASR corpus published through OpenSLR SLR12; Hugging Face conversion revision pinned for acquisition",
+      "license": "CC-BY-4.0",
+      "redistribution": "allowed-with-attribution",
+      "decision": "Use three speaker- and chapter-stratified clean-validation excerpts as the English companion to the MLS development pilot because the selected Hugging Face MLS conversion does not expose its English partition."
     },
     {
       "id": "gigaspeech",

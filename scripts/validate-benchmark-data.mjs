@@ -151,6 +151,7 @@ function validateSourceCandidates(registry) {
   const ids = new Set();
   const statuses = new Set([
     'active-diagnostic',
+    'active-development-pilot',
     'selected-for-acquisition',
     'selected-pending-rights-review',
     'selected-as-domain-bridge',
@@ -177,6 +178,127 @@ function validateSourceCandidates(registry) {
         errors.push(`${source.id}: ${field} must be a non-empty string`);
       }
     }
+  }
+  return errors;
+}
+
+function validateAudiobookPilot(manifest) {
+  const errors = [];
+  if (manifest.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(manifest.revision?.length > 0)) {
+    errors.push('revision must be a non-empty string');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(manifest.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (manifest.purpose !== 'development') {
+    errors.push('purpose must remain development until references are verified');
+  }
+  if (manifest.domain !== 'audiobook') {
+    errors.push('domain must be audiobook');
+  }
+  if (manifest.normalization?.sample_rate_hz !== 16000 ||
+      manifest.normalization?.channels !== 1 ||
+      manifest.normalization?.sample_format !== 'float32le') {
+    errors.push('normalization must be mono 16 kHz float32le');
+  }
+
+  const fixtures = manifest.fixtures ?? [];
+  const ids = new Set();
+  const rowKeys = new Set();
+  const datasetRevisions = new Map();
+  for (const fixture of fixtures) {
+    if (ids.has(fixture.id)) errors.push(`duplicate fixture id: ${fixture.id}`);
+    ids.add(fixture.id);
+    const rowKey = [
+      fixture.dataset,
+      fixture.config,
+      fixture.split,
+      fixture.row_index,
+    ].join(':');
+    if (rowKeys.has(rowKey)) errors.push(`${fixture.id}: duplicate dataset row`);
+    rowKeys.add(rowKey);
+    if (!['de', 'en', 'es', 'fr', 'pt'].includes(fixture.language)) {
+      errors.push(`${fixture.id}: unsupported language`);
+    }
+    if (fixture.locale !== null) {
+      errors.push(`${fixture.id}: locale must stay unverified`);
+    }
+    if (fixture.gold_status !== 'dataset-transcript-unverified') {
+      errors.push(`${fixture.id}: gold_status overstates the current review`);
+    }
+    if (!/^[0-9a-f]{40}$/.test(fixture.dataset_revision ?? '')) {
+      errors.push(`${fixture.id}: dataset_revision must be a Git SHA`);
+    }
+    const knownRevision = datasetRevisions.get(fixture.dataset);
+    if (knownRevision && knownRevision !== fixture.dataset_revision) {
+      errors.push(`${fixture.dataset}: multiple revisions in one pilot`);
+    }
+    datasetRevisions.set(fixture.dataset, fixture.dataset_revision);
+    if (!(fixture.reference_text?.length > 0)) {
+      errors.push(`${fixture.id}: reference_text is required`);
+    }
+    if (fixture.license !== 'CC-BY-4.0' || !fixture.redistributable) {
+      errors.push(`${fixture.id}: license and redistribution evidence changed`);
+    }
+    for (const [name, artifact] of [
+      ['source', fixture.source],
+      ['normalized', fixture.normalized],
+    ]) {
+      if (!/^[0-9a-f]{64}$/.test(artifact?.sha256 ?? '')) {
+        errors.push(`${fixture.id}: ${name}.sha256 must be SHA-256`);
+      }
+      if (!Number.isInteger(artifact?.bytes) || artifact.bytes <= 0) {
+        errors.push(`${fixture.id}: ${name}.bytes must be positive`);
+      }
+    }
+    if (fixture.normalized?.bytes !== fixture.normalized?.sample_count * 4) {
+      errors.push(`${fixture.id}: normalized byte and sample counts differ`);
+    }
+    const derivedDuration = fixture.normalized?.sample_count / 16;
+    if (fixture.normalized?.duration_ms !== derivedDuration) {
+      errors.push(`${fixture.id}: normalized duration differs from sample count`);
+    }
+  }
+  if (fixtures.length === 0) errors.push('fixtures must be non-empty');
+
+  const byLanguage = {};
+  for (const fixture of fixtures) {
+    const summary = byLanguage[fixture.language] ?? {
+      fixture_count: 0,
+      duration_ms: 0,
+      speakers: new Set(),
+      chapters: new Set(),
+    };
+    summary.fixture_count += 1;
+    summary.duration_ms += fixture.normalized.duration_ms;
+    summary.speakers.add(fixture.speaker_id);
+    summary.chapters.add(fixture.chapter_id);
+    byLanguage[fixture.language] = summary;
+  }
+  const derivedByLanguage = Object.fromEntries(
+    Object.entries(byLanguage).map(([language, value]) => [
+      language,
+      {
+        fixture_count: value.fixture_count,
+        duration_ms: value.duration_ms,
+        speaker_count: value.speakers.size,
+        chapter_count: value.chapters.size,
+      },
+    ]),
+  );
+  const derivedSummary = {
+    fixture_count: fixtures.length,
+    duration_ms: fixtures.reduce(
+      (sum, fixture) => sum + fixture.normalized.duration_ms,
+      0,
+    ),
+    by_language: derivedByLanguage,
+  };
+  if (JSON.stringify(manifest.summary) !== JSON.stringify(derivedSummary)) {
+    errors.push('summary does not match fixture metadata');
   }
   return errors;
 }
@@ -645,6 +767,10 @@ const sourceCandidatesPath = join(
   repoRoot,
   'benchmarks/fixtures/source-candidates.json',
 );
+const audiobookPilotPath = join(
+  repoRoot,
+  'benchmarks/fixtures/audiobook-pilot.json',
+);
 const postprocessingSnapshotPath = join(
   repoRoot,
   'benchmarks/postprocessing/cuttledoc-v2-snapshot.json',
@@ -658,6 +784,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
+  join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
   join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-prompts.schema.json'),
@@ -672,6 +799,7 @@ for (const path of schemaPaths) {
 const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
+const audiobookPilot = await readJson(audiobookPilotPath);
 const postprocessingSnapshot = await readJson(postprocessingSnapshotPath);
 const promptManifest = await readJson(promptManifestPath);
 const requestedRun = process.argv.indexOf('--run');
@@ -686,6 +814,11 @@ const failures = manifestValidation.errors.map((error) => `${manifestPath}: ${er
 failures.push(
   ...validateSourceCandidates(sourceCandidates).map(
     (error) => `${sourceCandidatesPath}: ${error}`,
+  ),
+);
+failures.push(
+  ...validateAudiobookPilot(audiobookPilot).map(
+    (error) => `${audiobookPilotPath}: ${error}`,
   ),
 );
 failures.push(
@@ -759,6 +892,11 @@ if (process.argv.includes('--self-test')) {
   if (validateSourceCandidates(invalidSourceCandidates).length === 0) {
     failures.push('validator self-test failed to reject duplicate source ids');
   }
+  const invalidAudiobookPilot = structuredClone(audiobookPilot);
+  invalidAudiobookPilot.summary.duration_ms += 1;
+  if (validateAudiobookPilot(invalidAudiobookPilot).length === 0) {
+    failures.push('validator self-test failed to reject audiobook summary drift');
+  }
   const invalidPostprocessing = structuredClone(postprocessingSnapshot);
   invalidPostprocessing.experiments[0].models[0].sample_count += 1;
   if (validatePostprocessingSnapshot(invalidPostprocessing).length === 0) {
@@ -780,6 +918,7 @@ console.log(
   `benchmark data: ${manifest.fixtures.length} fixture(s), ${runs.length} run record(s), ` +
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
+  `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

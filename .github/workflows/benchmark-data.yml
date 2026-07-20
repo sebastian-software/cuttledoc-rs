@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "benchmarks/**"
+      - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - ".github/workflows/benchmark-data.yml"
   push:
     branches: [main]
     paths:
       - "benchmarks/**"
+      - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - ".github/workflows/benchmark-data.yml"
 

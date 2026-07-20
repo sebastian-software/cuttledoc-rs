@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/audiobook-pilot.schema.json",
+  "title": "Cuttledoc multilingual audiobook pilot",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "revision",
+    "evidence_date",
+    "purpose",
+    "domain",
+    "normalization",
+    "summary",
+    "fixtures"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "purpose": {
+      "const": "development"
+    },
+    "domain": {
+      "const": "audiobook"
+    },
+    "normalization": {
+      "type": "object",
+      "required": [
+        "sample_rate_hz",
+        "channels",
+        "sample_format",
+        "ffmpeg_arguments",
+        "observed_ffmpeg_version"
+      ],
+      "properties": {
+        "sample_rate_hz": {
+          "const": 16000
+        },
+        "channels": {
+          "const": 1
+        },
+        "sample_format": {
+          "const": "float32le"
+        },
+        "ffmpeg_arguments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "observed_ffmpeg_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "fixture_count",
+        "duration_ms",
+        "by_language"
+      ],
+      "properties": {
+        "fixture_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "by_language": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "fixture_count",
+              "duration_ms",
+              "speaker_count",
+              "chapter_count"
+            ],
+            "properties": {
+              "fixture_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "duration_ms": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "speaker_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "chapter_count": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "language",
+          "locale",
+          "gold_status",
+          "dataset",
+          "dataset_revision",
+          "config",
+          "split",
+          "row_index",
+          "row_id",
+          "speaker_id",
+          "chapter_id",
+          "original_path",
+          "begin_time",
+          "end_time",
+          "reference_text",
+          "license",
+          "redistributable",
+          "source",
+          "normalized"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "language": {
+            "enum": [
+              "de",
+              "en",
+              "es",
+              "fr",
+              "pt"
+            ]
+          },
+          "locale": {
+            "type": "null"
+          },
+          "gold_status": {
+            "const": "dataset-transcript-unverified"
+          },
+          "dataset": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dataset_revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "config": {
+            "type": "string",
+            "minLength": 1
+          },
+          "split": {
+            "type": "string",
+            "minLength": 1
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "speaker_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "chapter_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "original_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "begin_time": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "end_time": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reference_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "license": {
+            "const": "CC-BY-4.0"
+          },
+          "redistributable": {
+            "const": true
+          },
+          "source": {
+            "$ref": "#/$defs/artifact"
+          },
+          "normalized": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/artifact"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "sample_count",
+                  "duration_ms"
+                ],
+                "properties": {
+                  "sample_count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "duration_ms": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": [
+        "extension",
+        "media_type",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "extension": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

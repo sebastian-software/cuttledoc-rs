@@ -1,7 +1,7 @@
 # Language- and domain-aware ASR benchmark
 
-**Status:** accepted evaluation direction; corpus acquisition is still in
-progress.
+**Status:** accepted evaluation direction; a development audiobook pilot is
+acquired, while target-size audiobook and podcast corpora remain in progress.
 
 **Evidence date:** 2026-07-20.
 
@@ -38,7 +38,7 @@ Machine-readable source dispositions and exact repository revisions are in
 | Source | Languages | Domain | Role |
 | --- | --- | --- | --- |
 | Existing FLEURS fixtures | all five | short read | keep as a fast integration gate; expand within the existing source only for variance estimation, not domain coverage |
-| [Multilingual LibriSpeech](https://www.openslr.org/94/) | all five language families | LibriVox audiobooks | first target-domain addition; CC-BY-4.0 and native-language dev/test splits; Spanish and Portuguese regional varieties still require an audit |
+| [Multilingual LibriSpeech](https://www.openslr.org/94/) plus [LibriSpeech](https://www.openslr.org/12/) clean validation for English | all five language families | LibriVox audiobooks | first target-domain addition; CC-BY-4.0 and native-language development splits; Spanish and Portuguese regional varieties still require an audit |
 | [GigaSpeech](https://github.com/SpeechColab/GigaSpeech) | English | podcasts and audiobooks | strong English target-domain candidate with professionally annotated evaluation data; keep audio local until per-source rights are accepted |
 | [VoxPopuli](https://github.com/facebookresearch/voxpopuli) | transcribed data for English, German, Spanish, and French | professional parliamentary speech | openly licensed robustness bridge, not a podcast substitute; no transcribed Portuguese set |
 | Curated Cuttledoc gold set | all five, German first | professional podcasts | required target-domain set using source-permitted or user-provided recordings and human-verified transcripts |
@@ -46,6 +46,34 @@ Machine-readable source dispositions and exact repository revisions are in
 MLS does not by itself prove Latin-American Spanish or Brazilian Portuguese
 coverage. Those product locales remain separate cells and require the curated
 set or another region-pinned source.
+
+### Acquired audiobook development pilot
+
+Revision `audiobook-pilot-1` contains 15 hash-pinned clips: three independent
+speakers and chapters in each of German, English, Spanish, French, and
+Portuguese. Its normalized duration is 223.68 seconds:
+
+| Language | Clips | Speakers/chapters | Duration |
+| --- | ---: | ---: | ---: |
+| German | 3 | 3/3 | 49.03 s |
+| English | 3 | 3/3 | 43.88 s |
+| Spanish | 3 | 3/3 | 49.90 s |
+| French | 3 | 3/3 | 38.88 s |
+| Portuguese | 3 | 3/3 | 41.99 s |
+
+The selected Hugging Face MLS conversion exposes German, Spanish, French, and
+Portuguese but not English. The English cells therefore use LibriSpeech clean
+validation from the same LibriVox audiobook domain. Both dataset revisions,
+row identities, source bytes, and normalized 16 kHz mono float PCM bytes are
+pinned in
+[`audiobook-pilot.json`](../benchmarks/fixtures/audiobook-pilot.json).
+
+This set is development evidence, not the target benchmark. It falls far short
+of 30 minutes per language/domain, and all clips have already influenced
+benchmark design. Spanish and Portuguese carry no regional locale claim.
+Dataset transcripts are useful lexical references but remain
+`dataset-transcript-unverified`: they must be checked against the exact audio
+before semantic error severity or postprocessing acceptance is reported.
 
 The initial acquisition target per language and target domain is at least 30
 minutes from three independent works or episodes and three speakers. Clips from
@@ -130,7 +158,7 @@ are useful hypotheses, not an acceptance result for Cuttledoc 3.
 2. Add deterministic word alignment and per-language/domain error reports.
 3. Expand FLEURS from two to ten clips per language as the short-read variance
    set.
-4. Add a compact MLS audiobook subset for all five languages.
+4. Add a compact MLS/LibriSpeech audiobook subset for all five languages.
 5. Add GigaSpeech English podcast material and a legally reviewed,
    German-first curated podcast set.
 6. Re-run Apple, Whisper, Qwen, and Parakeet on identical cells before defining

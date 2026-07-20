@@ -49,6 +49,7 @@
           "status": {
             "enum": [
               "active-diagnostic",
+              "active-development-pilot",
               "selected-for-acquisition",
               "selected-pending-rights-review",
               "selected-as-domain-bridge",

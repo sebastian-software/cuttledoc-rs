@@ -90,6 +90,22 @@ short-read integration gate; audiobook and professional-podcast cells are
 reported separately, with independent-source grouping and human-verified gold
 transcripts.
 
+The first target-domain development input is the 15-clip multilingual
+audiobook pilot. It deliberately remains outside Git as generated audio while
+the repository pins dataset revisions, row metadata, source digests, and
+normalized PCM digests. Materialize and verify it with:
+
+```sh
+node scripts/fetch-audiobook-pilot.mjs \
+  --output-dir /absolute/path/to/cuttledoc-audiobook-pilot
+```
+
+The command rejects dataset-row, source-byte, or normalized-byte drift. It
+requires network access and `ffmpeg`; set `FFMPEG=/absolute/path/to/ffmpeg`
+when the binary is not on `PATH`. The dataset transcripts are not yet
+human-verified surface-form gold, so the pilot may drive development and raw
+lexical diagnostics but not correction-model acceptance.
+
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in
 [`postprocessing/cuttledoc-v2-snapshot.json`](postprocessing/cuttledoc-v2-snapshot.json).
