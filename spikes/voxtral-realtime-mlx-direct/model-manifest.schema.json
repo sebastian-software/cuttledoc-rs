@@ -167,7 +167,11 @@
             "cancellation": true,
             "mel_frontend": true,
             "causal_conv_stem": true,
-            "causal_encoder": false,
+            "causal_encoder": true,
+            "rotating_kv_cache": true,
+            "sliding_window_attention": true,
+            "adapter_projection": true,
+            "decoder": false,
             "transcription": false
           }
         }

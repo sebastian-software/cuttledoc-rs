@@ -39,6 +39,16 @@ int32_t cuttledoc_voxtral_mlx_probe_audio_frontend(
     char **error_out);
 
 /*
+ * Runs all 32 causal encoder layers, the repository-owned rotating KV cache
+ * and sliding-window mask, 4x downsampling, and the audio-language adapter.
+ * The result is a numerical parity probe and still does not claim decoding.
+ */
+int32_t cuttledoc_voxtral_mlx_probe_causal_encoder(
+    const char *model_directory, const float *audio, size_t audio_len,
+    int32_t transcription_delay_ms, int32_t device_kind, char **json_out,
+    char **error_out);
+
+/*
  * Creates the repository-owned streaming task boundary. max_pending_samples
  * is the hard caller-visible queue capacity. max_ingest_samples_per_step is
  * the maximum snapshot a single step may remove and evaluate through MLX.

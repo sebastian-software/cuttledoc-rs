@@ -22,10 +22,12 @@
 #include <vector>
 
 #include "cuttledoc_voxtral_mlx_shim.h"
+#include "cuttledoc_mlx_transformer.h"
 #include "mlx/io.h"
 #include "mlx/mlx.h"
 
 namespace mx = mlx::core;
+namespace mx_support = cuttledoc::mlx_support;
 
 namespace {
 
@@ -46,7 +48,16 @@ constexpr std::size_t kMelBins = 128;
 constexpr std::size_t kRawAudioSamplesPerToken = 1'280;
 constexpr std::size_t kLeftPadTokens = 32;
 constexpr std::size_t kEncoderDimension = 1'280;
+constexpr std::size_t kEncoderLayers = 32;
+constexpr std::size_t kEncoderAttentionHeads = 32;
+constexpr std::size_t kEncoderHeadDimension = 64;
+constexpr std::size_t kEncoderSlidingWindow = 750;
 constexpr std::size_t kDownsampleFactor = 4;
+constexpr std::size_t kDecoderDimension = 3'072;
+constexpr int kQuantizationGroupSize = 64;
+constexpr int kQuantizationBits = 4;
+constexpr float kRmsNormEpsilon = 1e-5f;
+constexpr float kRopeTheta = 1'000'000.0f;
 
 std::mutex runtime_mutex;
 std::optional<mx::Stream> runtime_cpu_stream;
@@ -325,7 +336,10 @@ std::string model_json(const LoadedModel &model) {
        << model.quantized_module_count
        << ",\"capabilities\":{\"bounded_ingestion\":true,"
        << "\"cancellation\":true,\"mel_frontend\":true,"
-       << "\"causal_conv_stem\":true,\"causal_encoder\":false,"
+       << "\"causal_conv_stem\":true,\"causal_encoder\":true,"
+       << "\"rotating_kv_cache\":true,"
+       << "\"sliding_window_attention\":true,"
+       << "\"adapter_projection\":true,\"decoder\":false,"
        << "\"transcription\":false}}";
   return json.str();
 }
@@ -338,6 +352,22 @@ mx::array weight_on_device(const LoadedModel &model, const std::string &name,
   }
   return device == mx::Device::gpu ? mx::copy(found->second, device)
                                    : found->second;
+}
+
+void materialize_weight_prefix_on_device(LoadedModel &model,
+                                         std::string_view prefix,
+                                         mx::Device device) {
+  if (device == mx::Device::cpu) {
+    return;
+  }
+  std::vector<mx::array> arrays;
+  for (auto &[name, value] : model.weights) {
+    if (name.starts_with(prefix)) {
+      value = mx::copy(std::move(value), device);
+      arrays.push_back(value);
+    }
+  }
+  mx::eval(std::move(arrays));
 }
 
 std::size_t audio_token_count(std::size_t sample_count) {
@@ -396,10 +426,19 @@ FrontendPadding frontend_padding(std::size_t audio_len,
   };
 }
 
-std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
-                                 std::size_t audio_len,
-                                 int32_t transcription_delay_ms,
-                                 mx::Device device) {
+struct FrontendComputation {
+  FrontendPadding padding;
+  mx::array mel_filters;
+  mx::array log_mel;
+  mx::array conv0;
+  mx::array conv1_pretrunc;
+  mx::array conv_stem;
+  std::size_t front_truncation;
+};
+
+FrontendComputation compute_audio_frontend(
+    const LoadedModel &model, const float *audio, std::size_t audio_len,
+    int32_t transcription_delay_ms, mx::Device device) {
   if (audio_len < kFftSize) {
     throw std::invalid_argument(
         "audio must contain at least 400 mono float32 samples");
@@ -407,7 +446,6 @@ std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
   if (transcription_delay_ms <= 0) {
     throw std::invalid_argument("transcription delay must be positive");
   }
-  const auto started = std::chrono::steady_clock::now();
   const auto padding = frontend_padding(audio_len, transcription_delay_ms);
 
   std::vector<float> streaming_audio(padding.padded_samples, 0.0f);
@@ -450,7 +488,7 @@ std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
   const auto magnitudes =
       mx::square(mx::abs(frequencies, device), device);
   const auto mel_filters = make_slaney_mel_filters();
-  const auto mel_filter_array =
+  auto mel_filter_array =
       mx::array(mel_filters.begin(),
                 {static_cast<int>(kFrequencyBins), static_cast<int>(kMelBins)});
   auto log_mel = mx::log10(
@@ -507,13 +545,31 @@ std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
         device);
   }
 
+  return {padding,
+          std::move(mel_filter_array),
+          std::move(log_mel),
+          std::move(conv0),
+          std::move(conv1_pretrunc),
+          std::move(conv_stem),
+          front_truncation};
+}
+
+std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
+                                 std::size_t audio_len,
+                                 int32_t transcription_delay_ms,
+                                 mx::Device device) {
+  const auto started = std::chrono::steady_clock::now();
+  const auto frontend = compute_audio_frontend(
+      model, audio, audio_len, transcription_delay_ms, device);
   const auto mel_filter_fingerprint =
-      fingerprint_json(mel_filter_array, device);
-  const auto log_mel_fingerprint = fingerprint_json(log_mel, device);
-  const auto conv0_fingerprint = fingerprint_json(conv0, device);
+      fingerprint_json(frontend.mel_filters, device);
+  const auto log_mel_fingerprint =
+      fingerprint_json(frontend.log_mel, device);
+  const auto conv0_fingerprint = fingerprint_json(frontend.conv0, device);
   const auto conv1_pretrunc_fingerprint =
-      fingerprint_json(conv1_pretrunc, device);
-  const auto conv_stem_fingerprint = fingerprint_json(conv_stem, device);
+      fingerprint_json(frontend.conv1_pretrunc, device);
+  const auto conv_stem_fingerprint =
+      fingerprint_json(frontend.conv_stem, device);
   const auto elapsed_ms =
       std::chrono::duration<double, std::milli>(
           std::chrono::steady_clock::now() - started)
@@ -527,14 +583,16 @@ std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
        << "\",\"pcm_samples\":" << audio_len
        << ",\"padding\":{\"transcription_delay_ms\":"
        << transcription_delay_ms << ",\"delay_tokens\":"
-       << padding.delay_tokens << ",\"left_pad_tokens\":" << kLeftPadTokens
-       << ",\"left_pad_samples\":" << padding.left_pad_samples
-       << ",\"alignment_pad_samples\":" << padding.alignment_pad_samples
-       << ",\"right_pad_tokens\":" << padding.right_pad_tokens
-       << ",\"right_pad_samples\":" << padding.right_pad_samples
-       << ",\"padded_samples\":" << padding.padded_samples
-       << "},\"mel_frames\":" << log_mel.shape(1)
-       << ",\"front_truncation_frames\":" << front_truncation
+       << frontend.padding.delay_tokens << ",\"left_pad_tokens\":"
+       << kLeftPadTokens << ",\"left_pad_samples\":"
+       << frontend.padding.left_pad_samples
+       << ",\"alignment_pad_samples\":"
+       << frontend.padding.alignment_pad_samples
+       << ",\"right_pad_tokens\":" << frontend.padding.right_pad_tokens
+       << ",\"right_pad_samples\":" << frontend.padding.right_pad_samples
+       << ",\"padded_samples\":" << frontend.padding.padded_samples
+       << "},\"mel_frames\":" << frontend.log_mel.shape(1)
+       << ",\"front_truncation_frames\":" << frontend.front_truncation
        << ",\"elapsed_ms\":" << elapsed_ms << ",\"peak_memory_bytes\":"
        << mx::get_peak_memory() << ",\"fingerprints\":{\"mel_filters\":"
        << mel_filter_fingerprint << ",\"log_mel\":" << log_mel_fingerprint
@@ -543,6 +601,338 @@ std::string probe_audio_frontend(const LoadedModel &model, const float *audio,
        << ",\"conv_stem\":" << conv_stem_fingerprint
        << "},\"capabilities\":{\"mel_frontend\":true,"
        << "\"causal_conv_stem\":true,\"causal_encoder\":false,"
+       << "\"transcription\":false}}";
+  return json.str();
+}
+
+struct EncoderChunkEvidence {
+  std::size_t index;
+  std::size_t start;
+  std::size_t length;
+  std::string mask_kind;
+  mx::Shape mask_shape;
+};
+
+struct EncoderEvidence {
+  std::vector<EncoderChunkEvidence> chunks;
+  std::unordered_map<std::string, std::string> fingerprints;
+  std::size_t cache_offset{0};
+  std::size_t cache_size{0};
+  std::size_t cache_materialized_frames{0};
+};
+
+struct EncoderResult {
+  mx::array encoded;
+  mx::array projection0;
+  mx::array adapter;
+};
+
+class VoxtralCausalEncoder {
+public:
+  VoxtralCausalEncoder(const LoadedModel &model, mx::Device device)
+      : model_(model), device_(device) {}
+
+  EncoderResult encode(const mx::array &conv_stem,
+                       EncoderEvidence *evidence = nullptr) const {
+    if (conv_stem.ndim() != 2 ||
+        conv_stem.shape(1) != static_cast<int>(kEncoderDimension) ||
+        conv_stem.shape(0) % static_cast<int>(kDownsampleFactor) != 0) {
+      throw std::invalid_argument(
+          "encoder input must be aligned [frames, 1280] conv output");
+    }
+
+    std::vector<mx_support::RotatingKeyValueCache> caches;
+    caches.reserve(kEncoderLayers);
+    for (std::size_t layer = 0; layer < kEncoderLayers; ++layer) {
+      caches.emplace_back(kEncoderSlidingWindow, 0);
+    }
+
+    std::vector<mx::array> encoded_chunks;
+    for (std::size_t chunk_start = 0;
+         chunk_start < static_cast<std::size_t>(conv_stem.shape(0));
+         chunk_start += kEncoderSlidingWindow) {
+      const auto chunk_end = std::min(
+          chunk_start + kEncoderSlidingWindow,
+          static_cast<std::size_t>(conv_stem.shape(0)));
+      const auto chunk_length = chunk_end - chunk_start;
+      auto hidden = mx::slice(
+          conv_stem, {static_cast<int>(chunk_start), 0},
+          {static_cast<int>(chunk_end), static_cast<int>(kEncoderDimension)},
+          {1, 1}, device_);
+      const auto mask = caches.front().make_mask(
+          chunk_length, kEncoderSlidingWindow, device_);
+      const auto chunk_index = encoded_chunks.size();
+      if (evidence != nullptr) {
+        evidence->chunks.push_back(
+            {chunk_index,
+             chunk_start,
+             chunk_length,
+             mask.mode.empty() ? "array" : mask.mode,
+             mask.array.has_value() ? mask.array->shape() : mx::Shape{}});
+      }
+      for (std::size_t layer = 0; layer < kEncoderLayers; ++layer) {
+        hidden = encoder_layer(hidden, chunk_start, layer, mask, caches[layer]);
+        if (evidence != nullptr &&
+            (layer == 0 || layer == 15 || layer == 31)) {
+          const auto name = "chunk_" + std::to_string(chunk_index) +
+                            "_layer_" + std::to_string(layer);
+          evidence->fingerprints.emplace(name,
+                                         fingerprint_json(hidden, device_));
+        }
+      }
+      hidden = rms_norm(hidden, "encoder.transformer_norm.weight");
+      if (evidence != nullptr) {
+        evidence->fingerprints.emplace(
+            "chunk_" + std::to_string(chunk_index) + "_norm",
+            fingerprint_json(hidden, device_));
+      }
+      encoded_chunks.push_back(std::move(hidden));
+    }
+
+    if (evidence != nullptr) {
+      evidence->cache_offset = caches.front().offset();
+      evidence->cache_size = caches.front().size();
+      evidence->cache_materialized_frames =
+          caches.front().materialized_size();
+      evidence->fingerprints.emplace(
+          "layer_0_cache_keys",
+          fingerprint_json(caches.front().keys(), device_));
+      evidence->fingerprints.emplace(
+          "layer_0_cache_values",
+          fingerprint_json(caches.front().values(), device_));
+    }
+
+    auto encoded = encoded_chunks.size() == 1
+                       ? encoded_chunks.front()
+                       : mx::concatenate(std::move(encoded_chunks), 0, device_);
+    const auto adapter_frames =
+        static_cast<std::size_t>(encoded.shape(0)) / kDownsampleFactor;
+    auto downsampled = mx::reshape(
+        encoded,
+        {static_cast<int>(adapter_frames),
+         static_cast<int>(kEncoderDimension * kDownsampleFactor)},
+        device_);
+    auto projection0 = precise_gelu(
+        linear(downsampled, "encoder.audio_language_projection_0.weight"),
+        device_);
+    auto adapter =
+        linear(projection0, "encoder.audio_language_projection_2.weight");
+    if (evidence != nullptr) {
+      evidence->fingerprints.emplace("encoded",
+                                     fingerprint_json(encoded, device_));
+      evidence->fingerprints.emplace(
+          "adapter_projection0_gelu",
+          fingerprint_json(projection0, device_));
+      evidence->fingerprints.emplace("adapter",
+                                     fingerprint_json(adapter, device_));
+    }
+    return {std::move(encoded), std::move(projection0), std::move(adapter)};
+  }
+
+private:
+  const mx::array &weight(const std::string &name) const {
+    const auto found = model_.weights.find(name);
+    if (found == model_.weights.end()) {
+      throw std::runtime_error("missing required tensor: " + name);
+    }
+    return found->second;
+  }
+
+  std::optional<mx::array> optional_weight(const std::string &name) const {
+    const auto found = model_.weights.find(name);
+    return found == model_.weights.end()
+               ? std::nullopt
+               : std::optional<mx::array>(found->second);
+  }
+
+  mx::array quantized_linear(const mx::array &input,
+                             const std::string &prefix) const {
+    return mx_support::affine_quantized_linear(
+        input, weight(prefix + ".weight"), weight(prefix + ".scales"),
+        weight(prefix + ".biases"), optional_weight(prefix + ".bias"),
+        kQuantizationGroupSize, kQuantizationBits, device_);
+  }
+
+  mx::array linear(const mx::array &input,
+                   const std::string &weight_name) const {
+    return mx::matmul(input, mx::transpose(weight(weight_name), device_),
+                      device_);
+  }
+
+  mx::array rms_norm(const mx::array &input,
+                     const std::string &weight_name) const {
+    return mx::fast::rms_norm(input, weight(weight_name), kRmsNormEpsilon,
+                              device_);
+  }
+
+  mx::array encoder_attention(
+      const mx::array &input, std::size_t rope_offset, std::size_t layer,
+      const mx_support::AttentionMask &mask,
+      mx_support::RotatingKeyValueCache &cache) const {
+    const auto prefix = "encoder.transformer_layers." +
+                        std::to_string(layer) + ".attention.";
+    const auto sequence_length = input.shape(0);
+    auto queries = quantized_linear(input, prefix + "wq");
+    auto keys = quantized_linear(input, prefix + "wk");
+    auto values = quantized_linear(input, prefix + "wv");
+    queries = mx::transpose(
+        mx::reshape(queries,
+                    {1, sequence_length,
+                     static_cast<int>(kEncoderAttentionHeads),
+                     static_cast<int>(kEncoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    keys = mx::transpose(
+        mx::reshape(keys,
+                    {1, sequence_length,
+                     static_cast<int>(kEncoderAttentionHeads),
+                     static_cast<int>(kEncoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    values = mx::transpose(
+        mx::reshape(values,
+                    {1, sequence_length,
+                     static_cast<int>(kEncoderAttentionHeads),
+                     static_cast<int>(kEncoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    queries = mx::fast::rope(
+        queries, static_cast<int>(kEncoderHeadDimension), true, kRopeTheta,
+        1.0f, static_cast<int>(rope_offset), {}, device_);
+    keys = mx::fast::rope(
+        keys, static_cast<int>(kEncoderHeadDimension), true, kRopeTheta, 1.0f,
+        static_cast<int>(rope_offset), {}, device_);
+    auto [cached_keys, cached_values] =
+        cache.update_and_fetch(keys, values, device_);
+    auto output = mx::fast::scaled_dot_product_attention(
+        queries, cached_keys, cached_values,
+        1.0f / std::sqrt(static_cast<float>(kEncoderHeadDimension)),
+        mask.mode, mask.array, {}, device_);
+    output = mx::reshape(
+        mx::transpose(output, {0, 2, 1, 3}, device_),
+        {sequence_length,
+         static_cast<int>(kEncoderAttentionHeads * kEncoderHeadDimension)},
+        device_);
+    return quantized_linear(output, prefix + "wo");
+  }
+
+  mx::array encoder_layer(
+      const mx::array &input, std::size_t rope_offset, std::size_t layer,
+      const mx_support::AttentionMask &mask,
+      mx_support::RotatingKeyValueCache &cache) const {
+    const auto prefix =
+        "encoder.transformer_layers." + std::to_string(layer) + ".";
+    auto hidden =
+        input + encoder_attention(
+                    rms_norm(input, prefix + "attention_norm.weight"),
+                    rope_offset, layer, mask, cache);
+    const auto normalized = rms_norm(hidden, prefix + "ffn_norm.weight");
+    const auto gate =
+        mx_support::silu(quantized_linear(normalized,
+                                          prefix + "feed_forward_w1"),
+                         device_);
+    const auto up =
+        quantized_linear(normalized, prefix + "feed_forward_w3");
+    return hidden +
+           quantized_linear(gate * up, prefix + "feed_forward_w2");
+  }
+
+  const LoadedModel &model_;
+  mx::Device device_;
+};
+
+std::string probe_causal_encoder(LoadedModel model, const float *audio,
+                                 std::size_t audio_len,
+                                 int32_t transcription_delay_ms,
+                                 mx::Device device) {
+  const auto started = std::chrono::steady_clock::now();
+  materialize_weight_prefix_on_device(model, "encoder.", device);
+  const auto frontend = compute_audio_frontend(
+      model, audio, audio_len, transcription_delay_ms, device);
+  EncoderEvidence evidence;
+  evidence.fingerprints.emplace(
+      "conv_stem", fingerprint_json(frontend.conv_stem, device));
+  const VoxtralCausalEncoder encoder(model, device);
+  const auto result = encoder.encode(frontend.conv_stem, &evidence);
+  const auto elapsed_ms =
+      std::chrono::duration<double, std::milli>(
+          std::chrono::steady_clock::now() - started)
+          .count();
+
+  const std::vector<std::string> fingerprint_order{
+      "conv_stem",
+      "chunk_0_layer_0",
+      "chunk_0_layer_15",
+      "chunk_0_layer_31",
+      "chunk_0_norm",
+      "chunk_1_layer_0",
+      "chunk_1_layer_15",
+      "chunk_1_layer_31",
+      "chunk_1_norm",
+      "encoded",
+      "adapter_projection0_gelu",
+      "adapter",
+      "layer_0_cache_keys",
+      "layer_0_cache_values",
+  };
+
+  std::ostringstream json;
+  json << std::setprecision(17)
+       << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+       << "\"stage\":\"voxtral-causal-encoder\",\"device\":\""
+       << (device == mx::Device::gpu ? "gpu" : "cpu")
+       << "\",\"pcm_samples\":" << audio_len
+       << ",\"transcription_delay_ms\":" << transcription_delay_ms
+       << ",\"delay_tokens\":" << frontend.padding.delay_tokens
+       << ",\"architecture\":{\"layers\":" << kEncoderLayers
+       << ",\"dimension\":" << kEncoderDimension
+       << ",\"attention_heads\":" << kEncoderAttentionHeads
+       << ",\"head_dimension\":" << kEncoderHeadDimension
+       << ",\"sliding_window\":" << kEncoderSlidingWindow
+       << ",\"downsample_factor\":" << kDownsampleFactor
+       << ",\"adapter_dimension\":" << kDecoderDimension
+       << "},\"chunks\":[";
+  for (std::size_t index = 0; index < evidence.chunks.size(); ++index) {
+    if (index != 0) {
+      json << ",";
+    }
+    const auto &chunk = evidence.chunks[index];
+    json << "{\"index\":" << chunk.index << ",\"start\":" << chunk.start
+         << ",\"length\":" << chunk.length << ",\"mask_kind\":\""
+         << chunk.mask_kind << "\",\"mask_shape\":[";
+    for (std::size_t dimension = 0; dimension < chunk.mask_shape.size();
+         ++dimension) {
+      if (dimension != 0) {
+        json << ",";
+      }
+      json << chunk.mask_shape[dimension];
+    }
+    json << "]}";
+  }
+  json << "],\"cache\":{\"layer_0_offset\":" << evidence.cache_offset
+       << ",\"layer_0_size\":" << evidence.cache_size
+       << ",\"layer_0_materialized_key_frames\":"
+       << evidence.cache_materialized_frames
+       << ",\"layer_0_materialized_value_frames\":"
+       << evidence.cache_materialized_frames
+       << "},\"output\":{\"encoded_frames\":" << result.encoded.shape(0)
+       << ",\"adapter_frames\":" << result.adapter.shape(0)
+       << "},\"elapsed_ms\":" << elapsed_ms << ",\"peak_memory_bytes\":"
+       << mx::get_peak_memory() << ",\"fingerprints\":{";
+  for (std::size_t index = 0; index < fingerprint_order.size(); ++index) {
+    if (index != 0) {
+      json << ",";
+    }
+    const auto &name = fingerprint_order[index];
+    const auto found = evidence.fingerprints.find(name);
+    if (found == evidence.fingerprints.end()) {
+      throw std::runtime_error("missing encoder fingerprint: " + name);
+    }
+    json << "\"" << name << "\":" << found->second;
+  }
+  json << "},\"capabilities\":{\"causal_encoder\":true,"
+       << "\"rotating_kv_cache\":true,\"sliding_window_attention\":true,"
+       << "\"adapter_projection\":true,\"decoder\":false,"
        << "\"transcription\":false}}";
   return json.str();
 }
@@ -704,6 +1094,58 @@ extern "C" int32_t cuttledoc_voxtral_mlx_probe_audio_frontend(
     return fail_with_status(
         CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR,
         "MLX raised a non-standard exception in the audio frontend",
+        error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_voxtral_mlx_probe_causal_encoder(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    int32_t transcription_delay_ms, int32_t device_kind, char **json_out,
+    char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || audio_len == 0 ||
+      json_out == nullptr) {
+    return fail_with_status(
+        CUTTLEDOC_VOXTRAL_MLX_INVALID_ARGUMENT,
+        "model_directory, non-empty audio, and json_out are required",
+        error_out);
+  }
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      throw std::runtime_error("requested MLX device is not available");
+    }
+    mx::set_default_device(device);
+    const auto cpu_stream = reusable_thread_unsafe_stream(mx::Device::cpu);
+    mx::set_default_stream(cpu_stream);
+    const auto device_stream =
+        device == mx::Device::cpu ? cpu_stream
+                                  : reusable_thread_unsafe_stream(device);
+    mx::set_default_stream(device_stream);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    auto model = load_and_validate_model(model_directory);
+    return return_json(
+        CUTTLEDOC_VOXTRAL_MLX_OK,
+        probe_causal_encoder(std::move(model), audio, audio_len,
+                             transcription_delay_ms, device),
+        json_out, error_out);
+  } catch (const std::invalid_argument &error) {
+    return fail_with_status(CUTTLEDOC_VOXTRAL_MLX_INVALID_ARGUMENT,
+                            error.what(), error_out);
+  } catch (const std::exception &error) {
+    return fail_with_status(CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR, error.what(),
+                            error_out);
+  } catch (...) {
+    return fail_with_status(
+        CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR,
+        "MLX raised a non-standard exception in the causal encoder",
         error_out);
   }
 }

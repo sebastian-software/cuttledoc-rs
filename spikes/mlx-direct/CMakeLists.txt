@@ -49,12 +49,14 @@ target_compile_options(
 add_library(
   cuttledoc_voxtral_mlx_shim
   SHARED
-  ../voxtral-realtime-mlx-direct/Sources/CuttledocVoxtralMlxShim.cpp)
+  ../voxtral-realtime-mlx-direct/Sources/CuttledocVoxtralMlxShim.cpp
+  Sources/CuttledocMlxTransformer.cpp)
 target_link_libraries(cuttledoc_voxtral_mlx_shim PRIVATE mlx)
 target_include_directories(
   cuttledoc_voxtral_mlx_shim
   PUBLIC
-  ../voxtral-realtime-mlx-direct/include)
+  ../voxtral-realtime-mlx-direct/include
+  include)
 target_compile_options(
   cuttledoc_voxtral_mlx_shim
   PRIVATE

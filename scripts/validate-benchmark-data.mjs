@@ -1127,7 +1127,11 @@ function validateVoxtralRealtimeDirectModelManifest(
       contract?.capabilities?.cancellation !== true ||
       contract?.capabilities?.mel_frontend !== true ||
       contract?.capabilities?.causal_conv_stem !== true ||
-      contract?.capabilities?.causal_encoder !== false ||
+      contract?.capabilities?.causal_encoder !== true ||
+      contract?.capabilities?.rotating_kv_cache !== true ||
+      contract?.capabilities?.sliding_window_attention !== true ||
+      contract?.capabilities?.adapter_projection !== true ||
+      contract?.capabilities?.decoder !== false ||
       contract?.capabilities?.transcription !== false) {
     errors.push('direct Voxtral boundary contract must remain explicit and bounded');
   }
