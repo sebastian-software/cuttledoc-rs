@@ -182,6 +182,20 @@ Raw transcripts and repetitions remain under
 [`raw`](raw/), and the language-specific, boundary-preserving edit report is
 [`analysis/phase0.audiobook-pilot-1.errors.json`](analysis/phase0.audiobook-pilot-1.errors.json).
 
+The first repository-owned Voxtral boundary over official MLX is reproduced
+with:
+
+```sh
+scripts/run-voxtral-mlx-direct-spike.sh
+```
+
+Its checked-in
+[`boundary record`](raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json)
+machine-checks the pinned model layout, bounded 80 ms feed/320 ms step
+contract, backpressure, and cancellation. It deliberately records
+`transcription: false`; the current MLX fingerprint is lifecycle evidence, not
+an ASR-quality result.
+
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in
 [`postprocessing/cuttledoc-v2-snapshot.json`](postprocessing/cuttledoc-v2-snapshot.json).

@@ -1053,6 +1053,182 @@ function validateVoxtralRealtimeModelManifest(modelManifest) {
   return errors;
 }
 
+function validateVoxtralRealtimeDirectModelManifest(
+  modelManifest,
+  referenceManifest,
+) {
+  const errors = [];
+  if (modelManifest.id !== referenceManifest.id ||
+      modelManifest.task !== 'asr' ||
+      modelManifest.source?.revision !== referenceManifest.source?.revision ||
+      modelManifest.conversion?.revision !==
+        referenceManifest.conversion?.revision) {
+    errors.push('direct manifest must preserve the pinned Voxtral model');
+  }
+  if (modelManifest.source?.license !== 'Apache-2.0' ||
+      modelManifest.conversion?.license !== 'Apache-2.0' ||
+      modelManifest.official_runtime?.repository !== 'ml-explore/mlx' ||
+      modelManifest.official_runtime?.revision !==
+        '7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247' ||
+      modelManifest.official_runtime?.version !== '0.32.0' ||
+      modelManifest.official_runtime?.license !== 'MIT') {
+    errors.push('direct runtime and licenses must pin official MLX v0.32.0');
+  }
+
+  const artifactPaths = new Set();
+  let artifactBytes = 0;
+  for (const artifact of modelManifest.artifacts ?? []) {
+    if (!(artifact.path?.length > 0) || artifactPaths.has(artifact.path) ||
+        !(Number.isInteger(artifact.bytes) && artifact.bytes > 0) ||
+        !/^[0-9a-f]{64}$/.test(artifact.sha256 ?? '')) {
+      errors.push(`invalid direct Voxtral artifact: ${artifact.path}`);
+    }
+    artifactPaths.add(artifact.path);
+    artifactBytes += artifact.bytes ?? 0;
+  }
+  for (const requiredPath of [
+    'config.json',
+    'model.safetensors',
+    'model.safetensors.index.json',
+    'tekken.json',
+  ]) {
+    if (!artifactPaths.has(requiredPath)) {
+      errors.push(`missing required direct Voxtral artifact: ${requiredPath}`);
+    }
+  }
+  if (artifactBytes !== modelManifest.conversion?.snapshot_bytes ||
+      modelManifest.conversion?.snapshot_bytes !==
+        referenceManifest.conversion?.snapshot_bytes ||
+      modelManifest.conversion?.weight_bytes !== 3133798126) {
+    errors.push('direct Voxtral artifact bytes must reconcile with the pin');
+  }
+
+  const layout = modelManifest.expected_layout;
+  if (layout?.tensor_count !== 1523 ||
+      layout?.float32_tensors !== 300 ||
+      layout?.float16_tensors !== 817 ||
+      layout?.uint32_tensors !== 406 ||
+      layout?.affine_4bit_modules !== 406) {
+    errors.push('direct Voxtral tensor and quantization layout must stay pinned');
+  }
+  const contract = modelManifest.adapter_contract;
+  if (contract?.sample_rate_hz !== 16000 ||
+      contract?.sample_format !== 'f32le' ||
+      contract?.channel_count !== 1 ||
+      contract?.feed_semantics !== 'all-or-nothing' ||
+      contract?.stable_statuses?.invalid_argument !== 1 ||
+      contract?.stable_statuses?.cancelled !== 3 ||
+      contract?.stable_statuses?.busy !== 4 ||
+      contract?.stable_statuses?.backpressure !== 5 ||
+      contract?.stable_statuses?.needs_audio !== 6 ||
+      contract?.stable_statuses?.done !== 7 ||
+      contract?.capabilities?.bounded_ingestion !== true ||
+      contract?.capabilities?.backpressure !== true ||
+      contract?.capabilities?.cancellation !== true ||
+      contract?.capabilities?.transcription !== false) {
+    errors.push('direct Voxtral boundary contract must remain explicit and bounded');
+  }
+  return errors;
+}
+
+function validateVoxtralRealtimeDirectBoundary(
+  run,
+  modelManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  if (run.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(run.recorded_at ?? '') ||
+      run.candidate?.id !== 'voxtral-mini-4b-realtime-mlx-direct' ||
+      !run.candidate?.model?.endsWith(
+        `@${modelManifest.conversion?.revision}`,
+      ) ||
+      !run.candidate?.runtime?.endsWith(
+        `@${modelManifest.official_runtime?.revision}`,
+      ) ||
+      !run.candidate?.boundary?.includes('repository-owned')) {
+    errors.push('direct boundary run must pin its model, runtime, and ownership');
+  }
+  if (!fixture ||
+      run.fixture?.manifest_revision !== audiobookManifest.revision ||
+      run.fixture?.id !== fixture.id ||
+      run.fixture?.language !== fixture.language ||
+      run.fixture?.gold_status !== fixture.gold_status ||
+      run.fixture?.audio_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.sample_rate_hz !== 16000 ||
+      run.fixture?.sample_format !== 'f32le' ||
+      run.fixture?.channel_count !== 1 ||
+      run.fixture?.sample_count !== fixture.normalized.sample_count ||
+      run.fixture?.duration_ms !== fixture.normalized.duration_ms) {
+    errors.push('direct boundary fixture must match the pinned audiobook PCM');
+  }
+
+  const contract = run.contract;
+  const expectedStepCount = Math.ceil(
+    run.fixture?.sample_count /
+      modelManifest.adapter_contract?.sample_rate_hz * 1000 /
+      contract?.max_ingest_ms_per_step,
+  );
+  if (contract?.input_chunk_samples !== 1280 ||
+      contract?.input_chunk_ms !== 80 ||
+      contract?.queue_capacity_samples !== 10240 ||
+      contract?.queue_capacity_ms !== 640 ||
+      contract?.max_ingest_samples_per_step !== 5120 ||
+      contract?.max_ingest_ms_per_step !== 320 ||
+      contract?.total_fed_samples !== run.fixture?.sample_count ||
+      contract?.total_ingested_samples !== run.fixture?.sample_count ||
+      contract?.step_count !== expectedStepCount ||
+      contract?.maximum_ingested_samples >
+        contract?.max_ingest_samples_per_step ||
+      !(contract?.backpressure_count > 0) ||
+      contract?.stable_statuses?.invalid_argument !== 1 ||
+      contract?.stable_statuses?.cancelled !== 3 ||
+      contract?.stable_statuses?.backpressure !== 5 ||
+      contract?.stable_statuses?.needs_audio !== 6 ||
+      contract?.stable_statuses?.done !== 7) {
+    errors.push('direct boundary run must preserve bounded ingestion and states');
+  }
+  if (!(contract?.repetitions?.length >= 2) ||
+      contract.repetitions.some(
+        (repetition) =>
+          repetition.step_count !== expectedStepCount ||
+          !(repetition.backpressure_count > 0) ||
+          !(repetition.maximum_step_wall_ms >=
+            repetition.maximum_mlx_elapsed_ms) ||
+          !(repetition.maximum_step_wall_ms < 250),
+      )) {
+    errors.push('direct boundary repetitions must remain bounded below 250 ms');
+  }
+
+  const fingerprint = run.official_mlx_fingerprint;
+  const calculatedRelativeError = Math.abs(
+    fingerprint?.mlx_sum_squares - fingerprint?.cpu_expected_sum_squares,
+  ) / fingerprint?.cpu_expected_sum_squares;
+  if (!(fingerprint?.cpu_expected_sum_squares > 0) ||
+      !(fingerprint?.mlx_sum_squares > 0) ||
+      !(fingerprint?.relative_error <= 5e-5) ||
+      Math.abs(fingerprint.relative_error - calculatedRelativeError) > 1e-12) {
+    errors.push('direct official-MLX audio fingerprint must match its CPU control');
+  }
+  if (run.capabilities?.model_layout_validated !== true ||
+      run.capabilities?.bounded_ingestion !== true ||
+      run.capabilities?.backpressure !== true ||
+      run.capabilities?.cancellation !== true ||
+      run.capabilities?.transcription !== false ||
+      !(run.artifacts?.shim_dylib_bytes > 0) ||
+      !(run.artifacts?.rust_executable_bytes > 0) ||
+      !(run.artifacts?.metallib_bytes > 0) ||
+      run.artifacts?.model_safetensors_bytes !==
+        modelManifest.conversion?.weight_bytes ||
+      !run.limitations?.some((item) => item.includes('No transcript'))) {
+    errors.push('direct boundary capabilities must not overclaim transcription');
+  }
+  return errors;
+}
+
 function validateVoxtralRealtimeAggregate(
   aggregate,
   modelManifest,
@@ -2537,6 +2713,14 @@ const voxtralRealtimeModelManifestPath = join(
   repoRoot,
   'spikes/voxtral-realtime-mlx-reference/model-manifest.json',
 );
+const voxtralRealtimeDirectModelManifestPath = join(
+  repoRoot,
+  'spikes/voxtral-realtime-mlx-direct/model-manifest.json',
+);
+const voxtralRealtimeDirectBoundaryPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -2591,6 +2775,10 @@ const schemaPaths = [
     repoRoot,
     'spikes/voxtral-realtime-mlx-reference/model-manifest.schema.json',
   ),
+  join(
+    repoRoot,
+    'spikes/voxtral-realtime-mlx-direct/model-manifest.schema.json',
+  ),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
@@ -2619,6 +2807,12 @@ const qwen3TtsModelManifest = await readJson(qwen3TtsModelManifestPath);
 const voxtralTtsModelManifest = await readJson(voxtralTtsModelManifestPath);
 const voxtralRealtimeModelManifest = await readJson(
   voxtralRealtimeModelManifestPath,
+);
+const voxtralRealtimeDirectModelManifest = await readJson(
+  voxtralRealtimeDirectModelManifestPath,
+);
+const voxtralRealtimeDirectBoundary = await readJson(
+  voxtralRealtimeDirectBoundaryPath,
 );
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -2703,6 +2897,12 @@ failures.push(
   ).map((error) => `${voxtralRealtimeModelManifestPath}: ${error}`),
 );
 failures.push(
+  ...validateVoxtralRealtimeDirectModelManifest(
+    voxtralRealtimeDirectModelManifest,
+    voxtralRealtimeModelManifest,
+  ).map((error) => `${voxtralRealtimeDirectModelManifestPath}: ${error}`),
+);
+failures.push(
   ...validateQwen3TtsRun(
     qwen3TtsRun,
     syntheticRoundtripSelection,
@@ -2785,6 +2985,13 @@ failures.push(
     audiobookPilot,
     320,
   ).map((error) => `${voxtralRealtimeStreaming320Path}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralRealtimeDirectBoundary(
+    voxtralRealtimeDirectBoundary,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralRealtimeDirectBoundaryPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -3006,6 +3213,32 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject divergent Voxtral Realtime bytes',
     );
   }
+  const invalidVoxtralDirectModelManifest = structuredClone(
+    voxtralRealtimeDirectModelManifest,
+  );
+  invalidVoxtralDirectModelManifest.adapter_contract.capabilities
+    .transcription = true;
+  if (validateVoxtralRealtimeDirectModelManifest(
+    invalidVoxtralDirectModelManifest,
+    voxtralRealtimeModelManifest,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject a false direct Voxtral transcription capability',
+    );
+  }
+  const invalidVoxtralDirectBoundary = structuredClone(
+    voxtralRealtimeDirectBoundary,
+  );
+  invalidVoxtralDirectBoundary.contract.maximum_ingested_samples = 5121;
+  if (validateVoxtralRealtimeDirectBoundary(
+    invalidVoxtralDirectBoundary,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject an unbounded direct Voxtral step',
+    );
+  }
   const invalidVoxtralRealtimeAggregate = structuredClone(
     voxtralRealtime480,
   );
@@ -3087,6 +3320,7 @@ console.log(
   `3 measured TTS diagnostics, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
+  `1 direct Voxtral boundary record, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

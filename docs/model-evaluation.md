@@ -192,6 +192,29 @@ over official MLX, with cooperative cancellation designed into the Rust-owned
 lifecycle. The pure-C/MPS implementation remains a comparison boundary, not a
 reason to abandon the first-class MLX platform.
 
+### Repository-owned official-MLX boundary
+
+The first direct boundary now implements that lifecycle without linking
+`mlx-audio`. Its C++ adapter loads and validates the complete pinned model with
+official MLX, while Rust owns the opaque handle, hard queue capacity, per-step
+audio budget, end-of-audio, backpressure, cancellation, and stable statuses.
+
+On the same 13.34-second German audiobook fixture, the contract probe fed
+213,440 samples in 80 ms slices into a 640 ms queue. It observed 40 explicit
+backpressure responses in each of two runs, consumed all audio in 42 steps,
+and never admitted more than 320 ms into one step. The slower repetition's
+maximum step was 70.7 ms, versus the reference runtime's 25.15-second maximum
+under 80 ms production. The official-MLX sum-of-squares fingerprint matched a
+CPU control within `1.24e-8` relative error. Cancellation, closed-input,
+needs-audio, and done states also returned their pinned statuses.
+
+The machine-readable
+[`boundary record`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct-boundary-1/result.json)
+explicitly keeps `transcription: false`. This is a lifecycle and model-layout
+milestone, not frontend, encoder, token, transcript, WER, or first-text-latency
+evidence. Those claims require staged numerical parity with the existing
+Python oracle through the same repository-owned session.
+
 ## Artifact and license pins
 
 | Artifact | Exact revision | Representation | License |
@@ -249,10 +272,12 @@ timestamp detail, and streaming behavior.
    repeated Rust-owned lifecycle, exact transcript, busy, error, and
    cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
-2. Treat Voxtral Realtime as a measured model candidate. Preserve the proven
-   320 ms live-input behavior in a repository-owned official-MLX adapter with
-   bounded ingestion and cooperative cancellation; compare that narrow
-   boundary with pure C/MPS without adopting `mlx-audio`.
+2. Continue Voxtral Realtime as a measured model candidate. The first
+   repository-owned official-MLX boundary now proves bounded ingestion,
+   backpressure, and cancellation. Port the streaming frontend, causal
+   encoder, Tekken/delay-conditioned decoder, and exact fixed-fixture text
+   parity in that order before comparing the completed narrow adapter with
+   pure C/MPS; do not adopt `mlx-audio` as the product boundary.
 3. Acquire held-out German-first professional-podcast material and independent
    audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
    Voxtral on the identical language/domain cells.

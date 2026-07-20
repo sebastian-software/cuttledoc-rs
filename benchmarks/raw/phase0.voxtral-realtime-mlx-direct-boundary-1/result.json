@@ -9,8 +9,12 @@
     "boundary": "repository-owned Rust/C ABI over official MLX"
   },
   "fixture": {
-    "id": "audiobook-pilot-de-135_82_000105",
+    "manifest_revision": "audiobook-pilot-1",
+    "id": "audiobook-de-135_82_000105",
     "path": "/tmp/cuttledoc-audiobook-pilot/de-135_82_000105.f32le",
+    "language": "de",
+    "gold_status": "dataset-transcript-unverified",
+    "audio_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
     "sample_rate_hz": 16000,
     "sample_format": "f32le",
     "channel_count": 1,
