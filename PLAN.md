@@ -81,6 +81,7 @@ Evidence snapshot: 2026-07-20.
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advanced to the owned adapter in #17; every other named artifact has an exact runtime/license blocker. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical four-backend runs remain. |
+| Synthetic TTS roundtrip (#13) | Planned | The German-first Wikipedia pilot, separate English control, candidate set, MLX-Audio reference revision, remote quality ceiling, measurement contract, and non-selection guard are machine-readable. Text/model materialization and the Apple vertical slice are next. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
 
@@ -184,6 +185,8 @@ Evaluate independently:
 - Chunking, correction statistics, Markdown formatting, and prompt compatibility.
 - Whether enhancement belongs in the initial v3 or a later minor release.
 - Candidate local and remote TTS runtimes/models for Apple Silicon.
+- Start with Apple `AVSpeechSynthesizer`, Qwen3-TTS 0.6B CustomVoice and Chatterbox through a pinned MLX-Audio reference, plus Qwen-Audio-3.0-TTS-Plus as an English remote quality ceiling. Treat MLX-Audio as a serious implementation candidate and decide between retaining it and a narrow direct official-MLX adapter only after measurements.
+- Run the separate German-first synthetic TTS → STT diagnostic defined in `benchmarks/fixtures/synthetic-roundtrip-plan.json`. It may validate integration and diagnose pronunciation/recognition errors, but it cannot replace real podcast/audiobook evidence or select the production ASR backend.
 - Voice/language selection, streaming audio chunks, sample formats, and synthesis cancellation.
 - Build one narrow TTS vertical slice before fixing a public synthesis contract; validate output ownership, audio chunking, backpressure, cancellation, and lifecycle against a real runtime.
 - Decide whether a TTS implementation belongs in a later v3 minor release. Promoting TTS into a release gate requires a follow-up ADR with implementation evidence.

@@ -347,6 +347,242 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
   return errors;
 }
 
+function validateSyntheticRoundtripPlan(plan) {
+  const errors = [];
+  const uniqueStrings = (value) => (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => typeof item === 'string' && item.length > 0) &&
+    new Set(value).size === value.length
+  );
+  const requiredBackends = [
+    'apple-speechtranscriber',
+    'whisper-large-v3-turbo-coreml-whispercpp',
+    'qwen3-asr-0.6b-mlx-direct',
+    'parakeet-tdt-0.6b-v3-coreml',
+  ];
+  const requiredCandidateIds = [
+    'apple-avspeechsynthesizer',
+    'qwen3-tts-0.6b-customvoice-mlx-audio',
+    'chatterbox-multilingual-mlx-audio',
+    'qwen-audio-3.0-tts-plus-api',
+  ];
+  const requiredSourceIds = [
+    'de-wikipedia-kuenstliche-intelligenz-268935951',
+    'en-wikipedia-artificial-intelligence-1365114492',
+  ];
+
+  if (plan.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(plan.revision?.length > 0)) {
+    errors.push('revision must be a non-empty string');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(plan.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (plan.tracking_issue !==
+      'https://github.com/sebastian-software/cuttledoc-rs/issues/13') {
+    errors.push('tracking_issue must remain Phase 5 issue #13');
+  }
+  if (plan.purpose !== 'diagnostic') {
+    errors.push('purpose must remain diagnostic');
+  }
+  if (plan.relationship_to_target_domain?.eligible_for_model_selection !== false ||
+      plan.relationship_to_target_domain?.eligible_for_release_acceptance !== false) {
+    errors.push('synthetic evidence must not select ASR models or satisfy release acceptance');
+  }
+  for (const field of ['required_comparison', 'reason']) {
+    if (!(plan.relationship_to_target_domain?.[field]?.length > 0)) {
+      errors.push(`relationship_to_target_domain.${field} must be a non-empty string`);
+    }
+  }
+
+  if (!arrayEquals(plan.initial_scope?.locales ?? [], ['de-DE', 'en-US']) ||
+      plan.initial_scope?.primary_locale !== 'de-DE') {
+    errors.push('initial scope must preserve German-first de-DE and en-US cells');
+  }
+  if (plan.initial_scope?.topic !== 'artificial-intelligence') {
+    errors.push('initial scope topic must remain artificial-intelligence');
+  }
+  if (plan.initial_scope?.minimum_passages_per_locale?.['de-DE'] < 6 ||
+      plan.initial_scope?.minimum_passages_per_locale?.['en-US'] < 3) {
+    errors.push('initial scope requires at least six German and three English passages');
+  }
+  if (plan.initial_scope?.minimum_passage_duration_ms !== 45_000 ||
+      plan.initial_scope?.maximum_passage_duration_ms !== 90_000) {
+    errors.push('initial passage duration must remain 45-90 seconds');
+  }
+  if (!uniqueStrings(plan.initial_scope?.required_text_phenomena)) {
+    errors.push('required_text_phenomena must be a non-empty unique string array');
+  }
+
+  const sources = plan.text_sources ?? [];
+  if (!arrayEquals(sources.map((source) => source.id), requiredSourceIds)) {
+    errors.push('text_sources must preserve the pinned German and English Wikipedia revisions');
+  }
+  for (const source of sources) {
+    for (const field of [
+      'id',
+      'locale',
+      'title',
+      'revision',
+      'revision_url',
+      'history_url',
+      'license',
+      'selection_status',
+    ]) {
+      if (!(source[field]?.length > 0)) {
+        errors.push(`${source.id ?? '<source>'}.${field} must be a non-empty string`);
+      }
+    }
+    for (const field of ['revision_url', 'history_url']) {
+      try {
+        if (new URL(source[field]).protocol !== 'https:') {
+          errors.push(`${source.id}.${field} must use HTTPS`);
+        }
+      } catch {
+        errors.push(`${source.id}.${field} must be an absolute URL`);
+      }
+    }
+    if (source.license !== 'CC-BY-SA-4.0') {
+      errors.push(`${source.id}: Wikipedia source license must be CC-BY-SA-4.0`);
+    }
+    if (!uniqueStrings(source.required_sections)) {
+      errors.push(`${source.id}: required_sections must be a non-empty unique string array`);
+    }
+    const policy = source.materialization_policy;
+    for (const field of [
+      'pin_exact_revision',
+      'record_verbatim_text_sha256',
+      'record_spoken_text_sha256',
+      'record_change_notice',
+      'preserve_attribution',
+    ]) {
+      if (policy?.[field] !== true) {
+        errors.push(`${source.id}: materialization_policy.${field} must be true`);
+      }
+    }
+    if (policy?.generated_audio_location !== 'local-required' ||
+        policy?.redistribution !==
+          'blocked-until-CC-BY-SA-attribution-package-review') {
+      errors.push(`${source.id}: generated assets must remain local and redistribution-blocked`);
+    }
+  }
+
+  const candidates = plan.tts_candidates ?? [];
+  const candidateIds = candidates.map((candidate) => candidate.id);
+  if (!arrayEquals(candidateIds, requiredCandidateIds)) {
+    errors.push('tts_candidates must preserve the selected system, local MLX, and remote controls');
+  }
+  const candidateIdSet = new Set(candidateIds);
+  for (const candidate of candidates) {
+    for (const field of [
+      'id',
+      'role',
+      'runtime',
+      'model',
+      'integration',
+      'source_url',
+      'source_revision',
+      'license',
+      'status',
+      'decision_after_pilot',
+    ]) {
+      if (!(candidate[field]?.length > 0)) {
+        errors.push(`${candidate.id ?? '<candidate>'}.${field} must be a non-empty string`);
+      }
+    }
+    try {
+      if (new URL(candidate.source_url).protocol !== 'https:') {
+        errors.push(`${candidate.id}.source_url must use HTTPS`);
+      }
+    } catch {
+      errors.push(`${candidate.id}.source_url must be an absolute URL`);
+    }
+    if (!uniqueStrings(candidate.locales)) {
+      errors.push(`${candidate.id}: locales must be a non-empty unique string array`);
+    }
+  }
+  const mlxCandidates = candidates.filter(
+    (candidate) => candidate.runtime?.startsWith('Blaizzy/mlx-audio'),
+  );
+  if (mlxCandidates.length !== 2 ||
+      mlxCandidates.some(
+        (candidate) => candidate.source_revision !==
+          '64e8416c303fb3b3463dab8eb4ebd78c55a87c1a',
+      )) {
+    errors.push('local MLX candidates must pin the reviewed mlx-audio revision');
+  }
+  const remoteCandidate = candidates.find(
+    (candidate) => candidate.id === 'qwen-audio-3.0-tts-plus-api',
+  );
+  if (!arrayEquals(remoteCandidate?.locales ?? [], ['en-US'])) {
+    errors.push('Qwen-Audio-3.0-TTS-Plus must remain an English-only quality control');
+  }
+
+  const evidence = plan.external_evidence ?? [];
+  if (evidence.length === 0) {
+    errors.push('external_evidence must not be empty');
+  }
+  for (const item of evidence) {
+    if (!candidateIdSet.has(item.candidate_id)) {
+      errors.push(`external evidence names unknown candidate ${item.candidate_id}`);
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.observed_at ?? '')) {
+      errors.push('external evidence observed_at must be an ISO date');
+    }
+    if (!(item.source?.length > 0) ||
+        !(item.metric?.length > 0) ||
+        !(item.scope?.length > 0) ||
+        !Number.isFinite(item.value) ||
+        !Number.isFinite(item.confidence_interval_plus_minus) ||
+        !(Number.isInteger(item.sample_count) && item.sample_count > 0)) {
+      errors.push('external evidence requires source, metric, scope, value, confidence, and samples');
+    }
+    try {
+      if (new URL(item.source_url).protocol !== 'https:') {
+        errors.push('external evidence source_url must use HTTPS');
+      }
+    } catch {
+      errors.push('external evidence source_url must be an absolute URL');
+    }
+  }
+
+  if (!arrayEquals(plan.asr_backends ?? [], requiredBackends)) {
+    errors.push('asr_backends must contain the four frozen candidates in execution order');
+  }
+  const execution = plan.execution_policy;
+  for (const field of [
+    'retain_raw_tts_audio',
+    'retain_raw_asr_output',
+    'fixed_voice_per_candidate_and_locale',
+    'fixed_generation_parameters',
+    'require_fresh_process_cold_load',
+    'forbid_asr_specific_text_changes',
+  ]) {
+    if (execution?.[field] !== true) {
+      errors.push(`execution_policy.${field} must be true`);
+    }
+  }
+  if (!(execution?.matrix?.length > 0) ||
+      execution?.minimum_repetitions < 2) {
+    errors.push('execution policy requires a matrix description and at least two repetitions');
+  }
+  for (const field of ['text_fidelity', 'synthesis']) {
+    if (!uniqueStrings(plan.metrics?.[field])) {
+      errors.push(`metrics.${field} must be a non-empty unique string array`);
+    }
+  }
+  if (!(plan.metrics?.diagnosis?.length > 0)) {
+    errors.push('metrics.diagnosis must be a non-empty string');
+  }
+  if (!uniqueStrings(plan.exit_criteria) || plan.exit_criteria.length < 7) {
+    errors.push('exit_criteria must contain at least seven unique strings');
+  }
+  return errors;
+}
+
 function validateSourceRightsReview(
   review,
   sourceCandidates,
@@ -1136,6 +1372,10 @@ const targetDomainPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/target-domain-plan.json',
 );
+const syntheticRoundtripPlanPath = join(
+  repoRoot,
+  'benchmarks/fixtures/synthetic-roundtrip-plan.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -1155,6 +1395,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
+  join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
@@ -1172,6 +1413,7 @@ const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const targetDomainPlan = await readJson(targetDomainPlanPath);
+const syntheticRoundtripPlan = await readJson(syntheticRoundtripPlanPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -1203,6 +1445,11 @@ failures.push(
 failures.push(
   ...validateTargetDomainPlan(targetDomainPlan, sourceCandidates).map(
     (error) => `${targetDomainPlanPath}: ${error}`,
+  ),
+);
+failures.push(
+  ...validateSyntheticRoundtripPlan(syntheticRoundtripPlan).map(
+    (error) => `${syntheticRoundtripPlanPath}: ${error}`,
   ),
 );
 const rightsReviewIds = new Set();
@@ -1335,6 +1582,14 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push('validator self-test failed to reject a development source in a held-out cell');
   }
+  const invalidSyntheticRoundtripPlan = structuredClone(
+    syntheticRoundtripPlan,
+  );
+  invalidSyntheticRoundtripPlan.relationship_to_target_domain
+    .eligible_for_model_selection = true;
+  if (validateSyntheticRoundtripPlan(invalidSyntheticRoundtripPlan).length === 0) {
+    failures.push('validator self-test failed to reject synthetic model-selection evidence');
+  }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
   invalidRightsReview.disposition = 'accepted';
   if (validateSourceRightsReview(
@@ -1371,6 +1626,7 @@ console.log(
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
+  `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +

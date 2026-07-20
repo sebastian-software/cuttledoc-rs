@@ -94,6 +94,19 @@ remains a short-read integration gate; audiobook and professional-podcast
 cells are reported separately, with independent-source grouping and
 human-verified gold transcripts.
 
+The separate
+[`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
+defines the Phase 5 TTS → STT diagnostic under issue #13. It starts with
+German and reports English separately, pins exact Wikipedia revisions, and
+crosses each supported TTS/locale cell with the same four ASR backends. Apple
+`AVSpeechSynthesizer` is the system baseline; Qwen3-TTS and Chatterbox use a
+pinned MLX-Audio reference before a direct-official-MLX dependency decision;
+Qwen-Audio-3.0-TTS-Plus is an English remote quality ceiling. Synthetic
+results validate lifecycle and expose pronunciation/recognition failures, but
+the plan explicitly forbids using them as held-out target-domain or
+release-acceptance evidence. See
+[`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md).
+
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
 download or import. The exact deny-by-default workflow and the requirements for

@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/synthetic-roundtrip-plan.schema.json",
+  "title": "Cuttledoc synthetic TTS to STT diagnostic plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "revision",
+    "evidence_date",
+    "tracking_issue",
+    "purpose",
+    "relationship_to_target_domain",
+    "initial_scope",
+    "text_sources",
+    "tts_candidates",
+    "external_evidence",
+    "asr_backends",
+    "execution_policy",
+    "metrics",
+    "exit_criteria"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "tracking_issue": {
+      "type": "string",
+      "format": "uri"
+    },
+    "purpose": {
+      "const": "diagnostic"
+    },
+    "relationship_to_target_domain": {
+      "type": "object",
+      "required": [
+        "eligible_for_model_selection",
+        "eligible_for_release_acceptance",
+        "required_comparison",
+        "reason"
+      ],
+      "properties": {
+        "eligible_for_model_selection": {
+          "const": false
+        },
+        "eligible_for_release_acceptance": {
+          "const": false
+        },
+        "required_comparison": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "initial_scope": {
+      "type": "object",
+      "required": [
+        "locales",
+        "primary_locale",
+        "topic",
+        "minimum_passages_per_locale",
+        "minimum_passage_duration_ms",
+        "maximum_passage_duration_ms",
+        "required_text_phenomena"
+      ],
+      "properties": {
+        "locales": {
+          "type": "array",
+          "const": [
+            "de-DE",
+            "en-US"
+          ]
+        },
+        "primary_locale": {
+          "const": "de-DE"
+        },
+        "topic": {
+          "const": "artificial-intelligence"
+        },
+        "minimum_passages_per_locale": {
+          "type": "object",
+          "required": [
+            "de-DE",
+            "en-US"
+          ],
+          "properties": {
+            "de-DE": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "en-US": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "minimum_passage_duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum_passage_duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required_text_phenomena": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "text_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "locale",
+          "title",
+          "revision",
+          "revision_url",
+          "history_url",
+          "license",
+          "selection_status",
+          "required_sections",
+          "materialization_policy"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "locale": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "title": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "revision": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "revision_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "history_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "license": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "selection_status": {
+            "enum": [
+              "selected-pending-materialization",
+              "materialized",
+              "blocked"
+            ]
+          },
+          "required_sections": {
+            "$ref": "#/$defs/nonEmptyUniqueStrings"
+          },
+          "materialization_policy": {
+            "type": "object",
+            "required": [
+              "pin_exact_revision",
+              "record_verbatim_text_sha256",
+              "record_spoken_text_sha256",
+              "record_change_notice",
+              "preserve_attribution",
+              "generated_audio_location",
+              "redistribution"
+            ],
+            "properties": {
+              "pin_exact_revision": {
+                "const": true
+              },
+              "record_verbatim_text_sha256": {
+                "const": true
+              },
+              "record_spoken_text_sha256": {
+                "const": true
+              },
+              "record_change_notice": {
+                "const": true
+              },
+              "preserve_attribution": {
+                "const": true
+              },
+              "generated_audio_location": {
+                "const": "local-required"
+              },
+              "redistribution": {
+                "const": "blocked-until-CC-BY-SA-attribution-package-review"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tts_candidates": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "runtime",
+          "model",
+          "integration",
+          "source_url",
+          "source_revision",
+          "license",
+          "status",
+          "locales",
+          "decision_after_pilot"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "role": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "runtime": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "model": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "integration": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "source_revision": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "license": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "status": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "locales": {
+            "$ref": "#/$defs/nonEmptyUniqueStrings"
+          },
+          "decision_after_pilot": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "external_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "source",
+          "source_url",
+          "observed_at",
+          "metric",
+          "value",
+          "confidence_interval_plus_minus",
+          "sample_count",
+          "scope"
+        ],
+        "properties": {
+          "candidate_id": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "source": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "metric": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "value": {
+            "type": "number"
+          },
+          "confidence_interval_plus_minus": {
+            "type": "number",
+            "minimum": 0
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scope": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "asr_backends": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "execution_policy": {
+      "type": "object",
+      "required": [
+        "matrix",
+        "retain_raw_tts_audio",
+        "retain_raw_asr_output",
+        "fixed_voice_per_candidate_and_locale",
+        "fixed_generation_parameters",
+        "minimum_repetitions",
+        "require_fresh_process_cold_load",
+        "forbid_asr_specific_text_changes"
+      ],
+      "properties": {
+        "matrix": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "retain_raw_tts_audio": {
+          "const": true
+        },
+        "retain_raw_asr_output": {
+          "const": true
+        },
+        "fixed_voice_per_candidate_and_locale": {
+          "const": true
+        },
+        "fixed_generation_parameters": {
+          "const": true
+        },
+        "minimum_repetitions": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "require_fresh_process_cold_load": {
+          "const": true
+        },
+        "forbid_asr_specific_text_changes": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "text_fidelity",
+        "synthesis",
+        "diagnosis"
+      ],
+      "properties": {
+        "text_fidelity": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "synthesis": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "diagnosis": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "exit_criteria": {
+      "$ref": "#/$defs/nonEmptyUniqueStrings"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    }
+  }
+}

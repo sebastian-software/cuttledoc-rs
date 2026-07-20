@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "synthetic-roundtrip-pilot-1",
+  "evidence_date": "2026-07-20",
+  "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
+  "purpose": "diagnostic",
+  "relationship_to_target_domain": {
+    "eligible_for_model_selection": false,
+    "eligible_for_release_acceptance": false,
+    "required_comparison": "Report synthetic results separately from real podcast and audiobook cells.",
+    "reason": "Synthetic speech is controlled and reproducible, but it does not represent speaker, room, mastering, overlap, or spontaneous-speech variation in the target domain."
+  },
+  "initial_scope": {
+    "locales": [
+      "de-DE",
+      "en-US"
+    ],
+    "primary_locale": "de-DE",
+    "topic": "artificial-intelligence",
+    "minimum_passages_per_locale": {
+      "de-DE": 6,
+      "en-US": 3
+    },
+    "minimum_passage_duration_ms": 45000,
+    "maximum_passage_duration_ms": 90000,
+    "required_text_phenomena": [
+      "German compounds",
+      "English technical terms",
+      "proper names",
+      "abbreviations",
+      "numbers and dates",
+      "parenthetical punctuation",
+      "long sentences"
+    ]
+  },
+  "text_sources": [
+    {
+      "id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "locale": "de-DE",
+      "title": "Künstliche Intelligenz",
+      "revision": "268935951",
+      "revision_url": "https://de.wikipedia.org/w/index.php?oldid=268935951&title=K%C3%BCnstliche_Intelligenz",
+      "history_url": "https://de.wikipedia.org/w/index.php?title=K%C3%BCnstliche_Intelligenz&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "selected-pending-materialization",
+      "required_sections": [
+        "lead",
+        "Beschreibung",
+        "Geschichte",
+        "Definitionen und Kategorien Künstlicher Intelligenz",
+        "Methoden",
+        "Anwendungen"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "local-required",
+        "redistribution": "blocked-until-CC-BY-SA-attribution-package-review"
+      }
+    },
+    {
+      "id": "en-wikipedia-artificial-intelligence-1365114492",
+      "locale": "en-US",
+      "title": "Artificial intelligence",
+      "revision": "1365114492",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1365114492&title=Artificial_intelligence",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Artificial_intelligence&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "selected-pending-materialization",
+      "required_sections": [
+        "lead",
+        "Goals",
+        "Techniques",
+        "Applications"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "local-required",
+        "redistribution": "blocked-until-CC-BY-SA-attribution-package-review"
+      }
+    }
+  ],
+  "tts_candidates": [
+    {
+      "id": "apple-avspeechsynthesizer",
+      "role": "system-baseline",
+      "runtime": "Apple AVFAudio AVSpeechSynthesizer",
+      "model": "installed de-DE system voice selected and captured per run",
+      "integration": "narrow Swift-to-C ABI called from Rust",
+      "source_url": "https://developer.apple.com/documentation/avfaudio/avspeechsynthesizer",
+      "source_revision": "host-SDK-and-voice-inventory-captured-per-run",
+      "license": "Apple platform API and installed system voice terms",
+      "status": "selected-for-first-slice",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Retain as the deterministic platform baseline even if an open model wins product selection."
+    },
+    {
+      "id": "qwen3-tts-0.6b-customvoice-mlx-audio",
+      "role": "primary-open-mlx-candidate",
+      "runtime": "Blaizzy/mlx-audio over official Apple MLX",
+      "model": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16",
+      "integration": "pinned Python reference runner; direct repository-owned MLX boundary evaluated after measurements",
+      "source_url": "https://github.com/Blaizzy/mlx-audio",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "MIT runtime; Apache-2.0 upstream Qwen3-TTS model family; converted artifact license and revision must be verified before execution",
+      "status": "selected-pending-model-artifact-pin",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Compare accepting mlx-audio with owning only the required Qwen3-TTS path directly over official MLX."
+    },
+    {
+      "id": "chatterbox-multilingual-mlx-audio",
+      "role": "expressive-open-mlx-comparator",
+      "runtime": "Blaizzy/mlx-audio over official Apple MLX",
+      "model": "mlx-community/chatterbox-fp16",
+      "integration": "pinned Python reference runner; direct repository-owned MLX boundary considered only if the model materially outperforms the primary candidate",
+      "source_url": "https://github.com/Blaizzy/mlx-audio",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "MIT runtime and upstream model family; converted artifact license and revision must be verified before execution",
+      "status": "selected-for-second-pass-pending-model-artifact-pin",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Advance only if intelligibility, prosody, or operational evidence adds value beyond Qwen3-TTS and the system baseline."
+    },
+    {
+      "id": "qwen-audio-3.0-tts-plus-api",
+      "role": "remote-provider-quality-ceiling",
+      "runtime": "Alibaba Cloud Model Studio",
+      "model": "qwen-audio-3.0-tts-plus",
+      "integration": "provider API reference runner with credentials supplied only through the environment",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/tts-model/",
+      "source_revision": "hosted-service-observed-2026-07-20; immutable provider snapshot not exposed",
+      "license": "Alibaba Cloud service terms; no local model weights",
+      "status": "selected-for-English-control-pending-credentials",
+      "locales": [
+        "en-US"
+      ],
+      "decision_after_pilot": "Use as an English provider-voice quality ceiling; do not infer German or local-model quality from its score."
+    }
+  ],
+  "external_evidence": [
+    {
+      "candidate_id": "qwen-audio-3.0-tts-plus-api",
+      "source": "Artificial Analysis Provider Voice Arena",
+      "source_url": "https://artificialanalysis.ai/text-to-speech/leaderboard/provider-voice?tab=leaderboard",
+      "observed_at": "2026-07-20",
+      "metric": "Quality Elo",
+      "value": 1237,
+      "confidence_interval_plus_minus": 17,
+      "sample_count": 1427,
+      "scope": "Provider-selected voices in the provider-voice arena; this is not German-language or local-runtime evidence."
+    }
+  ],
+  "asr_backends": [
+    "apple-speechtranscriber",
+    "whisper-large-v3-turbo-coreml-whispercpp",
+    "qwen3-asr-0.6b-mlx-direct",
+    "parakeet-tdt-0.6b-v3-coreml"
+  ],
+  "execution_policy": {
+    "matrix": "Every materialized TTS candidate is run for each declared locale and transcribed by every ASR backend using identical digest-checked normalized PCM.",
+    "retain_raw_tts_audio": true,
+    "retain_raw_asr_output": true,
+    "fixed_voice_per_candidate_and_locale": true,
+    "fixed_generation_parameters": true,
+    "minimum_repetitions": 2,
+    "require_fresh_process_cold_load": true,
+    "forbid_asr_specific_text_changes": true
+  },
+  "metrics": {
+    "text_fidelity": [
+      "raw surface-form WER",
+      "lexically normalized WER",
+      "CER",
+      "critical-token recall",
+      "proper-name recall",
+      "number-date-unit recall",
+      "omission count",
+      "insertion count",
+      "substitution count"
+    ],
+    "synthesis": [
+      "time to first audio",
+      "complete synthesis time",
+      "real-time factor",
+      "peak memory",
+      "model size",
+      "sample format",
+      "stream chunk count",
+      "cancellation latency",
+      "pronunciation review",
+      "prosody review"
+    ],
+    "diagnosis": "Attribute a roundtrip error to TTS, ASR, or unresolved only after listening to the generated audio and comparing the same audio across ASR backends."
+  },
+  "exit_criteria": [
+    "All source text and model artifacts are revision- and digest-pinned before measured execution.",
+    "The Apple system baseline completes a Rust-owned synthesis lifecycle including cancellation and generated-audio ownership.",
+    "Qwen3-TTS completes the same German passage set through the pinned mlx-audio reference runner.",
+    "All generated PCM is passed unchanged to all four ASR backends.",
+    "Results separate lexical content errors from punctuation and capitalization differences.",
+    "At least one blinded pronunciation and prosody review is recorded per candidate.",
+    "The evidence supports a written dependency decision: retain mlx-audio, build a narrow direct official-MLX adapter, or stop the candidate."
+  ]
+}
