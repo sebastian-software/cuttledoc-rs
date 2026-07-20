@@ -700,6 +700,127 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   return errors;
 }
 
+function validateTtsRun(run, selection) {
+  const errors = [];
+  if (run.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(run.run_id?.length > 0) ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(run.source_revision ?? '')) {
+    errors.push('run_id, captured_at, and source_revision must be pinned');
+  }
+  if (run.selection_revision !== selection.revision ||
+      run.purpose !== 'development-diagnostic') {
+    errors.push('run must reference the diagnostic passage selection');
+  }
+  if (run.candidate?.task !== 'tts' ||
+      run.candidate?.id !== 'apple-avspeechsynthesizer' ||
+      !(run.candidate?.runtime?.length > 0) ||
+      !(run.candidate?.boundary?.length > 0) ||
+      !(run.candidate?.model_delivery?.length > 0)) {
+    errors.push('candidate must identify the Apple TTS task and boundary');
+  }
+  for (const field of ['identifier', 'name', 'language']) {
+    if (!(run.candidate?.voice?.[field]?.length > 0)) {
+      errors.push(`candidate.voice.${field} must be a non-empty string`);
+    }
+  }
+  if (run.host?.architecture !== 'arm64' ||
+      !(run.host?.memory_bytes > 0) ||
+      !(run.host?.chip?.length > 0) ||
+      !(run.host?.os?.length > 0) ||
+      !(run.host?.execution_context?.length > 0)) {
+    errors.push('host must record the Apple Silicon execution context');
+  }
+
+  const passages = new Map();
+  for (const source of selection.sources) {
+    for (const passage of source.passages) {
+      passages.set(passage.id, { source, passage });
+    }
+  }
+  const selected = passages.get(run.input?.passage_id);
+  if (!selected) {
+    errors.push(`unknown TTS input passage: ${run.input?.passage_id}`);
+  } else if (run.input.source_id !== selected.source.id ||
+      run.input.locale !== selected.source.locale ||
+      run.input.character_count !== selected.passage.character_count ||
+      run.input.text_sha256 !== selected.passage.spoken_sha256 ||
+      run.input.license !== selected.source.license) {
+    errors.push('TTS input metadata differs from the passage selection');
+  }
+  if (run.procedure?.repetitions !== 1 ||
+      !(run.procedure?.voice_selection?.length > 0) ||
+      !(run.procedure?.command?.length > 0) ||
+      !(run.procedure?.raw_audio?.includes('local-required'))) {
+    errors.push('procedure must preserve the one-run local diagnostic');
+  }
+  if (run.result?.status !== 'measured') {
+    errors.push('result.status must be measured');
+  }
+  const audio = run.result?.audio;
+  if (audio?.sample_format !== 'f32le' ||
+      audio?.channel_count !== 1 ||
+      !(Number.isInteger(audio?.sample_rate_hz) && audio.sample_rate_hz > 0) ||
+      !(Number.isInteger(audio?.sample_count) && audio.sample_count > 0) ||
+      audio?.byte_count !== audio?.sample_count * 4 ||
+      !/^[0-9a-f]{64}$/.test(audio?.sha256 ?? '') ||
+      audio?.non_finite_sample_count !== 0) {
+    errors.push('audio must be finite digest-pinned mono f32 PCM');
+  }
+  const expectedDuration = audio?.sample_count * 1_000 / audio?.sample_rate_hz;
+  if (!Number.isFinite(audio?.duration_ms) ||
+      Math.abs(audio.duration_ms - expectedDuration) > 1e-9 ||
+      !(audio.minimum_sample >= -1 && audio.minimum_sample <= 1) ||
+      !(audio.maximum_sample >= -1 && audio.maximum_sample <= 1) ||
+      !(audio.rms > 0 && audio.rms <= 1)) {
+    errors.push('audio duration or waveform metrics diverge from PCM metadata');
+  }
+  const timing = run.result?.timing;
+  const expectedRtf = timing?.complete_synthesis_ms / audio?.duration_ms;
+  if (!(timing?.session_create_ms >= 0) ||
+      !(timing?.first_audio_ms >= 0) ||
+      !(timing?.complete_synthesis_ms >= timing?.first_audio_ms) ||
+      !(Number.isInteger(timing?.chunk_count) && timing.chunk_count > 0) ||
+      !Number.isFinite(timing?.real_time_factor) ||
+      Math.abs(timing.real_time_factor - expectedRtf) > 1e-12) {
+    errors.push('timing metrics or real-time factor are inconsistent');
+  }
+  for (const field of [
+    'maximum_resident_set_size_bytes',
+    'peak_memory_footprint_bytes',
+    'swift_dylib_bytes',
+    'rust_executable_bytes',
+  ]) {
+    if (!(Number.isInteger(run.result?.resources?.[field]) &&
+        run.result.resources[field] > 0)) {
+      errors.push(`resources.${field} must be a positive integer`);
+    }
+  }
+  const lifecycle = run.result?.lifecycle;
+  if (lifecycle?.busy_status !== 4 ||
+      lifecycle?.cancelled_status !== 3 ||
+      !(lifecycle?.cancel_to_return_ms >= 0) ||
+      !(lifecycle?.shim_cancellation_latency_ms >= 0) ||
+      !(lifecycle?.cancelled_call_elapsed_ms >= 0) ||
+      lifecycle?.cancelled_call_sample_count !== 0) {
+    errors.push('lifecycle must preserve stable busy and cancelled behavior');
+  }
+  if (run.environment_control?.voice_inventory_succeeded !== true ||
+      run.environment_control?.synthesis_succeeded !== false ||
+      run.environment_control?.first_audio_received !== false ||
+      !(run.environment_control?.finding?.length > 0)) {
+    errors.push('environment control must record the restricted-process failure');
+  }
+  if (run.conclusion?.foundation_proven !== true ||
+      run.conclusion?.public_contract_accepted !== false ||
+      !(run.conclusion?.next?.length > 0)) {
+    errors.push('conclusion must keep the public TTS contract provisional');
+  }
+  return errors;
+}
+
 function validateSourceRightsReview(
   review,
   sourceCandidates,
@@ -1497,6 +1618,10 @@ const syntheticRoundtripSelectionPath = join(
   repoRoot,
   'benchmarks/fixtures/synthetic-roundtrip-selection.json',
 );
+const appleTtsRunPath = join(
+  repoRoot,
+  'benchmarks/raw/phase5.apple-tts.synthetic-de-origin-1/result.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -1518,6 +1643,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-selection.schema.json'),
+  join(repoRoot, 'benchmarks/schema/tts-run.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
@@ -1539,6 +1665,7 @@ const syntheticRoundtripPlan = await readJson(syntheticRoundtripPlanPath);
 const syntheticRoundtripSelection = await readJson(
   syntheticRoundtripSelectionPath,
 );
+const appleTtsRun = await readJson(appleTtsRunPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -1582,6 +1709,11 @@ failures.push(
     syntheticRoundtripSelection,
     syntheticRoundtripPlan,
   ).map((error) => `${syntheticRoundtripSelectionPath}: ${error}`),
+);
+failures.push(
+  ...validateTtsRun(appleTtsRun, syntheticRoundtripSelection).map(
+    (error) => `${appleTtsRunPath}: ${error}`,
+  ),
 );
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
@@ -1732,6 +1864,14 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push('validator self-test failed to reject synthetic text digest drift');
   }
+  const invalidTtsRun = structuredClone(appleTtsRun);
+  invalidTtsRun.result.audio.byte_count += 4;
+  if (validateTtsRun(
+    invalidTtsRun,
+    syntheticRoundtripSelection,
+  ).length === 0) {
+    failures.push('validator self-test failed to reject divergent TTS audio metrics');
+  }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
   invalidRightsReview.disposition = 'accepted';
   if (validateSourceRightsReview(
@@ -1770,6 +1910,7 @@ console.log(
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
+  `1 measured TTS diagnostic, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +

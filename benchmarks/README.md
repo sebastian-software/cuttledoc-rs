@@ -121,6 +121,12 @@ rejects any character-count or SHA-256 drift. The checked-in
 contains selectors and digests, not the licensed passage text or generated
 audio.
 
+The first measured TTS lifecycle record is
+[`phase5.apple-tts.synthetic-de-origin-1`](raw/phase5.apple-tts.synthetic-de-origin-1/result.json).
+It records the native Apple voice PCM metadata and digest, Rust/Swift
+ownership, timing/resources, stable busy/cancel statuses, and the restricted
+process-context control. The raw CC BY-SA-derived audio remains local.
+
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
 download or import. The exact deny-by-default workflow and the requirements for

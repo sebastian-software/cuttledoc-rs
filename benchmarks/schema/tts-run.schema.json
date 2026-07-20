@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/tts-run.schema.json",
+  "title": "Cuttledoc speech synthesis diagnostic run",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "captured_at",
+    "source_revision",
+    "selection_revision",
+    "purpose",
+    "candidate",
+    "host",
+    "input",
+    "procedure",
+    "result",
+    "environment_control",
+    "conclusion"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "run_id": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "selection_revision": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "purpose": {
+      "const": "development-diagnostic"
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "id",
+        "task",
+        "runtime",
+        "boundary",
+        "model_delivery",
+        "voice"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "task": {
+          "const": "tts"
+        },
+        "runtime": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "boundary": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "model_delivery": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "voice": {
+          "type": "object",
+          "required": [
+            "identifier",
+            "name",
+            "language",
+            "quality_raw_value",
+            "gender_raw_value"
+          ],
+          "properties": {
+            "identifier": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "name": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "language": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "quality_raw_value": {
+              "type": "integer"
+            },
+            "gender_raw_value": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "host": {
+      "$ref": "#/$defs/openObject"
+    },
+    "input": {
+      "$ref": "#/$defs/openObject"
+    },
+    "procedure": {
+      "$ref": "#/$defs/openObject"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "status",
+        "audio",
+        "timing",
+        "resources",
+        "lifecycle"
+      ],
+      "properties": {
+        "status": {
+          "const": "measured"
+        },
+        "audio": {
+          "$ref": "#/$defs/openObject"
+        },
+        "timing": {
+          "$ref": "#/$defs/openObject"
+        },
+        "resources": {
+          "$ref": "#/$defs/openObject"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/openObject"
+        }
+      },
+      "additionalProperties": false
+    },
+    "environment_control": {
+      "$ref": "#/$defs/openObject"
+    },
+    "conclusion": {
+      "$ref": "#/$defs/openObject"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openObject": {
+      "type": "object",
+      "minProperties": 1
+    }
+  }
+}

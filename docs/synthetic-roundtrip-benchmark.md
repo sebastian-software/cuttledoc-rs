@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** diagnostic text materialized and verified; no measured TTS result
-yet
+**Status:** diagnostic text and Apple TTS lifecycle verified; no roundtrip ASR
+result yet
 
 ## Purpose
 
@@ -117,6 +117,22 @@ TTS only when the generated audio contains the wrong or missing spoken
 content, to ASR when intelligible content is transcribed incorrectly across
 the shared audio, or left unresolved when the evidence is ambiguous.
 
+## Apple system baseline result
+
+The first machine-readable synthesis result is
+[`phase5.apple-tts.synthetic-de-origin-1`](../benchmarks/raw/phase5.apple-tts.synthetic-de-origin-1/result.json).
+At source revision `cc252ac91b2b1b67573361ac9ebb96c32a76466e`, the
+installed compact German voice Anna generated 55.145 seconds of native mono
+22,050 Hz f32 PCM. The measured development run reached first audio at
+0.963 seconds and completed synthesis in 1.437 seconds (RTF 0.0261) with a
+28.2 MB peak footprint. Busy and cancelled calls returned stable statuses `4`
+and `3`; cancel-to-return was 0.288 ms.
+
+This proves the Rust/Swift lifecycle and output ownership, not perceived voice
+quality. The identical binary could enumerate voices but received a platform
+cancel before its first buffer in a restricted process context. Clean packaged
+execution therefore remains an explicit productization gate.
+
 ## Implementation sequence
 
 1. Materialize and hash the German and English passages from both pinned
@@ -124,6 +140,8 @@ the shared audio, or left unresolved when the evidence is ambiguous.
    **Complete:** nine selectors reproduce their expected SHA-256 digests.
 2. Build the Apple system-voice Rust vertical slice and validate generated
    audio ownership plus cancellation.
+   **Complete:** real PCM, timing, busy, cancellation, and execution-context
+   behavior are recorded.
 3. Pin the converted Qwen3-TTS artifact and build the `mlx-audio` reference
    runner at the selected commit.
 4. Run the two local/system candidates through all four ASR backends, add the

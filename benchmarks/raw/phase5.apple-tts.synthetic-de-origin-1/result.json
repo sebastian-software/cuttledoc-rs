@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.apple-tts.synthetic-de-origin-1",
+  "captured_at": "2026-07-20T17:39:08Z",
+  "source_revision": "cc252ac91b2b1b67573361ac9ebb96c32a76466e",
+  "selection_revision": "synthetic-roundtrip-passages-1",
+  "purpose": "development-diagnostic",
+  "candidate": {
+    "id": "apple-avspeechsynthesizer",
+    "task": "tts",
+    "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+    "boundary": "repository-owned Swift C ABI called from Rust",
+    "model_delivery": "installed system voice",
+    "voice": {
+      "identifier": "com.apple.voice.compact.de-DE.Anna",
+      "name": "Anna",
+      "language": "de-DE",
+      "quality_raw_value": 1,
+      "gender_raw_value": 2
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-origin",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "locale": "de-DE",
+    "character_count": 811,
+    "text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "voice_selection": "AVSpeechSynthesisVoice(language: de-DE)",
+    "rate": 0.5,
+    "pitch_multiplier": 1,
+    "volume": 1,
+    "cold_load": "Fresh probe process; system voice and service caches were not cleared.",
+    "command": "CUTTLEDOC_TTS_TEXT_DIR=/local/synthetic-roundtrip CUTTLEDOC_TTS_BUILD_DIR=/tmp/cuttledoc-apple-tts-build-final bash scripts/run-apple-tts-spike.sh",
+    "raw_audio": "local-required; not checked into Git"
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 22050,
+      "channel_count": 1,
+      "sample_count": 1215946,
+      "byte_count": 4863784,
+      "duration_ms": 55144.943310657596,
+      "sha256": "b8852d7d0f5408642ebb621127a06b275f952b54fe7044dcdab9a32c627aefa7",
+      "minimum_sample": -0.61810302734375,
+      "maximum_sample": 0.96142578125,
+      "rms": 0.1297662393385546,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "session_create_ms": 37.763583,
+      "first_audio_ms": 962.757,
+      "complete_synthesis_ms": 1436.742667,
+      "real_time_factor": 0.026053933157681345,
+      "chunk_count": 4750
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 61030400,
+      "peak_memory_footprint_bytes": 28164960,
+      "swift_dylib_bytes": 246472,
+      "rust_executable_bytes": 667672
+    },
+    "lifecycle": {
+      "busy_status": 4,
+      "cancelled_status": 3,
+      "cancel_to_return_ms": 0.287666,
+      "shim_cancellation_latency_ms": 0.062541,
+      "cancelled_call_elapsed_ms": 11.724667,
+      "cancelled_call_sample_count": 0
+    }
+  },
+  "environment_control": {
+    "context": "restricted diagnostic process sandbox",
+    "voice_inventory_succeeded": true,
+    "synthesis_succeeded": false,
+    "first_audio_received": false,
+    "finding": "The speech service cancelled after write returned and before the first audio buffer. The identical built binary succeeded in a normal host process, so clean packaged executable context remains a productization gate."
+  },
+  "conclusion": {
+    "foundation_proven": true,
+    "public_contract_accepted": false,
+    "next": "Normalize every Apple passage to shared 16 kHz mono PCM, run the four ASR backends, and compare with the pinned Qwen3-TTS MLX-Audio reference."
+  }
+}
