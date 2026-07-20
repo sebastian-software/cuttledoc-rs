@@ -80,7 +80,7 @@ Evidence snapshot: 2026-07-20.
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advances to an owned official-MLX adapter; every other named artifact has an exact runtime/license blocker. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
-| Local text-generation runtime (#7) | Open | Run one bounded transcript-enhancement experiment and record adopt/defer. |
+| Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
 
 The open issue list is a work queue, not a second architecture plan. Completed
 foundation issues should close with links to their evidence. Productization

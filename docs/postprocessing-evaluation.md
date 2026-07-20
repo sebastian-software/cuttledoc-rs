@@ -84,3 +84,8 @@ candidate. It is a separate, optional stage:
 The first meaningful rerun should use raw outputs from Apple, Whisper, and
 Qwen on the audiobook and professional-podcast gold sets. Synthetic TTS remains
 a smoke/control condition, not the acceptance population.
+
+Prompt behavior is evaluated independently from model identity. The versioned
+historical, surface-only, error-profile, and targeted-span candidates plus
+their source-grouped development/validation/test discipline are defined in
+[`postprocessing-prompt-evaluation.md`](postprocessing-prompt-evaluation.md).

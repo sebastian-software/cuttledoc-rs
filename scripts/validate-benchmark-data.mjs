@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -300,6 +301,102 @@ function validatePostprocessingSnapshot(snapshot) {
   return errors;
 }
 
+async function validatePromptManifest(manifest) {
+  const errors = [];
+  if (manifest.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(manifest.revision?.length > 0)) {
+    errors.push('revision must be a non-empty string');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(manifest.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  for (const field of [
+    'grouping_unit',
+    'development',
+    'validation',
+    'test',
+    'current_fleurs_disposition',
+  ]) {
+    if (!(manifest.split_policy?.[field]?.length > 0)) {
+      errors.push(`split_policy.${field} must be a non-empty string`);
+    }
+  }
+  if (!Array.isArray(manifest.prompts) || manifest.prompts.length === 0) {
+    errors.push('prompts must be a non-empty array');
+  }
+
+  const ids = new Set();
+  const paths = new Set();
+  const modes = new Set([
+    'historical-control',
+    'surface-only',
+    'bounded-lexical',
+    'targeted-lexical',
+  ]);
+  for (const prompt of manifest.prompts ?? []) {
+    if (ids.has(prompt.id)) errors.push(`duplicate prompt id: ${prompt.id}`);
+    ids.add(prompt.id);
+    if (paths.has(prompt.path)) {
+      errors.push(`${prompt.id}: duplicate prompt path ${prompt.path}`);
+    }
+    paths.add(prompt.path);
+    if (!modes.has(prompt.mode)) errors.push(`${prompt.id}: invalid mode`);
+    if (!/^benchmarks\/postprocessing\/prompts\/[^/]+\.txt$/.test(
+      prompt.path ?? '',
+    )) {
+      errors.push(`${prompt.id}: prompt path must stay in the prompt directory`);
+      continue;
+    }
+    if (!/^[0-9a-f]{64}$/.test(prompt.sha256 ?? '')) {
+      errors.push(`${prompt.id}: sha256 must be SHA-256`);
+    }
+    for (const field of ['source', 'output_contract']) {
+      if (!(prompt[field]?.length > 0)) {
+        errors.push(`${prompt.id}: ${field} must be a non-empty string`);
+      }
+    }
+    for (const field of [
+      'allowed_edit_classes',
+      'context_fields',
+      'mechanical_gates',
+    ]) {
+      if (!Array.isArray(prompt[field]) ||
+          prompt[field].length === 0 ||
+          new Set(prompt[field]).size !== prompt[field].length) {
+        errors.push(`${prompt.id}: ${field} must be a non-empty unique array`);
+      }
+    }
+
+    try {
+      const promptBytes = await readFile(join(repoRoot, prompt.path));
+      const digest = createHash('sha256').update(promptBytes).digest('hex');
+      if (digest !== prompt.sha256) {
+        errors.push(`${prompt.id}: prompt digest does not match ${prompt.path}`);
+      }
+      const promptText = promptBytes.toString('utf8');
+      if (promptText.trim().length === 0) {
+        errors.push(`${prompt.id}: prompt file must not be empty`);
+      }
+      if (prompt.mode !== 'historical-control') {
+        for (const field of prompt.context_fields ?? []) {
+          if (!promptText.includes(`{{${field}}}`)) {
+            errors.push(`${prompt.id}: missing {{${field}}} placeholder`);
+          }
+        }
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        errors.push(`${prompt.id}: prompt file does not exist`);
+      } else {
+        throw error;
+      }
+    }
+  }
+  return errors;
+}
+
 function arrayEquals(left, right) {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
@@ -552,6 +649,10 @@ const postprocessingSnapshotPath = join(
   repoRoot,
   'benchmarks/postprocessing/cuttledoc-v2-snapshot.json',
 );
+const promptManifestPath = join(
+  repoRoot,
+  'benchmarks/postprocessing/prompts/manifest.json',
+);
 const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/run.schema.json'),
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
@@ -559,6 +660,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
   join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
+  join(repoRoot, 'benchmarks/schema/postprocessing-prompts.schema.json'),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);
@@ -571,6 +673,7 @@ const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const postprocessingSnapshot = await readJson(postprocessingSnapshotPath);
+const promptManifest = await readJson(promptManifestPath);
 const requestedRun = process.argv.indexOf('--run');
 const runPaths = requestedRun >= 0
   ? [resolve(process.cwd(), process.argv[requestedRun + 1])]
@@ -588,6 +691,11 @@ failures.push(
 failures.push(
   ...validatePostprocessingSnapshot(postprocessingSnapshot).map(
     (error) => `${postprocessingSnapshotPath}: ${error}`,
+  ),
+);
+failures.push(
+  ...(await validatePromptManifest(promptManifest)).map(
+    (error) => `${promptManifestPath}: ${error}`,
   ),
 );
 const runs = [];
@@ -656,6 +764,11 @@ if (process.argv.includes('--self-test')) {
   if (validatePostprocessingSnapshot(invalidPostprocessing).length === 0) {
     failures.push('validator self-test failed to reject divergent language counts');
   }
+  const invalidPrompts = structuredClone(promptManifest);
+  invalidPrompts.prompts[0].sha256 = '0'.repeat(64);
+  if ((await validatePromptManifest(invalidPrompts)).length === 0) {
+    failures.push('validator self-test failed to reject a prompt digest mismatch');
+  }
 }
 
 if (failures.length > 0) {
@@ -668,5 +781,6 @@ console.log(
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
+  `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,
 );

@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "postprocessing-prompts-1",
+  "evidence_date": "2026-07-20",
+  "split_policy": {
+    "grouping_unit": "complete source work or episode",
+    "development": "prompt authoring, error-profile derivation, and threshold tuning",
+    "validation": "frozen candidate selection",
+    "test": "one evaluation of the frozen tuple on unseen works",
+    "current_fleurs_disposition": "development-only"
+  },
+  "prompts": [
+    {
+      "id": "historical-cuttledoc-v2",
+      "path": "benchmarks/postprocessing/prompts/historical-cuttledoc-v2.txt",
+      "sha256": "583a49811268e4f770a484a535b39dd9be6b75563153b1b58d7204e9cd8d55a4",
+      "source": "cuttledoc@583db4531e51f92885e8c4977f662ae2ec39ddd3 packages/llm/src/types.ts TRANSCRIPT_CORRECTION_PROMPT",
+      "mode": "historical-control",
+      "output_contract": "plain-text complete transcript",
+      "allowed_edit_classes": [
+        "word-boundary",
+        "contextual-misrecognition",
+        "grammar",
+        "surface"
+      ],
+      "context_fields": [
+        "transcript"
+      ],
+      "mechanical_gates": [
+        "output is non-empty"
+      ]
+    },
+    {
+      "id": "surface-only-v1",
+      "path": "benchmarks/postprocessing/prompts/surface-only-v1.txt",
+      "sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
+      "source": "repository-authored",
+      "mode": "surface-only",
+      "output_contract": "plain-text complete transcript",
+      "allowed_edit_classes": [
+        "surface"
+      ],
+      "context_fields": [
+        "language",
+        "domain",
+        "transcript"
+      ],
+      "mechanical_gates": [
+        "case-and-punctuation-insensitive token sequence equals input",
+        "output is non-empty"
+      ]
+    },
+    {
+      "id": "conservative-error-profile-v1",
+      "path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "source": "repository-authored from development error taxonomy",
+      "mode": "bounded-lexical",
+      "output_contract": "JSON object with complete text and exhaustive non-overlapping edits",
+      "allowed_edit_classes": [
+        "surface",
+        "word-boundary",
+        "contextual-misrecognition",
+        "asr-inflection"
+      ],
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "mechanical_gates": [
+        "valid JSON object",
+        "every lexical diff has exactly one edit",
+        "edits do not overlap",
+        "protected spans are unchanged",
+        "numbers, dates, units, names, terms, and negations change only when explicitly permitted"
+      ]
+    },
+    {
+      "id": "targeted-spans-v1",
+      "path": "benchmarks/postprocessing/prompts/targeted-spans-v1.txt",
+      "sha256": "c14dc2c55249614b18d91640ff9b6ff0ac173a6bd73ade197c606e8f051e096a",
+      "source": "repository-authored from development error taxonomy",
+      "mode": "targeted-lexical",
+      "output_contract": "JSON object with complete text and edits keyed to supplied suspect spans",
+      "allowed_edit_classes": [
+        "surface",
+        "word-boundary",
+        "contextual-misrecognition",
+        "asr-inflection"
+      ],
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "glossary",
+        "protected_spans",
+        "suspect_spans",
+        "transcript"
+      ],
+      "mechanical_gates": [
+        "valid JSON object",
+        "every lexical diff names one supplied suspect id",
+        "replacement is one supplied alternative",
+        "no lexical edit occurs outside a suspect span",
+        "protected spans are unchanged"
+      ]
+    }
+  ]
+}

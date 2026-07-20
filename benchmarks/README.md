@@ -96,6 +96,10 @@ digest-pinned aggregate in
 Its TTS and real-ASR experiments, language splits, missing results, and legacy
 normalization limitations are documented in
 [`docs/postprocessing-evaluation.md`](../docs/postprocessing-evaluation.md).
+The next prompt candidates are immutable benchmark inputs under
+[`postprocessing/prompts`](postprocessing/prompts/); their hashes, edit
+permissions, context fields, output contracts, and mechanical rejection gates
+are pinned by the prompt manifest.
 
 Run one candidate across the bounded set and write its immutable aggregate
 outside the repository before review:
