@@ -702,7 +702,11 @@ async function validateMatrix(matrix, manifest, path) {
     }
     if (raw.schema_version !== schemaVersion) errors.push(`${candidate.id}: raw schema_version must be ${schemaVersion}`);
     if (raw.candidate?.id !== candidate.id) errors.push(`${candidate.id}: raw candidate id does not match`);
-    if (raw.source_revision !== matrix.source_revision) errors.push(`${candidate.id}: raw source_revision does not match`);
+    const candidateSourceRevision =
+      candidate.source_revision ?? matrix.source_revision;
+    if (raw.source_revision !== candidateSourceRevision) {
+      errors.push(`${candidate.id}: raw source_revision does not match`);
+    }
     if (raw.fixture_manifest_revision !== matrix.fixture_manifest_revision) {
       errors.push(`${candidate.id}: raw fixture_manifest_revision does not match`);
     }

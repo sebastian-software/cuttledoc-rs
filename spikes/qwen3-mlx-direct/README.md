@@ -189,5 +189,5 @@ direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Run the multilingual audiobook matrix.
-2. Add task lifecycle, cancellation, and bounded streaming behavior.
+1. Add task lifecycle, cancellation, and bounded streaming behavior.
+2. Add held-out audiobook and professional-podcast coverage.

@@ -9,7 +9,9 @@ MLX remains a first-class research foundation.
 
 **Machine-readable sources:**
 [`phase0.multilingual-fleurs-10-1.json`](../benchmarks/matrices/phase0.multilingual-fleurs-10-1.json)
-and its linked raw artifacts.
+and
+[`phase0.audiobook-pilot-1.json`](../benchmarks/matrices/phase0.audiobook-pilot-1.json),
+plus their linked raw artifacts.
 
 ## Multilingual breadth result
 
@@ -145,11 +147,12 @@ framework locale-equivalence choices cannot silently change a run. Apple
 multi-range final updates are reduced with the same replace/revoke semantics as
 the Rust stream contract.
 
-All ten current quality fixtures come from FLEURS. That single-source,
-short-utterance set is intentionally a breadth gate, not a proxy for
-professionally recorded long-form content. The next quality set must report
-language and source domain independently and add licensed audiobook plus
-podcast material before any language-specific backend policy is accepted.
+The original ten-fixture quality breadth gate comes from FLEURS. The additional
+15-fixture MLS/LibriSpeech development pilot now adds professionally recorded
+LibriVox audiobook audio across the same five languages, three
+speakers/chapters each. It is still too small and already inspected, so
+held-out audiobook plus licensed professional-podcast material remains required
+before any language-specific backend policy is accepted.
 
 Energy is still unmeasured because the documented alternating `powermetrics`
 procedure requires privileged sampling. Cold-load measurements used existing
@@ -160,11 +163,12 @@ timestamp detail, and streaming behavior.
 
 ## Next measurement order
 
-1. Continue the measured Qwen3-ASR 0.6B architecture through the bounded
-   repository-owned C++ adapter over official MLX. The exact official-MLX
-   model-load and 8-bit layout gate is complete; audio-encoder and transcript
-   parity remain under [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17).
-   Keep the community runtime as reference-only. See the
+1. Complete lifecycle, cancellation, streaming, and packaging gates for the
+   now end-to-end Qwen3-ASR 0.6B C++ adapter over official MLX under
+   [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17). The
+   direct adapter completed the 15-fixture audiobook pilot with 10.96% macro
+   WER and matched the reference text on 12/15 clips. Keep the community
+   runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
 2. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
    selected Apple-primary and Whisper-fallback architecture.

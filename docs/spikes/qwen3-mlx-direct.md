@@ -6,7 +6,8 @@ progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
 complete. All 18 audio transformer layers also match the reference oracle;
 the tokenizer/prompt/audio-embedding boundary matches as well. The complete
 28-layer decoder and KV cache reproduce the first two greedy decisions and the
-full pinned transcript exactly. Broader audiobook evidence remains open.
+full pinned transcript exactly. The direct path has also completed the
+15-fixture multilingual audiobook pilot.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -175,11 +176,46 @@ construction and reported a 1,904,298,424-byte MLX peak. It includes audio
 encoding, prompt construction, model prefill, 61 cached decoder steps, and
 token decoding, but is not yet a repeated performance sample.
 
-## Remaining parity gates
+## Milestone 7: multilingual audiobook pilot
 
-1. Add the direct adapter to the multilingual audiobook matrix.
-2. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
+The direct adapter completed all 45 fresh-process runs in the 15-fixture
+audiobook matrix: one discarded warm-up and two measured repetitions for each
+of three German, English, Spanish, French, and Portuguese clips. Every run was
+deterministic within its fixture and stopped on `<|im_end|>`.
+
+| Language | Direct macro WER | Reference macro WER | Direct macro CER |
+| --- | ---: | ---: | ---: |
+| German | 11.84% | 9.88% | 3.41% |
+| English | 7.37% | 8.20% | 1.18% |
+| Spanish | 12.34% | 12.34% | 1.73% |
+| French | 3.47% | 3.47% | 1.40% |
+| Portuguese | 19.76% | 21.78% | 5.74% |
+| **Macro** | **10.96%** | **11.14%** | **2.69%** |
+
+Twelve of 15 final texts are exact matches with the `mlx-audio` oracle. The
+other three are stable greedy-decision differences after the measured BF16
+drift: the direct path is worse against the unverified dataset transcript on
+one German clip, better on one English and one Portuguese clip, and slightly
+better in the aggregate. Therefore the broader result establishes behavioral
+parity, not a false claim of byte-identical logits or transcripts on every
+input.
+
+The mean adapter-reported inference time was 750.066 ms with a 0.0510 mean
+real-time factor. The maximum process RSS was 1,110,016,000 bytes and the
+maximum MLX allocation counter was 2,554,761,832 bytes. These fresh-process
+runs include lazy materialization in each inference and are not directly
+comparable to the reference runner's repeated inference inside one initialized
+engine.
+
+The checked raw result is
+[`benchmarks/raw/phase0.qwen3-mlx-direct.audiobook-pilot-1/result.json`](../../benchmarks/raw/phase0.qwen3-mlx-direct.audiobook-pilot-1/result.json).
+
+## Remaining product gates
+
+1. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
    memory measurements after materialization, and artifact pruning evidence.
+2. Extend the development set with held-out audiobook and professional-podcast
+   audio before setting language-specific selection thresholds.
 
 The order matters: comparing encoder tensors first prevents frontend or
 attention-layout errors from being misdiagnosed as generation or tokenizer

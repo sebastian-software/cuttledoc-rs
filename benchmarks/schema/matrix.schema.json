@@ -125,6 +125,10 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "raw_artifact": { "type": "string", "minLength": 1 },
+        "source_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
         "quality": {
           "type": "object",
           "additionalProperties": false,

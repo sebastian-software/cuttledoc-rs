@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "matrix_id": "phase0.audiobook-pilot-1",
-  "captured_at": "2026-07-20T11:38:41.166Z",
-  "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
+  "captured_at": "2026-07-20T15:24:40Z",
+  "source_revision": "29bcd917325d225330ab5c3f20dc4b8f7507175f",
   "fixture_manifest_revision": "audiobook-pilot-1",
   "fixture_ids": [
     "audiobook-de-10870_10823_000000",
@@ -57,6 +57,7 @@
     {
       "id": "whisper-large-v3-turbo-coreml-whispercpp",
       "raw_artifact": "benchmarks/raw/phase0.whisper.audiobook-pilot-1/result.json",
+      "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
       "quality": {
         "macro_wer": 0.044900264301524814,
         "macro_cer": 0.011769889648927927,
@@ -111,6 +112,7 @@
     {
       "id": "apple-speechtranscriber",
       "raw_artifact": "benchmarks/raw/phase0.apple-speech.audiobook-pilot-1/result.json",
+      "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
       "quality": {
         "macro_wer": 0.0717936564884818,
         "macro_cer": 0.024336892076741137,
@@ -165,6 +167,7 @@
     {
       "id": "parakeet-tdt-0.6b-v3-coreml",
       "raw_artifact": "benchmarks/raw/phase0.parakeet.audiobook-pilot-1/result.json",
+      "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
       "quality": {
         "macro_wer": 0.0889987540838934,
         "macro_cer": 0.030718284343290762,
@@ -219,6 +222,7 @@
     {
       "id": "qwen3-asr-0.6b-mlx-reference",
       "raw_artifact": "benchmarks/raw/phase0.qwen3-asr-0.6b-mlx-reference.audiobook-pilot-1/result.json",
+      "source_revision": "c6f579d6417a2ee10012395a5b4ddec01009dc06",
       "quality": {
         "macro_wer": 0.1113685691427841,
         "macro_cer": 0.030466800641370407,
@@ -269,19 +273,75 @@
         "timestamps": "unknown"
       },
       "disposition": "research"
+    },
+    {
+      "id": "qwen3-asr-0.6b-mlx-direct",
+      "raw_artifact": "benchmarks/raw/phase0.qwen3-mlx-direct.audiobook-pilot-1/result.json",
+      "source_revision": "b5f6afc70793654fa0675cd18aab4eec909bfd38",
+      "quality": {
+        "macro_wer": 0.10958306706316437,
+        "macro_cer": 0.026935533564745425,
+        "by_language": {
+          "de": {
+            "fixture_count": 3,
+            "macro_wer": 0.11844737895158064,
+            "macro_cer": 0.03411845580520279
+          },
+          "en": {
+            "fixture_count": 3,
+            "macro_wer": 0.07369281045751634,
+            "macro_cer": 0.01182532800179859
+          },
+          "es": {
+            "fixture_count": 3,
+            "macro_wer": 0.12344497607655502,
+            "macro_cer": 0.01733964714206847
+          },
+          "fr": {
+            "fixture_count": 3,
+            "macro_wer": 0.03472222222222222,
+            "macro_cer": 0.013962295808914296
+          },
+          "pt": {
+            "fixture_count": 3,
+            "macro_wer": 0.19760794760794761,
+            "macro_cer": 0.05743194106574298
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 92.26256386666667,
+        "minimum_cold_load_ms": 86.34395800000004,
+        "maximum_cold_load_ms": 99.8839999999999,
+        "mean_warm_inference_ms": 750.0661819333334,
+        "mean_real_time_factor": 0.05097227304906298
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 1110016000,
+        "runtime_peak_memory_bytes": 2554761832,
+        "model_size_bytes": 1010776466,
+        "binary_size_bytes": 149657984
+      },
+      "streaming": {
+        "supported": false,
+        "mean_first_result_ms": null,
+        "timestamps": "none"
+      },
+      "disposition": "research"
     }
   ],
   "recommendation": {
     "primary": "whisper-large-v3-turbo-coreml-whispercpp",
     "fallback": "apple-speechtranscriber",
     "research": [
-      "qwen3-asr-0.6b-mlx-reference"
+      "qwen3-asr-0.6b-mlx-direct"
     ],
     "rationale": [
       "Whisper is the quality hypothesis for professionally recorded audiobooks: it has the lowest raw macro WER at 4.49% and leads German, Spanish, and Portuguese in this development pilot.",
       "Apple remains the product-default and streaming hypothesis: it leads English, nearly matches the best French result, emits word timestamps, and uses far less measured process memory than the bundled model candidates.",
       "Parakeet is competitive with Apple on English and faster than Whisper, but this pilot does not show a quality or streaming advantage for the remaining languages.",
-      "Qwen on MLX remains a first-class research candidate despite the current reference-path score. It leads French, proves the desired MLX platform direction, and still requires a repository-owned direct adapter before product selection."
+      "The repository-owned Qwen adapter over official MLX is now the first-class research candidate. Its 10.96% macro WER is close to the reference path's 11.14%, it ties that path for best French quality, and it proves the desired direct MLX platform boundary without a Python runtime.",
+      "The direct and Python Qwen paths are text-identical on 12 of 15 clips. Three BF16 decision-boundary differences change one German, one English, and one Portuguese transcript; the direct aggregate is slightly better overall but not byte-equivalent across the matrix."
     ]
   },
   "limitations": [
@@ -289,6 +349,7 @@
     "Dataset transcripts have not yet been human-verified against the exact audio and include historical spelling, hyphenation, contractions, and number-form conventions that raw WER may count as lexical errors.",
     "Spanish and Portuguese regional locales are unverified; no es-419 or pt-BR quality claim follows from these rows.",
     "The matrix ranks raw ASR only. It does not yet measure punctuation, capitalization, critical semantic errors, or the constrained LLM correction prompts.",
+    "The direct Qwen timing uses fresh processes and adapter-reported inference after construction; it is not directly comparable to the Python reference's repeated inference inside one initialized engine.",
     "Energy was not measured, cold loads used warm system caches, and candidate order was not alternated."
   ]
 }

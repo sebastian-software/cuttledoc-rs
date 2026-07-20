@@ -77,7 +77,7 @@ before semantic error severity or postprocessing acceptance is reported.
 
 ### Development-pilot ASR results
 
-All four candidates ran sequentially on identical digest-checked PCM with one
+All five candidates ran sequentially on identical digest-checked PCM with one
 discarded warm-up and two measured repetitions. The immutable matrix is
 [`phase0.audiobook-pilot-1.json`](../benchmarks/matrices/phase0.audiobook-pilot-1.json);
 the deterministic word alignments are in
@@ -89,6 +89,7 @@ the deterministic word alignments are in
 | Apple SpeechTranscriber | 7.18% | 7.08% | 0.0174 |
 | Parakeet TDT 0.6B/CoreML | 8.90% | 8.56% | 0.0211 |
 | Qwen3-ASR 0.6B/MLX reference | 11.14% | 10.53% | 0.0305 |
+| Qwen3-ASR 0.6B/direct MLX | 10.96% | pending | 0.0510 |
 
 The boundary-review view keeps apostrophes inside words while treating
 hyphens, dashes, and slashes as boundaries. It removes obvious scoring
@@ -111,6 +112,15 @@ Portuguese is the weakest cell for every candidate except Parakeet relative to
 its own other languages. Qwen's strong French result and weak Portuguese row
 show why its direct MLX adapter should be evaluated, not selected or rejected,
 on a global mean.
+
+The direct Qwen adapter is now that evaluation: it completed all 45 runs, was
+deterministic per fixture, and matched the Python reference text on 12/15
+clips. Its raw WER is 11.84% German, 7.37% English, 12.34% Spanish, 3.47%
+French, and 19.76% Portuguese. The three stable differences improve the
+aggregate slightly but confirm that the measured BF16 execution drift can
+cross a greedy decision boundary. The boundary-review analysis has not yet
+been regenerated for this fifth candidate, so the matrix does not invent that
+number.
 
 Manual gold review comes next. Examples already show contractions, historical
 spelling, diacritics, number forms, and proper names mixed with real content
