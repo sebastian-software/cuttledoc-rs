@@ -9,7 +9,7 @@ import {
   unlink,
   writeFile,
 } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { totalmem } from 'node:os';
 import { parseArgs } from 'node:util';
@@ -20,6 +20,10 @@ const { values } = parseArgs({
     candidate: { type: 'string' },
     output: { type: 'string' },
     repetitions: { type: 'string', default: '2' },
+    manifest: {
+      type: 'string',
+      default: join(repoRoot, 'benchmarks/fixtures/manifest.json'),
+    },
     'fixture-dir': {
       type: 'string',
       default: resolve(
@@ -49,37 +53,36 @@ if (!Number.isInteger(repetitions) || repetitions < 1) {
   throw new Error('--repetitions must be a positive integer');
 }
 
-const manifest = JSON.parse(
-  await readFile(
-    join(repoRoot, 'benchmarks/fixtures/manifest.json'),
-    'utf8',
-  ),
-);
-const fixtures = manifest.fixtures.filter(
+const manifestPath = resolve(values.manifest);
+const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+const qualityFixtures = manifest.fixtures.filter(
   (fixture) => fixture.purpose === 'quality',
 );
-if (fixtures.length !== 10) {
-  throw new Error(
-    `expected the bounded ten-fixture quality set, found ${fixtures.length}`,
-  );
+const fixtures = qualityFixtures.length > 0
+  ? qualityFixtures
+  : manifest.fixtures;
+if (fixtures.length === 0) {
+  throw new Error(`${manifestPath}: benchmark manifest contains no fixtures`);
 }
 
 const fixtureDirectory = resolve(values['fixture-dir']);
 const capturedAt = new Date().toISOString();
 const results = [];
 for (const fixture of fixtures) {
-  const pcmPath = await materializeFixture(fixture);
+  const materialized = await materializeFixture(fixture);
   try {
     process.stderr.write(`${candidate}: ${fixture.id}\n`);
-    results.push(await runCandidate(fixture, pcmPath));
+    results.push(await runCandidate(fixture, materialized.path));
   } finally {
-    await unlink(pcmPath).catch(() => {});
+    if (materialized.temporary) {
+      await unlink(materialized.path).catch(() => {});
+    }
   }
 }
 
 const record = {
   schema_version: '1.0.0',
-  matrix_run_id: `phase0.${candidate}.multilingual-fleurs-10-1`,
+  matrix_run_id: `phase0.${candidate}.${manifest.revision}`,
   captured_at: capturedAt,
   source_revision: commandOutput('git', ['rev-parse', 'HEAD'], {
     cwd: repoRoot,
@@ -99,6 +102,8 @@ const record = {
   },
   procedure: {
     fixture_count: fixtures.length,
+    fixture_domain: manifest.domain ?? 'short-read',
+    fixture_manifest: relative(repoRoot, manifestPath),
     repetitions,
     fixture_order: fixtures.map((fixture) => fixture.id),
     quality_normalization:
@@ -133,7 +138,7 @@ async function runCandidate(fixture, pcmPath) {
       return runAppleSpeech(fixture, pcmPath);
     case 'parakeet':
     case 'whisper':
-      return runLegacy(fixture);
+      return runLegacy(fixture, pcmPath);
     case 'qwen3-mlx-reference':
       return runQwen3MlxReference(fixture, pcmPath);
     default:
@@ -373,7 +378,7 @@ async function runAppleSpeech(fixture, pcmPath) {
   });
 }
 
-async function runLegacy(fixture) {
+async function runLegacy(fixture, pcmPath) {
   const moduleDirectory = requiredEnvironment(
     candidate === 'parakeet'
       ? 'CUTTLEDOC_PARAKEET_MODULE_DIR'
@@ -389,16 +394,20 @@ async function runLegacy(fixture) {
       ? requiredEnvironment('CUTTLEDOC_PARAKEET_VAD_DIR')
       : null;
   const language = languageCode(fixture.language);
-  const prefix = fixturePrefix(fixture);
-  const fixturePath = join(fixtureDirectory, `${prefix}.ogg`);
-  const referencePath = join(fixtureDirectory, `${prefix}.txt`);
-  const outputPath = `/private/tmp/cuttledoc-${candidate}-${process.pid}-${prefix}.json`;
+  const safeId = fixture.id.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const referencePath =
+    `/private/tmp/cuttledoc-${candidate}-${process.pid}-${safeId}.txt`;
+  const outputPath =
+    `/private/tmp/cuttledoc-${candidate}-${process.pid}-${safeId}.json`;
+  await writeFile(referencePath, `${fixture.reference_text}\n`);
   const runnerArguments = [
     join(repoRoot, 'scripts/run-legacy-asr-baseline.mjs'),
     '--backend',
     candidate,
     '--fixture',
-    fixturePath,
+    pcmPath,
+    '--fixture-format',
+    'f32le',
     '--reference',
     referencePath,
     '--module-dir',
@@ -415,12 +424,17 @@ async function runLegacy(fixture) {
   if (vadDirectory) {
     runnerArguments.push('--vad-dir', vadDirectory);
   }
-  commandOutput(process.execPath, runnerArguments, {
-    cwd: repoRoot,
-    maxBuffer: 128 * 1024 * 1024,
-  });
-  const native = JSON.parse(await readFile(outputPath, 'utf8'));
-  await unlink(outputPath).catch(() => {});
+  let native;
+  try {
+    commandOutput(process.execPath, runnerArguments, {
+      cwd: repoRoot,
+      maxBuffer: 128 * 1024 * 1024,
+    });
+    native = JSON.parse(await readFile(outputPath, 'utf8'));
+  } finally {
+    await unlink(referencePath).catch(() => {});
+    await unlink(outputPath).catch(() => {});
+  }
   const representative = native.repetitions.at(-1);
 
   return resultRecord({
@@ -475,10 +489,10 @@ function resultRecord({
     text,
     quality,
     timing: {
-      audio_duration_ms: fixture.duration_ms,
+      audio_duration_ms: fixtureDurationMs(fixture),
       cold_load_ms: coldLoadMs,
       warm_inference_ms: warmInferenceMs,
-      real_time_factor: warmInferenceMs / fixture.duration_ms,
+      real_time_factor: warmInferenceMs / fixtureDurationMs(fixture),
     },
     resources: {
       peak_memory_bytes: peakMemoryBytes,
@@ -570,6 +584,15 @@ function rangesOverlap(left, right) {
 }
 
 async function materializeFixture(fixture) {
+  if (fixture.normalized) {
+    const path = join(
+      fixtureDirectory,
+      `${fixture.language}-${fixture.row_id}.${fixture.normalized.extension}`,
+    );
+    await verifyNormalizedFixture(fixture, path);
+    return { path, temporary: false };
+  }
+
   const prefix = fixturePrefix(fixture);
   const source = join(fixtureDirectory, `${prefix}.ogg`);
   const output = `/private/tmp/cuttledoc-${process.pid}-${prefix}.f32le`;
@@ -589,17 +612,36 @@ async function materializeFixture(fixture) {
     'pcm_f32le',
     output,
   ]);
-  const bytes = await readFile(output);
+  await verifyNormalizedFixture(fixture, output);
+  return { path: output, temporary: true };
+}
+
+async function verifyNormalizedFixture(fixture, path) {
+  let bytes;
+  try {
+    bytes = await readFile(path);
+  } catch (error) {
+    if (error.code === 'ENOENT' && fixture.normalized) {
+      throw new Error(
+        `${fixture.id}: missing ${path}; run fetch-audiobook-pilot.mjs first`,
+      );
+    }
+    throw error;
+  }
+  const expectedSha = fixture.normalized?.sha256 ?? fixture.sha256;
   const digest = createHash('sha256').update(bytes).digest('hex');
-  if (digest !== fixture.sha256) {
+  if (digest !== expectedSha) {
     throw new Error(
       `${fixture.id}: normalized PCM digest ${digest} does not match manifest`,
     );
   }
-  if ((bytes.length / 4 / 16) !== fixture.duration_ms) {
+  if ((bytes.length / 4 / 16) !== fixtureDurationMs(fixture)) {
     throw new Error(`${fixture.id}: normalized duration does not match manifest`);
   }
-  return output;
+}
+
+function fixtureDurationMs(fixture) {
+  return fixture.normalized?.duration_ms ?? fixture.duration_ms;
 }
 
 function fixturePrefix(fixture) {
@@ -622,6 +664,16 @@ function languageCode(locale) {
 }
 
 function appleSpeechLocale(fixtureLocale) {
+  const languageDefaults = {
+    de: 'de-DE',
+    en: 'en-US',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    pt: 'pt-PT',
+  };
+  if (languageDefaults[fixtureLocale]) {
+    return languageDefaults[fixtureLocale];
+  }
   if (fixtureLocale === 'es-419') {
     return 'es-MX';
   }

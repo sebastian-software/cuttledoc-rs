@@ -106,6 +106,25 @@ when the binary is not on `PATH`. The dataset transcripts are not yet
 human-verified surface-form gold, so the pilot may drive development and raw
 lexical diagnostics but not correction-model acceptance.
 
+Run a candidate on the materialized pilot by selecting its manifest and
+fixture directory:
+
+```sh
+CUTTLEDOC_SPEECH_PROBE=/absolute/path/to/cuttledoc-speech-spike \
+  CUTTLEDOC_SPEECH_LIBRARY_DIR=/absolute/path/to/build-directory \
+  node scripts/run-phase0-asr-matrix.mjs \
+    --candidate apple-speech \
+    --manifest benchmarks/fixtures/audiobook-pilot.json \
+    --fixture-dir /absolute/path/to/cuttledoc-audiobook-pilot \
+    --repetitions 2 \
+    --output /tmp/apple-speech-audiobook-pilot.json
+```
+
+The same manifest selection works for `whisper`, `parakeet`, and
+`qwen3-mlx-reference`. Every backend receives the exact same digest-checked
+float PCM; runtime-specific environment variables remain the ones documented
+for the original matrix.
+
 Historical Cuttledoc 2 transcript-correction evidence is preserved as a
 digest-pinned aggregate in
 [`postprocessing/cuttledoc-v2-snapshot.json`](postprocessing/cuttledoc-v2-snapshot.json).

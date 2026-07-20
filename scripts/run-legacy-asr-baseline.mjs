@@ -11,6 +11,7 @@ const { values } = parseArgs({
   options: {
     backend: { type: 'string' },
     fixture: { type: 'string' },
+    'fixture-format': { type: 'string', default: 'auto' },
     reference: { type: 'string' },
     'module-dir': { type: 'string' },
     'model-dir': { type: 'string' },
@@ -38,7 +39,11 @@ if (!Number.isInteger(repetitions) || repetitions < 1) {
 }
 
 const reference = (await readFile(referencePath, 'utf8')).trim();
-const samples = decodePcm(fixturePath);
+const fixtureFormat = values['fixture-format'];
+if (fixtureFormat !== 'auto' && fixtureFormat !== 'f32le') {
+  throw new Error('--fixture-format must be auto or f32le');
+}
+const samples = await decodePcm(fixturePath, fixtureFormat);
 const audioDurationMs = (samples.length / 16_000) * 1_000;
 const require = createRequire(import.meta.url);
 const api = require(join(moduleDir, 'dist/index.cjs'));
@@ -163,7 +168,18 @@ function requiredPath(value, option) {
   return resolve(value);
 }
 
-function decodePcm(path) {
+async function decodePcm(path, format) {
+  if (format === 'f32le') {
+    const bytes = await readFile(path);
+    if (bytes.length === 0 || bytes.length % 4 !== 0) {
+      throw new Error('f32le fixture must contain complete float32 samples');
+    }
+    const owned = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    );
+    return new Float32Array(owned);
+  }
   const result = spawnSync(
     'ffmpeg',
     [

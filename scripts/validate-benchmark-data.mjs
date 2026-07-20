@@ -570,9 +570,12 @@ function aggregateSummary(results) {
 
 function validateAggregate(aggregate, manifest, path) {
   const errors = [];
-  const qualityFixtureIds = manifest.fixtures
+  const qualityFixtures = manifest.fixtures
     .filter((fixture) => fixture.purpose === 'quality')
-    .map((fixture) => fixture.id);
+  const aggregateFixtures = qualityFixtures.length > 0
+    ? qualityFixtures
+    : manifest.fixtures;
+  const qualityFixtureIds = aggregateFixtures.map((fixture) => fixture.id);
   if (aggregate.schema_version !== schemaVersion) {
     errors.push(`schema_version must be ${schemaVersion}`);
   }
@@ -800,6 +803,10 @@ const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const audiobookPilot = await readJson(audiobookPilotPath);
+const aggregateManifests = new Map([
+  [manifest.revision, manifest],
+  [audiobookPilot.revision, audiobookPilot],
+]);
 const postprocessingSnapshot = await readJson(postprocessingSnapshotPath);
 const promptManifest = await readJson(promptManifestPath);
 const requestedRun = process.argv.indexOf('--run');
@@ -861,7 +868,17 @@ for (const path of aggregatePaths) {
     const raw = await readJson(path);
     if (typeof raw.matrix_run_id !== 'string') continue;
     aggregates.push(raw);
-    failures.push(...validateAggregate(raw, manifest, path));
+    const aggregateManifest = aggregateManifests.get(
+      raw.fixture_manifest_revision,
+    );
+    if (!aggregateManifest) {
+      failures.push(
+        `${path}: unknown fixture manifest revision ` +
+        `${raw.fixture_manifest_revision}`,
+      );
+      continue;
+    }
+    failures.push(...validateAggregate(raw, aggregateManifest, path));
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
