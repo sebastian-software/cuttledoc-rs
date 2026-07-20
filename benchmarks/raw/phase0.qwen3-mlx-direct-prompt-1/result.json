@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.qwen3-mlx-direct-prompt-1",
+  "captured_at": "2026-07-20T14:48:43Z",
+  "source_revision": "78f699daf41ea24e8c036b260fecbbb149f7a3a0",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/17",
+  "measurement_scope": "Repository-owned Qwen byte-level BPE, exact ASR chat prompt, affine 8-bit token-embedding dequantization, and replacement of 202 audio-pad rows with direct encoder features. This is an input-embedding parity result, not a transcript-quality result.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "fixture": {
+    "id": "audiobook-en-2277-149874-0000",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+    "pcm_samples": 248080,
+    "sample_rate_hz": 16000
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.prompt-en.json",
+    "probe": {
+      "status": "ok",
+      "stage": "qwen3-prompt-embeddings",
+      "device": "gpu",
+      "pcm_samples": 248080,
+      "language": "en",
+      "num_audio_tokens": 202,
+      "prompt_length": 220,
+      "token_layout": {
+        "prefix": [151644, 8948, 198, 151645, 198, 151644, 872, 198, 151669],
+        "audio_token_id": 151676,
+        "audio_token_count": 202,
+        "suffix": [151670, 151645, 198, 151644, 77091, 198, 11528, 662, 151704]
+      },
+      "audio_token_range": {
+        "start": 9,
+        "end_exclusive": 211
+      },
+      "elapsed_ms": 381.67654199999998,
+      "peak_memory_bytes": 1766258540,
+      "fingerprints": {
+        "token_embeddings": {
+          "shape": [1, 220, 1024],
+          "source_dtype": "bfloat16",
+          "mean": -0.00019346494439312004,
+          "stddev": 0.011406214751634789,
+          "minimum": -0.09716796875,
+          "maximum": 0.0966796875,
+          "l1": 1702.0736994743347,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [-0.0078125, -0.09716796875, 0.016357421875, 0.0693359375, -0.0025787353515625, 0.01153564453125, -0.0120849609375, -0.006011962890625]
+        },
+        "audio_features_bfloat16": {
+          "shape": [202, 1024],
+          "source_dtype": "bfloat16",
+          "mean": 0.0010513159343348223,
+          "stddev": 0.018574417804255377,
+          "minimum": -0.1162109375,
+          "maximum": 0.1396484375,
+          "l1": 2989.7693776618689,
+          "sample_indices": [0, 1, 2, 7, 31, 68949, 137898, 206847],
+          "sample_values": [-0.0206298828125, -0.01556396484375, -0.040283203125, 0.007598876953125, -0.0101318359375, -0.01348876953125, -0.016357421875, -0.00848388671875]
+        },
+        "inputs_embeds": {
+          "shape": [1, 220, 1024],
+          "source_dtype": "bfloat16",
+          "mean": 0.00095785821561300761,
+          "stddev": 0.019055615730982186,
+          "minimum": -0.1162109375,
+          "maximum": 0.1396484375,
+          "l1": 3323.5053495895118,
+          "sample_indices": [0, 1, 2, 7, 31, 75093, 150186, 225279],
+          "sample_values": [-0.0078125, -0.09716796875, 0.016357421875, 0.0693359375, -0.0025787353515625, 0.0005340576171875, -0.003875732421875, -0.006011962890625]
+        }
+      }
+    },
+    "parity": {
+      "status": "ok",
+      "exact_token_ids": true,
+      "exact_audio_token_indices": true,
+      "exact_sampled_bfloat16_values": true,
+      "aggregate_relative_tolerance": 0.00002,
+      "maximum_aggregate_relative_error": 0.000005299076348921004
+    },
+    "cpu_smoke": {
+      "status": "ok"
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18882384,
+    "rust_probe_bytes": 555640
+  },
+  "next_gate": "Implement the quantized 28-layer Qwen3 decoder and repository-owned KV cache, then require exact greedy transcript parity."
+}
