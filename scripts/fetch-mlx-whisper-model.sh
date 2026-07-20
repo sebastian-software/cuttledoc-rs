@@ -43,20 +43,25 @@ download_verified \
   "https://raw.githubusercontent.com/ml-explore/mlx-examples/$examples_revision/whisper/mlx_whisper/assets/mel_filters.npz" \
   "$downloads/mel_filters.npz" \
   7450ae70723a5ef9d341e3cee628c7cb0177f36ce42c44b7ed2bf3325f0f6d4c
+download_verified \
+  "https://raw.githubusercontent.com/ml-explore/mlx-examples/$examples_revision/whisper/mlx_whisper/assets/multilingual.tiktoken" \
+  "$downloads/multilingual.tiktoken" \
+  b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126
 
-unzip -qo "$downloads/weights.npz" 'encoder.*.npy' -d "$model_dir"
+unzip -qo "$downloads/weights.npz" '*.npy' -d "$model_dir"
 unzip -qo "$downloads/mel_filters.npz" mel_80.npy -d "$model_dir"
+cp "$downloads/multilingual.tiktoken" "$model_dir/multilingual.tiktoken"
 
-tensor_count=$(find "$model_dir" -maxdepth 1 -name 'encoder.*.npy' -type f | wc -l | tr -d ' ')
-if [[ "$tensor_count" != 66 ]]; then
-  echo "expected 66 Whisper encoder tensors, found $tensor_count" >&2
+tensor_count=$(find "$model_dir" -maxdepth 1 \( -name 'encoder.*.npy' -o -name 'decoder.*.npy' \) -type f | wc -l | tr -d ' ')
+if [[ "$tensor_count" != 166 ]]; then
+  echo "expected 166 Whisper model tensors, found $tensor_count" >&2
   exit 1
 fi
 
 echo "model_revision=$model_revision"
 echo "examples_revision=$examples_revision"
 echo "model_directory=$model_dir"
-echo "encoder_tensors=$tensor_count"
+echo "model_tensors=$tensor_count"
 find "$model_dir" -maxdepth 1 -name '*.npy' -type f -print0 |
   xargs -0 stat -f '%z' |
-  awk '{sum += $1} END {print "extracted_encoder_and_filter_bytes=" sum}'
+  awk '{sum += $1} END {print "extracted_model_and_filter_bytes=" sum}'

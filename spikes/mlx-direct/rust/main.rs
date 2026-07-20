@@ -6,32 +6,32 @@ use std::{
 };
 
 unsafe extern "C" {
-    fn cuttledoc_mlx_whisper_encoder_create(
+    fn cuttledoc_mlx_whisper_create(
         model_directory: *const c_char,
         device_kind: i32,
         error_out: *mut *mut c_char,
     ) -> *mut c_void;
-    fn cuttledoc_mlx_whisper_encoder_describe(
+    fn cuttledoc_mlx_whisper_describe(
         handle: *mut c_void,
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
-    fn cuttledoc_mlx_whisper_encoder_encode(
+    fn cuttledoc_mlx_whisper_transcribe(
         handle: *mut c_void,
         audio: *const f32,
         audio_len: usize,
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
-    fn cuttledoc_mlx_whisper_encoder_destroy(handle: *mut c_void);
+    fn cuttledoc_mlx_whisper_destroy(handle: *mut c_void);
     fn cuttledoc_mlx_free_string(value: *mut c_char);
 }
 
-struct Encoder(*mut c_void);
+struct Session(*mut c_void);
 
-impl Drop for Encoder {
+impl Drop for Session {
     fn drop(&mut self) {
-        unsafe { cuttledoc_mlx_whisper_encoder_destroy(self.0) };
+        unsafe { cuttledoc_mlx_whisper_destroy(self.0) };
     }
 }
 
@@ -90,18 +90,18 @@ fn run() -> Result<(), String> {
     let mut sessions = Vec::with_capacity(lifecycle_count);
     for _ in 0..lifecycle_count {
         let load_started = Instant::now();
-        let mut encoder = create_encoder(&model_directory, device_kind)?;
+        let mut session = create_session(&model_directory, device_kind)?;
         let load_ms = load_started.elapsed().as_secs_f64() * 1_000.0;
         let load_description = call_json(|json, error| unsafe {
-            cuttledoc_mlx_whisper_encoder_describe(encoder.0, json, error)
+            cuttledoc_mlx_whisper_describe(session.0, json, error)
         })?;
 
         let mut runs = Vec::with_capacity(runs_per_lifecycle);
         for _ in 0..runs_per_lifecycle {
             let started = Instant::now();
             let result = call_json(|json, error| unsafe {
-                cuttledoc_mlx_whisper_encoder_encode(
-                    encoder.0,
+                cuttledoc_mlx_whisper_transcribe(
+                    session.0,
                     audio.as_ptr(),
                     audio.len(),
                     json,
@@ -112,8 +112,8 @@ fn run() -> Result<(), String> {
         }
 
         let destroy_started = Instant::now();
-        unsafe { cuttledoc_mlx_whisper_encoder_destroy(encoder.0) };
-        encoder.0 = ptr::null_mut();
+        unsafe { cuttledoc_mlx_whisper_destroy(session.0) };
+        session.0 = ptr::null_mut();
         let destroy_ms = destroy_started.elapsed().as_secs_f64() * 1_000.0;
         sessions.push(SessionResult {
             load_ms,
@@ -139,7 +139,7 @@ fn run() -> Result<(), String> {
             if run_index != 0 {
                 print!(",");
             }
-            print!("{{\"wall_ms\":{wall_ms:.3},\"encoder\":{result}}}");
+            print!("{{\"wall_ms\":{wall_ms:.3},\"transcription\":{result}}}");
         }
         print!("],\"destroy_wall_ms\":{:.3}}}", session.destroy_ms);
     }
@@ -148,16 +148,16 @@ fn run() -> Result<(), String> {
 }
 
 fn usage() -> String {
-    "usage: cuttledoc-mlx-whisper-encoder MODEL_DIR PCM_F32LE cpu|gpu [LIFECYCLES] [RUNS_PER_LIFECYCLE]".to_owned()
+    "usage: cuttledoc-mlx-whisper MODEL_DIR PCM_F32LE cpu|gpu [LIFECYCLES] [RUNS_PER_LIFECYCLE]"
+        .to_owned()
 }
 
-fn create_encoder(model_directory: &CString, device_kind: i32) -> Result<Encoder, String> {
+fn create_session(model_directory: &CString, device_kind: i32) -> Result<Session, String> {
     let mut error = ptr::null_mut();
-    let handle = unsafe {
-        cuttledoc_mlx_whisper_encoder_create(model_directory.as_ptr(), device_kind, &mut error)
-    };
+    let handle =
+        unsafe { cuttledoc_mlx_whisper_create(model_directory.as_ptr(), device_kind, &mut error) };
     if !handle.is_null() {
-        return Ok(Encoder(handle));
+        return Ok(Session(handle));
     }
     Err(take_string(error).unwrap_or_else(|| "MLX shim returned no handle and no error".to_owned()))
 }

@@ -137,8 +137,10 @@ pub struct TranscriptionSegment {
 ```
 
 Known constants/completions initially cover `parakeet-local`, `whisper-local`,
-`apple-speech`, and `openai-transcription`. The MLX encoder proof does not
-receive a public backend ID until it implements an end-to-end task.
+`apple-speech`, and `openai-transcription`. The MLX proof now implements one
+end-to-end task, but it does not receive a public backend ID until the bakeoff
+selects and productizes it; runtime evidence alone does not define product
+identity.
 
 TypeScript uses the same open policy rather than a closed union that makes
 widening a breaking change:

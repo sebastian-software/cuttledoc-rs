@@ -1,7 +1,8 @@
 # Direct official MLX result (#6)
 
-**Status:** advance as the third first-class inference foundation; complete
-encoder proven, end-to-end ASR still partial.
+**Status:** advance as the third first-class inference foundation; end-to-end
+Whisper Tiny ASR is proven on the first real fixture, while broader selection
+evidence remains.
 
 **Evidence date:** 2026-07-17.
 
@@ -16,10 +17,13 @@ There is no useful Rust-port moment here: Rust owns the product contract and
 lifecycle, while the adapter owns MLX's model graph and native resources.
 
 This result advances MLX rather than adopting it as the production ASR backend
-today. The full real audio encoder is proven; tokenizer, autoregressive decoder,
-timestamp/alignment logic, and transcript-quality evidence remain separate
-work. MLX also stays available for future text generation, TTS, and other model
-families without exposing a generic tensor runtime in the public API.
+today. The real audio frontend, encoder, tokenizer, autoregressive decoder, and
+timestamp-token path now produce a complete transcript through Rust. Broader
+multilingual quality, long-audio chunking, incremental updates, energy, clean
+cold start, cancellation plumbing, and artifact pruning remain selection or
+productization work. MLX also stays available for future text generation, TTS,
+and other model families without exposing a generic tensor runtime in the
+public API.
 
 `mlx-c` is not the planned product route. The direct model implementation did
 not expose an uncertainty that a second C wrapper would resolve, so it was not
@@ -67,23 +71,29 @@ mirror another MLX operator.
 The Rust probe passes real 16-kHz f32 PCM through an owned C ABI. The C++
 session:
 
-1. loads 66 pinned Float16 Whisper Tiny encoder tensors;
+1. loads all 166 pinned Float16 Whisper Tiny tensors plus the official
+   multilingual tokenizer vocabulary;
 2. computes the official MLX Examples log-Mel frontend with its pinned filter;
 3. runs both convolutions and all four attention/MLP encoder blocks;
-4. explicitly evaluates MLX's lazy graph with the official Whisper compute
+4. runs four autoregressive decoder blocks with timestamp-token rules and
+   decodes mergeable token bytes into UTF-8 text;
+5. explicitly evaluates MLX's lazy graph with the official Whisper compute
    behavior: Float32 activations on CPU and Float16 on Metal;
-5. materializes the `[1, 1500, 384]` output and returns a Rust-owned summary;
-6. destroys the model arrays and clears the runtime cache.
+6. returns Rust-owned transcript text, tokens, segment timestamps, timings, and
+   memory values;
+7. destroys the model arrays and clears the runtime cache.
 
 The source model is
 `mlx-community/whisper-tiny@78c52ab98ca87f570bc57ad852e15ef7060f9f76`.
 Its 74,418,182-byte NPZ has SHA-256
 `d5a3b8671ac7aab11a2c9d0f16e7da94bad5500d785856f438c6bd44c3723944`.
-The used encoder tensors plus filter occupy 15,337,664 bytes. The pinned model
-card records conversion from OpenAI Whisper Tiny with the official MIT MLX
-Examples converter. It omits a structured license field, so a production model
-manifest should preserve the MIT source/converter chain explicitly rather than
-inferring metadata from the hosting repository.
+The extracted model tensors plus filter occupy 74,454,976 bytes. The official
+multilingual vocabulary is pinned separately with SHA-256
+`b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126`.
+The pinned model card records conversion from OpenAI Whisper Tiny with the
+official MIT MLX Examples converter. It omits a structured license field, so a
+production model manifest should preserve the MIT source/converter chain
+explicitly rather than inferring metadata from the hosting repository.
 
 ## Measurements
 
@@ -117,6 +127,38 @@ MLX Examples Whisper graph used as a test oracle. CPU FP32 matched within
 last-bit reduction differences. The upgrade required zero adapter source
 changes.
 
+### End-to-end ASR measurement
+
+The #15 extension used MLX 0.32.0 and ran three create/transcribe/destroy
+lifecycles with two transcriptions each. All six CPU and all six GPU results
+were identical:
+
+> However, due to the slow communication channels, styles in the West could
+> lag behind by 25 to 30 years.
+
+After benchmark normalization this matches the fixture reference except for
+the reference's singular final word `year`, giving 5.26% WER and 1.23% CER.
+The decoder returned two timestamp-token segments, 0.00–7.24 seconds and
+7.24–8.62 seconds. The pinned official `mlx-whisper` 0.4.3 Python reference
+returned identical text and the same 7.24-second boundary; its final boundary
+was 8.52 seconds. The 100-ms final-boundary difference is retained as evidence:
+the C++ spike recomputes full decoder context instead of using the reference's
+FP16 KV-cache path, so text equivalence does not imply last-bit timestamp-logit
+equivalence.
+
+| Device | First complete run | Median warm complete run | Warm RTF | MLX peak |
+| --- | ---: | ---: | ---: | ---: |
+| CPU FP32 | 625.4 ms | 599.2 ms | 0.0567 | 191.5 MB |
+| GPU FP16 | 179.0 ms | 115.8 ms | 0.0110 | 285.8 MB |
+
+The repeated-process maximum resident set sizes were 462.0 MB for CPU and
+124.7 MB for GPU. Those process values include the Rust probe and dynamically
+loaded shim; MLX's allocator peak is the more stable within-session measure.
+Warm GPU decoder time was approximately 101–105 ms in the stable runs. This
+non-cached decoder is already fast enough to prove the product boundary, but a
+production backend should add a bounded KV cache before treating it as final
+performance evidence.
+
 ## Concrete integration findings
 
 - NPY `Load` evaluates only on CPU. A GPU session must materialize each tensor
@@ -140,6 +182,10 @@ changes.
   production work.
 - The synchronous encoder cannot be preempted mid-graph. Cancellation is
   observable at the next chunk or decoder-step boundary.
+- The task ABI now carries a complete transcript without adding any MLX array
+  or operator handle. The future private Rust adapter needs safe ownership,
+  typed errors, cancellation checks between decoder steps, and a worker proxy;
+  it does not need a general MLX binding.
 
 ## Disposition and next proof
 
@@ -149,10 +195,11 @@ changes.
 official source, explicit artifact manifest, process-serialized lifecycle, and
 no public MLX types.
 
-**ASR result:** partial. The next MLX-specific proof should add the Whisper
-tokenizer/decoder and timestamp path or select a stronger current ASR model,
-then run the complete quality harness. Do not use the 11.8-ms encoder number as
-an ASR claim.
+**ASR result:** works on the first real fixture. Do not use the 11.8-ms encoder
+number as an ASR claim; the comparable warm end-to-end GPU result is about
+115.8 ms. The next proof is breadth and product behavior: multilingual
+fixtures, long-audio chunking, incremental result mapping, energy, clean cold
+start, safe cancellation plumbing, KV-cache behavior, and artifact pruning.
 
 The machine-readable evidence is in
 [`benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json`](../../benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json)

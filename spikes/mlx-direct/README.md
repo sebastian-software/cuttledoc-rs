@@ -1,26 +1,28 @@
-# Direct official MLX spike (#6)
+# Direct official MLX task adapter (#6, #15)
 
-This spike runs the complete Whisper Tiny audio frontend and encoder over the
-official MLX C++ core. Rust owns the input and result; the adapter owns all MLX
-arrays and exposes only a task-level C ABI:
+This spike runs Whisper Tiny end to end over the official MLX C++ core. Rust
+owns the input, lifecycle, and result; the adapter owns all MLX arrays,
+tokenizer data, and model-specific graph code. It exposes only a task-level C
+ABI:
 
 ```c
-void *cuttledoc_mlx_whisper_encoder_create(
+void *cuttledoc_mlx_whisper_create(
     const char *model_directory, int32_t device_kind, char **error_out);
 
-int32_t cuttledoc_mlx_whisper_encoder_encode(
+int32_t cuttledoc_mlx_whisper_transcribe(
     void *handle, const float *audio, size_t audio_len,
     char **json_out, char **error_out);
 
-void cuttledoc_mlx_whisper_encoder_destroy(void *handle);
+void cuttledoc_mlx_whisper_destroy(void *handle);
 ```
 
 The input is mono f32 PCM at 16 kHz. The adapter pads it to Whisper's 30-second
 window, computes the pinned 80-bin log-Mel frontend, evaluates both
-convolutions and all four self-attention/MLP encoder blocks, and returns an
-owned summary of the `[1, 1500, 384]` encoder output. This is a real model path,
-not yet an end-to-end transcriber. It follows the official Whisper execution
-behavior: Float32 activations on CPU and Float16 on Metal.
+convolutions and all four audio blocks, then runs the four-layer
+autoregressive text decoder with the official multilingual vocabulary and
+timestamp-token rules. It returns Rust-owned transcript text, tokens, segment
+times, timing, and memory evidence. CPU uses the official reference-compatible
+Float32 path; Metal uses Float16.
 
 ## Pinned inputs
 
@@ -30,14 +32,14 @@ behavior: Float32 activations on CPU and Float16 on Metal.
   `68cf2fddd8de5edd8ab3d926391772b2e2cedad8`
 - `mlx-community/whisper-tiny`:
   `78c52ab98ca87f570bc57ad852e15ef7060f9f76`
-- MLX Examples frontend/filter source:
+- MLX Examples frontend/filter/tokenizer and decoder reference:
   `796f5b53cab69a3d48a44233ce21aae889e94a08`
 
-The model fetcher verifies every downloaded digest and extracts only the 66
-encoder tensors plus `mel_80.npy`:
+The model fetcher verifies every downloaded digest and extracts all 166 model
+tensors plus `mel_80.npy` and `multilingual.tiktoken`:
 
 ```sh
-bash scripts/fetch-mlx-whisper-encoder-model.sh
+bash scripts/fetch-mlx-whisper-model.sh
 ```
 
 Clone either exact official MLX release outside this repository, then run:
@@ -64,12 +66,14 @@ real FLEURS fixture, and runs repeated CPU and GPU lifecycles. Set
   Whisper graph. The source-built CPU FP16 convolution did not; the adapter
   uses the official graph's reference-compatible FP32 CPU behavior.
 - MLX's default device is process-global. The spike serializes create,
-  encode, and destroy through one mutex to prevent cross-session device races.
+  transcribe, and destroy through one mutex to prevent cross-session device
+  races.
 - Destroy deletes all session-owned arrays and clears MLX's allocator cache.
-- Inference is synchronous and can be cancelled only at the next task/chunk
-  boundary.
+- Encoder execution is synchronous; autoregressive decoding provides a natural
+  cancellation checkpoint between tokens. Long-audio chunking and streaming
+  updates remain production work.
 - `mlx-c` remains an optional control for a named uncertainty. The real model
   path did not reveal one, so no second product dependency was added.
 
 See [`docs/spikes/mlx-direct.md`](../../docs/spikes/mlx-direct.md) and the
-[raw lifecycle evidence](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).
+[encoder foundation evidence](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).

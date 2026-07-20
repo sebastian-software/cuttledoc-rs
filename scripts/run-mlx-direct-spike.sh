@@ -32,7 +32,7 @@ if [[ ! -f "$source_fixture" ]]; then
   exit 2
 fi
 
-bash "$root/scripts/fetch-mlx-whisper-encoder-model.sh" "$model_dir"
+bash "$root/scripts/fetch-mlx-whisper-model.sh" "$model_dir"
 
 if [[ -n "${CUTTLEDOC_MLX_BUILD_DIR:-}" ]]; then
   build_dir=$CUTTLEDOC_MLX_BUILD_DIR
@@ -69,7 +69,7 @@ rustc \
   "$root/spikes/mlx-direct/rust/main.rs" \
   -L "native=$build_dir" \
   -l dylib=cuttledoc_mlx_shim \
-  -o "$build_dir/cuttledoc-mlx-whisper-encoder"
+  -o "$build_dir/cuttledoc-mlx-whisper"
 
 echo "UPSTREAM"
 echo "mlx_release=$mlx_release"
@@ -82,7 +82,7 @@ for device in cpu gpu; do
     echo "GPU"
   fi
   /usr/bin/time -l \
-    "$build_dir/cuttledoc-mlx-whisper-encoder" \
+    "$build_dir/cuttledoc-mlx-whisper" \
     "$model_dir" \
     "$fixture" \
     "$device" \
@@ -92,9 +92,9 @@ done
 
 echo "ARTIFACTS"
 stat -f 'shim_dylib_bytes=%z' "$build_dir/libcuttledoc_mlx_shim.dylib"
-stat -f 'rust_executable_bytes=%z' "$build_dir/cuttledoc-mlx-whisper-encoder"
+stat -f 'rust_executable_bytes=%z' "$build_dir/cuttledoc-mlx-whisper"
 stat -f 'metallib_bytes=%z' "$build_dir/mlx.metallib"
 stat -f 'source_model_npz_bytes=%z' "$model_dir/downloads/weights.npz"
 find "$model_dir" -maxdepth 1 -name '*.npy' -type f -print0 |
   xargs -0 stat -f '%z' |
-  awk '{sum += $1} END {print "extracted_encoder_and_filter_bytes=" sum}'
+  awk '{sum += $1} END {print "extracted_model_and_filter_bytes=" sum}'

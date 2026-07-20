@@ -75,7 +75,8 @@ Evidence snapshot: 2026-07-17.
 | Capability-oriented API and ownership (#8) | Complete | Check the provisional types against the first real vertical slice. |
 | CoreML feasibility (#5) | Foundation proven | A complete ASR graph, typed adapter errors, cancellation boundary, and common benchmark remain. |
 | Apple Speech feasibility (#11) | Foundation proven | Broader fixture quality, clean cold start, energy, and shipped executable identity remain selection evidence. |
-| Official MLX feasibility (#6) | Foundation proven | End-to-end tokenizer/decoder/timestamps, transcript quality, clean cold start, energy, and artifact pruning remain. |
+| Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
+| End-to-end MLX ASR (#15) | Foundation proven | Broader languages, long audio, streaming, clean cold start, energy, KV cache, cancellation plumbing, and artifact pruning remain. |
 | Mandatory ASR benchmark (#4) | Partial | Expand the fixture set, make measurements comparable, and recommend a first backend plus fallback. |
 | Exploratory ASR sweep (#12) | Open | Use it selectively to find a stronger end-to-end MLX ASR path; breadth must not block #4. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
