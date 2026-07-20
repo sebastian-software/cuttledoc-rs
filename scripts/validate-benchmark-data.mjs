@@ -2378,6 +2378,14 @@ const voxtralRealtime2400Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.audiobook-pilot-1/result.json',
 );
+const voxtralRealtimeFleurs480Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.multilingual-fleurs-10-1/result.json',
+);
+const voxtralRealtimeFleurs2400Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.multilingual-fleurs-10-1/result.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -2447,6 +2455,12 @@ const sourceRightsReviews = await Promise.all(
 const audiobookPilot = await readJson(audiobookPilotPath);
 const voxtralRealtime480 = await readJson(voxtralRealtime480Path);
 const voxtralRealtime2400 = await readJson(voxtralRealtime2400Path);
+const voxtralRealtimeFleurs480 = await readJson(
+  voxtralRealtimeFleurs480Path,
+);
+const voxtralRealtimeFleurs2400 = await readJson(
+  voxtralRealtimeFleurs2400Path,
+);
 const aggregateManifests = new Map([
   [manifest.revision, manifest],
   [audiobookPilot.revision, audiobookPilot],
@@ -2547,6 +2561,34 @@ if (!(voxtralRealtime2400.summary?.macro_wer <
       voxtralRealtime480.summary?.macro_wer)) {
   failures.push(
     'Voxtral Realtime 2400 ms control must preserve its observed macro-WER gain',
+  );
+}
+failures.push(
+  ...validateAggregate(
+    voxtralRealtimeFleurs480,
+    manifest,
+    voxtralRealtimeFleurs480Path,
+  ),
+  ...validateVoxtralRealtimeAggregate(
+    voxtralRealtimeFleurs480,
+    voxtralRealtimeModelManifest,
+    480,
+  ).map((error) => `${voxtralRealtimeFleurs480Path}: ${error}`),
+  ...validateAggregate(
+    voxtralRealtimeFleurs2400,
+    manifest,
+    voxtralRealtimeFleurs2400Path,
+  ),
+  ...validateVoxtralRealtimeAggregate(
+    voxtralRealtimeFleurs2400,
+    voxtralRealtimeModelManifest,
+    2400,
+  ).map((error) => `${voxtralRealtimeFleurs2400Path}: ${error}`),
+);
+if (!(voxtralRealtimeFleurs2400.summary?.macro_wer <
+      voxtralRealtimeFleurs480.summary?.macro_wer)) {
+  failures.push(
+    'Voxtral Realtime 2400 ms FLEURS control must preserve its observed macro-WER gain',
   );
 }
 const rightsReviewIds = new Set();

@@ -259,23 +259,194 @@
         "timestamps": "segment"
       },
       "disposition": "research"
+    },
+    {
+      "id": "qwen3-asr-0.6b-mlx-reference",
+      "raw_artifact": "benchmarks/raw/phase0.qwen3-asr-0.6b-mlx-reference.multilingual-fleurs-10-1/result.json",
+      "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
+      "quality": {
+        "macro_wer": 0.050997188638468624,
+        "macro_cer": 0.014863481640544934,
+        "by_language": {
+          "en": {
+            "fixture_count": 2,
+            "macro_wer": 0.07393483709273183,
+            "macro_cer": 0.023218294051627383
+          },
+          "de": {
+            "fixture_count": 2,
+            "macro_wer": 0.047619047619047616,
+            "macro_cer": 0
+          },
+          "es": {
+            "fixture_count": 2,
+            "macro_wer": 0.07606490872210953,
+            "macro_cer": 0.029442513633409627
+          },
+          "fr": {
+            "fixture_count": 2,
+            "macro_wer": 0,
+            "macro_cer": 0
+          },
+          "pt": {
+            "fixture_count": 2,
+            "macro_wer": 0.057367149758454104,
+            "macro_cer": 0.02165660051768766
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 979.3828916,
+        "minimum_cold_load_ms": 929.045583,
+        "maximum_cold_load_ms": 1050.402125,
+        "mean_warm_inference_ms": 356.7112501,
+        "mean_real_time_factor": 0.02427888457577002
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 1248739328,
+        "runtime_peak_memory_bytes": 2149093200,
+        "model_size_bytes": 1010776466,
+        "binary_size_bytes": 402617370
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": 147.98749800000002,
+        "timestamps": "unknown"
+      },
+      "disposition": "research"
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-480ms",
+      "raw_artifact": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.multilingual-fleurs-10-1/result.json",
+      "source_revision": "0b444c81287cf5b25f7cbf10255939bcaa0cbde6",
+      "quality": {
+        "macro_wer": 0.05125764369768528,
+        "macro_cer": 0.010880003062587133,
+        "by_language": {
+          "en": {
+            "fixture_count": 2,
+            "macro_wer": 0.05012531328320802,
+            "macro_cer": 0.017536475869809203
+          },
+          "de": {
+            "fixture_count": 2,
+            "macro_wer": 0.10317460317460317,
+            "macro_cer": 0
+          },
+          "es": {
+            "fixture_count": 2,
+            "macro_wer": 0.03684922244759973,
+            "macro_cer": 0.013506258653329942
+          },
+          "fr": {
+            "fixture_count": 2,
+            "macro_wer": 0.008771929824561403,
+            "macro_cer": 0.0017006802721088435
+          },
+          "pt": {
+            "fixture_count": 2,
+            "macro_wer": 0.057367149758454104,
+            "macro_cer": 0.02165660051768766
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 1169.2433501,
+        "minimum_cold_load_ms": 1051.516291,
+        "maximum_cold_load_ms": 1970.877541,
+        "mean_warm_inference_ms": 3266.0182479000005,
+        "mean_real_time_factor": 0.22331691164962802
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 3406446592,
+        "runtime_peak_memory_bytes": 5864391652,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475435637
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": null,
+        "timestamps": "none"
+      },
+      "disposition": "research"
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-2400ms",
+      "raw_artifact": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.multilingual-fleurs-10-1/result.json",
+      "source_revision": "0b444c81287cf5b25f7cbf10255939bcaa0cbde6",
+      "quality": {
+        "macro_wer": 0.03818574827284869,
+        "macro_cer": 0.010083190313583146,
+        "by_language": {
+          "en": {
+            "fixture_count": 2,
+            "macro_wer": 0.05012531328320802,
+            "macro_cer": 0.017536475869809203
+          },
+          "de": {
+            "fixture_count": 2,
+            "macro_wer": 0.047619047619047616,
+            "macro_cer": 0
+          },
+          "es": {
+            "fixture_count": 2,
+            "macro_wer": 0.027045300878972278,
+            "macro_cer": 0.009522194908310022
+          },
+          "fr": {
+            "fixture_count": 2,
+            "macro_wer": 0.008771929824561403,
+            "macro_cer": 0.0017006802721088435
+          },
+          "pt": {
+            "fixture_count": 2,
+            "macro_wer": 0.057367149758454104,
+            "macro_cer": 0.02165660051768766
+          }
+        }
+      },
+      "timing": {
+        "mean_cold_load_ms": 1055.0678083999999,
+        "minimum_cold_load_ms": 1027.949417,
+        "maximum_cold_load_ms": 1159.93325,
+        "mean_warm_inference_ms": 3112.0495647000002,
+        "mean_real_time_factor": 0.21399110699229773
+      },
+      "resources": {
+        "maximum_peak_memory_bytes": 3402727424,
+        "runtime_peak_memory_bytes": 5924647908,
+        "model_size_bytes": 3148833321,
+        "binary_size_bytes": 475435637
+      },
+      "streaming": {
+        "supported": true,
+        "mean_first_result_ms": null,
+        "timestamps": "none"
+      },
+      "disposition": "research"
     }
   ],
   "recommendation": {
     "primary": "apple-speechtranscriber",
     "fallback": "whisper-large-v3-turbo-coreml-whispercpp",
     "research": [
-      "mlx-whisper-tiny"
+      "mlx-whisper-tiny",
+      "qwen3-asr-0.6b-mlx-reference",
+      "voxtral-mini-4b-realtime-mlx-reference-480ms",
+      "voxtral-mini-4b-realtime-mlx-reference-2400ms"
     ],
     "rationale": [
       "Apple SpeechTranscriber is the first vertical-slice backend because it combines 7.58% macro WER with the lowest warm latency and process RSS, real incremental results, and word timestamps.",
-      "Whisper large-v3-turbo is the opt-in quality and coverage fallback because it has the best measured WER, but its 2.90 GB model, 2.00 GB peak RSS, 774 ms warm latency, and batch-only output make it a poor default.",
+      "Whisper large-v3-turbo remains the opt-in proven quality and coverage fallback; its 2.90 GB model, 2.00 GB peak RSS, 774 ms warm latency, and batch-only output make it a poor default.",
       "Parakeet remains a compatibility baseline because it is less accurate than Apple SpeechTranscriber on this matrix without adding streaming or a smaller materialized model.",
-      "Direct official MLX remains a first-class research foundation; Whisper Tiny proves the boundary but its multilingual quality is not sufficient for product selection."
+      "Direct official MLX remains a first-class research foundation; Whisper Tiny proves the boundary but its multilingual quality is not sufficient for product selection.",
+      "Qwen3-ASR 0.6B and Voxtral Realtime are reference-oracle research candidates, not accepted product dependencies; both require repository-owned official-MLX boundaries and held-out target-domain evidence.",
+      "Voxtral Realtime at 2,400 ms has the lowest raw macro WER in this ten-clip matrix, but neither Voxtral run measured incremental audio input, and both are much slower and heavier than the selected product paths."
     ]
   },
   "limitations": [
     "Two fixtures per language expose language-path failures but are not statistically sufficient for a final quality ranking.",
+    "The Qwen reference reports token emissions after whole-clip preprocessing, and the Voxtral reference runs load complete clips; neither is live-input streaming evidence.",
     "Energy was not measured because the documented powermetrics procedure requires privileged, alternating runs.",
     "Cold-load measurements use warm system and model caches and are not clean-host startup measurements.",
     "Candidate order was not alternated, so thermal and background-load effects were not controlled."

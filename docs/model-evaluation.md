@@ -24,15 +24,18 @@ by two measured repetitions per fixture on the same M1 Ultra host.
 | --- | ---: | ---: | ---: | ---: | --- | --- |
 | Apple SpeechTranscriber | 7.58% / 3.35% | 189.5 ms / 0.0136 | 24.0 MB | system-managed / 0.95 MB shim | word / incremental, 52.1 ms first result | primary |
 | Qwen3-ASR 0.6B MLX reference | 5.10% / 1.49% | 356.7 ms / 0.0243 | 1.25 GB | 1.01 GB / 402.6 MB reference environment | token output / 148.0 ms first token; timestamps unknown | direct-MLX research |
+| Voxtral Realtime 4B MLX reference, 480 ms | 5.13% / 1.09% | 3,266.0 ms / 0.2233 | 3.41 GB | 3.15 GB / 475.4 MB reference environment | whole-clip result; live input not measured | research |
+| Voxtral Realtime 4B MLX reference, 2,400 ms | 3.82% / 1.01% | 3,112.0 ms / 0.2140 | 3.40 GB | 3.15 GB / 475.4 MB reference environment | whole-clip result; live input not measured | research |
 | Whisper large-v3-turbo | 5.61% / 1.25% | 774.2 ms / 0.0564 | 2.00 GB | 2.90 GB / 2.17 MB addon | segment / final-only | fallback |
 | Parakeet TDT 0.6B v3 | 10.27% / 4.75% | 249.8 ms / 0.0176 | 153.6 MB | 1.90 GB materialized / 0.13 MB addon | segment / final-only | compatibility baseline |
 | Whisper Tiny on MLX | 26.24% / 7.61% | 284.8 ms / 0.0184 | 130.6 MB process | 74.4 MB / 148.8 MB MLX runtime | segment / final-only | runtime research |
 
-Whisper large-v3-turbo has the second-best aggregate WER and best aggregate CER
-in this bounded sample, but it uses about 83 times Apple's peak process memory,
-has about four times Apple's warm latency, materializes a 2.90 GB model, and
-only returns a final batch result. It is therefore valuable as an explicit
-quality/coverage fallback rather than the default.
+Voxtral at 2,400 ms has the best raw WER and CER in this bounded sample.
+Whisper remains valuable as an explicit quality/coverage fallback because it
+has an already accepted boundary and is about four times faster than Voxtral
+offline. It still uses about 83 times Apple's peak process memory, has about
+four times Apple's warm latency, materializes a 2.90 GB model, and only returns
+a final batch result, so it is not the default.
 
 Apple SpeechTranscriber is the strongest product foundation for the supported
 macOS 26 locales. It is close to the best measured quality while providing the
@@ -41,14 +44,14 @@ timestamps, and no repository-distributed model. Phase 2 should put the Rust
 domain contract in front of the existing repository-owned Swift C ABI; product
 logic must not move into Swift.
 
-Qwen3-ASR 0.6B is the strongest new-model signal: its recorded phase-0 WER
+Qwen3-ASR 0.6B remains the compact new-model signal: its recorded phase-0 WER
 slightly beats Whisper at less than half Whisper's warm latency and model size.
-The boundary-preserving review view below instead favors Whisper by 3.60% to
-4.15%, exposing how sensitive this tiny set is to token normalization. The
-result still advances Qwen as the third candidate through an owned adapter over
-official MLX. It does not make the community Python port product-ready, and it
-does not displace Apple's default because it still uses about 52 times Apple's
-process RSS, has slower first output, and has no aligned timestamps.
+Voxtral is the strongest raw-quality signal, including after the
+boundary-preserving review, but uses substantially more time and memory. These
+results advance both models as candidates through owned adapters over official
+MLX. They do not make either community Python runtime product-ready, and they
+do not displace Apple's default before held-out target-domain and true-streaming
+evidence exists.
 
 Parakeet remains compatibility evidence rather than a selected backend. In this
 matrix it is less accurate than Apple SpeechTranscriber without adding
@@ -70,6 +73,8 @@ WER varies materially by language and candidate even in this small sample:
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Apple SpeechTranscriber | 7.39% | 7.54% | 6.15% | 1.75% | 15.04% |
 | Qwen3-ASR 0.6B MLX reference | 7.39% | 4.76% | 7.61% | 0.00% | 5.74% |
+| Voxtral Realtime, 480 ms | 5.01% | 10.32% | 3.68% | 0.88% | 5.74% |
+| Voxtral Realtime, 2,400 ms | 5.01% | 4.76% | 2.70% | 0.88% | 5.74% |
 | Whisper large-v3-turbo | 15.29% | 4.76% | 2.70% | 1.75% | 3.56% |
 | Parakeet TDT 0.6B v3 | 23.18% | 13.10% | 2.70% | 5.26% | 7.13% |
 | Whisper Tiny on MLX | 12.16% | 41.27% | 19.41% | 24.56% | 33.82% |
@@ -79,11 +84,11 @@ rankings. Two samples per language are enough to expose language-token,
 locale-resolution, and stream-reduction failures, but not enough to estimate
 general recognition quality.
 
-They nevertheless reject one global quality ranking. The provisional WER
-leaders are Apple and Qwen for English, Qwen and Whisper for German, Whisper
-and Parakeet for Spanish, Qwen for French, and Whisper for Portuguese. A
-production selector may therefore accept language and operating mode as
-inputs, but it must not auto-route from these two-sample estimates.
+They nevertheless reject one global quality ranking. Voxtral leads English
+and is among the leaders in German, Spanish, and French; Qwen is exact on these
+two French references, while Whisper leads Portuguese. A production selector
+may therefore accept language and operating mode as inputs, but it must not
+auto-route from these two-sample estimates.
 
 WER and CER here lowercase text and remove punctuation and whitespace before
 comparison. A 5% WER is consequently not a 5% mixture of punctuation,
@@ -106,6 +111,8 @@ The review view changes the aggregate and language numbers as follows:
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Apple SpeechTranscriber | 6.62% | 7.39% | 2.78% | 6.15% | 1.72% | 15.04% |
 | Qwen3-ASR 0.6B MLX reference | 4.15% | 7.39% | 0.00% | 7.61% | 0.00% | 5.74% |
+| Voxtral Realtime, 480 ms | 4.17% | 5.01% | 5.56% | 3.68% | 0.86% | 5.74% |
+| Voxtral Realtime, 2,400 ms | 2.86% | 5.01% | 0.00% | 2.70% | 0.86% | 5.74% |
 | Whisper large-v3-turbo | 3.60% | 10.03% | 0.00% | 2.70% | 1.72% | 3.56% |
 | Parakeet TDT 0.6B v3 | 9.31% | 23.18% | 8.33% | 2.70% | 5.22% | 7.13% |
 | Whisper Tiny on MLX | 25.41% | 12.16% | 36.51% | 19.41% | 25.18% | 33.82% |
@@ -115,7 +122,7 @@ reviewable numeric representation difference, while `3` versus `XI` is a
 critical content error. The report flags both rather than silently deciding
 that they are equivalent.
 
-## Voxtral Realtime audiobook follow-up
+## Voxtral Realtime cross-source follow-up
 
 The pinned 4-bit Voxtral Realtime MLX oracle completed the 15 professionally
 recorded audiobook clips at both the publisher-recommended 480 ms delay and a
@@ -133,6 +140,16 @@ Apache-2.0 and Apple-local feasibility is proven, but it is substantially
 heavier: a 3.15 GB model, roughly 5.8 GB MLX peak allocation, and about four
 times Whisper's offline RTF. The runner loads complete clips, so no live-input
 latency or cancellation claim follows from these numbers.
+
+The second-source FLEURS control preserves the 2,400 ms aggregate advantage
+(3.82% versus 5.13%) and the strong French result. It does not preserve every
+per-language direction: German improves from 10.32% to 4.76%, while English,
+French, and Portuguese are identical across delays. German's remaining raw WER
+at 2,400 ms drops to 0% in the boundary-review view because the differences are
+word boundaries such as `Kow Loon` versus `Kowloon`, not character changes.
+This is useful evidence that Voxtral deserves intensive evaluation, while also
+showing that delay tuning must be judged by source, language, CER, and error
+class rather than a global WER alone.
 
 ## Artifact and license pins
 

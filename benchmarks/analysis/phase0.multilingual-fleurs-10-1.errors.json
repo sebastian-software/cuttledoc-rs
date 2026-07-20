@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "analysis_id": "phase0-multilingual-fleurs-error-analysis-1",
-  "source_captured_through": "2026-07-20T10:35:16.732Z",
+  "source_captured_through": "2026-07-20T19:18:07.860Z",
   "source_artifacts": [
     {
       "path": "benchmarks/raw/phase0.apple-speech.multilingual-fleurs-10-1/result.json",
@@ -34,6 +34,22 @@
       "source_revision": "21d79622e69742bc57f5633eb957654f7a2b8795",
       "captured_at": "2026-07-20T10:35:16.732Z",
       "candidate_id": "qwen3-asr-0.6b-mlx-reference"
+    },
+    {
+      "path": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.multilingual-fleurs-10-1/result.json",
+      "sha256": "13fa53838efa41348d26ba800020841e2d281be3f061f171b4e9815765e43bf1",
+      "matrix_run_id": "phase0.voxtral-realtime-mlx-reference-2400ms.phase0-multilingual-asr-1",
+      "source_revision": "0b444c81287cf5b25f7cbf10255939bcaa0cbde6",
+      "captured_at": "2026-07-20T19:18:07.860Z",
+      "candidate_id": "voxtral-mini-4b-realtime-mlx-reference-2400ms"
+    },
+    {
+      "path": "benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.multilingual-fleurs-10-1/result.json",
+      "sha256": "2ae2f29494f1126f1b7b13ba79dbd491727dd321898ab5939f557c7acb8c5a85",
+      "matrix_run_id": "phase0.voxtral-realtime-mlx-reference-480ms.phase0-multilingual-asr-1",
+      "source_revision": "0b444c81287cf5b25f7cbf10255939bcaa0cbde6",
+      "captured_at": "2026-07-20T19:14:23.995Z",
+      "candidate_id": "voxtral-mini-4b-realtime-mlx-reference-480ms"
     },
     {
       "path": "benchmarks/raw/phase0.whisper.multilingual-fleurs-10-1/result.json",
@@ -7932,6 +7948,1899 @@
           "source_domain": "short-read",
           "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
           "hypothesis_text": "Construída pelos egípcios no século III a.C., a Grande Pirâmide é uma das muitas grandes estruturas da pirâmide construídas para honrar faraós mortos.",
+          "recorded": {
+            "reference_word_count": 23,
+            "hypothesis_word_count": 23,
+            "wer": 0.08695652173913043,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 23,
+            "hypothesis_word_count": 23,
+            "wer": 0.08695652173913043,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-pt-br-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": [
+                  "3"
+                ],
+                "hypothesis": [
+                  "iii"
+                ],
+                "reference_context": {
+                  "before": [
+                    "egípcios",
+                    "no",
+                    "século"
+                  ],
+                  "focus": [
+                    "3"
+                  ],
+                  "after": [
+                    "ac",
+                    "a",
+                    "grande"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "egípcios",
+                    "no",
+                    "século"
+                  ],
+                  "focus": [
+                    "iii"
+                  ],
+                  "after": [
+                    "ac",
+                    "a",
+                    "grande"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution",
+                  "number-date-or-unit"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              },
+              {
+                "operation_id": "fleurs-pt-br-test-001:E002",
+                "operation": "substitution",
+                "reference_index": 16,
+                "hypothesis_index": 16,
+                "reference": [
+                  "de"
+                ],
+                "hypothesis": [
+                  "da"
+                ],
+                "reference_context": {
+                  "before": [
+                    "muitas",
+                    "grandes",
+                    "estruturas"
+                  ],
+                  "focus": [
+                    "de"
+                  ],
+                  "after": [
+                    "pirâmide",
+                    "construídas",
+                    "para"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "muitas",
+                    "grandes",
+                    "estruturas"
+                  ],
+                  "focus": [
+                    "da"
+                  ],
+                  "after": [
+                    "pirâmide",
+                    "construídas",
+                    "para"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-2400ms",
+      "model": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e; converted from mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+      "aggregate": {
+        "recorded": {
+          "fixture_count": 10,
+          "reference_word_count": 294,
+          "macro_wer": 0.03818574827284869,
+          "micro_wer": 0.034013605442176874,
+          "counts": {
+            "substitutions": 9,
+            "deletions": 1,
+            "insertions": 0,
+            "edits": 10
+          }
+        },
+        "review": {
+          "fixture_count": 10,
+          "reference_word_count": 295,
+          "macro_wer": 0.028631690715161362,
+          "micro_wer": 0.02711864406779661,
+          "counts": {
+            "substitutions": 8,
+            "deletions": 0,
+            "insertions": 0,
+            "edits": 8
+          },
+          "unreviewed_operation_count": 8
+        }
+      },
+      "by_language": {
+        "en": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 40,
+            "macro_wer": 0.05012531328320802,
+            "micro_wer": 0.05,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 40,
+            "macro_wer": 0.05012531328320802,
+            "micro_wer": 0.05,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "unreviewed_operation_count": 2
+          }
+        },
+        "de": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 39,
+            "macro_wer": 0.047619047619047616,
+            "micro_wer": 0.05128205128205128,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 1,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 39,
+            "macro_wer": 0,
+            "micro_wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "unreviewed_operation_count": 0
+          }
+        },
+        "es": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 80,
+            "macro_wer": 0.027045300878972278,
+            "micro_wer": 0.025,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 80,
+            "macro_wer": 0.027045300878972278,
+            "micro_wer": 0.025,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "unreviewed_operation_count": 2
+          }
+        },
+        "fr": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 76,
+            "macro_wer": 0.008771929824561403,
+            "micro_wer": 0.013157894736842105,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 77,
+            "macro_wer": 0.008620689655172414,
+            "micro_wer": 0.012987012987012988,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "unreviewed_operation_count": 1
+          }
+        },
+        "pt": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 59,
+            "macro_wer": 0.057367149758454104,
+            "micro_wer": 0.05084745762711865,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 59,
+            "macro_wer": 0.057367149758454104,
+            "micro_wer": 0.05084745762711865,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            },
+            "unreviewed_operation_count": 3
+          }
+        }
+      },
+      "fixtures": [
+        {
+          "fixture_id": "fleurs-en-us-test-000",
+          "language": "en",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+          "hypothesis_text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years.",
+          "recorded": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0.05263157894736842,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0.05263157894736842,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-en-us-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 18,
+                "hypothesis_index": 18,
+                "reference": [
+                  "year"
+                ],
+                "hypothesis": [
+                  "years"
+                ],
+                "reference_context": {
+                  "before": [
+                    "25",
+                    "to",
+                    "30"
+                  ],
+                  "focus": [
+                    "year"
+                  ],
+                  "after": []
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "25",
+                    "to",
+                    "30"
+                  ],
+                  "focus": [
+                    "years"
+                  ],
+                  "after": []
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-en-us-test-001",
+          "language": "en",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "all nouns alongside the word sie for you always begin with a capital letter even in the middle of a sentence",
+          "hypothesis_text": "All nouns alongside the word safe for you always begin with a capital letter, even in the middle of a sentence.",
+          "recorded": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0.047619047619047616,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0.047619047619047616,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-en-us-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": [
+                  "sie"
+                ],
+                "hypothesis": [
+                  "safe"
+                ],
+                "reference_context": {
+                  "before": [
+                    "alongside",
+                    "the",
+                    "word"
+                  ],
+                  "focus": [
+                    "sie"
+                  ],
+                  "after": [
+                    "for",
+                    "you",
+                    "always"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "alongside",
+                    "the",
+                    "word"
+                  ],
+                  "focus": [
+                    "safe"
+                  ],
+                  "after": [
+                    "for",
+                    "you",
+                    "always"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-de-de-test-000",
+          "language": "de",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "für die besten aussichten auf hongkong sollten sie die insel verlassen und zum gegenüberliegenden ufer von kowloon fahren",
+          "hypothesis_text": "Für die besten Aussichten auf Hongkong sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kowloon fahren.",
+          "recorded": {
+            "reference_word_count": 18,
+            "hypothesis_word_count": 18,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            }
+          },
+          "review": {
+            "reference_word_count": 18,
+            "hypothesis_word_count": 18,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "operations": []
+          }
+        },
+        {
+          "fixture_id": "fleurs-de-de-test-001",
+          "language": "de",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "er griff auch alles an was ins wasser kam selbst ein großer dinosaurier wie der t rex war ihm nicht gewachsen",
+          "hypothesis_text": "Er griff auch alles an, was ins Wasser kam, selbst ein großer Dinosaurier wie der T-Rex war ihm nicht gewachsen..",
+          "recorded": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 20,
+            "wer": 0.09523809523809523,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 1,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "operations": []
+          }
+        },
+        {
+          "fixture_id": "fleurs-es-419-test-000",
+          "language": "es",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo de clima extremo en el área que visitan dado que ello puede afectar sus planes de viaje",
+          "hypothesis_text": "Se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo del clima extremo en el área que visitan, dado que ello puede afectar sus planes de viaje..",
+          "recorded": {
+            "reference_word_count": 29,
+            "hypothesis_word_count": 29,
+            "wer": 0.034482758620689655,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 29,
+            "hypothesis_word_count": 29,
+            "wer": 0.034482758620689655,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-es-419-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 12,
+                "hypothesis_index": 12,
+                "reference": [
+                  "de"
+                ],
+                "hypothesis": [
+                  "del"
+                ],
+                "reference_context": {
+                  "before": [
+                    "sobre",
+                    "cualquier",
+                    "riesgo"
+                  ],
+                  "focus": [
+                    "de"
+                  ],
+                  "after": [
+                    "clima",
+                    "extremo",
+                    "en"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "sobre",
+                    "cualquier",
+                    "riesgo"
+                  ],
+                  "focus": [
+                    "del"
+                  ],
+                  "after": [
+                    "clima",
+                    "extremo",
+                    "en"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-es-419-test-001",
+          "language": "es",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "el uso adecuado de los blogs «puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de internet pueden definir sus posturas en el contexto de los escritos de otros además de establecer sus perspectivas sobre temas específicos» oravec 2002",
+          "hypothesis_text": "El uso adecuado de los blogs puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de Internet. Pueden definir sus posturas en el contexto de los escritos de otros, además de establecer sus perspectivas sobre temas específicos. Horabek 2002",
+          "recorded": {
+            "reference_word_count": 51,
+            "hypothesis_word_count": 51,
+            "wer": 0.0196078431372549,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 51,
+            "hypothesis_word_count": 51,
+            "wer": 0.0196078431372549,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-es-419-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 49,
+                "hypothesis_index": 49,
+                "reference": [
+                  "oravec"
+                ],
+                "hypothesis": [
+                  "horabek"
+                ],
+                "reference_context": {
+                  "before": [
+                    "sobre",
+                    "temas",
+                    "específicos"
+                  ],
+                  "focus": [
+                    "oravec"
+                  ],
+                  "after": [
+                    "2002"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "sobre",
+                    "temas",
+                    "específicos"
+                  ],
+                  "focus": [
+                    "horabek"
+                  ],
+                  "after": [
+                    "2002"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-fr-fr-test-000",
+          "language": "fr",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "l'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant",
+          "hypothesis_text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant.",
+          "recorded": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            }
+          },
+          "review": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "operations": []
+          }
+        },
+        {
+          "fixture_id": "fleurs-fr-fr-test-001",
+          "language": "fr",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "nous sommes d'accord avec la déclaration de l'usoc comité olympique des états-unis selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation",
+          "hypothesis_text": "Nous sommes d'accord avec la déclaration de l'USOC, Comité Olympique des Etats-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+          "recorded": {
+            "reference_word_count": 57,
+            "hypothesis_word_count": 57,
+            "wer": 0.017543859649122806,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 58,
+            "hypothesis_word_count": 58,
+            "wer": 0.017241379310344827,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-fr-fr-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 11,
+                "hypothesis_index": 11,
+                "reference": [
+                  "états"
+                ],
+                "hypothesis": [
+                  "etats"
+                ],
+                "reference_context": {
+                  "before": [
+                    "comité",
+                    "olympique",
+                    "des"
+                  ],
+                  "focus": [
+                    "états"
+                  ],
+                  "after": [
+                    "unis",
+                    "selon",
+                    "laquelle"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "comité",
+                    "olympique",
+                    "des"
+                  ],
+                  "focus": [
+                    "etats"
+                  ],
+                  "after": [
+                    "unis",
+                    "selon",
+                    "laquelle"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-pt-br-test-000",
+          "language": "pt",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "segundo informações ele estava na casa dos 20 anos em uma declaração bieber disse que embora eu não estivesse presente nem diretamente envolvido neste trágico incidente meus pensamentos e orações estão com a família da vítima",
+          "hypothesis_text": "Segundo informações, ele estava na casa dos 20 anos. Em uma declaração, Bieber disse que, embora eu não tivesse presente nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima.",
+          "recorded": {
+            "reference_word_count": 36,
+            "hypothesis_word_count": 36,
+            "wer": 0.027777777777777776,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 36,
+            "hypothesis_word_count": 36,
+            "wer": 0.027777777777777776,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-pt-br-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 18,
+                "hypothesis_index": 18,
+                "reference": [
+                  "estivesse"
+                ],
+                "hypothesis": [
+                  "tivesse"
+                ],
+                "reference_context": {
+                  "before": [
+                    "embora",
+                    "eu",
+                    "não"
+                  ],
+                  "focus": [
+                    "estivesse"
+                  ],
+                  "after": [
+                    "presente",
+                    "nem",
+                    "diretamente"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "embora",
+                    "eu",
+                    "não"
+                  ],
+                  "focus": [
+                    "tivesse"
+                  ],
+                  "after": [
+                    "presente",
+                    "nem",
+                    "diretamente"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-pt-br-test-001",
+          "language": "pt",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
+          "hypothesis_text": "Construída pelos egípcios no século III a.C., a Grande Pirâmide é uma das muitas grandes estruturas da pirâmide construídas para honrar faraós mortos.",
+          "recorded": {
+            "reference_word_count": 23,
+            "hypothesis_word_count": 23,
+            "wer": 0.08695652173913043,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 23,
+            "hypothesis_word_count": 23,
+            "wer": 0.08695652173913043,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-pt-br-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": [
+                  "3"
+                ],
+                "hypothesis": [
+                  "iii"
+                ],
+                "reference_context": {
+                  "before": [
+                    "egípcios",
+                    "no",
+                    "século"
+                  ],
+                  "focus": [
+                    "3"
+                  ],
+                  "after": [
+                    "ac",
+                    "a",
+                    "grande"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "egípcios",
+                    "no",
+                    "século"
+                  ],
+                  "focus": [
+                    "iii"
+                  ],
+                  "after": [
+                    "ac",
+                    "a",
+                    "grande"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution",
+                  "number-date-or-unit"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              },
+              {
+                "operation_id": "fleurs-pt-br-test-001:E002",
+                "operation": "substitution",
+                "reference_index": 16,
+                "hypothesis_index": 16,
+                "reference": [
+                  "de"
+                ],
+                "hypothesis": [
+                  "da"
+                ],
+                "reference_context": {
+                  "before": [
+                    "muitas",
+                    "grandes",
+                    "estruturas"
+                  ],
+                  "focus": [
+                    "de"
+                  ],
+                  "after": [
+                    "pirâmide",
+                    "construídas",
+                    "para"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "muitas",
+                    "grandes",
+                    "estruturas"
+                  ],
+                  "focus": [
+                    "da"
+                  ],
+                  "after": [
+                    "pirâmide",
+                    "construídas",
+                    "para"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "voxtral-mini-4b-realtime-mlx-reference-480ms",
+      "model": "mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e; converted from mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+      "aggregate": {
+        "recorded": {
+          "fixture_count": 10,
+          "reference_word_count": 294,
+          "macro_wer": 0.05125764369768528,
+          "micro_wer": 0.04421768707482993,
+          "counts": {
+            "substitutions": 11,
+            "deletions": 1,
+            "insertions": 1,
+            "edits": 13
+          }
+        },
+        "review": {
+          "fixture_count": 10,
+          "reference_word_count": 295,
+          "macro_wer": 0.04170358613999796,
+          "micro_wer": 0.03728813559322034,
+          "counts": {
+            "substitutions": 10,
+            "deletions": 0,
+            "insertions": 1,
+            "edits": 11
+          },
+          "unreviewed_operation_count": 11
+        }
+      },
+      "by_language": {
+        "en": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 40,
+            "macro_wer": 0.05012531328320802,
+            "micro_wer": 0.05,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 40,
+            "macro_wer": 0.05012531328320802,
+            "micro_wer": 0.05,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "unreviewed_operation_count": 2
+          }
+        },
+        "de": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 39,
+            "macro_wer": 0.10317460317460317,
+            "micro_wer": 0.10256410256410256,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 1,
+              "insertions": 1,
+              "edits": 4
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 39,
+            "macro_wer": 0.05555555555555555,
+            "micro_wer": 0.05128205128205128,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 1,
+              "edits": 2
+            },
+            "unreviewed_operation_count": 2
+          }
+        },
+        "es": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 80,
+            "macro_wer": 0.03684922244759973,
+            "micro_wer": 0.0375,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 80,
+            "macro_wer": 0.03684922244759973,
+            "micro_wer": 0.0375,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            },
+            "unreviewed_operation_count": 3
+          }
+        },
+        "fr": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 76,
+            "macro_wer": 0.008771929824561403,
+            "micro_wer": 0.013157894736842105,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 77,
+            "macro_wer": 0.008620689655172414,
+            "micro_wer": 0.012987012987012988,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "unreviewed_operation_count": 1
+          }
+        },
+        "pt": {
+          "recorded": {
+            "fixture_count": 2,
+            "reference_word_count": 59,
+            "macro_wer": 0.057367149758454104,
+            "micro_wer": 0.05084745762711865,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            }
+          },
+          "review": {
+            "fixture_count": 2,
+            "reference_word_count": 59,
+            "macro_wer": 0.057367149758454104,
+            "micro_wer": 0.05084745762711865,
+            "counts": {
+              "substitutions": 3,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 3
+            },
+            "unreviewed_operation_count": 3
+          }
+        }
+      },
+      "fixtures": [
+        {
+          "fixture_id": "fleurs-en-us-test-000",
+          "language": "en",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+          "hypothesis_text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years.",
+          "recorded": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0.05263157894736842,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0.05263157894736842,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-en-us-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 18,
+                "hypothesis_index": 18,
+                "reference": [
+                  "year"
+                ],
+                "hypothesis": [
+                  "years"
+                ],
+                "reference_context": {
+                  "before": [
+                    "25",
+                    "to",
+                    "30"
+                  ],
+                  "focus": [
+                    "year"
+                  ],
+                  "after": []
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "25",
+                    "to",
+                    "30"
+                  ],
+                  "focus": [
+                    "years"
+                  ],
+                  "after": []
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-en-us-test-001",
+          "language": "en",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "all nouns alongside the word sie for you always begin with a capital letter even in the middle of a sentence",
+          "hypothesis_text": "All nouns alongside the word say for you, always begin with a capital letter, even in the middle of a sentence.",
+          "recorded": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0.047619047619047616,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0.047619047619047616,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-en-us-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": [
+                  "sie"
+                ],
+                "hypothesis": [
+                  "say"
+                ],
+                "reference_context": {
+                  "before": [
+                    "alongside",
+                    "the",
+                    "word"
+                  ],
+                  "focus": [
+                    "sie"
+                  ],
+                  "after": [
+                    "for",
+                    "you",
+                    "always"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "alongside",
+                    "the",
+                    "word"
+                  ],
+                  "focus": [
+                    "say"
+                  ],
+                  "after": [
+                    "for",
+                    "you",
+                    "always"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-de-de-test-000",
+          "language": "de",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "für die besten aussichten auf hongkong sollten sie die insel verlassen und zum gegenüberliegenden ufer von kowloon fahren",
+          "hypothesis_text": "Für die besten Aussichten auf Hongkong sollten Sie die Insel verlassen und zum gegenüberliegenden Ufer von Kow Loon fahren.",
+          "recorded": {
+            "reference_word_count": 18,
+            "hypothesis_word_count": 19,
+            "wer": 0.1111111111111111,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 1,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 18,
+            "hypothesis_word_count": 19,
+            "wer": 0.1111111111111111,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 1,
+              "edits": 2
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-de-de-test-000:E001",
+                "operation": "insertion",
+                "reference_index": 16,
+                "hypothesis_index": 16,
+                "reference": [],
+                "hypothesis": [
+                  "kow"
+                ],
+                "reference_context": {
+                  "before": [
+                    "gegenüberliegenden",
+                    "ufer",
+                    "von"
+                  ],
+                  "focus": [],
+                  "after": [
+                    "kowloon",
+                    "fahren"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "gegenüberliegenden",
+                    "ufer",
+                    "von"
+                  ],
+                  "focus": [
+                    "kow"
+                  ],
+                  "after": [
+                    "loon",
+                    "fahren"
+                  ]
+                },
+                "risk_hints": [
+                  "insertion"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              },
+              {
+                "operation_id": "fleurs-de-de-test-000:E002",
+                "operation": "substitution",
+                "reference_index": 16,
+                "hypothesis_index": 17,
+                "reference": [
+                  "kowloon"
+                ],
+                "hypothesis": [
+                  "loon"
+                ],
+                "reference_context": {
+                  "before": [
+                    "gegenüberliegenden",
+                    "ufer",
+                    "von"
+                  ],
+                  "focus": [
+                    "kowloon"
+                  ],
+                  "after": [
+                    "fahren"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "ufer",
+                    "von",
+                    "kow"
+                  ],
+                  "focus": [
+                    "loon"
+                  ],
+                  "after": [
+                    "fahren"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-de-de-test-001",
+          "language": "de",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "er griff auch alles an was ins wasser kam selbst ein großer dinosaurier wie der t rex war ihm nicht gewachsen",
+          "hypothesis_text": "Er griff auch alles an, was ins Wasser kam, selbst ein großer Dinosaurier wie der T-Rex war ihm nicht gewachsen.",
+          "recorded": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 20,
+            "wer": 0.09523809523809523,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 1,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 21,
+            "hypothesis_word_count": 21,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "operations": []
+          }
+        },
+        {
+          "fixture_id": "fleurs-es-419-test-000",
+          "language": "es",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo de clima extremo en el área que visitan dado que ello puede afectar sus planes de viaje",
+          "hypothesis_text": "Se recomienda enfáticamente a los viajeros que se informen sobre cualquier riesgo del clima extremo en el área que visitan, dado que ello puede afectar sus planes de viaje.",
+          "recorded": {
+            "reference_word_count": 29,
+            "hypothesis_word_count": 29,
+            "wer": 0.034482758620689655,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 29,
+            "hypothesis_word_count": 29,
+            "wer": 0.034482758620689655,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-es-419-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 12,
+                "hypothesis_index": 12,
+                "reference": [
+                  "de"
+                ],
+                "hypothesis": [
+                  "del"
+                ],
+                "reference_context": {
+                  "before": [
+                    "sobre",
+                    "cualquier",
+                    "riesgo"
+                  ],
+                  "focus": [
+                    "de"
+                  ],
+                  "after": [
+                    "clima",
+                    "extremo",
+                    "en"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "sobre",
+                    "cualquier",
+                    "riesgo"
+                  ],
+                  "focus": [
+                    "del"
+                  ],
+                  "after": [
+                    "clima",
+                    "extremo",
+                    "en"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-es-419-test-001",
+          "language": "es",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "el uso adecuado de los blogs «puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de internet pueden definir sus posturas en el contexto de los escritos de otros además de establecer sus perspectivas sobre temas específicos» oravec 2002",
+          "hypothesis_text": "El uso adecuado de los blocks puede empoderar a los alumnos para que sean más analíticos y críticos a través de la respuesta activa a los contenidos de Internet. Pueden definir sus posturas en el contexto de los escritos de otros, además de establecer sus perspectivas sobre temas específicos. Horabek 2002.",
+          "recorded": {
+            "reference_word_count": 51,
+            "hypothesis_word_count": 51,
+            "wer": 0.0392156862745098,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            }
+          },
+          "review": {
+            "reference_word_count": 51,
+            "hypothesis_word_count": 51,
+            "wer": 0.0392156862745098,
+            "counts": {
+              "substitutions": 2,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 2
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-es-419-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": [
+                  "blogs"
+                ],
+                "hypothesis": [
+                  "blocks"
+                ],
+                "reference_context": {
+                  "before": [
+                    "adecuado",
+                    "de",
+                    "los"
+                  ],
+                  "focus": [
+                    "blogs"
+                  ],
+                  "after": [
+                    "puede",
+                    "empoderar",
+                    "a"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "adecuado",
+                    "de",
+                    "los"
+                  ],
+                  "focus": [
+                    "blocks"
+                  ],
+                  "after": [
+                    "puede",
+                    "empoderar",
+                    "a"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              },
+              {
+                "operation_id": "fleurs-es-419-test-001:E002",
+                "operation": "substitution",
+                "reference_index": 49,
+                "hypothesis_index": 49,
+                "reference": [
+                  "oravec"
+                ],
+                "hypothesis": [
+                  "horabek"
+                ],
+                "reference_context": {
+                  "before": [
+                    "sobre",
+                    "temas",
+                    "específicos"
+                  ],
+                  "focus": [
+                    "oravec"
+                  ],
+                  "after": [
+                    "2002"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "sobre",
+                    "temas",
+                    "específicos"
+                  ],
+                  "focus": [
+                    "horabek"
+                  ],
+                  "after": [
+                    "2002"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-fr-fr-test-000",
+          "language": "fr",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "l'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant",
+          "hypothesis_text": "L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant.",
+          "recorded": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            }
+          },
+          "review": {
+            "reference_word_count": 19,
+            "hypothesis_word_count": 19,
+            "wer": 0,
+            "counts": {
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 0
+            },
+            "operations": []
+          }
+        },
+        {
+          "fixture_id": "fleurs-fr-fr-test-001",
+          "language": "fr",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "nous sommes d'accord avec la déclaration de l'usoc comité olympique des états-unis selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation",
+          "hypothesis_text": "Nous sommes d'accord avec la déclaration de l'USOC, Comité Olympique des Etats-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+          "recorded": {
+            "reference_word_count": 57,
+            "hypothesis_word_count": 57,
+            "wer": 0.017543859649122806,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 58,
+            "hypothesis_word_count": 58,
+            "wer": 0.017241379310344827,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-fr-fr-test-001:E001",
+                "operation": "substitution",
+                "reference_index": 11,
+                "hypothesis_index": 11,
+                "reference": [
+                  "états"
+                ],
+                "hypothesis": [
+                  "etats"
+                ],
+                "reference_context": {
+                  "before": [
+                    "comité",
+                    "olympique",
+                    "des"
+                  ],
+                  "focus": [
+                    "états"
+                  ],
+                  "after": [
+                    "unis",
+                    "selon",
+                    "laquelle"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "comité",
+                    "olympique",
+                    "des"
+                  ],
+                  "focus": [
+                    "etats"
+                  ],
+                  "after": [
+                    "unis",
+                    "selon",
+                    "laquelle"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-pt-br-test-000",
+          "language": "pt",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "segundo informações ele estava na casa dos 20 anos em uma declaração bieber disse que embora eu não estivesse presente nem diretamente envolvido neste trágico incidente meus pensamentos e orações estão com a família da vítima",
+          "hypothesis_text": "Segundo informações, ele estava na casa dos 20 anos. Em uma declaração, Bieber disse que, embora eu não tivesse presente nem diretamente envolvido neste trágico incidente, meus pensamentos e orações estão com a família da vítima.",
+          "recorded": {
+            "reference_word_count": 36,
+            "hypothesis_word_count": 36,
+            "wer": 0.027777777777777776,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            }
+          },
+          "review": {
+            "reference_word_count": 36,
+            "hypothesis_word_count": 36,
+            "wer": 0.027777777777777776,
+            "counts": {
+              "substitutions": 1,
+              "deletions": 0,
+              "insertions": 0,
+              "edits": 1
+            },
+            "operations": [
+              {
+                "operation_id": "fleurs-pt-br-test-000:E001",
+                "operation": "substitution",
+                "reference_index": 18,
+                "hypothesis_index": 18,
+                "reference": [
+                  "estivesse"
+                ],
+                "hypothesis": [
+                  "tivesse"
+                ],
+                "reference_context": {
+                  "before": [
+                    "embora",
+                    "eu",
+                    "não"
+                  ],
+                  "focus": [
+                    "estivesse"
+                  ],
+                  "after": [
+                    "presente",
+                    "nem",
+                    "diretamente"
+                  ]
+                },
+                "hypothesis_context": {
+                  "before": [
+                    "embora",
+                    "eu",
+                    "não"
+                  ],
+                  "focus": [
+                    "tivesse"
+                  ],
+                  "after": [
+                    "presente",
+                    "nem",
+                    "diretamente"
+                  ]
+                },
+                "risk_hints": [
+                  "lexical-substitution"
+                ],
+                "review": {
+                  "classification": "unreviewed",
+                  "severity": "unreviewed",
+                  "note": null
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fixture_id": "fleurs-pt-br-test-001",
+          "language": "pt",
+          "source_dataset": "FLEURS",
+          "source_domain": "short-read",
+          "reference_text": "construída pelos egípcios no século 3 a.c. a grande pirâmide é uma das muitas grandes estruturas de pirâmide construídas para honrar faraós mortos",
+          "hypothesis_text": "Construída pelos egípcios no século III a.C., a Grande Pirâmide é uma das muitas grandes estruturas da pirâmide construídas para honrar faraós mortos..",
           "recorded": {
             "reference_word_count": 23,
             "hypothesis_word_count": 23,

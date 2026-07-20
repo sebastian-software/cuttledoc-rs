@@ -44,3 +44,26 @@ The quality runner loads complete digest-pinned PCM clips before inference.
 Although the implementation contains a stateful streaming session, this
 offline matrix does not claim measured live-input first-result latency.
 Streaming chunking, cancellation, and lifecycle behavior are separate gates.
+
+## Recorded controls
+
+The audiobook pilot and the independent FLEURS short-read control both favor
+2,400 ms in aggregate:
+
+| Source | 480 ms WER / CER | 2,400 ms WER / CER |
+| --- | ---: | ---: |
+| 15 audiobook clips | 5.84% / 1.67% | 4.25% / 1.45% |
+| 10 FLEURS clips | 5.13% / 1.09% | 3.82% / 1.01% |
+
+The exact FLEURS aggregates are
+[`480 ms`](../../benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.multilingual-fleurs-10-1/result.json)
+and
+[`2,400 ms`](../../benchmarks/raw/phase0.voxtral-realtime-mlx-reference-2400ms.multilingual-fleurs-10-1/result.json).
+Their boundary-review alignments are part of the shared
+[`error report`](../../benchmarks/analysis/phase0.multilingual-fleurs-10-1.errors.json).
+
+The aggregate agreement is not a universal delay rule. Per-language results
+change by source, and the German FLEURS errors are dominated by token
+boundaries rather than character changes. The next experiment must feed audio
+incrementally and record first, stable, and final output plus cancellation and
+repeated lifecycle behavior.

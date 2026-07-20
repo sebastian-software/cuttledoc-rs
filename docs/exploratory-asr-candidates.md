@@ -20,7 +20,7 @@ the official MLX core?
 | [Qwen3-ASR 0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B/tree/5eb144179a02acc5e5ba31e748d22b0cf3e303b0) | Apache-2.0 | official Transformers/vLLM Python stack | measured end to end through the repository-owned adapter over official MLX; lifecycle/cancellation accepted, advance corpus and packaging gates |
 | [Qwen3-ASR 1.7B](https://huggingface.co/Qwen/Qwen3-ASR-1.7B/tree/7278e1e70fe206f11671096ffdd38061171dd6e5) | Apache-2.0 | official Transformers/vLLM Python stack | blocked until the shared 0.6B architecture has an accepted Apple boundary |
 | [Voxtral Mini 3B](https://huggingface.co/mistralai/Voxtral-Mini-3B-2507/tree/3060fe34b35ba5d44202ce9ff3c097642914f8f3) | Apache-2.0 | vLLM 0.10+ or Transformers; about 9.5 GB GPU memory | blocked: no accepted Apple runtime; owned port is materially larger than Qwen 0.6B |
-| [Voxtral Mini 4B Realtime](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add) | Apache-2.0 | official vLLM and Transformers; publisher-linked ExecuTorch, C/MPS, MLX, and Rust paths | measured through pinned 4-bit MLX reference on 15 audiobook clips at 480/2,400 ms; advance held-out corpus and true-streaming gates |
+| [Voxtral Mini 4B Realtime](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602/tree/2769294da9567371363522aac9bbcfdd19447add) | Apache-2.0 | official vLLM and Transformers; publisher-linked ExecuTorch, C/MPS, MLX, and Rust paths | measured through pinned 4-bit MLX reference on audiobook and FLEURS controls at 480/2,400 ms; advance held-out corpus and true-streaming gates |
 
 The machine-readable blocked records retain exact format, revision, license,
 runtime, platform, engineering cost, and blocker under
@@ -112,6 +112,24 @@ Portuguese. This validates language-specific selection and rules out a single
 global Voxtral setting. The pilot is small, uses development-exposed
 unverified transcripts, and measures complete-clip inference. The next gate is
 held-out professional speech plus stateful streaming latency and cancellation.
+
+The same settings were then run on the existing ten-clip FLEURS integration
+set:
+
+| Delay | Macro WER | German | English | Spanish | French | Portuguese | Mean RTF |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 480 ms | 5.13% | 10.32% | 5.01% | 3.68% | 0.88% | 5.74% | 0.223 |
+| 2,400 ms | 3.82% | 4.76% | 5.01% | 2.70% | 0.88% | 5.74% | 0.214 |
+| Qwen3-ASR reference | 5.10% | 4.76% | 7.39% | 7.61% | 0.00% | 5.74% | 0.0243 |
+| Whisper comparison | 5.61% | 4.76% | 15.29% | 2.70% | 1.75% | 3.56% | 0.0564 |
+
+The aggregate advantage at 2,400 ms and the strong French cell replicate
+across sources. The individual language pattern does not: the two FLEURS
+German clips expose word-boundary sensitivity, and three languages are
+identical across delay settings. The boundary-review report lowers the
+2,400 ms aggregate to 2.86% and its German cell to 0% by treating hyphens and
+spaces as token boundaries. This is strong candidate evidence, not a
+population-level European-language ranking.
 
 Do not broaden Qwen to 1.7B yet. For Voxtral, compare a narrow official-MLX
 adapter with the pure-C/MPS path only after it survives those quality and

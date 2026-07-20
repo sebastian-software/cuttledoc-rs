@@ -30,6 +30,21 @@ Model-only and product-pipeline quality are separate measurements:
   chunking/VAD, overlap handling, merge behavior, timestamps, and memory over
   time.
 
+### Voxtral short-read control
+
+The pinned Voxtral Realtime MLX oracle now covers the same ten FLEURS fixtures
+at 480 and 2,400 ms transcription delay. Raw macro WER is 5.13% and 3.82%
+respectively; the boundary-review view is 4.17% and 2.86%. The 2,400 ms setting
+therefore wins the aggregate on both FLEURS and the audiobook pilot, while
+per-language delay behavior remains source-dependent.
+
+The German FLEURS cell is the clearest scoring caution: 10.32% raw WER at
+480 ms and 4.76% at 2,400 ms become 5.56% and 0% after word-boundary review,
+with 0% CER in both raw cells. The evidence supports retaining WER, CER,
+boundary-normalized alignment, and semantic error classes together. It does
+not support a German or European-language production ranking from two
+short-read clips.
+
 ## Source plan
 
 Machine-readable source dispositions and exact repository revisions are in
