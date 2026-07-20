@@ -76,7 +76,48 @@
       "dataset_version": "1.0.0",
       "license": "Apache-2.0 repository; underlying audio remains source-specific",
       "redistribution": "local-required-until-source-review",
+      "evidence_urls": [
+        "https://github.com/SpeechColab/GigaSpeech"
+      ],
       "decision": "Use professionally annotated evaluation excerpts for English after per-source rights review; never infer audio redistribution rights from the repository license."
+    },
+    {
+      "id": "merkel-podcast-corpus",
+      "status": "selected-pending-rights-review",
+      "domains": [
+        "podcast"
+      ],
+      "languages": [
+        "de-DE"
+      ],
+      "source_revision": "deeplsd/Merkel-Podcast-Corpus@ef839a3940e13f52ad44798a54819b7338010054",
+      "dataset_version": "repository snapshot reviewed on the evidence date",
+      "license": "No explicit repository dataset, transcript, or audio license found",
+      "redistribution": "denied-pending-source-specific-rights-review",
+      "evidence_urls": [
+        "https://github.com/deeplsd/Merkel-Podcast-Corpus",
+        "https://aclanthology.org/2022.lrec-1.270/"
+      ],
+      "decision": "Retain as the strongest identified German podcast candidate because it supplies episode metadata and aligned text for professionally produced weekly podcasts. Do not run its downloader or admit any audio until the exact source item, transcript, and derived-clip rights are accepted."
+    },
+    {
+      "id": "hui-audio-corpus-german",
+      "status": "selected-pending-rights-review",
+      "domains": [
+        "audiobook"
+      ],
+      "languages": [
+        "de-DE"
+      ],
+      "source_revision": "iisys-hof/HUI-Audio-Corpus-German@0092c51f0e1b24bb72f27429e3df256e6e279b49",
+      "dataset_version": "published IISYS full and clean archives; generator snapshot pinned separately",
+      "license": "Apache-2.0 generator repository; generated LibriVox audio and per-work text rights require separate review",
+      "redistribution": "denied-pending-artifact-and-work-review",
+      "evidence_urls": [
+        "https://github.com/iisys-hof/HUI-Audio-Corpus-German",
+        "https://opendata.iisys.de/dataset/hui-audio-corpus-german/"
+      ],
+      "decision": "Retain as the leading independent German audiobook candidate, with multiple speakers and clean 44.1 kHz archives. Do not infer dataset or audio rights from the generator's Apache-2.0 license; admit only work and speaker groups whose audio, text, and development-set isolation are accepted."
     },
     {
       "id": "voxpopuli",
@@ -94,6 +135,10 @@
       "dataset_version": "archived upstream snapshot",
       "license": "CC0 data; CC-BY-NC-4.0 code and pretrained models",
       "redistribution": "data-allowed-subject-to-European-Parliament-legal-notice",
+      "evidence_urls": [
+        "https://github.com/facebookresearch/voxpopuli",
+        "https://www.europarl.europa.eu/legal-notice/en/"
+      ],
       "decision": "Use only as a professional-speech robustness bridge. It is not a podcast substitute, and the upstream corpus has no transcribed Portuguese partition."
     },
     {
@@ -113,6 +158,24 @@
       "license": "per-source permission, permissive Creative Commons, public domain, or user-provided",
       "redistribution": "denied-by-default",
       "decision": "Build a German-first, human-verified held-out set from at least three independent shows per language; keep audio local unless redistribution is explicitly licensed."
+    },
+    {
+      "id": "cuttledoc-professional-audiobook-gold",
+      "status": "acquisition-required",
+      "domains": [
+        "audiobook"
+      ],
+      "languages": [
+        "de-DE",
+        "en-US",
+        "es-419",
+        "fr-FR",
+        "pt-BR"
+      ],
+      "source_revision": null,
+      "license": "per-source permission, permissive Creative Commons, public domain, or user-provided",
+      "redistribution": "denied-by-default",
+      "decision": "Build a German-first, human-verified held-out set from at least three independent works and speakers per language. Exclude every FLEURS, MLS, and LibriSpeech development source group and keep audio local unless redistribution is explicitly licensed."
     }
   ]
 }

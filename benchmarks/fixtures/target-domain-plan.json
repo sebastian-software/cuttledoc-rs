@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "target-domain-held-out-1",
+  "evidence_date": "2026-07-20",
+  "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/18",
+  "purpose": "held-out",
+  "priority_order": [
+    "de-DE/podcast",
+    "de-DE/audiobook",
+    "en-US/podcast",
+    "en-US/audiobook",
+    "es-419/podcast",
+    "es-419/audiobook",
+    "fr-FR/podcast",
+    "fr-FR/audiobook",
+    "pt-BR/podcast",
+    "pt-BR/audiobook"
+  ],
+  "candidate_backends": [
+    "apple-speechtranscriber",
+    "whisper-large-v3-turbo-coreml-whispercpp",
+    "qwen3-asr-0.6b-mlx-direct",
+    "parakeet-tdt-0.6b-v3-coreml"
+  ],
+  "excluded_development_sources": [
+    "fleurs",
+    "multilingual-librispeech",
+    "librispeech-clean"
+  ],
+  "tracks": {
+    "aligned_clip": {
+      "minimum_total_duration_ms": 1800000,
+      "minimum_source_groups": 3,
+      "minimum_speakers": 3,
+      "alignment": "human-verified-exact-audio-range"
+    },
+    "long_form": {
+      "minimum_passage_duration_ms": 300000,
+      "maximum_passage_duration_ms": 900000,
+      "minimum_passages_per_source_group": 1,
+      "required_behaviors": [
+        "chunking-or-vad",
+        "overlap-and-merge",
+        "timestamp-continuity",
+        "memory-over-time"
+      ]
+    }
+  },
+  "split_policy": {
+    "grouping_unit": "source-work-or-episode",
+    "development": "May influence implementation and prompt design; never contributes held-out acceptance results.",
+    "validation": "May tune bounded model, runtime, normalization, or prompt choices; remains source-group disjoint from development and test.",
+    "test": "Opened only after the candidate configuration is frozen; remains source-group disjoint from development and validation.",
+    "forbid_cross_split_derivatives": true
+  },
+  "rights_policy": {
+    "default_redistribution": "denied",
+    "acquisition_gate": "accepted-rights-review",
+    "accepted_bases": [
+      "explicit-permission",
+      "permissive-license",
+      "public-domain",
+      "user-provided-with-authorization"
+    ],
+    "separate_audio_and_transcript_evidence": true,
+    "local_required_by_default": true,
+    "repository_license_is_not_audio_evidence": true
+  },
+  "gold_policy": {
+    "verification": "independent-human-review-against-exact-audio",
+    "draft_sources_only": [
+      "publisher-transcript",
+      "subtitle",
+      "book-text",
+      "asr-output"
+    ],
+    "preserve": [
+      "verbatim-text",
+      "speaker-turns",
+      "punctuation",
+      "capitalization",
+      "numbers",
+      "disfluencies",
+      "uncertainty"
+    ],
+    "critical_content": [
+      "names-and-terms",
+      "numbers-dates-and-units",
+      "negation"
+    ]
+  },
+  "cells": [
+    {
+      "id": "de-DE/podcast",
+      "priority": 1,
+      "locale": "de-DE",
+      "domain": "podcast",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "merkel-podcast-corpus",
+        "cuttledoc-professional-podcast-gold"
+      ]
+    },
+    {
+      "id": "de-DE/audiobook",
+      "priority": 2,
+      "locale": "de-DE",
+      "domain": "audiobook",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "hui-audio-corpus-german",
+        "cuttledoc-professional-audiobook-gold"
+      ]
+    },
+    {
+      "id": "en-US/podcast",
+      "priority": 3,
+      "locale": "en-US",
+      "domain": "podcast",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "gigaspeech",
+        "cuttledoc-professional-podcast-gold"
+      ]
+    },
+    {
+      "id": "en-US/audiobook",
+      "priority": 4,
+      "locale": "en-US",
+      "domain": "audiobook",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "gigaspeech",
+        "cuttledoc-professional-audiobook-gold"
+      ]
+    },
+    {
+      "id": "es-419/podcast",
+      "priority": 5,
+      "locale": "es-419",
+      "domain": "podcast",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-podcast-gold"
+      ]
+    },
+    {
+      "id": "es-419/audiobook",
+      "priority": 6,
+      "locale": "es-419",
+      "domain": "audiobook",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-audiobook-gold"
+      ]
+    },
+    {
+      "id": "fr-FR/podcast",
+      "priority": 7,
+      "locale": "fr-FR",
+      "domain": "podcast",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-podcast-gold"
+      ]
+    },
+    {
+      "id": "fr-FR/audiobook",
+      "priority": 8,
+      "locale": "fr-FR",
+      "domain": "audiobook",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-audiobook-gold"
+      ]
+    },
+    {
+      "id": "pt-BR/podcast",
+      "priority": 9,
+      "locale": "pt-BR",
+      "domain": "podcast",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-podcast-gold"
+      ]
+    },
+    {
+      "id": "pt-BR/audiobook",
+      "priority": 10,
+      "locale": "pt-BR",
+      "domain": "audiobook",
+      "status": "acquisition-required",
+      "source_candidate_ids": [
+        "cuttledoc-professional-audiobook-gold"
+      ]
+    }
+  ]
+}

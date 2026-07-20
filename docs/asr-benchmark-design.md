@@ -34,18 +34,30 @@ Model-only and product-pipeline quality are separate measurements:
 
 Machine-readable source dispositions and exact repository revisions are in
 [`source-candidates.json`](../benchmarks/fixtures/source-candidates.json).
+The held-out cell order, source isolation, rights gate, gold contract, and
+minimum scale are frozen in
+[`target-domain-plan.json`](../benchmarks/fixtures/target-domain-plan.json)
+and tracked by [issue #18](https://github.com/sebastian-software/cuttledoc-rs/issues/18).
 
 | Source | Languages | Domain | Role |
 | --- | --- | --- | --- |
 | Existing FLEURS fixtures | all five | short read | keep as a fast integration gate; expand within the existing source only for variance estimation, not domain coverage |
 | [Multilingual LibriSpeech](https://www.openslr.org/94/) plus [LibriSpeech](https://www.openslr.org/12/) clean validation for English | all five language families | LibriVox audiobooks | first target-domain addition; CC-BY-4.0 and native-language development splits; Spanish and Portuguese regional varieties still require an audit |
+| [Merkel Podcast Corpus](https://github.com/deeplsd/Merkel-Podcast-Corpus) | German | professional weekly podcasts | leading German podcast candidate; blocked because the repository exposes no explicit dataset, transcript, or audio license |
+| [HUI Audio Corpus German](https://opendata.iisys.de/dataset/hui-audio-corpus-german/) | German | LibriVox audiobooks | leading independent German audiobook candidate; the generator is Apache-2.0, but generated audio and per-work text rights require separate review |
 | [GigaSpeech](https://github.com/SpeechColab/GigaSpeech) | English | podcasts and audiobooks | strong English target-domain candidate with professionally annotated evaluation data; keep audio local until per-source rights are accepted |
-| [VoxPopuli](https://github.com/facebookresearch/voxpopuli) | transcribed data for English, German, Spanish, and French | professional parliamentary speech | openly licensed robustness bridge, not a podcast substitute; no transcribed Portuguese set |
+| [VoxPopuli](https://github.com/facebookresearch/voxpopuli) | transcribed data for English, German, Spanish, and French | professional parliamentary speech | CC0 corpus-data robustness bridge subject to the [European Parliament legal notice](https://www.europarl.europa.eu/legal-notice/en/), not a podcast substitute; no transcribed Portuguese set |
 | Curated Cuttledoc gold set | all five, German first | professional podcasts | required target-domain set using source-permitted or user-provided recordings and human-verified transcripts |
 
 MLS does not by itself prove Latin-American Spanish or Brazilian Portuguese
 coverage. Those product locales remain separate cells and require the curated
 set or another region-pinned source.
+
+A candidate does not pass the rights gate because its repository or generator
+has a permissive license. Audio, transcript, derived clips, and redistribution
+must each be supported by source-specific evidence. Acquisition is blocked
+until an accepted review records that evidence; local-only material remains
+the default even after acquisition is allowed.
 
 ### Acquired audiobook development pilot
 

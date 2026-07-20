@@ -80,6 +80,7 @@ Evidence snapshot: 2026-07-20.
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR 0.6B reached 5.10% macro WER through a pinned reference-only MLX path and advanced to the owned adapter in #17; every other named artifact has an exact runtime/license blocker. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
+| Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical four-backend runs remain. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
 

@@ -182,6 +182,171 @@ function validateSourceCandidates(registry) {
   return errors;
 }
 
+function validateTargetDomainPlan(plan, sourceCandidates) {
+  const errors = [];
+  if (plan.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(plan.revision?.length > 0)) {
+    errors.push('revision must be a non-empty string');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(plan.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (!/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/.test(
+    plan.tracking_issue ?? '',
+  )) {
+    errors.push('tracking_issue must be a GitHub issue URL');
+  }
+  if (plan.purpose !== 'held-out') {
+    errors.push('purpose must be held-out');
+  }
+
+  const requiredBackends = [
+    'apple-speechtranscriber',
+    'whisper-large-v3-turbo-coreml-whispercpp',
+    'qwen3-asr-0.6b-mlx-direct',
+    'parakeet-tdt-0.6b-v3-coreml',
+  ];
+  if (!arrayEquals(plan.candidate_backends ?? [], requiredBackends)) {
+    errors.push('candidate_backends must contain the four frozen candidates in execution order');
+  }
+
+  const sources = new Map(
+    (sourceCandidates.sources ?? []).map((source) => [source.id, source]),
+  );
+  for (const sourceId of plan.excluded_development_sources ?? []) {
+    const source = sources.get(sourceId);
+    if (!source) {
+      errors.push(`unknown excluded development source: ${sourceId}`);
+    } else if (!['active-diagnostic', 'active-development-pilot'].includes(
+      source.status,
+    )) {
+      errors.push(`${sourceId}: excluded source must remain diagnostic or development`);
+    }
+  }
+  if (!arrayEquals(
+    plan.excluded_development_sources ?? [],
+    ['fleurs', 'multilingual-librispeech', 'librispeech-clean'],
+  )) {
+    errors.push('excluded_development_sources must preserve the known development inputs');
+  }
+
+  const alignedClip = plan.tracks?.aligned_clip;
+  if (alignedClip?.minimum_total_duration_ms < 1_800_000) {
+    errors.push('aligned_clip requires at least 30 minutes per cell');
+  }
+  if (alignedClip?.minimum_source_groups < 3) {
+    errors.push('aligned_clip requires at least three source groups per cell');
+  }
+  if (alignedClip?.minimum_speakers < 3) {
+    errors.push('aligned_clip requires at least three speakers per cell');
+  }
+  if (!(alignedClip?.alignment?.length > 0)) {
+    errors.push('aligned_clip.alignment must be a non-empty string');
+  }
+  const longForm = plan.tracks?.long_form;
+  if (longForm?.minimum_passage_duration_ms !== 300_000 ||
+      longForm?.maximum_passage_duration_ms !== 900_000) {
+    errors.push('long_form passage bounds must remain 5-15 minutes');
+  }
+  if (longForm?.minimum_passages_per_source_group < 1) {
+    errors.push('long_form requires at least one passage per source group');
+  }
+  if (!Array.isArray(longForm?.required_behaviors) ||
+      longForm.required_behaviors.length === 0 ||
+      new Set(longForm.required_behaviors).size !==
+        longForm.required_behaviors.length) {
+    errors.push('long_form.required_behaviors must be a non-empty unique array');
+  }
+
+  for (const field of ['grouping_unit', 'development', 'validation', 'test']) {
+    if (!(plan.split_policy?.[field]?.length > 0)) {
+      errors.push(`split_policy.${field} must be a non-empty string`);
+    }
+  }
+  if (plan.split_policy?.forbid_cross_split_derivatives !== true) {
+    errors.push('split_policy must forbid cross-split derivatives');
+  }
+  if (plan.rights_policy?.default_redistribution !== 'denied' ||
+      plan.rights_policy?.acquisition_gate !== 'accepted-rights-review' ||
+      plan.rights_policy?.separate_audio_and_transcript_evidence !== true ||
+      plan.rights_policy?.local_required_by_default !== true ||
+      plan.rights_policy?.repository_license_is_not_audio_evidence !== true) {
+    errors.push('rights_policy must preserve the deny-by-default acquisition gate');
+  }
+  if (!Array.isArray(plan.rights_policy?.accepted_bases) ||
+      plan.rights_policy.accepted_bases.length === 0 ||
+      new Set(plan.rights_policy.accepted_bases).size !==
+        plan.rights_policy.accepted_bases.length) {
+    errors.push('rights_policy.accepted_bases must be a non-empty unique array');
+  }
+  for (const field of ['draft_sources_only', 'preserve', 'critical_content']) {
+    if (!Array.isArray(plan.gold_policy?.[field]) ||
+        plan.gold_policy[field].length === 0 ||
+        new Set(plan.gold_policy[field]).size !==
+          plan.gold_policy[field].length) {
+      errors.push(`gold_policy.${field} must be a non-empty unique array`);
+    }
+  }
+  if (!(plan.gold_policy?.verification?.length > 0)) {
+    errors.push('gold_policy.verification must be a non-empty string');
+  }
+
+  const expectedCells = sourceCandidates.target_languages.flatMap(
+    (locale) => ['podcast', 'audiobook'].map((domain) => `${locale}/${domain}`),
+  );
+  const cells = plan.cells ?? [];
+  const cellIds = cells.map((cell) => cell.id);
+  if (!arrayEquals(cellIds, expectedCells)) {
+    errors.push('cells must cover every target locale and domain in German-first order');
+  }
+  if (!arrayEquals(plan.priority_order ?? [], cellIds)) {
+    errors.push('priority_order must exactly match cell order');
+  }
+  const seenCells = new Set();
+  const excludedSources = new Set(plan.excluded_development_sources ?? []);
+  for (const [index, cell] of cells.entries()) {
+    if (seenCells.has(cell.id)) errors.push(`duplicate target-domain cell: ${cell.id}`);
+    seenCells.add(cell.id);
+    if (cell.priority !== index + 1) {
+      errors.push(`${cell.id}: priority must match German-first cell order`);
+    }
+    if (cell.id !== `${cell.locale}/${cell.domain}`) {
+      errors.push(`${cell.id}: id must match locale/domain`);
+    }
+    if (!['acquisition-required', 'rights-review', 'gold-review', 'ready', 'complete'].includes(
+      cell.status,
+    )) {
+      errors.push(`${cell.id}: invalid status`);
+    }
+    if (!Array.isArray(cell.source_candidate_ids) ||
+        cell.source_candidate_ids.length === 0 ||
+        new Set(cell.source_candidate_ids).size !==
+          cell.source_candidate_ids.length) {
+      errors.push(`${cell.id}: source_candidate_ids must be a non-empty unique array`);
+      continue;
+    }
+    for (const sourceId of cell.source_candidate_ids) {
+      const source = sources.get(sourceId);
+      if (!source) {
+        errors.push(`${cell.id}: unknown source candidate ${sourceId}`);
+        continue;
+      }
+      if (excludedSources.has(sourceId)) {
+        errors.push(`${cell.id}: development source ${sourceId} cannot enter held-out cells`);
+      }
+      if (!source.domains.includes(cell.domain)) {
+        errors.push(`${cell.id}: ${sourceId} does not cover ${cell.domain}`);
+      }
+      if (!source.languages.includes(cell.locale)) {
+        errors.push(`${cell.id}: ${sourceId} does not cover ${cell.locale}`);
+      }
+    }
+  }
+  return errors;
+}
+
 function validateAudiobookPilot(manifest) {
   const errors = [];
   if (manifest.schema_version !== schemaVersion) {
@@ -782,6 +947,10 @@ const sourceCandidatesPath = join(
   repoRoot,
   'benchmarks/fixtures/source-candidates.json',
 );
+const targetDomainPlanPath = join(
+  repoRoot,
+  'benchmarks/fixtures/target-domain-plan.json',
+);
 const audiobookPilotPath = join(
   repoRoot,
   'benchmarks/fixtures/audiobook-pilot.json',
@@ -799,6 +968,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
+  join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
   join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
@@ -814,6 +984,7 @@ for (const path of schemaPaths) {
 const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
+const targetDomainPlan = await readJson(targetDomainPlanPath);
 const audiobookPilot = await readJson(audiobookPilotPath);
 const aggregateManifests = new Map([
   [manifest.revision, manifest],
@@ -833,6 +1004,11 @@ const failures = manifestValidation.errors.map((error) => `${manifestPath}: ${er
 failures.push(
   ...validateSourceCandidates(sourceCandidates).map(
     (error) => `${sourceCandidatesPath}: ${error}`,
+  ),
+);
+failures.push(
+  ...validateTargetDomainPlan(targetDomainPlan, sourceCandidates).map(
+    (error) => `${targetDomainPlanPath}: ${error}`,
   ),
 );
 failures.push(
@@ -931,6 +1107,14 @@ if (process.argv.includes('--self-test')) {
   if (validateSourceCandidates(invalidSourceCandidates).length === 0) {
     failures.push('validator self-test failed to reject duplicate source ids');
   }
+  const invalidTargetDomainPlan = structuredClone(targetDomainPlan);
+  invalidTargetDomainPlan.cells[0].source_candidate_ids = ['fleurs'];
+  if (validateTargetDomainPlan(
+    invalidTargetDomainPlan,
+    sourceCandidates,
+  ).length === 0) {
+    failures.push('validator self-test failed to reject a development source in a held-out cell');
+  }
   const invalidAudiobookPilot = structuredClone(audiobookPilot);
   invalidAudiobookPilot.summary.duration_ms += 1;
   if (validateAudiobookPilot(invalidAudiobookPilot).length === 0) {
@@ -957,6 +1141,7 @@ console.log(
   `benchmark data: ${manifest.fixtures.length} fixture(s), ${runs.length} run record(s), ` +
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
+  `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +

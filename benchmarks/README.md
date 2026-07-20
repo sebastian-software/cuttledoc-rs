@@ -85,10 +85,14 @@ are not statistically sufficient for a final model-quality ranking.
 The target benchmark design is language- and domain-aware. See
 [`docs/asr-benchmark-design.md`](../docs/asr-benchmark-design.md) and the
 machine-readable
-[`source-candidates.json`](fixtures/source-candidates.json). FLEURS remains a
-short-read integration gate; audiobook and professional-podcast cells are
-reported separately, with independent-source grouping and human-verified gold
-transcripts.
+[`source-candidates.json`](fixtures/source-candidates.json) registry. The
+held-out execution contract is
+[`target-domain-plan.json`](fixtures/target-domain-plan.json). It keeps German
+podcast and audiobook cells first, rejects development-source overlap, and
+requires an accepted source-specific rights review before acquisition. FLEURS
+remains a short-read integration gate; audiobook and professional-podcast
+cells are reported separately, with independent-source grouping and
+human-verified gold transcripts.
 
 The first target-domain development input is the 15-clip multilingual
 audiobook pilot. It deliberately remains outside Git as generated audio while

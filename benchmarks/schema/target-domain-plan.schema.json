@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/target-domain-plan.schema.json",
+  "title": "Cuttledoc held-out target-domain benchmark plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "revision",
+    "evidence_date",
+    "tracking_issue",
+    "purpose",
+    "priority_order",
+    "candidate_backends",
+    "excluded_development_sources",
+    "tracks",
+    "split_policy",
+    "rights_policy",
+    "gold_policy",
+    "cells"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "tracking_issue": {
+      "type": "string",
+      "format": "uri"
+    },
+    "purpose": {
+      "const": "held-out"
+    },
+    "priority_order": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "candidate_backends": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "excluded_development_sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tracks": {
+      "type": "object",
+      "required": [
+        "aligned_clip",
+        "long_form"
+      ],
+      "properties": {
+        "aligned_clip": {
+          "type": "object",
+          "required": [
+            "minimum_total_duration_ms",
+            "minimum_source_groups",
+            "minimum_speakers",
+            "alignment"
+          ],
+          "properties": {
+            "minimum_total_duration_ms": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minimum_source_groups": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minimum_speakers": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "alignment": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "long_form": {
+          "type": "object",
+          "required": [
+            "minimum_passage_duration_ms",
+            "maximum_passage_duration_ms",
+            "minimum_passages_per_source_group",
+            "required_behaviors"
+          ],
+          "properties": {
+            "minimum_passage_duration_ms": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maximum_passage_duration_ms": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minimum_passages_per_source_group": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "required_behaviors": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "split_policy": {
+      "type": "object",
+      "required": [
+        "grouping_unit",
+        "development",
+        "validation",
+        "test",
+        "forbid_cross_split_derivatives"
+      ],
+      "properties": {
+        "grouping_unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "development": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "test": {
+          "type": "string",
+          "minLength": 1
+        },
+        "forbid_cross_split_derivatives": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "rights_policy": {
+      "type": "object",
+      "required": [
+        "default_redistribution",
+        "acquisition_gate",
+        "accepted_bases",
+        "separate_audio_and_transcript_evidence",
+        "local_required_by_default",
+        "repository_license_is_not_audio_evidence"
+      ],
+      "properties": {
+        "default_redistribution": {
+          "const": "denied"
+        },
+        "acquisition_gate": {
+          "const": "accepted-rights-review"
+        },
+        "accepted_bases": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "separate_audio_and_transcript_evidence": {
+          "const": true
+        },
+        "local_required_by_default": {
+          "const": true
+        },
+        "repository_license_is_not_audio_evidence": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "gold_policy": {
+      "type": "object",
+      "required": [
+        "verification",
+        "draft_sources_only",
+        "preserve",
+        "critical_content"
+      ],
+      "properties": {
+        "verification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draft_sources_only": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "preserve": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "critical_content": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "priority",
+          "locale",
+          "domain",
+          "status",
+          "source_candidate_ids"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "locale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "podcast",
+              "audiobook"
+            ]
+          },
+          "status": {
+            "enum": [
+              "acquisition-required",
+              "rights-review",
+              "gold-review",
+              "ready",
+              "complete"
+            ]
+          },
+          "source_candidate_ids": {
+            "$ref": "#/$defs/nonEmptyUniqueStrings"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false
+}
