@@ -895,7 +895,7 @@ function validateQwen3TtsModelManifest(modelManifest, plan, selection) {
       !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
       candidate.source_revision !== modelManifest.reference_runtime?.revision ||
       candidate.status !==
-        'measured-reference-run-pending-listening-and-asr-matrix') {
+        'measured-reference-run-pending-qwen-asr-and-listening') {
     errors.push('synthetic plan does not reference the pinned model and runtime');
   }
   return errors;
@@ -1029,55 +1029,79 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
     errors.push('resource metrics must include process, MLX, and model size');
   }
 
-  const contentCheck = run.result?.content_check;
-  const normalizedAudio = contentCheck?.normalized_audio;
-  if (contentCheck?.status !== 'measured-diagnostic' ||
-      contentCheck?.backend?.id !== 'apple-speechtranscriber' ||
-      contentCheck?.backend?.locale !== 'de-DE' ||
+  const contentChecks = run.result?.asr_content_checks;
+  const normalizedAudio = contentChecks?.normalized_audio;
+  if (contentChecks?.status !== 'partial' ||
       normalizedAudio?.sample_format !== 'f32le' ||
       normalizedAudio?.sample_rate_hz !== 16000 ||
       normalizedAudio?.channel_count !== 1 ||
       normalizedAudio?.byte_count !== normalizedAudio?.sample_count * 4 ||
       normalizedAudio?.duration_ms !== audio?.duration_ms ||
       !/^[0-9a-f]{64}$/.test(normalizedAudio?.sha256 ?? '')) {
-    errors.push('content check must pin the shared 16 kHz Apple ASR input');
+    errors.push('content checks must pin the shared 16 kHz ASR input');
   }
-  const transcript = contentCheck?.transcript;
-  const transcriptDigest = createHash('sha256')
-    .update(transcript?.text ?? '')
-    .digest('hex');
-  if (!(transcript?.text?.length > 0) ||
-      transcript?.sha256 !== transcriptDigest ||
-      !(transcript?.final_segment_count > 0) ||
-      transcript?.update_count !==
-        transcript?.final_update_count + transcript?.volatile_update_count ||
-      transcript?.revoke_count !== 0) {
-    errors.push('content-check transcript or update counts are inconsistent');
+  const expectedContentChecks = new Map([
+    ['apple-speechtranscriber', [5, 104, 4, 694]],
+    ['whisper-large-v3-turbo-coreml-whispercpp', [2, 104, 0, 692]],
+    ['parakeet-tdt-0.6b-v3-coreml', [9, 100, 21, 692]],
+  ]);
+  const measuredChecks = contentChecks?.backends ?? [];
+  if (measuredChecks.length !== expectedContentChecks.size ||
+      new Set(measuredChecks.map((check) => check.backend?.id)).size !==
+        measuredChecks.length) {
+    errors.push('content checks must contain three unique measured backends');
   }
-  const quality = contentCheck?.quality;
-  if (quality?.word_edits !== 5 ||
-      quality?.reference_word_count !== 103 ||
-      quality?.hypothesis_word_count !== 104 ||
-      Math.abs(
-        quality?.wer - quality?.word_edits / quality?.reference_word_count,
-      ) > 1e-15 ||
-      quality?.character_edits !== 4 ||
-      quality?.reference_character_count !== 692 ||
-      quality?.hypothesis_character_count !== 694 ||
-      Math.abs(
-        quality?.cer -
-          quality?.character_edits / quality?.reference_character_count,
-      ) > 1e-15) {
-    errors.push('content-check WER or CER is not derivable from edit counts');
+  for (const check of measuredChecks) {
+    const transcript = check.transcript;
+    const transcriptDigest = createHash('sha256')
+      .update(transcript?.text ?? '')
+      .digest('hex');
+    if (!(transcript?.text?.length > 0) ||
+        transcript?.sha256 !== transcriptDigest ||
+        !(transcript?.segment_count > 0) ||
+        transcript?.update_count !==
+          transcript?.final_update_count + transcript?.volatile_update_count ||
+        transcript?.revoke_count !== 0) {
+      errors.push(
+        `${check.backend?.id ?? 'unknown'} transcript metadata is inconsistent`,
+      );
+    }
+    const expected = expectedContentChecks.get(check.backend?.id);
+    const quality = check.quality;
+    if (!expected ||
+        quality?.word_edits !== expected[0] ||
+        quality?.reference_word_count !== 103 ||
+        quality?.hypothesis_word_count !== expected[1] ||
+        Math.abs(
+          quality?.wer - quality?.word_edits / quality?.reference_word_count,
+        ) > 1e-15 ||
+        quality?.character_edits !== expected[2] ||
+        quality?.reference_character_count !== 692 ||
+        quality?.hypothesis_character_count !== expected[3] ||
+        Math.abs(
+          quality?.cer -
+            quality?.character_edits / quality?.reference_character_count,
+        ) > 1e-15) {
+      errors.push(
+        `${check.backend?.id ?? 'unknown'} WER or CER is not derivable`,
+      );
+    }
+    const asrTiming = check.timing;
+    if (!(asrTiming?.complete_inference_ms > 0) ||
+        Math.abs(
+          asrTiming?.real_time_factor -
+            asrTiming?.complete_inference_ms / audio?.duration_ms,
+        ) > 1e-15) {
+      errors.push(`${check.backend?.id ?? 'unknown'} timing is inconsistent`);
+    }
   }
-  const asrTiming = contentCheck?.timing;
-  if (!(asrTiming?.first_result_ms > 0) ||
-      !(asrTiming?.complete_inference_ms >= asrTiming?.first_result_ms) ||
-      Math.abs(
-        asrTiming?.real_time_factor -
-          asrTiming?.complete_inference_ms / audio?.duration_ms,
-      ) > 1e-15) {
-    errors.push('content-check ASR timing is inconsistent');
+  if (contentChecks?.comparison?.completed_backend_count !== 3 ||
+      contentChecks?.comparison?.expected_backend_count !== 4 ||
+      !arrayEquals(
+        contentChecks?.comparison?.remaining_backends ?? [],
+        ['qwen3-asr-0.6b-mlx-direct'],
+      )) {
+    errors.push('content-check matrix must leave only direct Qwen3-ASR open');
   }
   if (run.conclusion?.reference_path_proven !== true ||
       run.conclusion?.public_contract_accepted !== false ||
@@ -2181,7 +2205,8 @@ if (process.argv.includes('--self-test')) {
     );
   }
   const invalidQwen3TtsRun = structuredClone(qwen3TtsRun);
-  invalidQwen3TtsRun.result.content_check.quality.word_edits += 1;
+  invalidQwen3TtsRun.result.asr_content_checks.backends[0]
+    .quality.word_edits += 1;
   if (validateQwen3TtsRun(
     invalidQwen3TtsRun,
     syntheticRoundtripSelection,

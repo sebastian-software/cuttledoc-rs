@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
 **Status:** diagnostic text, Apple TTS lifecycle, and local Qwen3-TTS MLX
-reference verified; first Qwen → Apple Speech content check measured
+reference verified; three of four Qwen → ASR content checks measured
 
 ## Purpose
 
@@ -149,12 +149,19 @@ The first diagnostic therefore fixes the English-native `Ryan` preset speaking
 German. This is a real cross-lingual limitation to review, not a reason to
 discard the platform or model family.
 
-As an initial content check, the exact normalized audio was transcribed by the
-existing German Apple Speech spike. It recovered the passage at 4.85% lexical
-WER and 0.58% CER. The differences included `Dartmouth`/`Dartmoalth`,
-`Augmentation`/`Augumentation`, `des`/`das`, and tokenization of
-`Rockefeller-Stiftung`. Those mismatches are not yet assigned to TTS or ASR:
-the remaining three ASR backends and a blinded listening review are required.
+Three ASR backends have now transcribed the exact same digest-pinned 16 kHz
+audio:
+
+| Backend | German WER | German CER | Diagnostic observation |
+| --- | ---: | ---: | --- |
+| Whisper large-v3-turbo | 1.94% | 0.00% | exact lexical character sequence; WER comes from splitting `Rockefeller-Stiftung` |
+| Apple Speech | 4.85% | 0.58% | substitutions include `Dartmouth`/`Dartmoalth` and `Augmentation`/`Augumentation` |
+| Parakeet TDT 0.6B v3 | 8.74% | 3.03% | language-switch errors concentrate around embedded English terms |
+
+The spread strengthens the evidence that Qwen generated the intended German
+content and demonstrates why one roundtrip score must not be treated as a TTS
+quality score. The direct Qwen3-ASR cell and blinded listening review remain
+necessary before assigning the residual errors to synthesis or recognition.
 
 ## Implementation sequence
 
@@ -172,8 +179,8 @@ the remaining three ASR backends and a blinded listening review are required.
    cross-lingual German generation contract are frozen in
    [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
    **Reference run complete:** real PCM, timing, resource use, termination, and
-   the first Apple Speech content check are recorded. Listening and the
-   remaining ASR cells are still open.
+   three ASR content checks are recorded. Direct Qwen3-ASR and listening are
+   still open.
 4. Run the two local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.

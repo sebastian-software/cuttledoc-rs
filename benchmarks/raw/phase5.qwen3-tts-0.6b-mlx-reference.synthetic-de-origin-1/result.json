@@ -117,14 +117,8 @@
       "reached_max_tokens": false,
       "configured_max_tokens": 1200
     },
-    "content_check": {
-      "status": "measured-diagnostic",
-      "captured_at": "2026-07-20T18:06:19Z",
-      "backend": {
-        "id": "apple-speechtranscriber",
-        "locale": "de-DE",
-        "execution": "existing repository Rust/Swift spike in a normal host process"
-      },
+    "asr_content_checks": {
+      "status": "partial",
       "normalized_audio": {
         "sample_format": "f32le",
         "sample_rate_hz": 16000,
@@ -134,36 +128,142 @@
         "duration_ms": 77520,
         "sha256": "fc6b9e3f6df3c2f380352809313ed9240cf9613e4c67cc5189b900c4c0d10174"
       },
-      "transcript": {
-        "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz wurde 1955 vom US-amerikanischen Informatiker. John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmoalth Summer Research Project on Artificial Intelligence geprägt . Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augumentation vor . Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis, das mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
-        "sha256": "d3f6b4cf501d2f80b4fa8043dbd4d28ee67da623ea0a947e39b6530a37ea6aef",
-        "final_segment_count": 106,
-        "update_count": 213,
-        "final_update_count": 4,
-        "volatile_update_count": 209,
-        "revoke_count": 0
-      },
-      "quality": {
-        "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
-        "reference_word_count": 103,
-        "hypothesis_word_count": 104,
-        "word_edits": 5,
-        "wer": 0.04854368932038835,
-        "reference_character_count": 692,
-        "hypothesis_character_count": 694,
-        "character_edits": 4,
-        "cer": 0.005780346820809248
-      },
-      "timing": {
-        "first_result_ms": 67.274417,
-        "complete_inference_ms": 609.872834,
-        "real_time_factor": 0.00786729662022704
-      },
-      "observations": [
-        "The first ASR pass recovers nearly all lexical content from the generated German audio.",
-        "The lexical differences include Rockefeller-Stiftung versus Rockefeller Stiftung, Dartmouth versus Dartmoalth, Augmentation versus Augumentation, and des versus das.",
-        "The roundtrip alone cannot attribute those differences to TTS pronunciation or ASR recognition; listening and the remaining ASR backends are required."
-      ]
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-20T18:06:19Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "de-DE",
+            "execution": "existing repository Rust/Swift spike in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz wurde 1955 vom US-amerikanischen Informatiker. John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmoalth Summer Research Project on Artificial Intelligence geprägt . Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augumentation vor . Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis, das mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "d3f6b4cf501d2f80b4fa8043dbd4d28ee67da623ea0a947e39b6530a37ea6aef",
+            "segment_count": 106,
+            "update_count": 213,
+            "final_update_count": 4,
+            "volatile_update_count": 209,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 5,
+            "wer": 0.04854368932038835,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 694,
+            "character_edits": 4,
+            "cer": 0.005780346820809248
+          },
+          "timing": {
+            "first_result_ms": 67.274417,
+            "complete_inference_ms": 609.872834,
+            "real_time_factor": 0.00786729662022704
+          }
+        },
+        {
+          "captured_at": "2026-07-20T18:12:56.521Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "de",
+            "repository": "whisper-coreml",
+            "revision": "20f619e02b46e64dc819958d3ab83bd029607f0a",
+            "version": {
+              "addon": "1.0.0",
+              "whisper": "whisper.cpp CoreML",
+              "coreml": "CoreML (ANE accelerated)"
+            }
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "e60ee23ef7450bd7f7f426de02d81cc83265dc8fd7f28d964465ae2368f057b8",
+            "segment_count": 7,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 2,
+            "wer": 0.019417475728155338,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 692,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "cold_load_ms": 1164.217333,
+            "complete_inference_ms": 3114.594833,
+            "real_time_factor": 0.04017795192208463
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1956511744
+          }
+        },
+        {
+          "captured_at": "2026-07-20T18:13:15.087Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "repository": "parakeet-coreml",
+            "revision": "3a29d6f80bfa5f95e791d21cfa86a0154806ef47",
+            "version": {
+              "addon": "1.0.0",
+              "model": "parakeet-tdt-0.6b-v3",
+              "coreml": "CoreML 7.0+"
+            }
+          },
+          "transcript": {
+            "text": "The begriff artificial intelligence. Künstliche Intelligenz Wurde 1955 vom US-amerikanischen Informatiker. John McCarthy. Im Rahmen eines Förderantrags an die Rockefeller-Stiftung Futis Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt? bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs Künstliche Intelligenz. wurde im Lauf der Zeit verschiedentlich diskutiert. Computerpionier Douglas. Engelbart. Zog bereits. 1962 den Begriff Intelligence augmentation four. Seiner Ansicht nach. Zidest zeal. durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken. Anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "208c13081082519dfa091fbd043601b75add5977056a22d7db7f14b745b6de91",
+            "segment_count": 22,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 100,
+            "word_edits": 9,
+            "wer": 0.08737864077669903,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 692,
+            "character_edits": 21,
+            "cer": 0.030346820809248554
+          },
+          "timing": {
+            "cold_load_ms": 336.06766700000003,
+            "complete_inference_ms": 2090.365208,
+            "real_time_factor": 0.02696549545923633
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 167198720
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 3,
+        "expected_backend_count": 4,
+        "remaining_backends": [
+          "qwen3-asr-0.6b-mlx-direct"
+        ],
+        "lowest_observed_wer_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+        "observations": [
+          "Whisper recovers the lexical character sequence exactly; its two word edits are caused by splitting Rockefeller-Stiftung into two tokens.",
+          "Apple Speech introduces four character edits, including Dartmouth versus Dartmoalth and Augmentation versus Augumentation.",
+          "Parakeet introduces nine word edits and 21 character edits, including language-switch errors around embedded English terms.",
+          "The backend spread strengthens the evidence that the generated speech carries the intended German passage, but errors remain unattributed until the direct Qwen3-ASR cell and listening review are complete."
+        ]
+      }
     }
   },
   "environment": {
@@ -204,6 +304,6 @@
     "reference_path_proven": true,
     "public_contract_accepted": false,
     "quality_decision_ready": false,
-    "next": "Run the normalized audio through Whisper, direct Qwen3-ASR over MLX, and Parakeet, then perform a small blinded German listening review before comparing voices and candidates."
+    "next": "Run the normalized audio through direct Qwen3-ASR over MLX, then perform a small blinded German listening review before comparing voices and candidates."
   }
 }

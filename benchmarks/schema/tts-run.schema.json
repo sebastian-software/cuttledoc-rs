@@ -123,7 +123,7 @@
         "termination": {
           "$ref": "#/$defs/openObject"
         },
-        "content_check": {
+        "asr_content_checks": {
           "$ref": "#/$defs/openObject"
         }
       },
