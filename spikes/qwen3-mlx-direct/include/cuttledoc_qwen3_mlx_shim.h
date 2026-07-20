@@ -48,6 +48,15 @@ int32_t cuttledoc_qwen3_mlx_probe_prompt_embeddings(
     const char *language, int32_t device_kind, char **json_out,
     char **error_out);
 
+/*
+ * Runs the 28-layer quantized text model through prompt prefill and two greedy
+ * decode positions using a repository-owned KV cache.
+ */
+int32_t cuttledoc_qwen3_mlx_probe_decoder_prefill(
+    const char *model_directory, const float *audio, size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out);
+
 void cuttledoc_qwen3_mlx_free_string(char *value);
 
 #ifdef __cplusplus

@@ -35,6 +35,15 @@ unsafe extern "C" {
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
+    fn cuttledoc_qwen3_mlx_probe_decoder_prefill(
+        model_directory: *const c_char,
+        audio: *const f32,
+        audio_len: usize,
+        language: *const c_char,
+        device_kind: i32,
+        json_out: *mut *mut c_char,
+        error_out: *mut *mut c_char,
+    ) -> i32;
     fn cuttledoc_qwen3_mlx_free_string(value: *mut c_char);
 }
 
@@ -56,7 +65,22 @@ fn run() -> Result<(), String> {
             probe_audio(model_directory, pcm_path, device, AudioProbe::Encoder)
         }
         [command, model_directory, pcm_path, language, device] if command == "prompt" => {
-            probe_prompt(model_directory, pcm_path, language, device)
+            probe_text_boundary(
+                model_directory,
+                pcm_path,
+                language,
+                device,
+                TextProbe::Prompt,
+            )
+        }
+        [command, model_directory, pcm_path, language, device] if command == "decoder" => {
+            probe_text_boundary(
+                model_directory,
+                pcm_path,
+                language,
+                device,
+                TextProbe::Decoder,
+            )
         }
         _ => Err(usage()),
     }
@@ -148,11 +172,18 @@ fn probe_audio(
     Ok(())
 }
 
-fn probe_prompt(
+#[derive(Clone, Copy)]
+enum TextProbe {
+    Prompt,
+    Decoder,
+}
+
+fn probe_text_boundary(
     model_directory: &str,
     pcm_path: &str,
     language: &str,
     device: &str,
+    probe: TextProbe,
 ) -> Result<(), String> {
     let model_directory = CString::new(model_directory)
         .map_err(|_| "model path contains an embedded NUL byte".to_owned())?;
@@ -176,31 +207,43 @@ fn probe_prompt(
     let mut json = ptr::null_mut();
     let mut error = ptr::null_mut();
     let status = unsafe {
-        cuttledoc_qwen3_mlx_probe_prompt_embeddings(
-            model_directory.as_ptr(),
-            audio.as_ptr(),
-            audio.len(),
-            language.as_ptr(),
-            device_kind,
-            &mut json,
-            &mut error,
-        )
+        match probe {
+            TextProbe::Prompt => cuttledoc_qwen3_mlx_probe_prompt_embeddings(
+                model_directory.as_ptr(),
+                audio.as_ptr(),
+                audio.len(),
+                language.as_ptr(),
+                device_kind,
+                &mut json,
+                &mut error,
+            ),
+            TextProbe::Decoder => cuttledoc_qwen3_mlx_probe_decoder_prefill(
+                model_directory.as_ptr(),
+                audio.as_ptr(),
+                audio.len(),
+                language.as_ptr(),
+                device_kind,
+                &mut json,
+                &mut error,
+            ),
+        }
     };
     if status != 0 {
         if !json.is_null() {
             unsafe { cuttledoc_qwen3_mlx_free_string(json) };
         }
-        return Err(take_string(error)
-            .unwrap_or_else(|| "MLX prompt probe returned an error without a message".to_owned()));
+        return Err(take_string(error).unwrap_or_else(|| {
+            "MLX text-boundary probe returned an error without a message".to_owned()
+        }));
     }
     let result = take_string(json)
-        .ok_or_else(|| "MLX prompt probe returned success without JSON".to_owned())?;
+        .ok_or_else(|| "MLX text-boundary probe returned success without JSON".to_owned())?;
     println!("{result}");
     Ok(())
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect encoder MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect prompt MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-qwen3-mlx-inspect MODEL_DIR\n  cuttledoc-qwen3-mlx-inspect frontend MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect encoder MODEL_DIR PCM_F32LE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect prompt MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu\n  cuttledoc-qwen3-mlx-inspect decoder MODEL_DIR PCM_F32LE LANGUAGE cpu|gpu".to_owned()
 }
 
 fn take_string(value: *mut c_char) -> Option<String> {

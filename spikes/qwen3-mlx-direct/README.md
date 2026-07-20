@@ -36,6 +36,11 @@ embeddings with official MLX, and replaces every audio-pad embedding with the
 corresponding direct encoder feature. No Transformers tokenizer is required by
 the direct runtime.
 
+The fifth vertical slice executes all 28 quantized Qwen3 text layers with
+grouped-query attention, RoPE, SwiGLU, tied output projection, and a
+repository-owned growable KV cache. Prompt prefill and the first two greedy
+decode positions match the pinned Python reference.
+
 ## Pinned inputs
 
 - official MLX `v0.32.0`,
@@ -118,6 +123,18 @@ DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
   gpu
 ```
 
+Run decoder prompt prefill and the first two cached greedy positions:
+
+```sh
+DYLD_LIBRARY_PATH=/private/tmp/cuttledoc-qwen3-mlx-direct-build \
+  /private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect \
+  decoder \
+  /absolute/path/to/Qwen3-ASR-0.6B-8bit \
+  /absolute/path/to/fixture.f32le \
+  en \
+  gpu
+```
+
 Compare its JSON output with the pinned reference oracle:
 
 ```sh
@@ -136,6 +153,16 @@ node scripts/validate-qwen3-mlx-prompt.mjs \
   --actual /absolute/path/to/direct-prompt-result.json
 ```
 
+The decoder boundary has a separate validator for cache state, logits, and
+greedy decisions:
+
+```sh
+node scripts/validate-qwen3-mlx-decoder.mjs \
+  --oracle \
+  benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.decoder-en.json \
+  --actual /absolute/path/to/direct-decoder-result.json
+```
+
 The validator requires exact shapes, feature length, chunk boundaries, sample
 positions, encoder length, and attention windows. It allows `2e-6` sampled
 absolute error through `conv_out`, `1e-5` through the full encoder, and `2e-5`
@@ -144,6 +171,5 @@ direct MLX path use different FFT implementations.
 
 ## Next parity gates
 
-1. Implement the quantized 28-layer Qwen3 decoder with KV caching.
-2. Require exact transcript parity on one fixture before running the
-   multilingual audiobook matrix.
+1. Require exact full-transcript parity on one fixture.
+2. Run the multilingual audiobook matrix.

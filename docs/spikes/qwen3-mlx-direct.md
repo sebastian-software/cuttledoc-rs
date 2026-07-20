@@ -4,8 +4,9 @@
 [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17) is in
 progress. The model-artifact boundary and the direct 128-Mel/Conv2d path are
 complete. All 18 audio transformer layers also match the reference oracle;
-the tokenizer/prompt/audio-embedding boundary matches as well. Decoder parity
-remains open.
+the tokenizer/prompt/audio-embedding boundary matches as well. The complete
+28-layer decoder and KV cache now reproduce the first two greedy decisions;
+full-transcript parity remains open.
 
 **Runnable artifact:**
 [`spikes/qwen3-mlx-direct`](../../spikes/qwen3-mlx-direct/).
@@ -124,12 +125,40 @@ The Metal development probe took 381.677 ms after adapter construction and
 reported a 1,766,258,540-byte MLX peak. This is still a parity probe with lazy
 materialization, not the final repeated decoder performance result.
 
+## Milestone 5: quantized decoder prefill and KV cache
+
+The adapter now executes all 28 text transformer layers directly through
+official MLX. It implements the converted model's affine 8-bit linear layers,
+RMS normalization, grouped-query attention, RoPE with base 1,000,000, SwiGLU
+MLPs, tied quantized output projection, and a repository-owned KV cache whose
+capacity grows in 256-token steps.
+
+For the pinned English fixture, the two-step probe proves:
+
+- the 220-token prompt is split and cached with the same prefill semantics as
+  the reference generator;
+- the first-layer sampled key/value cache entries are exact after prefill;
+- the first token is exactly `6217` and the second exactly `10810`;
+- the first top-10 candidate set overlaps 10/10 and the second 9/10;
+- the layer-27 maximum sampled difference is 0.3711 in BF16 values, while the
+  largest aggregate relative difference across checked tensors is 3.0532%.
+
+The deeper hidden-state values are not byte-identical because official MLX C++
+and the Python reference reach different fused BF16 execution paths. The exact
+greedy decisions, exact first-layer cache samples, and bounded deeper
+fingerprints make the acceptance criterion explicit instead of hiding that
+numerical distinction.
+
+The fresh Metal parity run took 354.257 ms after adapter construction and
+reported a 1,918,491,576-byte MLX peak. Top-candidate fingerprinting forces the
+full vocabulary logits to materialize, so this remains a development probe
+rather than a production memory measurement.
+
 ## Remaining parity gates
 
-1. Run the 28-layer quantized decoder with a repository-owned KV cache.
-2. Require exact transcript parity on one fixture before adding the direct
+1. Require exact full-transcript parity on one fixture before adding the direct
    adapter to the multilingual audiobook matrix.
-3. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
+2. Add task lifecycle, cancellation checkpoints, bounded streaming updates,
    memory measurements after materialization, and artifact pruning evidence.
 
 The order matters: comparing encoder tensors first prevents frontend or

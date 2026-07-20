@@ -50,6 +50,14 @@ constexpr int32_t kAudioStartToken = 151669;
 constexpr int32_t kAudioEndToken = 151670;
 constexpr int32_t kAudioPadToken = 151676;
 constexpr int32_t kAsrTextToken = 151704;
+constexpr std::size_t kTextHiddenSize = 1024;
+constexpr std::size_t kTextAttentionHeads = 16;
+constexpr std::size_t kTextKeyValueHeads = 8;
+constexpr std::size_t kTextHeadDimension = 128;
+constexpr std::size_t kTextDecoderLayers = 28;
+constexpr float kTextRmsNormEpsilon = 1e-6f;
+constexpr float kTextRopeBase = 1'000'000.0f;
+constexpr std::size_t kTextCacheStep = 256;
 
 std::mutex runtime_mutex;
 
@@ -375,6 +383,34 @@ std::string fingerprint_json(const mx::array &value, mx::Device device) {
     json << values[sample_indices[index]];
   }
   json << "]}";
+  return json.str();
+}
+
+std::string top_tokens_json(const mx::array &logits, std::size_t count,
+                            mx::Device device) {
+  auto materialized =
+      mx::contiguous(mx::astype(logits, mx::float32, device), false, device);
+  mx::eval(materialized);
+  const auto *values = materialized.data<float>();
+  std::vector<std::size_t> indices(materialized.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  count = std::min(count, indices.size());
+  std::partial_sort(
+      indices.begin(), indices.begin() + static_cast<std::ptrdiff_t>(count),
+      indices.end(),
+      [values](std::size_t left, std::size_t right) {
+        return values[left] > values[right];
+      });
+  std::ostringstream json;
+  json << std::setprecision(17) << "[";
+  for (std::size_t index = 0; index < count; ++index) {
+    if (index != 0) {
+      json << ",";
+    }
+    json << "{\"token\":" << indices[index] << ",\"logit\":"
+         << values[indices[index]] << "}";
+  }
+  json << "]";
   return json.str();
 }
 
@@ -707,6 +743,103 @@ private:
   mutable std::unordered_map<std::string, std::vector<int32_t>> cache_;
 };
 
+class TextKeyValueCache {
+public:
+  std::size_t offset() const { return offset_; }
+
+  std::pair<mx::array, mx::array> update(const mx::array &keys,
+                                         const mx::array &values,
+                                         mx::Device device) {
+    const auto previous = offset_;
+    const auto input_length = static_cast<std::size_t>(keys.shape(2));
+    if (!keys_.has_value() ||
+        previous + input_length >
+            static_cast<std::size_t>(keys_->shape(2))) {
+      const auto steps =
+          (kTextCacheStep + input_length - 1) / kTextCacheStep;
+      const auto capacity = steps * kTextCacheStep;
+      const mx::Shape key_shape{
+          keys.shape(0), keys.shape(1), static_cast<int>(capacity),
+          keys.shape(3)};
+      const mx::Shape value_shape{
+          values.shape(0), values.shape(1), static_cast<int>(capacity),
+          values.shape(3)};
+      auto new_keys = mx::zeros(key_shape, keys.dtype(), device);
+      auto new_values = mx::zeros(value_shape, values.dtype(), device);
+      if (keys_.has_value()) {
+        if (previous % kTextCacheStep != 0) {
+          keys_ = mx::slice(
+              keys_.value(), {0, 0, 0, 0},
+              {keys_->shape(0), keys_->shape(1),
+               static_cast<int>(previous), keys_->shape(3)},
+              {1, 1, 1, 1}, device);
+          values_ = mx::slice(
+              values_.value(), {0, 0, 0, 0},
+              {values_->shape(0), values_->shape(1),
+               static_cast<int>(previous), values_->shape(3)},
+              {1, 1, 1, 1}, device);
+        }
+        keys_ =
+            mx::concatenate({keys_.value(), std::move(new_keys)}, 2, device);
+        values_ =
+            mx::concatenate({values_.value(), std::move(new_values)}, 2, device);
+      } else {
+        keys_ = std::move(new_keys);
+        values_ = std::move(new_values);
+      }
+    }
+
+    offset_ += input_length;
+    keys_ = mx::slice_update(
+        keys_.value(), keys,
+        {0, 0, static_cast<int>(previous), 0},
+        {keys.shape(0), keys.shape(1), static_cast<int>(offset_),
+         keys.shape(3)},
+        device);
+    values_ = mx::slice_update(
+        values_.value(), values,
+        {0, 0, static_cast<int>(previous), 0},
+        {values.shape(0), values.shape(1), static_cast<int>(offset_),
+         values.shape(3)},
+        device);
+    return {
+        mx::slice(keys_.value(), {0, 0, 0, 0},
+                  {keys_->shape(0), keys_->shape(1),
+                   static_cast<int>(offset_), keys_->shape(3)},
+                  {1, 1, 1, 1}, device),
+        mx::slice(values_.value(), {0, 0, 0, 0},
+                  {values_->shape(0), values_->shape(1),
+                   static_cast<int>(offset_), values_->shape(3)},
+                  {1, 1, 1, 1}, device),
+    };
+  }
+
+  mx::array keys(mx::Device device) const {
+    if (!keys_.has_value()) {
+      throw std::runtime_error("text key cache is empty");
+    }
+    return mx::slice(keys_.value(), {0, 0, 0, 0},
+                     {keys_->shape(0), keys_->shape(1),
+                      static_cast<int>(offset_), keys_->shape(3)},
+                     {1, 1, 1, 1}, device);
+  }
+
+  mx::array values(mx::Device device) const {
+    if (!values_.has_value()) {
+      throw std::runtime_error("text value cache is empty");
+    }
+    return mx::slice(values_.value(), {0, 0, 0, 0},
+                     {values_->shape(0), values_->shape(1),
+                      static_cast<int>(offset_), values_->shape(3)},
+                     {1, 1, 1, 1}, device);
+  }
+
+private:
+  std::optional<mx::array> keys_;
+  std::optional<mx::array> values_;
+  std::size_t offset_ = 0;
+};
+
 class Qwen3AudioEncoder {
 public:
   Qwen3AudioEncoder(const std::filesystem::path &model_directory,
@@ -768,6 +901,33 @@ public:
            }) {
         expect_shape(weights_, prefix + suffix, shape);
       }
+    }
+    expect_shape(weights_, "model.norm.weight", {1024});
+    const auto expect_quantized =
+        [this](const std::string &prefix, const mx::Shape &weight_shape,
+               const mx::Shape &parameter_shape) {
+          expect_shape(weights_, prefix + ".weight", weight_shape);
+          expect_shape(weights_, prefix + ".scales", parameter_shape);
+          expect_shape(weights_, prefix + ".biases", parameter_shape);
+        };
+    for (std::size_t layer = 0; layer < kTextDecoderLayers; ++layer) {
+      const auto prefix = "model.layers." + std::to_string(layer) + ".";
+      expect_quantized(prefix + "self_attn.q_proj", {2048, 256},
+                       {2048, 16});
+      expect_quantized(prefix + "self_attn.k_proj", {1024, 256},
+                       {1024, 16});
+      expect_quantized(prefix + "self_attn.v_proj", {1024, 256},
+                       {1024, 16});
+      expect_quantized(prefix + "self_attn.o_proj", {1024, 512},
+                       {1024, 32});
+      expect_quantized(prefix + "mlp.gate_proj", {3072, 256}, {3072, 16});
+      expect_quantized(prefix + "mlp.up_proj", {3072, 256}, {3072, 16});
+      expect_quantized(prefix + "mlp.down_proj", {1024, 768}, {1024, 48});
+      expect_shape(weights_, prefix + "self_attn.q_norm.weight", {128});
+      expect_shape(weights_, prefix + "self_attn.k_norm.weight", {128});
+      expect_shape(weights_, prefix + "input_layernorm.weight", {1024});
+      expect_shape(weights_, prefix + "post_attention_layernorm.weight",
+                   {1024});
     }
   }
 
@@ -1056,7 +1216,91 @@ public:
     return json.str();
   }
 
+  std::string probe_decoder(const float *audio, std::size_t audio_len,
+                            std::string_view language) const {
+    const auto started = std::chrono::steady_clock::now();
+    const auto prompt = build_prompt_inputs(audio, audio_len, language);
+    if (prompt.token_ids.size() < 2) {
+      throw std::runtime_error("decoder prompt must contain at least two tokens");
+    }
+
+    std::vector<TextKeyValueCache> caches(kTextDecoderLayers);
+    const auto prefix_length = prompt.token_ids.size() - 1;
+    const auto prefix_embeddings = mx::slice(
+        prompt.embeddings, {0, 0, 0},
+        {1, static_cast<int>(prefix_length),
+         static_cast<int>(kTextHiddenSize)},
+        {1, 1, 1}, device_);
+    static_cast<void>(text_model(prefix_embeddings, caches));
+    evaluate_text_caches(caches);
+
+    const auto final_prompt_embedding = mx::slice(
+        prompt.embeddings, {0, static_cast<int>(prefix_length), 0},
+        {1, static_cast<int>(prompt.token_ids.size()),
+         static_cast<int>(kTextHiddenSize)},
+        {1, 1, 1}, device_);
+    const auto hidden = text_model(final_prompt_embedding, caches);
+    const auto logits = mx::squeeze(output_logits(hidden), 1, device_);
+    const auto hidden_fingerprint = fingerprint_json(hidden, device_);
+    const auto logits_fingerprint = fingerprint_json(logits, device_);
+    const auto first_top_tokens = top_tokens_json(logits, 10, device_);
+    const auto layer_zero_keys =
+        fingerprint_json(caches.front().keys(device_), device_);
+    const auto layer_zero_values =
+        fingerprint_json(caches.front().values(device_), device_);
+    const auto layer_final_keys =
+        fingerprint_json(caches.back().keys(device_), device_);
+    const auto layer_final_values =
+        fingerprint_json(caches.back().values(device_), device_);
+    const auto first_token = greedy_token(logits);
+
+    const auto first_embedding = embed_token_ids({first_token});
+    const auto second_hidden = text_model(first_embedding, caches);
+    const auto second_logits =
+        mx::squeeze(output_logits(second_hidden), 1, device_);
+    const auto second_hidden_fingerprint =
+        fingerprint_json(second_hidden, device_);
+    const auto second_logits_fingerprint =
+        fingerprint_json(second_logits, device_);
+    const auto second_top_tokens =
+        top_tokens_json(second_logits, 10, device_);
+    const auto second_token = greedy_token(second_logits);
+
+    const auto elapsed =
+        std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - started)
+            .count();
+    std::ostringstream json;
+    json << std::setprecision(17)
+         << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+         << "\"stage\":\"qwen3-decoder-prefill\","
+         << "\"device\":\""
+         << (device_ == mx::Device::gpu ? "gpu" : "cpu") << "\","
+         << "\"pcm_samples\":" << audio_len << ",\"language\":\""
+         << json_escape(language) << "\",\"prompt_length\":"
+         << prompt.token_ids.size() << ",\"cache_offset_after_prefill\":"
+         << prefix_length + 1 << ",\"first_token\":" << first_token
+         << ",\"second_token\":" << second_token << ",\"elapsed_ms\":"
+         << elapsed << ",\"peak_memory_bytes\":" << mx::get_peak_memory()
+         << ",\"prefill\":{\"hidden\":" << hidden_fingerprint
+         << ",\"logits\":" << logits_fingerprint
+         << ",\"layer_0_keys\":" << layer_zero_keys
+         << ",\"layer_0_values\":" << layer_zero_values
+         << ",\"layer_27_keys\":" << layer_final_keys
+         << ",\"layer_27_values\":" << layer_final_values
+         << "},\"second_step\":{\"hidden\":" << second_hidden_fingerprint
+         << ",\"logits\":" << second_logits_fingerprint
+         << "},\"first_top_tokens\":" << first_top_tokens
+         << ",\"second_top_tokens\":" << second_top_tokens << "}";
+    return json.str();
+  }
+
 private:
+  struct PromptInputs {
+    std::vector<int32_t> token_ids;
+    mx::array embeddings;
+  };
+
   const mx::array &weight(const std::string &name) const {
     const auto found = weights_.find(name);
     if (found == weights_.end()) {
@@ -1226,6 +1470,187 @@ private:
     hidden = layer_norm(hidden, "audio_tower.ln_post");
     hidden = gelu(linear(hidden, "audio_tower.proj1"));
     return linear(hidden, "audio_tower.proj2");
+  }
+
+  PromptInputs build_prompt_inputs(const float *audio, std::size_t audio_len,
+                                   std::string_view language) const {
+    const auto audio_features = encode_audio_features(audio, audio_len);
+    const auto audio_token_count =
+        static_cast<std::size_t>(audio_features.shape(0));
+    const QwenTokenizer tokenizer(model_directory_);
+    auto token_ids = tokenizer.build_asr_prompt(audio_token_count, language);
+    auto embeddings = embed_token_ids(token_ids);
+    const auto audio_features_bfloat16 =
+        mx::astype(audio_features, embeddings.dtype(), device_);
+    const auto flat_embeddings = mx::squeeze(embeddings, 0, device_);
+    std::vector<mx::array> rows;
+    rows.reserve(token_ids.size());
+    std::size_t audio_index = 0;
+    for (std::size_t token_index = 0; token_index < token_ids.size();
+         ++token_index) {
+      if (token_ids[token_index] == kAudioPadToken) {
+        rows.push_back(mx::take(audio_features_bfloat16,
+                                static_cast<int>(audio_index++), 0, device_));
+      } else {
+        rows.push_back(mx::take(flat_embeddings,
+                                static_cast<int>(token_index), 0, device_));
+      }
+    }
+    if (audio_index != audio_token_count) {
+      throw std::runtime_error(
+          "audio feature count does not match the prompt placeholders");
+    }
+    embeddings = mx::expand_dims(mx::stack(rows, 0, device_), 0, device_);
+    return {std::move(token_ids), std::move(embeddings)};
+  }
+
+  mx::array embed_token_ids(const std::vector<int32_t> &token_ids) const {
+    if (token_ids.empty()) {
+      throw std::runtime_error("cannot embed an empty token sequence");
+    }
+    const auto token_array =
+        mx::array(token_ids.begin(), {1, static_cast<int>(token_ids.size())});
+    return mx::dequantize(
+        mx::take(weight("model.embed_tokens.weight"), token_array, 0, device_),
+        mx::take(weight("model.embed_tokens.scales"), token_array, 0, device_),
+        mx::take(weight("model.embed_tokens.biases"), token_array, 0, device_),
+        64, 8, "affine", std::nullopt, std::nullopt, device_);
+  }
+
+  mx::array text_quantized_linear(const mx::array &input,
+                                  const std::string &prefix) const {
+    return mx::quantized_matmul(
+        input, weight(prefix + ".weight"), weight(prefix + ".scales"),
+        weight(prefix + ".biases"), true, 64, 8, "affine", device_);
+  }
+
+  mx::array text_rms_norm(const mx::array &input,
+                          const std::string &weight_name) const {
+    return mx::fast::rms_norm(input, weight(weight_name),
+                              kTextRmsNormEpsilon, device_);
+  }
+
+  mx::array text_causal_mask(std::size_t sequence_length,
+                             std::size_t offset, mx::Dtype dtype) const {
+    const auto total_length = offset + sequence_length;
+    std::vector<float> values(sequence_length * total_length, 0.0f);
+    for (std::size_t row = 0; row < sequence_length; ++row) {
+      const auto absolute_row = offset + row;
+      for (std::size_t column = absolute_row + 1; column < total_length;
+           ++column) {
+        values[row * total_length + column] = -1e9f;
+      }
+    }
+    return mx::astype(
+        mx::array(values.begin(),
+                  {static_cast<int>(sequence_length),
+                   static_cast<int>(total_length)}),
+        dtype, device_);
+  }
+
+  mx::array text_attention(const mx::array &input, std::size_t layer,
+                           TextKeyValueCache &cache) const {
+    const auto prefix =
+        "model.layers." + std::to_string(layer) + ".self_attn.";
+    const auto batch_size = input.shape(0);
+    const auto sequence_length = input.shape(1);
+    auto queries = text_quantized_linear(input, prefix + "q_proj");
+    auto keys = text_quantized_linear(input, prefix + "k_proj");
+    auto values = text_quantized_linear(input, prefix + "v_proj");
+    queries = mx::reshape(
+        queries,
+        {batch_size, sequence_length, static_cast<int>(kTextAttentionHeads),
+         static_cast<int>(kTextHeadDimension)},
+        device_);
+    keys = mx::reshape(
+        keys,
+        {batch_size, sequence_length, static_cast<int>(kTextKeyValueHeads),
+         static_cast<int>(kTextHeadDimension)},
+        device_);
+    values = mx::reshape(
+        values,
+        {batch_size, sequence_length, static_cast<int>(kTextKeyValueHeads),
+         static_cast<int>(kTextHeadDimension)},
+        device_);
+    queries = text_rms_norm(queries, prefix + "q_norm.weight");
+    keys = text_rms_norm(keys, prefix + "k_norm.weight");
+    queries = mx::transpose(queries, {0, 2, 1, 3}, device_);
+    keys = mx::transpose(keys, {0, 2, 1, 3}, device_);
+    values = mx::transpose(values, {0, 2, 1, 3}, device_);
+
+    const auto offset = cache.offset();
+    queries = mx::fast::rope(queries, static_cast<int>(kTextHeadDimension),
+                             false, kTextRopeBase, 1.0f,
+                             static_cast<int>(offset), {}, device_);
+    keys = mx::fast::rope(keys, static_cast<int>(kTextHeadDimension), false,
+                          kTextRopeBase, 1.0f, static_cast<int>(offset), {},
+                          device_);
+    auto [cached_keys, cached_values] = cache.update(keys, values, device_);
+    const auto mask = text_causal_mask(
+        static_cast<std::size_t>(sequence_length), offset, queries.dtype());
+    auto output = mx::fast::scaled_dot_product_attention(
+        queries, cached_keys, cached_values,
+        1.0f / std::sqrt(static_cast<float>(kTextHeadDimension)), "", mask, {},
+        device_);
+    output = mx::reshape(
+        mx::transpose(output, {0, 2, 1, 3}, device_),
+        {batch_size, sequence_length,
+         static_cast<int>(kTextAttentionHeads * kTextHeadDimension)},
+        device_);
+    return text_quantized_linear(output, prefix + "o_proj");
+  }
+
+  mx::array text_decoder_layer(const mx::array &input, std::size_t layer,
+                               TextKeyValueCache &cache) const {
+    const auto prefix = "model.layers." + std::to_string(layer) + ".";
+    auto hidden =
+        input + text_attention(
+                    text_rms_norm(input, prefix + "input_layernorm.weight"),
+                    layer, cache);
+    const auto normalized =
+        text_rms_norm(hidden, prefix + "post_attention_layernorm.weight");
+    const auto gate =
+        text_quantized_linear(normalized, prefix + "mlp.gate_proj");
+    const auto up = text_quantized_linear(normalized, prefix + "mlp.up_proj");
+    const auto activated = gate * mx::sigmoid(gate, device_) * up;
+    return hidden +
+           text_quantized_linear(activated, prefix + "mlp.down_proj");
+  }
+
+  mx::array text_model(const mx::array &inputs,
+                       std::vector<TextKeyValueCache> &caches) const {
+    if (caches.size() != kTextDecoderLayers) {
+      throw std::runtime_error("text cache layer count mismatch");
+    }
+    auto hidden = inputs;
+    for (std::size_t layer = 0; layer < kTextDecoderLayers; ++layer) {
+      hidden = text_decoder_layer(hidden, layer, caches[layer]);
+    }
+    return text_rms_norm(hidden, "model.norm.weight");
+  }
+
+  mx::array output_logits(const mx::array &hidden) const {
+    return mx::quantized_matmul(
+        hidden, weight("model.embed_tokens.weight"),
+        weight("model.embed_tokens.scales"),
+        weight("model.embed_tokens.biases"), true, 64, 8, "affine", device_);
+  }
+
+  int32_t greedy_token(const mx::array &logits) const {
+    auto token = mx::argmax(logits, -1, false, device_);
+    mx::eval(token);
+    return token.item<int32_t>();
+  }
+
+  void evaluate_text_caches(
+      const std::vector<TextKeyValueCache> &caches) const {
+    std::vector<mx::array> arrays;
+    arrays.reserve(caches.size() * 2);
+    for (const auto &cache : caches) {
+      arrays.push_back(cache.keys(device_));
+      arrays.push_back(cache.values(device_));
+    }
+    mx::eval(std::move(arrays));
   }
 
   mx::array gelu(const mx::array &input) const {
@@ -1478,6 +1903,47 @@ extern "C" int32_t cuttledoc_qwen3_mlx_probe_prompt_embeddings(
     return fail(error.what(), error_out);
   } catch (...) {
     return fail("MLX raised a non-standard exception in prompt embedding",
+                error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_qwen3_mlx_probe_decoder_prefill(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    const char *language, int32_t device_kind, char **json_out,
+    char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || language == nullptr ||
+      json_out == nullptr) {
+    return fail(
+        "model_directory, audio, language, and json_out must be non-null",
+        error_out);
+  }
+
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      return fail("requested MLX device is not available", error_out);
+    }
+    mx::set_default_device(device);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    const Qwen3AudioEncoder model(model_directory, device);
+    const auto json = model.probe_decoder(audio, audio_len, language);
+    *json_out = strdup(json.c_str());
+    if (*json_out == nullptr) {
+      return fail("could not allocate JSON result", error_out);
+    }
+    return 0;
+  } catch (const std::exception &error) {
+    return fail(error.what(), error_out);
+  } catch (...) {
+    return fail("MLX raised a non-standard exception in decoder prefill",
                 error_out);
   }
 }
