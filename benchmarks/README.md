@@ -97,6 +97,13 @@ candidate uses the same manifest order and quality normalization; the raw
 aggregate retains each transcript, timing repetition, segment list, and
 candidate-specific streaming behavior.
 
+Issue #12 also supplies `qwen3-mlx-reference`. It intentionally runs the
+reference-only Python port in an external disposable environment while keeping
+the model, runtime, and result shape pinned. See
+[`spikes/qwen3-mlx-reference`](../spikes/qwen3-mlx-reference/) for the exact
+materialization and the boundary between useful MLX evidence and an accepted
+product dependency.
+
 ## Fixture rules
 
 - Record exact provenance, artifact license, language, normalization, and hash.

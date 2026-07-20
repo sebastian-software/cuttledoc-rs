@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   readFile,
+  readdir,
   stat,
   unlink,
   writeFile,
@@ -33,11 +34,13 @@ const supportedCandidates = new Set([
   'mlx',
   'apple-speech',
   'parakeet',
+  'qwen3-mlx-reference',
   'whisper',
 ]);
 if (!supportedCandidates.has(values.candidate)) {
   throw new Error(
-    '--candidate must be mlx, apple-speech, parakeet, or whisper',
+    '--candidate must be mlx, apple-speech, parakeet, ' +
+    'qwen3-mlx-reference, or whisper',
   );
 }
 const candidate = values.candidate;
@@ -131,8 +134,99 @@ async function runCandidate(fixture, pcmPath) {
     case 'parakeet':
     case 'whisper':
       return runLegacy(fixture);
+    case 'qwen3-mlx-reference':
+      return runQwen3MlxReference(fixture, pcmPath);
     default:
       throw new Error(`unsupported candidate: ${candidate}`);
+  }
+}
+
+async function runQwen3MlxReference(fixture, pcmPath) {
+  const python = requiredEnvironment('CUTTLEDOC_QWEN3_PYTHON');
+  const modelDirectory = requiredEnvironment('CUTTLEDOC_QWEN3_MODEL_DIR');
+  const language = languageCode(fixture.language);
+  const wavPath = `${pcmPath}.wav`;
+  commandOutput('ffmpeg', [
+    '-y',
+    '-v',
+    'error',
+    '-f',
+    'f32le',
+    '-ar',
+    '16000',
+    '-ac',
+    '1',
+    '-i',
+    pcmPath,
+    '-c:a',
+    'pcm_f32le',
+    wavPath,
+  ]);
+  try {
+    const timed = timedCommand(python, [
+      join(repoRoot, 'spikes/qwen3-mlx-reference/probe.py'),
+      modelDirectory,
+      wavPath,
+      language,
+      String(repetitions + 1),
+    ]);
+    const native = JSON.parse(timed.stdout.trim());
+    const measured = native.runs.slice(1);
+    const representative = measured.at(-1);
+    const finalUpdate = representative.updates.at(-1);
+
+    return resultRecord({
+      fixture,
+      text: representative.text,
+      reportedLanguage: representative.reported_language,
+      runtimeLocaleRequested: language,
+      coldLoadMs: native.load_ms,
+      warmInferenceMs: mean(
+        measured.map((sample) => sample.inference_ms),
+      ),
+      peakMemoryBytes: timed.maximumResidentSetBytes,
+      runtimePeakMemoryBytes: Math.max(
+        ...measured.map((sample) => sample.peak_memory_bytes),
+      ),
+      modelSizeBytes: await directorySize(modelDirectory),
+      binarySizeBytes: await directorySize(
+        resolve(python, '..', '..'),
+      ),
+      streaming: {
+        supported: true,
+        first_result_ms: mean(
+          measured.map((sample) => sample.first_result_ms),
+        ),
+        update_count: representative.updates.length,
+        volatile_update_count: representative.updates.filter(
+          (update) => !update.is_final,
+        ).length,
+        final_update_count: representative.updates.filter(
+          (update) => update.is_final,
+        ).length,
+        revoke_count: 0,
+        timestamps: 'unknown',
+      },
+      segments: [
+        {
+          start_seconds: 0,
+          end_seconds: finalUpdate.end_seconds,
+          text: representative.text,
+        },
+      ],
+      repetitions: measured.map((sample) => ({
+        inference_ms: sample.inference_ms,
+        first_result_ms: sample.first_result_ms,
+        peak_memory_bytes: sample.peak_memory_bytes,
+        prompt_tokens: sample.prompt_tokens,
+        generation_tokens: sample.generation_tokens,
+        text: sample.text,
+        updates: sample.updates,
+      })),
+      warmup: native.runs[0],
+    });
+  } finally {
+    await unlink(wavPath).catch(() => {});
   }
 }
 
@@ -663,6 +757,18 @@ function candidateMetadata(name) {
         boundary: 'legacy Node addon driving CoreML and Silero VAD',
         license: 'CC-BY-4.0 model; MIT VAD',
       };
+    case 'qwen3-mlx-reference':
+      return {
+        id: 'qwen3-asr-0.6b-mlx-reference',
+        model:
+          'mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f; converted from Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0',
+        runtime:
+          'reference-only mlx-audio v0.4.5@04151c6abb74b886f879a4457ccdc96761f10102 over official MLX 0.32.0',
+        boundary:
+          'external Python reference probe; not a product dependency or accepted interop boundary',
+        license:
+          'Apache-2.0 official model and converted artifact; MIT mlx-audio and official MLX',
+      };
     case 'whisper':
       return {
         id: 'whisper-large-v3-turbo-coreml-whispercpp',
@@ -743,6 +849,17 @@ async function firstExisting(paths) {
     }
   }
   throw new Error(`none of the expected paths exist: ${paths.join(', ')}`);
+}
+
+async function directorySize(directory) {
+  let total = 0;
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const entryPath = join(directory, entry.name);
+    total += entry.isDirectory()
+      ? await directorySize(entryPath)
+      : (await stat(entryPath)).size;
+  }
+  return total;
 }
 
 function mean(values_) {
