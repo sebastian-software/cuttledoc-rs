@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -8,6 +9,7 @@
 #include <cstring>
 #include <deque>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <mutex>
@@ -18,6 +20,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -25,9 +28,11 @@
 #include "cuttledoc_mlx_transformer.h"
 #include "mlx/io.h"
 #include "mlx/mlx.h"
+#include <json.hpp>
 
 namespace mx = mlx::core;
 namespace mx_support = cuttledoc::mlx_support;
+using json = nlohmann::json;
 
 namespace {
 
@@ -54,6 +59,18 @@ constexpr std::size_t kEncoderHeadDimension = 64;
 constexpr std::size_t kEncoderSlidingWindow = 750;
 constexpr std::size_t kDownsampleFactor = 4;
 constexpr std::size_t kDecoderDimension = 3'072;
+constexpr std::size_t kDecoderLayers = 26;
+constexpr std::size_t kDecoderAttentionHeads = 32;
+constexpr std::size_t kDecoderKeyValueHeads = 8;
+constexpr std::size_t kDecoderHeadDimension = 128;
+constexpr std::size_t kDecoderHiddenDimension = 9'216;
+constexpr std::size_t kDecoderSlidingWindow = 8'192;
+constexpr std::size_t kDecoderVocabularySize = 131'072;
+constexpr std::size_t kAdaBottleneckDimension = 32;
+constexpr int32_t kBosToken = 1;
+constexpr int32_t kEosToken = 2;
+constexpr int32_t kStreamingPadToken = 32;
+constexpr std::size_t kTekkenSpecialTokens = 1'000;
 constexpr int kQuantizationGroupSize = 64;
 constexpr int kQuantizationBits = 4;
 constexpr float kRmsNormEpsilon = 1e-5f;
@@ -75,6 +92,149 @@ bool ends_with(std::string_view value, std::string_view suffix) {
   return value.size() >= suffix.size() &&
          value.substr(value.size() - suffix.size()) == suffix;
 }
+
+std::string json_escape(std::string_view value) {
+  std::ostringstream escaped;
+  for (const auto character : value) {
+    switch (character) {
+    case '"':
+      escaped << "\\\"";
+      break;
+    case '\\':
+      escaped << "\\\\";
+      break;
+    case '\b':
+      escaped << "\\b";
+      break;
+    case '\f':
+      escaped << "\\f";
+      break;
+    case '\n':
+      escaped << "\\n";
+      break;
+    case '\r':
+      escaped << "\\r";
+      break;
+    case '\t':
+      escaped << "\\t";
+      break;
+    default:
+      if (static_cast<unsigned char>(character) < 0x20) {
+        escaped << "\\u00";
+        constexpr std::string_view digits = "0123456789abcdef";
+        escaped << digits[(static_cast<unsigned char>(character) >> 4) & 0xf]
+                << digits[static_cast<unsigned char>(character) & 0xf];
+      } else {
+        escaped << character;
+      }
+    }
+  }
+  return escaped.str();
+}
+
+std::string decode_base64(std::string_view encoded) {
+  static constexpr std::string_view alphabet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  std::array<int, 256> values{};
+  values.fill(-1);
+  for (std::size_t index = 0; index < alphabet.size(); ++index) {
+    values[static_cast<unsigned char>(alphabet[index])] =
+        static_cast<int>(index);
+  }
+
+  std::string decoded;
+  decoded.reserve(encoded.size() * 3 / 4);
+  std::uint32_t accumulator = 0;
+  int available_bits = -8;
+  for (const auto character : encoded) {
+    if (character == '=') {
+      break;
+    }
+    const auto value = values[static_cast<unsigned char>(character)];
+    if (value < 0) {
+      throw std::runtime_error("invalid base64 in Tekken vocabulary");
+    }
+    accumulator = (accumulator << 6) | static_cast<std::uint32_t>(value);
+    available_bits += 6;
+    if (available_bits >= 0) {
+      decoded.push_back(static_cast<char>(
+          (accumulator >> available_bits) & static_cast<std::uint32_t>(0xff)));
+      available_bits -= 8;
+    }
+  }
+  return decoded;
+}
+
+std::string trim_ascii_whitespace(std::string value) {
+  const auto is_whitespace = [](unsigned char character) {
+    return character == ' ' || character == '\t' || character == '\n' ||
+           character == '\r' || character == '\f' || character == '\v';
+  };
+  const auto first = std::find_if_not(value.begin(), value.end(), is_whitespace);
+  const auto last = std::find_if_not(value.rbegin(), value.rend(), is_whitespace)
+                        .base();
+  if (first >= last) {
+    return {};
+  }
+  return std::string(first, last);
+}
+
+class TekkenTokenizer {
+public:
+  explicit TekkenTokenizer(const std::filesystem::path &path) {
+    std::ifstream input(path);
+    if (!input) {
+      throw std::runtime_error("could not open Tekken vocabulary: " +
+                               path.string());
+    }
+    const auto document = json::parse(input);
+    const auto &config = document.at("config");
+    const auto n_special =
+        config.value("default_num_special_tokens", kTekkenSpecialTokens);
+    const auto vocabulary_size =
+        config.value("default_vocab_size", kDecoderVocabularySize);
+    if (n_special != kTekkenSpecialTokens ||
+        vocabulary_size != kDecoderVocabularySize) {
+      throw std::runtime_error("Tekken vocabulary configuration drifted");
+    }
+    std::unordered_set<std::size_t> special_ids;
+    for (const auto &special : document.at("special_tokens")) {
+      special_ids.insert(special.at("rank").get<std::size_t>());
+    }
+    if (special_ids.size() != kTekkenSpecialTokens ||
+        *std::max_element(special_ids.begin(), special_ids.end()) >=
+            kTekkenSpecialTokens) {
+      throw std::runtime_error("Tekken special-token layout drifted");
+    }
+
+    const auto regular_count = kDecoderVocabularySize - kTekkenSpecialTokens;
+    const auto &vocabulary = document.at("vocab");
+    if (vocabulary.size() < regular_count) {
+      throw std::runtime_error("Tekken vocabulary is shorter than model vocab");
+    }
+    token_bytes_.reserve(regular_count);
+    for (std::size_t index = 0; index < regular_count; ++index) {
+      token_bytes_.push_back(decode_base64(
+          vocabulary.at(index).at("token_bytes").get<std::string>()));
+    }
+  }
+
+  std::string decode(const std::vector<int32_t> &token_ids) const {
+    std::string output;
+    for (const auto token_id : token_ids) {
+      if (token_id < static_cast<int32_t>(kTekkenSpecialTokens) ||
+          token_id >= static_cast<int32_t>(kDecoderVocabularySize)) {
+        continue;
+      }
+      output += token_bytes_.at(
+          static_cast<std::size_t>(token_id) - kTekkenSpecialTokens);
+    }
+    return output;
+  }
+
+private:
+  std::vector<std::string> token_bytes_;
+};
 
 std::string shape_string(const mx::array &value) {
   std::ostringstream shape;
@@ -339,8 +499,10 @@ std::string model_json(const LoadedModel &model) {
        << "\"causal_conv_stem\":true,\"causal_encoder\":true,"
        << "\"rotating_kv_cache\":true,"
        << "\"sliding_window_attention\":true,"
-       << "\"adapter_projection\":true,\"decoder\":false,"
-       << "\"transcription\":false}}";
+       << "\"adapter_projection\":true,\"delay_conditioning\":true,"
+       << "\"decoder\":true,\"decoder_kv_cache\":true,"
+       << "\"tekken_decode\":true,\"greedy_transcription\":true,"
+       << "\"transcription\":true,\"streaming_session\":false}}";
   return json.str();
 }
 
@@ -937,6 +1099,433 @@ std::string probe_causal_encoder(LoadedModel model, const float *audio,
   return json.str();
 }
 
+struct DecoderEvidence {
+  std::unordered_map<std::string, std::string> fingerprints;
+};
+
+class VoxtralDecoder {
+public:
+  VoxtralDecoder(const LoadedModel &model, std::size_t delay_tokens,
+                 mx::Device device)
+      : model_(model), device_(device),
+        time_embedding_(compute_time_embedding(delay_tokens)) {
+    ada_scales_.reserve(kDecoderLayers);
+    for (std::size_t layer = 0; layer < kDecoderLayers; ++layer) {
+      const auto prefix = "decoder.layers." + std::to_string(layer) +
+                          ".ada_rms_norm_t_cond.";
+      auto hidden = precise_gelu(
+          linear(time_embedding_, prefix + "ada_down.weight"), device_);
+      ada_scales_.push_back(linear(hidden, prefix + "ada_up.weight"));
+    }
+    mx::eval(ada_scales_);
+  }
+
+  const mx::array &time_embedding() const { return time_embedding_; }
+
+  const mx::array &ada_scale(std::size_t layer) const {
+    return ada_scales_.at(layer);
+  }
+
+  mx::array embed_tokens(const std::vector<int32_t> &token_ids) const {
+    if (token_ids.empty()) {
+      throw std::invalid_argument("cannot embed an empty token sequence");
+    }
+    const auto ids = mx::array(
+        token_ids.begin(), {static_cast<int>(token_ids.size())});
+    return mx::take(weight("decoder.tok_embeddings.weight"), ids, 0,
+                    device_);
+  }
+
+  mx::array embed_token(int32_t token_id) const {
+    const auto ids = mx::array({token_id});
+    return mx::squeeze(
+        mx::take(weight("decoder.tok_embeddings.weight"), ids, 0, device_),
+        0, device_);
+  }
+
+  std::vector<mx_support::RotatingKeyValueCache> make_cache() const {
+    std::vector<mx_support::RotatingKeyValueCache> caches;
+    caches.reserve(kDecoderLayers);
+    for (std::size_t layer = 0; layer < kDecoderLayers; ++layer) {
+      caches.emplace_back(kDecoderSlidingWindow, 0);
+    }
+    return caches;
+  }
+
+  mx::array forward(
+      const mx::array &embeddings, std::size_t start_position,
+      std::vector<mx_support::RotatingKeyValueCache> &caches,
+      DecoderEvidence *evidence = nullptr,
+      std::string_view evidence_prefix = {}) const {
+    if (embeddings.ndim() != 2 ||
+        embeddings.shape(1) != static_cast<int>(kDecoderDimension) ||
+        caches.size() != kDecoderLayers) {
+      throw std::invalid_argument(
+          "decoder requires [tokens, 3072] embeddings and 26 caches");
+    }
+    auto hidden = embeddings;
+    for (std::size_t layer = 0; layer < kDecoderLayers; ++layer) {
+      hidden = decoder_layer(hidden, start_position, layer, caches[layer]);
+      if (evidence != nullptr &&
+          (layer == 0 || layer == 12 || layer == 25)) {
+        evidence->fingerprints.emplace(
+            std::string(evidence_prefix) + "_layer_" +
+                std::to_string(layer),
+            fingerprint_json(hidden, device_));
+      }
+    }
+    hidden = rms_norm(hidden, "decoder.norm.weight");
+    if (evidence != nullptr) {
+      evidence->fingerprints.emplace(
+          std::string(evidence_prefix) + "_norm",
+          fingerprint_json(hidden, device_));
+    }
+    return hidden;
+  }
+
+  mx::array logits(const mx::array &hidden) const {
+    return mx::matmul(
+        hidden,
+        mx::transpose(weight("decoder.tok_embeddings.weight"), device_),
+        device_);
+  }
+
+private:
+  const mx::array &weight(const std::string &name) const {
+    const auto found = model_.weights.find(name);
+    if (found == model_.weights.end()) {
+      throw std::runtime_error("missing required tensor: " + name);
+    }
+    return found->second;
+  }
+
+  mx::array quantized_linear(const mx::array &input,
+                             const std::string &prefix) const {
+    return mx_support::affine_quantized_linear(
+        input, weight(prefix + ".weight"), weight(prefix + ".scales"),
+        weight(prefix + ".biases"), std::nullopt, kQuantizationGroupSize,
+        kQuantizationBits, device_);
+  }
+
+  mx::array linear(const mx::array &input,
+                   const std::string &weight_name) const {
+    return mx::matmul(input, mx::transpose(weight(weight_name), device_),
+                      device_);
+  }
+
+  mx::array rms_norm(const mx::array &input,
+                     const std::string &weight_name) const {
+    return mx::fast::rms_norm(input, weight(weight_name), kRmsNormEpsilon,
+                              device_);
+  }
+
+  mx::array compute_time_embedding(std::size_t delay_tokens) const {
+    constexpr auto half_dimension = kDecoderDimension / 2;
+    auto inverse_frequency = mx::exp(
+        (-static_cast<float>(std::log(10'000.0)) /
+         static_cast<float>(half_dimension)) *
+            mx::arange(static_cast<int>(half_dimension), mx::float32, device_),
+        device_);
+    const auto phase = static_cast<float>(delay_tokens) * inverse_frequency;
+    return mx::concatenate(
+        {mx::cos(phase, device_), mx::sin(phase, device_)}, 0, device_);
+  }
+
+  mx::array decoder_attention(
+      const mx::array &input, std::size_t start_position, std::size_t layer,
+      mx_support::RotatingKeyValueCache &cache) const {
+    const auto prefix = "decoder.layers." + std::to_string(layer) +
+                        ".attention.";
+    const auto sequence_length = input.shape(0);
+    auto queries = quantized_linear(input, prefix + "wq");
+    auto keys = quantized_linear(input, prefix + "wk");
+    auto values = quantized_linear(input, prefix + "wv");
+    queries = mx::transpose(
+        mx::reshape(queries,
+                    {1, sequence_length,
+                     static_cast<int>(kDecoderAttentionHeads),
+                     static_cast<int>(kDecoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    keys = mx::transpose(
+        mx::reshape(keys,
+                    {1, sequence_length,
+                     static_cast<int>(kDecoderKeyValueHeads),
+                     static_cast<int>(kDecoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    values = mx::transpose(
+        mx::reshape(values,
+                    {1, sequence_length,
+                     static_cast<int>(kDecoderKeyValueHeads),
+                     static_cast<int>(kDecoderHeadDimension)},
+                    device_),
+        {0, 2, 1, 3}, device_);
+    queries = mx::fast::rope(
+        queries, static_cast<int>(kDecoderHeadDimension), true, kRopeTheta,
+        1.0f, static_cast<int>(start_position), {}, device_);
+    keys = mx::fast::rope(
+        keys, static_cast<int>(kDecoderHeadDimension), true, kRopeTheta, 1.0f,
+        static_cast<int>(start_position), {}, device_);
+    auto [cached_keys, cached_values] =
+        cache.update_and_fetch(keys, values, device_);
+    const auto mask = sequence_length == 1
+                          ? mx_support::AttentionMask{"", std::nullopt}
+                          : cache.make_mask(
+                                static_cast<std::size_t>(sequence_length),
+                                kDecoderSlidingWindow, device_);
+    auto output = mx::fast::scaled_dot_product_attention(
+        queries, cached_keys, cached_values,
+        1.0f / std::sqrt(static_cast<float>(kDecoderHeadDimension)),
+        mask.mode, mask.array, {}, device_);
+    output = mx::reshape(
+        mx::transpose(output, {0, 2, 1, 3}, device_),
+        {sequence_length,
+         static_cast<int>(kDecoderAttentionHeads * kDecoderHeadDimension)},
+        device_);
+    return quantized_linear(output, prefix + "wo");
+  }
+
+  mx::array decoder_layer(
+      const mx::array &input, std::size_t start_position, std::size_t layer,
+      mx_support::RotatingKeyValueCache &cache) const {
+    const auto prefix =
+        "decoder.layers." + std::to_string(layer) + ".";
+    auto hidden =
+        input + decoder_attention(
+                    rms_norm(input, prefix + "attention_norm.weight"),
+                    start_position, layer, cache);
+    auto normalized = rms_norm(hidden, prefix + "ffn_norm.weight");
+    normalized = normalized * (1.0f + ada_scales_.at(layer));
+    const auto gate =
+        mx_support::silu(quantized_linear(normalized,
+                                          prefix + "feed_forward_w1"),
+                         device_);
+    const auto up =
+        quantized_linear(normalized, prefix + "feed_forward_w3");
+    return hidden +
+           quantized_linear(gate * up, prefix + "feed_forward_w2");
+  }
+
+  const LoadedModel &model_;
+  mx::Device device_;
+  mx::array time_embedding_;
+  std::vector<mx::array> ada_scales_;
+};
+
+int32_t greedy_token(const mx::array &logits, mx::Device device) {
+  const auto token = mx::argmax(logits, -1, false, device);
+  mx::eval(token);
+  return token.item<int32_t>();
+}
+
+std::string transcribe_greedy(LoadedModel model,
+                              const std::filesystem::path &model_directory,
+                              const float *audio, std::size_t audio_len,
+                              int32_t transcription_delay_ms,
+                              std::size_t max_generated_tokens,
+                              mx::Device device) {
+  if (max_generated_tokens == 0) {
+    throw std::invalid_argument("max_generated_tokens must be positive");
+  }
+  const auto started = std::chrono::steady_clock::now();
+  materialize_weight_prefix_on_device(model, "encoder.", device);
+  materialize_weight_prefix_on_device(model, "decoder.", device);
+  const auto frontend = compute_audio_frontend(
+      model, audio, audio_len, transcription_delay_ms, device);
+  const VoxtralCausalEncoder encoder(model, device);
+  auto encoder_result = encoder.encode(frontend.conv_stem);
+  auto adapter = encoder_result.adapter;
+  mx::eval(adapter);
+
+  const VoxtralDecoder decoder(model, frontend.padding.delay_tokens, device);
+  DecoderEvidence evidence;
+  evidence.fingerprints.emplace("adapter",
+                                fingerprint_json(adapter, device));
+  evidence.fingerprints.emplace(
+      "time_embedding", fingerprint_json(decoder.time_embedding(), device));
+  for (const auto layer : {0U, 12U, 25U}) {
+    evidence.fingerprints.emplace(
+        "ada_scale_layer_" + std::to_string(layer),
+        fingerprint_json(decoder.ada_scale(layer), device));
+  }
+
+  std::vector<int32_t> prompt_ids{ kBosToken };
+  prompt_ids.insert(prompt_ids.end(),
+                    kLeftPadTokens + frontend.padding.delay_tokens,
+                    kStreamingPadToken);
+  auto prompt_text_embeddings = decoder.embed_tokens(prompt_ids);
+  auto prefix_embeddings =
+      mx::slice(adapter, {0, 0},
+                {static_cast<int>(prompt_ids.size()),
+                 static_cast<int>(kDecoderDimension)},
+                {1, 1}, device) +
+      prompt_text_embeddings;
+  evidence.fingerprints.emplace(
+      "prompt_text_embeddings",
+      fingerprint_json(prompt_text_embeddings, device));
+  evidence.fingerprints.emplace(
+      "prefix_embeddings", fingerprint_json(prefix_embeddings, device));
+
+  auto caches = decoder.make_cache();
+  auto hidden =
+      decoder.forward(prefix_embeddings, 0, caches, &evidence, "prefill");
+  auto logits = decoder.logits(
+      mx::take(hidden, hidden.shape(0) - 1, 0, device));
+  evidence.fingerprints.emplace("prefill_logits",
+                                fingerprint_json(logits, device));
+
+  std::vector<int32_t> generated;
+  auto next_token = greedy_token(logits, device);
+  auto last_logits = logits;
+  std::size_t forward_steps = 0;
+  bool stopped = false;
+  std::string_view finish_reason = "audio_end";
+  for (std::size_t position = prompt_ids.size();
+       position < static_cast<std::size_t>(adapter.shape(0)); ++position) {
+    const auto token = next_token;
+    generated.push_back(token);
+    if (token == kEosToken || generated.size() >= max_generated_tokens) {
+      stopped = true;
+      finish_reason = token == kEosToken ? "eos" : "max_tokens";
+      break;
+    }
+
+    auto decoder_input =
+        mx::take(adapter, static_cast<int>(position), 0, device) +
+        decoder.embed_token(token);
+    const auto capture = forward_steps == 0;
+    if (capture) {
+      evidence.fingerprints.emplace(
+          "decode_0_input", fingerprint_json(decoder_input, device));
+    }
+    hidden = decoder.forward(mx::expand_dims(decoder_input, 0, device),
+                             position, caches,
+                             capture ? &evidence : nullptr,
+                             capture ? "decode_0" : "");
+    logits = decoder.logits(mx::squeeze(hidden, 0, device));
+    if (capture) {
+      evidence.fingerprints.emplace("decode_0_logits",
+                                    fingerprint_json(logits, device));
+    }
+    last_logits = logits;
+    next_token = greedy_token(logits, device);
+    ++forward_steps;
+  }
+  if (!stopped) {
+    generated.push_back(next_token);
+  }
+  evidence.fingerprints.emplace("final_logits",
+                                fingerprint_json(last_logits, device));
+  evidence.fingerprints.emplace(
+      "decoder_layer_0_cache_keys",
+      fingerprint_json(caches.front().keys(), device));
+  evidence.fingerprints.emplace(
+      "decoder_layer_0_cache_values",
+      fingerprint_json(caches.front().values(), device));
+
+  auto text_tokens = generated;
+  if (!text_tokens.empty() && text_tokens.back() == kEosToken) {
+    text_tokens.pop_back();
+  }
+  const TekkenTokenizer tokenizer(model_directory / "tekken.json");
+  const auto text = trim_ascii_whitespace(tokenizer.decode(text_tokens));
+  if (text.empty()) {
+    throw std::runtime_error("direct Voxtral decoder emitted no text");
+  }
+  const auto elapsed_ms =
+      std::chrono::duration<double, std::milli>(
+          std::chrono::steady_clock::now() - started)
+          .count();
+
+  const std::vector<std::string> fingerprint_order{
+      "adapter",
+      "time_embedding",
+      "ada_scale_layer_0",
+      "ada_scale_layer_12",
+      "ada_scale_layer_25",
+      "prompt_text_embeddings",
+      "prefix_embeddings",
+      "prefill_layer_0",
+      "prefill_layer_12",
+      "prefill_layer_25",
+      "prefill_norm",
+      "prefill_logits",
+      "decode_0_input",
+      "decode_0_layer_0",
+      "decode_0_layer_12",
+      "decode_0_layer_25",
+      "decode_0_norm",
+      "decode_0_logits",
+      "final_logits",
+      "decoder_layer_0_cache_keys",
+      "decoder_layer_0_cache_values",
+  };
+
+  std::ostringstream output;
+  output << std::setprecision(17)
+         << "{\"status\":\"ok\",\"boundary\":\"official-mlx-cpp\","
+         << "\"stage\":\"voxtral-greedy-transcription\",\"device\":\""
+         << (device == mx::Device::gpu ? "gpu" : "cpu")
+         << "\",\"pcm_samples\":" << audio_len
+         << ",\"transcription_delay_ms\":" << transcription_delay_ms
+         << ",\"delay_tokens\":" << frontend.padding.delay_tokens
+         << ",\"architecture\":{\"layers\":" << kDecoderLayers
+         << ",\"dimension\":" << kDecoderDimension
+         << ",\"attention_heads\":" << kDecoderAttentionHeads
+         << ",\"kv_heads\":" << kDecoderKeyValueHeads
+         << ",\"head_dimension\":" << kDecoderHeadDimension
+         << ",\"hidden_dimension\":" << kDecoderHiddenDimension
+         << ",\"sliding_window\":" << kDecoderSlidingWindow
+         << ",\"vocabulary_size\":" << kDecoderVocabularySize
+         << ",\"ada_bottleneck_dimension\":" << kAdaBottleneckDimension
+         << "},\"prompt\":{\"bos_token_id\":" << kBosToken
+         << ",\"streaming_pad_token_id\":" << kStreamingPadToken
+         << ",\"eos_token_id\":" << kEosToken << ",\"token_ids\":[";
+  for (std::size_t index = 0; index < prompt_ids.size(); ++index) {
+    if (index != 0) {
+      output << ",";
+    }
+    output << prompt_ids[index];
+  }
+  output << "],\"length\":" << prompt_ids.size()
+         << ",\"adapter_frames\":" << adapter.shape(0)
+         << "},\"generation\":{\"tokens\":[";
+  for (std::size_t index = 0; index < generated.size(); ++index) {
+    if (index != 0) {
+      output << ",";
+    }
+    output << generated[index];
+  }
+  output << "],\"token_count\":" << generated.size()
+         << ",\"forward_steps\":" << forward_steps
+         << ",\"finish_reason\":\"" << finish_reason
+         << "\",\"text\":\"" << json_escape(text)
+         << "\"},\"cache\":{\"layer_0_offset\":"
+         << caches.front().offset() << ",\"layer_0_size\":"
+         << caches.front().size() << ",\"layer_0_state_frames\":"
+         << caches.front().materialized_size()
+         << "},\"elapsed_ms\":" << elapsed_ms
+         << ",\"peak_memory_bytes\":" << mx::get_peak_memory()
+         << ",\"fingerprints\":{";
+  for (std::size_t index = 0; index < fingerprint_order.size(); ++index) {
+    if (index != 0) {
+      output << ",";
+    }
+    const auto &name = fingerprint_order[index];
+    const auto found = evidence.fingerprints.find(name);
+    if (found == evidence.fingerprints.end()) {
+      throw std::runtime_error("missing decoder fingerprint: " + name);
+    }
+    output << "\"" << name << "\":" << found->second;
+  }
+  output << "},\"capabilities\":{\"delay_conditioning\":true,"
+         << "\"decoder\":true,\"decoder_kv_cache\":true,"
+         << "\"tekken_decode\":true,\"greedy_transcription\":true,"
+         << "\"streaming_session\":false}}";
+  return output.str();
+}
+
 mx::Device requested_device(int32_t device_kind) {
   if (device_kind == 0) {
     return mx::Device::cpu;
@@ -1146,6 +1735,60 @@ extern "C" int32_t cuttledoc_voxtral_mlx_probe_causal_encoder(
     return fail_with_status(
         CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR,
         "MLX raised a non-standard exception in the causal encoder",
+        error_out);
+  }
+}
+
+extern "C" int32_t cuttledoc_voxtral_mlx_transcribe(
+    const char *model_directory, const float *audio, std::size_t audio_len,
+    int32_t transcription_delay_ms, std::size_t max_generated_tokens,
+    int32_t device_kind, char **json_out, char **error_out) {
+  if (json_out != nullptr) {
+    *json_out = nullptr;
+  }
+  if (error_out != nullptr) {
+    *error_out = nullptr;
+  }
+  if (model_directory == nullptr || audio == nullptr || audio_len == 0 ||
+      max_generated_tokens == 0 || json_out == nullptr) {
+    return fail_with_status(
+        CUTTLEDOC_VOXTRAL_MLX_INVALID_ARGUMENT,
+        "model_directory, non-empty audio, positive max_generated_tokens, "
+        "and json_out are required",
+        error_out);
+  }
+  try {
+    const std::lock_guard lock(runtime_mutex);
+    const auto device = requested_device(device_kind);
+    if (!mx::is_available(device)) {
+      throw std::runtime_error("requested MLX device is not available");
+    }
+    mx::set_default_device(device);
+    const auto cpu_stream = reusable_thread_unsafe_stream(mx::Device::cpu);
+    mx::set_default_stream(cpu_stream);
+    const auto device_stream =
+        device == mx::Device::cpu ? cpu_stream
+                                  : reusable_thread_unsafe_stream(device);
+    mx::set_default_stream(device_stream);
+    mx::clear_cache();
+    mx::reset_peak_memory();
+    auto model = load_and_validate_model(model_directory);
+    return return_json(
+        CUTTLEDOC_VOXTRAL_MLX_OK,
+        transcribe_greedy(std::move(model), model_directory, audio, audio_len,
+                          transcription_delay_ms, max_generated_tokens,
+                          device),
+        json_out, error_out);
+  } catch (const std::invalid_argument &error) {
+    return fail_with_status(CUTTLEDOC_VOXTRAL_MLX_INVALID_ARGUMENT,
+                            error.what(), error_out);
+  } catch (const std::exception &error) {
+    return fail_with_status(CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR, error.what(),
+                            error_out);
+  } catch (...) {
+    return fail_with_status(
+        CUTTLEDOC_VOXTRAL_MLX_RUNTIME_ERROR,
+        "MLX raised a non-standard exception during transcription",
         error_out);
   }
 }

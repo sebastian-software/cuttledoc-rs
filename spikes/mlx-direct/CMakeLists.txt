@@ -57,6 +57,11 @@ target_include_directories(
   PUBLIC
   ../voxtral-realtime-mlx-direct/include
   include)
+FetchContent_GetProperties(json)
+target_include_directories(
+  cuttledoc_voxtral_mlx_shim
+  PRIVATE
+  "${json_SOURCE_DIR}/single_include/nlohmann")
 target_compile_options(
   cuttledoc_voxtral_mlx_shim
   PRIVATE

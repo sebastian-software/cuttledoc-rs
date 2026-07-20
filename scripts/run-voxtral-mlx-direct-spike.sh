@@ -11,6 +11,7 @@ build_home=${CUTTLEDOC_VOXTRAL_BUILD_HOME:-/private/tmp/cuttledoc-mlx-build-home
 expected_mlx_commit=7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247
 frontend_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.frontend-480ms.json"
 encoder_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.encoder-480ms.json"
+decoder_oracle="$root/benchmarks/oracles/voxtral-realtime.audiobook-de-135_82_000105.decoder-480ms.json"
 
 if [[ ! -d "$source_dir/.git" ]]; then
   echo "missing official MLX checkout: $source_dir" >&2
@@ -75,6 +76,14 @@ cat "$encoder_result"
 node "$root/scripts/validate-voxtral-mlx-encoder.mjs" \
   --oracle "$encoder_oracle" \
   --actual "$encoder_result"
+echo "DECODER"
+decoder_result="$build_dir/voxtral-decoder-480ms.json"
+"$build_dir/cuttledoc-voxtral-mlx" \
+  transcribe "$model_dir" "$fixture" 480 4096 gpu >"$decoder_result"
+cat "$decoder_result"
+node "$root/scripts/validate-voxtral-mlx-decoder.mjs" \
+  --oracle "$decoder_oracle" \
+  --actual "$decoder_result"
 echo "CONTRACT"
 "$build_dir/cuttledoc-voxtral-mlx" contract "$model_dir" "$fixture" gpu
 echo "ARTIFACTS"

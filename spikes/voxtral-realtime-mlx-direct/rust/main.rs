@@ -40,6 +40,16 @@ unsafe extern "C" {
         json_out: *mut *mut c_char,
         error_out: *mut *mut c_char,
     ) -> i32;
+    fn cuttledoc_voxtral_mlx_transcribe(
+        model_directory: *const c_char,
+        audio: *const f32,
+        audio_len: usize,
+        transcription_delay_ms: i32,
+        max_generated_tokens: usize,
+        device_kind: i32,
+        json_out: *mut *mut c_char,
+        error_out: *mut *mut c_char,
+    ) -> i32;
     fn cuttledoc_voxtral_mlx_session_create(
         model_directory: *const c_char,
         device_kind: i32,
@@ -54,10 +64,8 @@ unsafe extern "C" {
         audio_len: usize,
         error_out: *mut *mut c_char,
     ) -> i32;
-    fn cuttledoc_voxtral_mlx_session_close(
-        handle: *mut c_void,
-        error_out: *mut *mut c_char,
-    ) -> i32;
+    fn cuttledoc_voxtral_mlx_session_close(handle: *mut c_void, error_out: *mut *mut c_char)
+    -> i32;
     fn cuttledoc_voxtral_mlx_session_step(
         handle: *mut c_void,
         json_out: *mut *mut c_char,
@@ -103,11 +111,76 @@ fn run() -> Result<(), String> {
         [command, model_directory, pcm_path, delay_ms, device] if command == "encoder" => {
             encoder(model_directory, pcm_path, delay_ms, device)
         }
+        [
+            command,
+            model_directory,
+            pcm_path,
+            delay_ms,
+            max_tokens,
+            device,
+        ] if command == "transcribe" => {
+            transcribe(model_directory, pcm_path, delay_ms, max_tokens, device)
+        }
         [command, model_directory, pcm_path, device] if command == "contract" => {
             contract(model_directory, pcm_path, device)
         }
         _ => Err(usage()),
     }
+}
+
+fn transcribe(
+    model_directory: &str,
+    pcm_path: &str,
+    delay_ms: &str,
+    max_tokens: &str,
+    device: &str,
+) -> Result<(), String> {
+    let model_directory = c_string(model_directory, "model path")?;
+    let audio = read_audio(pcm_path)?;
+    let delay_ms = delay_ms
+        .parse::<i32>()
+        .map_err(|error| format!("delay must be a positive integer: {error}"))?;
+    if delay_ms <= 0 {
+        return Err("delay must be positive".to_owned());
+    }
+    let max_tokens = max_tokens
+        .parse::<usize>()
+        .map_err(|error| format!("max tokens must be a positive integer: {error}"))?;
+    if max_tokens == 0 {
+        return Err("max tokens must be positive".to_owned());
+    }
+    let device_kind = parse_device(device)?;
+    let mut json = ptr::null_mut();
+    let mut error = ptr::null_mut();
+    let status = unsafe {
+        cuttledoc_voxtral_mlx_transcribe(
+            model_directory.as_ptr(),
+            audio.as_ptr(),
+            audio.len(),
+            delay_ms,
+            max_tokens,
+            device_kind,
+            &mut json,
+            &mut error,
+        )
+    };
+    let response = Response {
+        status,
+        json: take_string(json),
+        error: take_string(error),
+    };
+    if response.status != OK {
+        return Err(response.error.unwrap_or_else(|| {
+            format!("MLX transcription returned status {status} without a message")
+        }));
+    }
+    println!(
+        "{}",
+        response
+            .json
+            .ok_or_else(|| "MLX transcription returned no JSON".to_owned())?
+    );
+    Ok(())
 }
 
 fn encoder(
@@ -144,9 +217,9 @@ fn encoder(
         error: take_string(error),
     };
     if response.status != OK {
-        return Err(response.error.unwrap_or_else(|| {
-            format!("MLX encoder returned status {status} without a message")
-        }));
+        return Err(response
+            .error
+            .unwrap_or_else(|| format!("MLX encoder returned status {status} without a message")));
     }
     println!(
         "{}",
@@ -284,9 +357,9 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
                 )?;
             }
             status => {
-                return Err(response.error.unwrap_or_else(|| {
-                    format!("feed returned unexpected status {status}")
-                }));
+                return Err(response
+                    .error
+                    .unwrap_or_else(|| format!("feed returned unexpected status {status}")));
             }
         }
     }
@@ -316,9 +389,9 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
             )?,
             DONE if response.json.is_some() => break,
             status => {
-                return Err(response.error.unwrap_or_else(|| {
-                    format!("drain step returned unexpected status {status}")
-                }));
+                return Err(response
+                    .error
+                    .unwrap_or_else(|| format!("drain step returned unexpected status {status}")));
             }
         }
     }
@@ -326,7 +399,9 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
     if total_ingested != audio.len() || maximum_ingested > MAX_INGEST_SAMPLES_PER_STEP {
         return Err(format!(
             "bounded ingestion mismatch: fed {}, ingested {}, maximum step {}",
-            audio.len(), total_ingested, maximum_ingested
+            audio.len(),
+            total_ingested,
+            maximum_ingested
         ));
     }
     let energy_absolute_error = (actual_energy - expected_energy).abs();
@@ -394,8 +469,7 @@ fn consume_step(
 ) -> Result<(), String> {
     let started = Instant::now();
     let response = step(handle);
-    *maximum_step_wall_ms = maximum_step_wall_ms
-        .max(started.elapsed().as_secs_f64() * 1_000.0);
+    *maximum_step_wall_ms = maximum_step_wall_ms.max(started.elapsed().as_secs_f64() * 1_000.0);
     if response.status != OK {
         return Err(response.error.unwrap_or_else(|| {
             format!(
@@ -427,7 +501,9 @@ fn record_step(
     let energy = json_number(json, "mlx_sum_squares")?;
     let mlx_elapsed_ms = json_number(json, "mlx_elapsed_ms")?;
     if ingested == 0 || ingested > MAX_INGEST_SAMPLES_PER_STEP {
-        return Err(format!("step ingested invalid bounded slice of {ingested} samples"));
+        return Err(format!(
+            "step ingested invalid bounded slice of {ingested} samples"
+        ));
     }
     *total_ingested += ingested;
     *actual_energy += energy;
@@ -484,9 +560,7 @@ fn close(handle: *mut c_void) -> Response {
 fn step(handle: *mut c_void) -> Response {
     let mut json = ptr::null_mut();
     let mut error = ptr::null_mut();
-    let status = unsafe {
-        cuttledoc_voxtral_mlx_session_step(handle, &mut json, &mut error)
-    };
+    let status = unsafe { cuttledoc_voxtral_mlx_session_step(handle, &mut json, &mut error) };
     Response {
         status,
         json: take_string(json),
@@ -579,5 +653,5 @@ fn take_string(value: *mut c_char) -> Option<String> {
 }
 
 fn usage() -> String {
-    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx frontend MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx encoder MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
+    "usage:\n  cuttledoc-voxtral-mlx inspect MODEL_DIR\n  cuttledoc-voxtral-mlx frontend MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx encoder MODEL_DIR PCM_F32LE DELAY_MS cpu|gpu\n  cuttledoc-voxtral-mlx transcribe MODEL_DIR PCM_F32LE DELAY_MS MAX_TOKENS cpu|gpu\n  cuttledoc-voxtral-mlx contract MODEL_DIR PCM_F32LE cpu|gpu".to_owned()
 }

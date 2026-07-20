@@ -22,7 +22,8 @@ typedef enum cuttledoc_voxtral_mlx_status {
 /*
  * Loads the pinned Voxtral safetensors with the official MLX C++ API and
  * validates the artifact, tensor layout, and critical architecture shapes.
- * This first vertical slice deliberately does not claim transcription.
+ * Reported capabilities distinguish usable batch transcription from the
+ * still-incomplete incremental streaming session.
  */
 int32_t cuttledoc_voxtral_mlx_inspect_model(const char *model_directory,
                                              char **json_out,
@@ -47,6 +48,17 @@ int32_t cuttledoc_voxtral_mlx_probe_causal_encoder(
     const char *model_directory, const float *audio, size_t audio_len,
     int32_t transcription_delay_ms, int32_t device_kind, char **json_out,
     char **error_out);
+
+/*
+ * Runs the repository-owned delay-conditioned Voxtral decoder over the direct
+ * encoder output, greedily decodes Tekken tokens, and returns transcript and
+ * numerical parity evidence. MLX supplies tensor execution only; the model
+ * graph, cache semantics, generation loop, and tokenizer live in this shim.
+ */
+int32_t cuttledoc_voxtral_mlx_transcribe(
+    const char *model_directory, const float *audio, size_t audio_len,
+    int32_t transcription_delay_ms, size_t max_generated_tokens,
+    int32_t device_kind, char **json_out, char **error_out);
 
 /*
  * Creates the repository-owned streaming task boundary. max_pending_samples
