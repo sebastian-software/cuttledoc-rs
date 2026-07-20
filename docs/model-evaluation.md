@@ -160,9 +160,12 @@ timestamp detail, and streaming behavior.
 
 ## Next measurement order
 
-1. Port the measured Qwen3-ASR 0.6B architecture through a bounded
-   repository-owned C++ adapter over official MLX; keep the community runtime
-   as reference-only.
+1. Continue the measured Qwen3-ASR 0.6B architecture through the bounded
+   repository-owned C++ adapter over official MLX. The exact official-MLX
+   model-load and 8-bit layout gate is complete; audio-encoder and transcript
+   parity remain under [#17](https://github.com/sebastian-software/cuttledoc-rs/issues/17).
+   Keep the community runtime as reference-only. See the
+   [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
 2. Close the remaining CoreML acceptance gaps in #5 and resolve #3 against the
    selected Apple-primary and Whisper-fallback architecture.
 3. Record the backend selection in an ADR, then begin the smallest Phase 1 /

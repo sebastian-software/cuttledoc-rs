@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.qwen3-mlx-direct-model-load-1",
+  "source_revision": "10641df1dd816b4e73f45697630cf8219ee9cc29",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/17",
+  "measurement_scope": "Official MLX C++ safetensors header, tensor layout, dtype, quantization-triplet, and critical-shape validation. MLX arrays remain lazily file-backed; no tensor is evaluated and this is not an inference or fully materialized model-memory measurement.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_bytes": 1006229426,
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "result": {
+    "boundary": "repository-owned C ABI over official MLX C++",
+    "status": "ok",
+    "tensor_count": 1005,
+    "metadata_entries": 1,
+    "bfloat16_tensors": 808,
+    "uint32_tensors": 197,
+    "affine_8bit_modules": 197,
+    "validated_shapes": 14,
+    "architecture": {
+      "audio_encoder_layers": 18,
+      "audio_state": 896,
+      "audio_output_dim": 1024,
+      "text_decoder_layers": 28,
+      "text_hidden_size": 1024,
+      "text_attention_heads": 16,
+      "text_key_value_heads": 8,
+      "vocabulary_size": 151936,
+      "quantization_bits": 8,
+      "quantization_group_size": 64
+    }
+  },
+  "runs": [
+    {
+      "wall_ms": 50,
+      "maximum_resident_set_bytes": 17973248
+    },
+    {
+      "wall_ms": 50,
+      "maximum_resident_set_bytes": 17924096
+    },
+    {
+      "wall_ms": 40,
+      "maximum_resident_set_bytes": 17760256
+    }
+  ],
+  "summary": {
+    "mean_wall_ms": 46.667,
+    "maximum_resident_set_bytes": 17973248,
+    "shim_dylib_bytes": 18770096,
+    "mlx_metallib_bytes": 130164152,
+    "rust_probe_bytes": 498776
+  },
+  "next_gate": "Materialize and compare the 128-bin frontend and three Conv2d stages against pinned reference-oracle tensors for one fixed audiobook fixture."
+}
