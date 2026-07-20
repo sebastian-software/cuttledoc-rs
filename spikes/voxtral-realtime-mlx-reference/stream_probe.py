@@ -344,6 +344,7 @@ def run_stream(
     started = time.perf_counter_ns()
     events: list[dict[str, Any]] = []
     step_durations_ms: list[float] = []
+    step_trace: list[dict[str, Any]] = []
     step_calls = 0
     feed_ready = threading.Event()
     feed_lock = threading.Lock()
@@ -406,31 +407,53 @@ def run_stream(
     while not session.done:
         with feed_lock:
             producer_done = producer_state["done"]
+            fed_samples_before_step = producer_state["fed_samples"]
         if not producer_done:
             feed_ready.wait(timeout=0.1)
             feed_ready.clear()
+            with feed_lock:
+                producer_done = producer_state["done"]
+                fed_samples_before_step = producer_state["fed_samples"]
+        step_started_ms = elapsed_ms(started)
         deltas, step_ms = step_once(session, max_decode_tokens)
         step_calls += 1
         step_durations_ms.append(step_ms)
         with feed_lock:
-            fed_samples = producer_state["fed_samples"]
-            producer_done = producer_state["done"]
+            fed_samples_after_step = producer_state["fed_samples"]
+            producer_done_after_step = producer_state["done"]
             producer_error = producer_state["error"]
         if producer_error is not None:
             raise RuntimeError(f"audio producer failed: {producer_error}")
-        if producer_done:
+        if producer_done_after_step:
             finalization_step_calls += 1
+        step_trace.append(
+            {
+                "index": len(step_trace),
+                "started_ms": step_started_ms,
+                "duration_ms": step_ms,
+                "audio_fed_before_step_ms": (
+                    fed_samples_before_step / SAMPLE_RATE_HZ * 1000
+                ),
+                "audio_fed_after_step_ms": (
+                    fed_samples_after_step / SAMPLE_RATE_HZ * 1000
+                ),
+                "producer_done_before_step": producer_done,
+                "producer_done_after_step": producer_done_after_step,
+                "delta_count": len(deltas),
+            }
+        )
         append_events(
             events,
             deltas,
             started,
-            fed_samples,
+            fed_samples_before_step,
+            fed_samples_after_step,
         )
         if deltas:
             empty_steps = 0
         else:
             empty_steps += 1
-        if producer_done and empty_steps > 10_000:
+        if producer_done_after_step and empty_steps > 10_000:
             raise RuntimeError(
                 "streaming session made no finalization progress"
             )
@@ -450,6 +473,16 @@ def run_stream(
         )
     first_event = events[0]
     audio_duration_ms = audio.size / SAMPLE_RATE_HZ * 1000
+    steps_started_before_close = [
+        step["duration_ms"]
+        for step in step_trace
+        if not step["producer_done_before_step"]
+    ]
+    steps_started_after_close = [
+        step["duration_ms"]
+        for step in step_trace
+        if step["producer_done_before_step"]
+    ]
     return {
         "transcription_delay_ms": delay_ms,
         "repetition": repetition,
@@ -458,7 +491,12 @@ def run_stream(
         "timing": {
             "first_append_ms": first_event["elapsed_ms"],
             "first_stable_ms": first_event["elapsed_ms"],
-            "first_append_audio_fed_ms": first_event["audio_fed_ms"],
+            "first_append_audio_fed_before_step_ms": (
+                first_event["audio_fed_before_step_ms"]
+            ),
+            "first_append_audio_fed_at_emit_ms": (
+                first_event["audio_fed_at_emit_ms"]
+            ),
             "audio_close_ms": close_elapsed_ms,
             "final_ms": final_elapsed_ms,
             "endpoint_finalization_ms": final_elapsed_ms
@@ -467,6 +505,16 @@ def run_stream(
             "mean_step_ms": mean(step_durations_ms),
             "p95_step_ms": percentile(step_durations_ms, 0.95),
             "maximum_step_ms": max(step_durations_ms),
+            "maximum_step_started_before_close_ms": (
+                max(steps_started_before_close)
+                if steps_started_before_close
+                else None
+            ),
+            "maximum_step_started_after_close_ms": (
+                max(steps_started_after_close)
+                if steps_started_after_close
+                else None
+            ),
             "mean_feed_schedule_lateness_ms": (
                 mean(schedule_lateness_ms) if schedule_lateness_ms else None
             ),
@@ -494,6 +542,7 @@ def run_stream(
             "runtime_peak_memory_bytes": mx.get_peak_memory(),
         },
         "events": events,
+        "step_trace": step_trace,
     }
 
 
@@ -510,7 +559,8 @@ def append_events(
     events: list[dict[str, Any]],
     deltas: list[str],
     started: int,
-    fed_samples: int,
+    fed_samples_before_step: int,
+    fed_samples_after_step: int,
 ) -> None:
     for delta in deltas:
         if not delta:
@@ -519,7 +569,12 @@ def append_events(
             {
                 "index": len(events),
                 "elapsed_ms": elapsed_ms(started),
-                "audio_fed_ms": fed_samples / SAMPLE_RATE_HZ * 1000,
+                "audio_fed_before_step_ms": (
+                    fed_samples_before_step / SAMPLE_RATE_HZ * 1000
+                ),
+                "audio_fed_at_emit_ms": (
+                    fed_samples_after_step / SAMPLE_RATE_HZ * 1000
+                ),
                 "delta": delta,
             }
         )
