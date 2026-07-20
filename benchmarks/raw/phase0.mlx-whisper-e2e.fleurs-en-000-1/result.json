@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-17T09:49:00Z",
+  "source_revision": "24a07d0000384ab45b5c9f142b75fcba4e059fde",
+  "capture": {
+    "command": "CUTTLEDOC_MLX_SOURCE_DIR=/private/tmp/cuttledoc-mlx-v0.32.0 CUTTLEDOC_MLX_BUILD_DIR=/private/tmp/cuttledoc-mlx-e2e-build bash scripts/run-mlx-direct-spike.sh",
+    "source": "Normalized from the preserved stdout of the exact checked-in runner execution. Numeric values and model output are copied without rerunning or estimating missing measurements.",
+    "lifecycle_count": 3,
+    "runs_per_lifecycle": 2
+  },
+  "fixture": {
+    "id": "fleurs-en-us-test-000",
+    "source_sha256": "3f5c5cab149908b7133cae1aade5623acae4c870a4c87c62adad0dca0c8b058c",
+    "pcm_sha256": "645769836a2e19904a313494f8edca207ca54a41d94971844217572beb5c9a3a",
+    "reference_sha256": "94ac868ffec4f7c70ed84e34efdb3d7e5a728d7efcbe9342dda4342e32583365",
+    "reference_text": "however due to the slow communication channels styles in the west could lag behind by 25 to 30 year",
+    "audio_duration_ms": 10560,
+    "samples": 168960,
+    "sample_rate_hz": 16000
+  },
+  "model": {
+    "id": "mlx-community/whisper-tiny",
+    "revision": "78c52ab98ca87f570bc57ad852e15ef7060f9f76",
+    "weights_npz_sha256": "d5a3b8671ac7aab11a2c9d0f16e7da94bad5500d785856f438c6bd44c3723944",
+    "weights_npz_bytes": 74418182,
+    "extracted_model_and_filter_bytes": 74454976,
+    "tensor_count": 166,
+    "tokenizer_sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126",
+    "representation": "Float16 Whisper Tiny tensors, Float32 80-bin mel filter, official multilingual tokenizer",
+    "license": "MIT source model and official converter; the pinned converted model card has no structured license field"
+  },
+  "runtime": {
+    "id": "official-mlx-cpp",
+    "version": "v0.32.0",
+    "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+    "examples_revision": "796f5b53cab69a3d48a44233ce21aae889e94a08",
+    "deployment_target": "macOS 14.0",
+    "boundary": "Rust f32 PCM and owned JSON through a repository-owned task-level C ABI to the official MLX C++ core"
+  },
+  "host": {
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "xcode": "26.6 (17F113)",
+    "cmake": "4.4.0",
+    "rustc": "rustc 1.95.0-nightly (842bd5be2 2026-01-29)",
+    "ffmpeg": "8.1.2",
+    "metal_language_version": "310"
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18675320,
+    "rust_probe_bytes": 377136,
+    "metallib_bytes": 130164152,
+    "shipped_runtime_bytes": 148839472
+  },
+  "result": {
+    "language": "en",
+    "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years.",
+    "wer": 0.05263157894736842,
+    "cer": 0.012345679012345678,
+    "tokens": [
+      50364,
+      2908,
+      11,
+      3462,
+      281,
+      264,
+      2964,
+      6101,
+      9235,
+      11,
+      13273,
+      294,
+      264,
+      4055,
+      727,
+      8953,
+      2261,
+      538,
+      50726,
+      50726,
+      3552,
+      281,
+      2217,
+      924,
+      13,
+      50795,
+      50257
+    ],
+    "segments": [
+      {
+        "start_seconds": 0,
+        "end_seconds": 7.24,
+        "text": "However, due to the slow communication channels, styles in the West could lag behind by"
+      },
+      {
+        "start_seconds": 7.24,
+        "end_seconds": 8.62,
+        "text": "25 to 30 years."
+      }
+    ]
+  },
+  "cpu": {
+    "compute_dtype": "Float32 activations with converted Float16 weights",
+    "load_wall_ms": [80.798, 20.754, 21.152],
+    "run_wall_ms": [
+      [625.457, 599.852],
+      [625.316, 599.168],
+      [625.596, 598.631]
+    ],
+    "inference_ms": [
+      [625.431, 599.824],
+      [625.289, 599.118],
+      [625.555, 598.606]
+    ],
+    "destroy_wall_ms": [7.869, 7.637, 7.501],
+    "mlx_peak_memory_bytes": 191528052,
+    "maximum_resident_set_bytes": 461963264,
+    "process_peak_footprint_bytes": 450937816,
+    "stable_result_count": 6
+  },
+  "gpu": {
+    "compute_dtype": "Float16",
+    "load_wall_ms": [65.919, 20.891, 21.17],
+    "run_wall_ms": [
+      [178.961, 115.831],
+      [135.308, 112.907],
+      [114.24, 187.811]
+    ],
+    "inference_ms": [
+      [178.934, 115.811],
+      [135.285, 112.88],
+      [114.217, 187.734]
+    ],
+    "destroy_wall_ms": [3.432, 3.444, 12.152],
+    "mlx_peak_memory_bytes": 285849476,
+    "maximum_resident_set_bytes": 124747776,
+    "process_peak_footprint_bytes": 391709584,
+    "stable_result_count": 6
+  },
+  "reference_validation": {
+    "implementation": "mlx-whisper 0.4.3 using the pinned official MLX Python path as a test-only oracle",
+    "text_match": true,
+    "segments": [
+      {
+        "start_seconds": 0,
+        "end_seconds": 7.24
+      },
+      {
+        "start_seconds": 7.24,
+        "end_seconds": 8.52
+      }
+    ],
+    "observation": "The C++ adapter's final boundary is 100 ms later because it recomputes the complete decoder context instead of using the reference FP16 KV cache path."
+  },
+  "observations": [
+    "All six CPU and all six GPU transcriptions returned the same text, tokens, and segment boundaries.",
+    "The median of the three second GPU inferences was 115.811 ms, for an RTF of 0.010966950757575759.",
+    "The first-process load value is not a clean-host cold-start claim because system and Metal caches were not cleared.",
+    "No alternating powermetrics capture was made for this run.",
+    "The adapter exposes only task-level create, describe, transcribe, destroy, and free-string operations; no MLX type crosses the ABI."
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.mlx-whisper-e2e.fleurs-en-000-1",
+  "captured_at": "2026-07-17T09:49:00Z",
+  "source_revision": "24a07d0000384ab45b5c9f142b75fcba4e059fde",
+  "fixture_id": "fleurs-en-us-test-000",
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "mlx-community/whisper-tiny",
+      "revision": "78c52ab98ca87f570bc57ad852e15ef7060f9f76",
+      "quantization": "Float16 model and Metal compute; Float32 CPU activations and mel filter",
+      "license": "MIT source model and official converter; pinned converted model card has no structured license field"
+    },
+    "runtime": {
+      "id": "official-mlx-cpp",
+      "version": "v0.32.0 (7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247)",
+      "boundary": "Rust f32 PCM and owned JSON through a repository-owned task-level C ABI to the official MLX C++ core"
+    },
+    "options": {
+      "device": "gpu",
+      "language": "en",
+      "sample_rate_hz": 16000,
+      "deployment_target": "macOS 14.0",
+      "lifecycle_count": 3,
+      "runs_per_lifecycle": 2,
+      "decoder_cache": "full-context recomputation",
+      "cpu_control": true
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": 0.05263157894736842,
+      "cer": 0.012345679012345678
+    },
+    "timing": {
+      "audio_duration_ms": 10560,
+      "cold_load_ms": 65.919,
+      "warm_inference_ms": 115.811,
+      "real_time_factor": 0.010966950757575759
+    },
+    "resources": {
+      "peak_memory_bytes": 124747776,
+      "model_size_bytes": 74418182,
+      "binary_size_bytes": 148839472
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "segment"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "No alternating powermetrics capture was made. Relative energy remains part of the broader #4 bakeoff, not the #15 task-boundary proof."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "The official MLX Examples converter produced the pinned complete NPZ. The repository fetcher verifies and extracts all 166 model tensors, mel filter, and multilingual tokenizer; product inference contains no Python or Node logic.",
+    "update_cost": "The repository owns a model-specific C++ task adapter over pinned official MLX. The earlier v0.31.2 to v0.32.0 control required no source edits, but model graph and runtime upgrades remain explicit retest events.",
+    "packaging_cost": "The proof needs a 18,675,320-byte shim, a colocated 130,164,152-byte metallib, an executable-relative RPATH, and the 74,418,182-byte model NPZ. Kernel and artifact pruning remain productization work."
+  },
+  "reproduction": {
+    "command": "CUTTLEDOC_MLX_SOURCE_DIR=/absolute/path/to/mlx-v0.32.0 CUTTLEDOC_MLX_BUILD_DIR=/private/tmp/cuttledoc-mlx-e2e-build bash scripts/run-mlx-direct-spike.sh",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.mlx-whisper-e2e.fleurs-en-000-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "blocker": null,
+    "observations": [
+      "The Rust-owned task path produced the same complete transcript, tokens, and two segment boundaries in six CPU and six GPU runs.",
+      "The transcript differed from the fixture reference only by pluralizing the final word.",
+      "The text matched the pinned official mlx-whisper 0.4.3 reference; the final boundary was 100 ms later under full-context decoder recomputation.",
+      "The recorded cold-load value is process-cold but not a clean-host claim because system and Metal caches were not cleared.",
+      "Cancellation between decoder steps, long-audio chunking, streaming updates, KV caching, and artifact pruning are bounded follow-up work rather than unresolved ABI feasibility."
+    ]
+  }
+}

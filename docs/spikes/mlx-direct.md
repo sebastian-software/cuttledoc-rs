@@ -1,8 +1,7 @@
 # Direct official MLX result (#6)
 
-**Status:** advance as the third first-class inference foundation; end-to-end
-Whisper Tiny ASR is proven on the first real fixture, while broader selection
-evidence remains.
+**Status:** #6 and #15 complete; advance official MLX as the third first-class
+inference foundation. Broader selection evidence remains in #4 and #12.
 
 **Evidence date:** 2026-07-17.
 
@@ -201,7 +200,10 @@ number as an ASR claim; the comparable warm end-to-end GPU result is about
 fixtures, long-audio chunking, incremental result mapping, energy, clean cold
 start, safe cancellation plumbing, KV-cache behavior, and artifact pruning.
 
-The machine-readable evidence is in
-[`benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json`](../../benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json)
+The end-to-end machine-readable evidence is in
+[`benchmarks/runs/mlx-whisper-e2e.fleurs-en-000.json`](../../benchmarks/runs/mlx-whisper-e2e.fleurs-en-000.json)
 and its
-[raw record](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).
+[raw record](../../benchmarks/raw/phase0.mlx-whisper-e2e.fleurs-en-000-1/result.json).
+The earlier
+[encoder-only record](../../benchmarks/runs/mlx-whisper-encoder.fleurs-en-000.json)
+is retained as the narrower #6 foundation measurement.

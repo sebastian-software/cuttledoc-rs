@@ -75,5 +75,7 @@ real FLEURS fixture, and runs repeated CPU and GPU lifecycles. Set
 - `mlx-c` remains an optional control for a named uncertainty. The real model
   path did not reveal one, so no second product dependency was added.
 
-See [`docs/spikes/mlx-direct.md`](../../docs/spikes/mlx-direct.md) and the
-[encoder foundation evidence](../../benchmarks/raw/phase0.mlx-whisper-encoder.fleurs-en-000-1/result.json).
+See [`docs/spikes/mlx-direct.md`](../../docs/spikes/mlx-direct.md), the
+[end-to-end benchmark record](../../benchmarks/runs/mlx-whisper-e2e.fleurs-en-000.json),
+and its
+[raw lifecycle evidence](../../benchmarks/raw/phase0.mlx-whisper-e2e.fleurs-en-000-1/result.json).

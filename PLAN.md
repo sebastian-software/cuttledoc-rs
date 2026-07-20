@@ -67,7 +67,7 @@ Exit criteria:
 
 ### Current Phase 0 status
 
-Evidence snapshot: 2026-07-17.
+Evidence snapshot: 2026-07-20.
 
 | Workstream | State | Remaining gate |
 | --- | --- | --- |
@@ -76,7 +76,7 @@ Evidence snapshot: 2026-07-17.
 | CoreML feasibility (#5) | Foundation proven | A complete ASR graph, typed adapter errors, cancellation boundary, and common benchmark remain. |
 | Apple Speech feasibility (#11) | Foundation proven | Broader fixture quality, clean cold start, energy, and shipped executable identity remain selection evidence. |
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
-| End-to-end MLX ASR (#15) | Foundation proven | Broader languages, long audio, streaming, clean cold start, energy, KV cache, cancellation plumbing, and artifact pruning remain. |
+| End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
 | Mandatory ASR benchmark (#4) | Partial | Expand the fixture set, make measurements comparable, and recommend a first backend plus fallback. |
 | Exploratory ASR sweep (#12) | Open | Use it selectively to find a stronger end-to-end MLX ASR path; breadth must not block #4. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
@@ -287,10 +287,12 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Reconcile this plan and the GitHub issue state with completed Phase 0 evidence.
-2. Close the bounded MLX foundation spike with an explicit Rust/C/C++ boundary decision.
-3. Build a focused end-to-end MLX ASR proof through the repository-owned task ABI.
-4. Complete #4/#12 with a multilingual fixture set and comparable cold, warm, memory, energy, and quality evidence.
-5. Finish #9 with Node 22 plus packed-artifact CI gates.
-6. Record the selected first ASR backend and fallback in an ADR, then scaffold only the Phase 1 crates justified by that decision.
-7. Complete #7 independently with an evidence-backed embedded-LLM recommendation or defer decision.
+1. Complete #4/#12 with a multilingual fixture set and comparable cold, warm,
+   memory, energy, and quality evidence.
+2. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
+   rescope the prior-art audit in #3.
+3. Finish #9 with Node 22 plus packed-artifact CI gates.
+4. Record the selected first ASR backend and fallback in an ADR, then scaffold
+   only the Phase 1 crates justified by that decision.
+5. Complete #7 independently with an evidence-backed embedded-LLM
+   recommendation or defer decision.
