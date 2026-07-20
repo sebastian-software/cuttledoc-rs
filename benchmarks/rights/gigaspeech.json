@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "gigaspeech-candidate-1",
+  "source_candidate_id": "gigaspeech",
+  "source_group_id": null,
+  "scope": "candidate",
+  "evidence_date": "2026-07-20",
+  "review_authority": "repository-evidence-review",
+  "disposition": "blocked",
+  "benchmark_role": "target-domain",
+  "allowed_domains": [
+    "podcast",
+    "audiobook"
+  ],
+  "allowed_locales": [
+    "en-US"
+  ],
+  "evidence": [
+    {
+      "kind": "pinned-corpus-repository",
+      "url": "https://github.com/SpeechColab/GigaSpeech/tree/44289e4bb6d65291456cf94de495ea83668d1df1",
+      "finding": "The Apache-2.0 repository describes professionally annotated podcast and audiobook subsets and source-specific metadata, but its license does not grant rights to every underlying source recording."
+    }
+  ],
+  "rights": {
+    "audio": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "transcript": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "derived_clips": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "commercial_benchmark_use": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "redistribution": "denied"
+  },
+  "development_isolation": {
+    "status": "unverified",
+    "compared_source_ids": [
+      "fleurs",
+      "multilingual-librispeech",
+      "librispeech-clean"
+    ],
+    "evidence": []
+  },
+  "acquisition": {
+    "status": "blocked",
+    "method": null,
+    "source_url": null,
+    "expected_source_sha256": null,
+    "artifact_name": null
+  },
+  "blockers": [
+    "Select exact podcast or audiobook source groups and review their source-specific audio terms.",
+    "Confirm transcript and derived-clip rights for every selected group.",
+    "Prove that selected source groups do not overlap development inputs."
+  ],
+  "notes": [
+    "Do not infer underlying media rights from the repository's Apache-2.0 license.",
+    "Keep admitted source audio local unless an accepted source-group review explicitly permits redistribution."
+  ]
+}

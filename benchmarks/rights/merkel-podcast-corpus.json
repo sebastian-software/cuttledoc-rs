@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "merkel-podcast-corpus-candidate-1",
+  "source_candidate_id": "merkel-podcast-corpus",
+  "source_group_id": null,
+  "scope": "candidate",
+  "evidence_date": "2026-07-20",
+  "review_authority": "repository-evidence-review",
+  "disposition": "blocked",
+  "benchmark_role": "target-domain",
+  "allowed_domains": [
+    "podcast"
+  ],
+  "allowed_locales": [
+    "de-DE"
+  ],
+  "evidence": [
+    {
+      "kind": "pinned-corpus-repository",
+      "url": "https://github.com/deeplsd/Merkel-Podcast-Corpus/tree/ef839a3940e13f52ad44798a54819b7338010054",
+      "finding": "The pinned repository contains metadata and download/cropping scripts but no explicit license file or per-artifact rights statement."
+    },
+    {
+      "kind": "corpus-paper",
+      "url": "https://aclanthology.org/2022.lrec-1.270/",
+      "finding": "The paper establishes the corpus composition and professional weekly-podcast domain; the paper license does not establish rights to redistribute or derive clips from the source audio and transcripts."
+    }
+  ],
+  "rights": {
+    "audio": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "transcript": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "derived_clips": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "commercial_benchmark_use": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "redistribution": "denied"
+  },
+  "development_isolation": {
+    "status": "unverified",
+    "compared_source_ids": [
+      "fleurs",
+      "multilingual-librispeech",
+      "librispeech-clean"
+    ],
+    "evidence": []
+  },
+  "acquisition": {
+    "status": "blocked",
+    "method": null,
+    "source_url": null,
+    "expected_source_sha256": null,
+    "artifact_name": null
+  },
+  "blockers": [
+    "Identify source-specific terms or obtain explicit permission for the exact audio and transcript.",
+    "Confirm that cropping and local benchmark use are permitted.",
+    "Select complete episodes and prove that their source groups do not overlap development data."
+  ],
+  "notes": [
+    "Do not run the repository downloader while this review is blocked.",
+    "A later accepted review must be source-group scoped; candidate-level acceptance is insufficient."
+  ]
+}

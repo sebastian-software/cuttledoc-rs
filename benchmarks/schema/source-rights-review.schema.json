@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/source-rights-review.schema.json",
+  "title": "Cuttledoc benchmark source rights review",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "review_id",
+    "source_candidate_id",
+    "source_group_id",
+    "scope",
+    "evidence_date",
+    "review_authority",
+    "disposition",
+    "benchmark_role",
+    "allowed_domains",
+    "allowed_locales",
+    "evidence",
+    "rights",
+    "development_isolation",
+    "acquisition",
+    "blockers",
+    "notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "review_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_group_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "enum": [
+        "candidate",
+        "source-group"
+      ]
+    },
+    "evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_authority": {
+      "type": "string",
+      "minLength": 1
+    },
+    "disposition": {
+      "enum": [
+        "draft",
+        "blocked",
+        "accepted"
+      ]
+    },
+    "benchmark_role": {
+      "enum": [
+        "target-domain",
+        "professional-speech-bridge"
+      ]
+    },
+    "allowed_domains": {
+      "$ref": "#/$defs/nonEmptyUniqueStrings"
+    },
+    "allowed_locales": {
+      "$ref": "#/$defs/nonEmptyUniqueStrings"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "url",
+          "finding"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rights": {
+      "type": "object",
+      "required": [
+        "audio",
+        "transcript",
+        "derived_clips",
+        "commercial_benchmark_use",
+        "redistribution"
+      ],
+      "properties": {
+        "audio": {
+          "$ref": "#/$defs/rightDecision"
+        },
+        "transcript": {
+          "$ref": "#/$defs/rightDecision"
+        },
+        "derived_clips": {
+          "$ref": "#/$defs/rightDecision"
+        },
+        "commercial_benchmark_use": {
+          "$ref": "#/$defs/rightDecision"
+        },
+        "redistribution": {
+          "enum": [
+            "unverified",
+            "denied",
+            "local-only",
+            "allowed"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "development_isolation": {
+      "type": "object",
+      "required": [
+        "status",
+        "compared_source_ids",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unverified",
+            "rejected",
+            "accepted"
+          ]
+        },
+        "compared_source_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "acquisition": {
+      "type": "object",
+      "required": [
+        "status",
+        "method",
+        "source_url",
+        "expected_source_sha256",
+        "artifact_name"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "blocked",
+            "allowed"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "manual-local-file"
+          ]
+        },
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expected_source_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "artifact_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rightDecision": {
+      "type": "object",
+      "required": [
+        "status",
+        "basis",
+        "evidence_urls",
+        "conditions"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unverified",
+            "rejected",
+            "accepted"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "explicit-permission",
+            "permissive-license",
+            "public-domain",
+            "user-provided-with-authorization"
+          ]
+        },
+        "evidence_urls": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

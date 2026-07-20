@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "hui-audio-corpus-german-candidate-1",
+  "source_candidate_id": "hui-audio-corpus-german",
+  "source_group_id": null,
+  "scope": "candidate",
+  "evidence_date": "2026-07-20",
+  "review_authority": "repository-evidence-review",
+  "disposition": "blocked",
+  "benchmark_role": "target-domain",
+  "allowed_domains": [
+    "audiobook"
+  ],
+  "allowed_locales": [
+    "de-DE"
+  ],
+  "evidence": [
+    {
+      "kind": "pinned-generator-repository",
+      "url": "https://github.com/iisys-hof/HUI-Audio-Corpus-German/tree/0092c51f0e1b24bb72f27429e3df256e6e279b49",
+      "finding": "The Apache-2.0 repository contains the dataset generator and configurations that acquire LibriVox recordings and per-work text; its license is not by itself an artifact-level audio or transcript grant."
+    },
+    {
+      "kind": "published-dataset-page",
+      "url": "https://opendata.iisys.de/dataset/hui-audio-corpus-german/",
+      "finding": "The publisher provides multi-speaker full and clean 44.1 kHz archives but the reviewed page does not state an explicit license for the downloadable dataset artifacts."
+    }
+  ],
+  "rights": {
+    "audio": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "transcript": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "derived_clips": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "commercial_benchmark_use": {
+      "status": "unverified",
+      "basis": null,
+      "evidence_urls": [],
+      "conditions": []
+    },
+    "redistribution": "denied"
+  },
+  "development_isolation": {
+    "status": "unverified",
+    "compared_source_ids": [
+      "fleurs",
+      "multilingual-librispeech",
+      "librispeech-clean"
+    ],
+    "evidence": []
+  },
+  "acquisition": {
+    "status": "blocked",
+    "method": null,
+    "source_url": null,
+    "expected_source_sha256": null,
+    "artifact_name": null
+  },
+  "blockers": [
+    "Obtain an explicit artifact-level license or permission statement for selected HUI audio archives.",
+    "Review the exact LibriVox recording and text-source rights for each selected work.",
+    "Select independent works and speakers that do not overlap the MLS/LibriSpeech development source groups."
+  ],
+  "notes": [
+    "Do not download the published archives while this review is blocked.",
+    "A later accepted review must identify one exact work/speaker source group and pin its original artifact digest."
+  ]
+}

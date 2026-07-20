@@ -94,6 +94,20 @@ remains a short-read integration gate; audiobook and professional-podcast
 cells are reported separately, with independent-source grouping and
 human-verified gold transcripts.
 
+Candidate-level rights reviews live under [`rights`](rights/) and are
+validated with the rest of the benchmark data. They cannot authorize a
+download or import. The exact deny-by-default workflow and the requirements for
+an accepted source-group review are documented in
+[`docs/source-rights-review.md`](../docs/source-rights-review.md). Once a
+source-group review is accepted, import its digest-pinned local audio with:
+
+```sh
+node scripts/import-target-domain-source.mjs \
+  --review benchmarks/rights/<source-group>.json \
+  --source /absolute/path/to/original-audio \
+  --output-dir /absolute/path/to/cuttledoc-target-domain
+```
+
 The first target-domain development input is the 15-clip multilingual
 audiobook pilot. It deliberately remains outside Git as generated audio while
 the repository pins dataset revisions, row metadata, source digests, and

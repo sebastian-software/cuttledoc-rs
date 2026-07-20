@@ -347,6 +347,191 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
   return errors;
 }
 
+function validateSourceRightsReview(
+  review,
+  sourceCandidates,
+  targetDomainPlan,
+) {
+  const errors = [];
+  if (review.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  for (const field of [
+    'review_id',
+    'source_candidate_id',
+    'review_authority',
+    'benchmark_role',
+  ]) {
+    if (!(review[field]?.length > 0)) {
+      errors.push(`${field} must be a non-empty string`);
+    }
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(review.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (!['candidate', 'source-group'].includes(review.scope)) {
+    errors.push('scope is invalid');
+  }
+  if (review.scope === 'candidate' && review.source_group_id !== null) {
+    errors.push('candidate review source_group_id must be null');
+  }
+  if (review.scope === 'source-group' &&
+      !(review.source_group_id?.length > 0)) {
+    errors.push('source-group review requires source_group_id');
+  }
+  if (!['draft', 'blocked', 'accepted'].includes(review.disposition)) {
+    errors.push('disposition is invalid');
+  }
+  if (!['target-domain', 'professional-speech-bridge'].includes(
+    review.benchmark_role,
+  )) {
+    errors.push('benchmark_role is invalid');
+  }
+
+  const source = sourceCandidates.sources.find(
+    (candidate) => candidate.id === review.source_candidate_id,
+  );
+  if (!source) {
+    errors.push(`unknown source candidate: ${review.source_candidate_id}`);
+  }
+  for (const [field, allowedValues] of [
+    ['allowed_domains', source?.domains ?? []],
+    ['allowed_locales', source?.languages ?? []],
+  ]) {
+    if (!Array.isArray(review[field]) ||
+        review[field].length === 0 ||
+        new Set(review[field]).size !== review[field].length) {
+      errors.push(`${field} must be a non-empty unique array`);
+      continue;
+    }
+    for (const value of review[field]) {
+      if (!allowedValues.includes(value)) {
+        errors.push(`${field} contains unsupported value: ${value}`);
+      }
+    }
+  }
+  if (!Array.isArray(review.evidence) || review.evidence.length === 0) {
+    errors.push('evidence must be a non-empty array');
+  }
+  for (const [index, evidence] of (review.evidence ?? []).entries()) {
+    for (const field of ['kind', 'url', 'finding']) {
+      if (!(evidence[field]?.length > 0)) {
+        errors.push(`evidence[${index}].${field} must be a non-empty string`);
+      }
+    }
+    try {
+      const url = new URL(evidence.url);
+      if (url.protocol !== 'https:') {
+        errors.push(`evidence[${index}].url must use HTTPS`);
+      }
+    } catch {
+      errors.push(`evidence[${index}].url must be an absolute URL`);
+    }
+  }
+
+  const rightFields = [
+    'audio',
+    'transcript',
+    'derived_clips',
+    'commercial_benchmark_use',
+  ];
+  const allowedBases = new Set(targetDomainPlan.rights_policy.accepted_bases);
+  for (const field of rightFields) {
+    const decision = review.rights?.[field];
+    if (!['unverified', 'rejected', 'accepted'].includes(decision?.status)) {
+      errors.push(`rights.${field}.status is invalid`);
+    }
+    if (decision?.basis !== null &&
+        !allowedBases.has(decision?.basis)) {
+      errors.push(`rights.${field}.basis is invalid`);
+    }
+    for (const listField of ['evidence_urls', 'conditions']) {
+      if (!Array.isArray(decision?.[listField]) ||
+          new Set(decision[listField]).size !== decision[listField].length) {
+        errors.push(`rights.${field}.${listField} must be a unique array`);
+      }
+    }
+    if (decision?.status === 'accepted' &&
+        (!(decision.basis?.length > 0) ||
+         decision.evidence_urls.length === 0)) {
+      errors.push(`rights.${field} accepted without basis and evidence`);
+    }
+  }
+  if (!['unverified', 'denied', 'local-only', 'allowed'].includes(
+    review.rights?.redistribution,
+  )) {
+    errors.push('rights.redistribution is invalid');
+  }
+
+  if (!['unverified', 'rejected', 'accepted'].includes(
+    review.development_isolation?.status,
+  )) {
+    errors.push('development_isolation.status is invalid');
+  }
+  if (!arrayEquals(
+    review.development_isolation?.compared_source_ids ?? [],
+    targetDomainPlan.excluded_development_sources,
+  )) {
+    errors.push('development_isolation must compare every excluded development source');
+  }
+  if (!Array.isArray(review.development_isolation?.evidence)) {
+    errors.push('development_isolation.evidence must be an array');
+  }
+  if (!['blocked', 'allowed'].includes(review.acquisition?.status)) {
+    errors.push('acquisition.status is invalid');
+  }
+  if (![null, 'manual-local-file'].includes(review.acquisition?.method)) {
+    errors.push('acquisition.method is invalid');
+  }
+  if (!Array.isArray(review.blockers) || !Array.isArray(review.notes)) {
+    errors.push('blockers and notes must be arrays');
+  }
+
+  if (review.disposition === 'accepted') {
+    if (review.scope !== 'source-group') {
+      errors.push('accepted review must be source-group scoped');
+    }
+    if (review.benchmark_role !== 'target-domain') {
+      errors.push('accepted importer review must have target-domain role');
+    }
+    for (const field of rightFields) {
+      if (review.rights?.[field]?.status !== 'accepted') {
+        errors.push(`accepted review requires rights.${field}`);
+      }
+    }
+    if (!['local-only', 'allowed'].includes(review.rights?.redistribution)) {
+      errors.push('accepted review requires local-only or allowed redistribution');
+    }
+    if (review.development_isolation?.status !== 'accepted' ||
+        review.development_isolation.evidence.length === 0) {
+      errors.push('accepted review requires development isolation evidence');
+    }
+    if (review.acquisition?.status !== 'allowed' ||
+        review.acquisition?.method !== 'manual-local-file' ||
+        !(review.acquisition?.source_url?.length > 0) ||
+        !/^[0-9a-f]{64}$/.test(
+          review.acquisition?.expected_source_sha256 ?? '',
+        ) ||
+        !(review.acquisition?.artifact_name?.length > 0)) {
+      errors.push('accepted review requires a complete manual-local-file acquisition');
+    }
+    if (review.blockers.length !== 0) {
+      errors.push('accepted review must have no blockers');
+    }
+  } else if (review.disposition === 'blocked') {
+    if (review.acquisition?.status !== 'blocked' ||
+        review.acquisition?.method !== null ||
+        review.acquisition?.expected_source_sha256 !== null ||
+        review.acquisition?.artifact_name !== null) {
+      errors.push('blocked review must not expose an acquisition path');
+    }
+    if (review.blockers.length === 0) {
+      errors.push('blocked review requires precise blockers');
+    }
+  }
+  return errors;
+}
+
 function validateAudiobookPilot(manifest) {
   const errors = [];
   if (manifest.schema_version !== schemaVersion) {
@@ -951,6 +1136,7 @@ const targetDomainPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/target-domain-plan.json',
 );
+const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
   'benchmarks/fixtures/audiobook-pilot.json',
@@ -969,6 +1155,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
+  join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
   join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
@@ -985,6 +1172,13 @@ const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const targetDomainPlan = await readJson(targetDomainPlanPath);
+const sourceRightsPaths = (await readdir(sourceRightsDirectory))
+  .filter((name) => name.endsWith('.json'))
+  .sort()
+  .map((name) => join(sourceRightsDirectory, name));
+const sourceRightsReviews = await Promise.all(
+  sourceRightsPaths.map((path) => readJson(path)),
+);
 const audiobookPilot = await readJson(audiobookPilotPath);
 const aggregateManifests = new Map([
   [manifest.revision, manifest],
@@ -1011,6 +1205,32 @@ failures.push(
     (error) => `${targetDomainPlanPath}: ${error}`,
   ),
 );
+const rightsReviewIds = new Set();
+const reviewedCandidateIds = new Set();
+for (const [index, review] of sourceRightsReviews.entries()) {
+  if (rightsReviewIds.has(review.review_id)) {
+    failures.push(
+      `${sourceRightsPaths[index]}: duplicate rights review id ${review.review_id}`,
+    );
+  }
+  rightsReviewIds.add(review.review_id);
+  reviewedCandidateIds.add(review.source_candidate_id);
+  failures.push(
+    ...validateSourceRightsReview(
+      review,
+      sourceCandidates,
+      targetDomainPlan,
+    ).map((error) => `${sourceRightsPaths[index]}: ${error}`),
+  );
+}
+for (const source of sourceCandidates.sources) {
+  if (source.status === 'selected-pending-rights-review' &&
+      !reviewedCandidateIds.has(source.id)) {
+    failures.push(
+      `${sourceRightsDirectory}: missing rights review for ${source.id}`,
+    );
+  }
+}
 failures.push(
   ...validateAudiobookPilot(audiobookPilot).map(
     (error) => `${audiobookPilotPath}: ${error}`,
@@ -1115,6 +1335,15 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push('validator self-test failed to reject a development source in a held-out cell');
   }
+  const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
+  invalidRightsReview.disposition = 'accepted';
+  if (validateSourceRightsReview(
+    invalidRightsReview,
+    sourceCandidates,
+    targetDomainPlan,
+  ).length === 0) {
+    failures.push('validator self-test failed to reject candidate-level rights acceptance');
+  }
   const invalidAudiobookPilot = structuredClone(audiobookPilot);
   invalidAudiobookPilot.summary.duration_ms += 1;
   if (validateAudiobookPilot(invalidAudiobookPilot).length === 0) {
@@ -1142,6 +1371,7 @@ console.log(
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
+  `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
