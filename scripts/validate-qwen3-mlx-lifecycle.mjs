@@ -6,11 +6,15 @@ import { resolve } from 'node:path';
 const { oraclePath, lifecyclePath, cancellationPath } = parseArguments(
   process.argv.slice(2),
 );
-const [oracle, lifecycle, cancellation] = await Promise.all(
+const [oracle, lifecycleDocument, cancellationDocument] = await Promise.all(
   [oraclePath, lifecyclePath, cancellationPath].map(async (path) =>
     JSON.parse(await readFile(path, 'utf8')),
   ),
 );
+const lifecycle =
+  lifecycleDocument.result?.lifecycle ?? lifecycleDocument;
+const cancellation =
+  cancellationDocument.result?.cancellation ?? cancellationDocument;
 const errors = [];
 const sessions = lifecycle.sessions ?? [];
 const runs = sessions.flatMap((session) => session.runs ?? []);
