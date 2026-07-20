@@ -895,7 +895,7 @@ function validateQwen3TtsModelManifest(modelManifest, plan, selection) {
       !candidate.model.endsWith(`@${modelManifest.conversion?.revision}`) ||
       candidate.source_revision !== modelManifest.reference_runtime?.revision ||
       candidate.status !==
-        'measured-reference-run-pending-qwen-asr-and-listening') {
+        'measured-reference-run-pending-listening') {
     errors.push('synthetic plan does not reference the pinned model and runtime');
   }
   return errors;
@@ -1031,7 +1031,7 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
 
   const contentChecks = run.result?.asr_content_checks;
   const normalizedAudio = contentChecks?.normalized_audio;
-  if (contentChecks?.status !== 'partial' ||
+  if (contentChecks?.status !== 'complete' ||
       normalizedAudio?.sample_format !== 'f32le' ||
       normalizedAudio?.sample_rate_hz !== 16000 ||
       normalizedAudio?.channel_count !== 1 ||
@@ -1044,12 +1044,13 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
     ['apple-speechtranscriber', [5, 104, 4, 694]],
     ['whisper-large-v3-turbo-coreml-whispercpp', [2, 104, 0, 692]],
     ['parakeet-tdt-0.6b-v3-coreml', [9, 100, 21, 692]],
+    ['qwen3-asr-0.6b-mlx-direct', [2, 103, 4, 696]],
   ]);
   const measuredChecks = contentChecks?.backends ?? [];
   if (measuredChecks.length !== expectedContentChecks.size ||
       new Set(measuredChecks.map((check) => check.backend?.id)).size !==
         measuredChecks.length) {
-    errors.push('content checks must contain three unique measured backends');
+    errors.push('content checks must contain four unique measured backends');
   }
   for (const check of measuredChecks) {
     const transcript = check.transcript;
@@ -1095,13 +1096,13 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
       errors.push(`${check.backend?.id ?? 'unknown'} timing is inconsistent`);
     }
   }
-  if (contentChecks?.comparison?.completed_backend_count !== 3 ||
+  if (contentChecks?.comparison?.completed_backend_count !== 4 ||
       contentChecks?.comparison?.expected_backend_count !== 4 ||
       !arrayEquals(
         contentChecks?.comparison?.remaining_backends ?? [],
-        ['qwen3-asr-0.6b-mlx-direct'],
+        [],
       )) {
-    errors.push('content-check matrix must leave only direct Qwen3-ASR open');
+    errors.push('content-check matrix must complete all four ASR backends');
   }
   if (run.conclusion?.reference_path_proven !== true ||
       run.conclusion?.public_contract_accepted !== false ||

@@ -118,7 +118,7 @@
       "configured_max_tokens": 1200
     },
     "asr_content_checks": {
-      "status": "partial",
+      "status": "complete",
       "normalized_audio": {
         "sample_format": "f32le",
         "sample_rate_hz": 16000,
@@ -248,20 +248,69 @@
             "binary_bytes": 133472,
             "maximum_resident_set_size_bytes": 167198720
           }
+        },
+        {
+          "captured_at": "2026-07-20T18:19:22Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "de",
+            "adapter_revision": "825ceaaed0ca6dfd97bc7a950cb1644df288a7ce",
+            "boundary": "repository-owned C++ task ABI called from Rust over official MLX",
+            "model": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+            "runtime": "official MLX 0.32.0@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+          },
+          "transcript": {
+            "text": "Der Begriff \"Artificial Intelligence\" (künstliche Intelligenz) wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs \"künstliche Intelligenz\" wurde im Laufe der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff \"Intelligence Augmentation\" vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "cd84abc50a274891c1927bcf5f03dea772dd053be66428615f5fcc0c0adb57ae",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 103,
+            "word_edits": 2,
+            "wer": 0.019417475728155338,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 696,
+            "character_edits": 4,
+            "cer": 0.005780346820809248
+          },
+          "timing": {
+            "session_create_ms": 35.578041,
+            "repetitions": 2,
+            "complete_inference_ms": 1697.7844165000001,
+            "real_time_factor": 0.021901243762899897
+          },
+          "resources": {
+            "model_bytes": 1010771234,
+            "binary_bytes": 149817552,
+            "mlx_peak_memory_bytes": 3280442320
+          },
+          "generation": {
+            "token_count": 216,
+            "finish_reason": "eos",
+            "stop_token": 151645,
+            "deterministic_across_repetitions": true
+          }
         }
       ],
       "comparison": {
-        "completed_backend_count": 3,
+        "completed_backend_count": 4,
         "expected_backend_count": 4,
-        "remaining_backends": [
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp",
           "qwen3-asr-0.6b-mlx-direct"
         ],
-        "lowest_observed_wer_backend": "whisper-large-v3-turbo-coreml-whispercpp",
         "observations": [
           "Whisper recovers the lexical character sequence exactly; its two word edits are caused by splitting Rockefeller-Stiftung into two tokens.",
           "Apple Speech introduces four character edits, including Dartmouth versus Dartmoalth and Augmentation versus Augumentation.",
           "Parakeet introduces nine word edits and 21 character edits, including language-switch errors around embedded English terms.",
-          "The backend spread strengthens the evidence that the generated speech carries the intended German passage, but errors remain unattributed until the direct Qwen3-ASR cell and listening review are complete."
+          "Direct Qwen3-ASR preserves every proper name and technical term; its two word edits are semantically equivalent expansions of ca. to circa and im Lauf to im Laufe.",
+          "All four backends completed on identical normalized audio. The spread strongly supports lexical TTS fidelity, while a listening review remains necessary for pronunciation and prosody."
         ]
       }
     }
@@ -304,6 +353,6 @@
     "reference_path_proven": true,
     "public_contract_accepted": false,
     "quality_decision_ready": false,
-    "next": "Run the normalized audio through direct Qwen3-ASR over MLX, then perform a small blinded German listening review before comparing voices and candidates."
+    "next": "Perform a small blinded German listening review before comparing voices and candidates."
   }
 }

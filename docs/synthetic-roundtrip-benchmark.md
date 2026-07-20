@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
 **Status:** diagnostic text, Apple TTS lifecycle, and local Qwen3-TTS MLX
-reference verified; three of four Qwen → ASR content checks measured
+reference verified; first four-backend Qwen → ASR content matrix complete
 
 ## Purpose
 
@@ -155,13 +155,15 @@ audio:
 | Backend | German WER | German CER | Diagnostic observation |
 | --- | ---: | ---: | --- |
 | Whisper large-v3-turbo | 1.94% | 0.00% | exact lexical character sequence; WER comes from splitting `Rockefeller-Stiftung` |
+| Direct Qwen3-ASR 0.6B/MLX | 1.94% | 0.58% | semantically equivalent `ca.`/`circa` and `im Lauf`/`im Laufe`; names and technical terms preserved |
 | Apple Speech | 4.85% | 0.58% | substitutions include `Dartmouth`/`Dartmoalth` and `Augmentation`/`Augumentation` |
 | Parakeet TDT 0.6B v3 | 8.74% | 3.03% | language-switch errors concentrate around embedded English terms |
 
 The spread strengthens the evidence that Qwen generated the intended German
 content and demonstrates why one roundtrip score must not be treated as a TTS
-quality score. The direct Qwen3-ASR cell and blinded listening review remain
-necessary before assigning the residual errors to synthesis or recognition.
+quality score. All four ASR cells are complete on identical PCM. A blinded
+listening review remains necessary to evaluate pronunciation and prosody and
+to assign any audible residual errors.
 
 ## Implementation sequence
 
@@ -179,8 +181,7 @@ necessary before assigning the residual errors to synthesis or recognition.
    cross-lingual German generation contract are frozen in
    [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
    **Reference run complete:** real PCM, timing, resource use, termination, and
-   three ASR content checks are recorded. Direct Qwen3-ASR and listening are
-   still open.
+   all four ASR content checks are recorded. Listening is still open.
 4. Run the two local/system candidates through all four ASR backends, add the
    remote Qwen English ceiling when credentials are available, and produce the
    first language-aware roundtrip report.
