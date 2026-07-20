@@ -21,7 +21,7 @@ set(MLX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(MLX_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
 set(MLX_BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 set(MLX_BUILD_GGUF OFF CACHE BOOL "" FORCE)
-set(MLX_BUILD_SAFETENSORS OFF CACHE BOOL "" FORCE)
+set(MLX_BUILD_SAFETENSORS ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory("${MLX_SOURCE_DIR}" mlx-upstream EXCLUDE_FROM_ALL)
 
@@ -30,17 +30,39 @@ target_link_libraries(cuttledoc_mlx_shim PRIVATE mlx)
 target_include_directories(cuttledoc_mlx_shim PUBLIC include)
 target_compile_options(cuttledoc_mlx_shim PRIVATE -Wall -Wextra -Wpedantic)
 
+add_library(
+  cuttledoc_qwen3_mlx_shim
+  SHARED
+  ../qwen3-mlx-direct/Sources/CuttledocQwen3MlxShim.cpp)
+target_link_libraries(cuttledoc_qwen3_mlx_shim PRIVATE mlx)
+target_include_directories(
+  cuttledoc_qwen3_mlx_shim
+  PUBLIC
+  ../qwen3-mlx-direct/include)
+target_compile_options(
+  cuttledoc_qwen3_mlx_shim
+  PRIVATE
+  -Wall
+  -Wextra
+  -Wpedantic)
+
 # MLX resolves its default Metal kernels from mlx.metallib at runtime. Make the
 # artifact an explicit build dependency of the shim so the spike cannot appear
 # to link successfully while omitting the file needed for GPU execution.
 if(TARGET mlx-metallib)
-  add_dependencies(cuttledoc_mlx_shim mlx-metallib)
-  add_custom_command(
-    TARGET cuttledoc_mlx_shim
-    POST_BUILD
-    COMMAND
-      ${CMAKE_COMMAND} -E copy_if_different
-      "${CMAKE_BINARY_DIR}/mlx-upstream/mlx/backend/metal/kernels/mlx.metallib"
-      "$<TARGET_FILE_DIR:cuttledoc_mlx_shim>/mlx.metallib"
-    COMMENT "Colocating mlx.metallib with the Rust executable")
+  foreach(
+    shim_target
+    IN ITEMS
+    cuttledoc_mlx_shim
+    cuttledoc_qwen3_mlx_shim)
+    add_dependencies(${shim_target} mlx-metallib)
+    add_custom_command(
+      TARGET ${shim_target}
+      POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/mlx-upstream/mlx/backend/metal/kernels/mlx.metallib"
+        "$<TARGET_FILE_DIR:${shim_target}>/mlx.metallib"
+      COMMENT "Colocating mlx.metallib with ${shim_target}")
+  endforeach()
 endif()

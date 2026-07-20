@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/qwen3-mlx-model-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "source",
+    "conversion",
+    "artifacts",
+    "architecture",
+    "expected_layout"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "const": "qwen3-asr-0.6b-mlx-8bit"
+    },
+    "source": {
+      "$ref": "#/$defs/repository"
+    },
+    "conversion": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/repository"
+        },
+        {
+          "type": "object",
+          "required": [
+            "quantization"
+          ],
+          "properties": {
+            "quantization": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mode",
+                "bits",
+                "group_size"
+              ],
+              "properties": {
+                "mode": {
+                  "const": "affine"
+                },
+                "bits": {
+                  "const": 8
+                },
+                "group_size": {
+                  "const": 64
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "architecture": {
+      "type": "object"
+    },
+    "expected_layout": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "repository": {
+      "type": "object",
+      "required": [
+        "repository",
+        "revision",
+        "license"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
