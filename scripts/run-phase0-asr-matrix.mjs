@@ -407,18 +407,66 @@ function parseAppleSpeech(output) {
   const updates = lines
     .filter((line) => line.startsWith('UPDATE '))
     .map((line) => JSON.parse(line.slice('UPDATE '.length)));
-  const final = updates.findLast(
-    (update) => update.stability === 'final',
-  );
-  if (!final) {
-    throw new Error('Apple Speech emitted no final update');
-  }
+  const final = reduceAppleSpeech(updates);
   return {
     create_ms: Number.parseFloat(value('CREATE_MS ')),
     metadata: JSON.parse(value('SESSION_METADATA ')),
     summary: JSON.parse(value('SESSION_SUMMARY ')),
     final,
   };
+}
+
+function reduceAppleSpeech(updates) {
+  let stored = [];
+  for (const update of updates) {
+    const affected = update.replace_range;
+    if (
+      stored.some(
+        (segment) =>
+          segment.stability === 'final' &&
+          rangesOverlap(segment, affected),
+      )
+    ) {
+      throw new Error(
+        `Apple Speech update ${update.sequence} overlaps finalized content`,
+      );
+    }
+    stored = stored.filter(
+      (segment) =>
+        segment.stability === 'final' ||
+        !rangesOverlap(segment, affected),
+    );
+    if (update.kind === 'replace') {
+      stored.push(
+        ...update.segments.map((segment) => ({
+          ...segment,
+          stability: update.stability,
+        })),
+      );
+      stored.sort(
+        (left, right) =>
+          left.start_ms - right.start_ms ||
+          left.end_ms - right.end_ms,
+      );
+    }
+  }
+  const segments = stored
+    .filter((segment) => segment.stability === 'final')
+    .map(({ stability: _, ...segment }) => segment);
+  if (segments.length === 0) {
+    throw new Error('Apple Speech emitted no final segments');
+  }
+  return {
+    text: segments
+      .map((segment) => segment.text)
+      .filter(Boolean)
+      .join(' '),
+    segments,
+  };
+}
+
+function rangesOverlap(left, right) {
+  return left.start_ms < right.end_ms && right.start_ms < left.end_ms;
 }
 
 async function materializeFixture(fixture) {
