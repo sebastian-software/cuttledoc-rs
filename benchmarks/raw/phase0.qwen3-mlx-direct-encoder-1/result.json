@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.qwen3-mlx-direct-encoder-1",
+  "captured_at": "2026-07-20T14:33:57Z",
+  "source_revision": "677bc3085f3e894be932ce4c8c48ea4cdca37fab",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/17",
+  "measurement_scope": "Repository-owned Qwen3 audio encoder through all 18 transformer layers and the final 1024-dimensional projection, executed through official MLX C++ on the pinned audiobook fixture. This is an encoder-parity result, not a transcript-quality result.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "toolchain": {
+    "mlx": {
+      "version": "0.32.0",
+      "revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247"
+    },
+    "cmake": "4.4.0",
+    "rustc": "1.95.0-nightly (842bd5be2 2026-01-29)"
+  },
+  "model": {
+    "source": "Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+    "conversion": "mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f",
+    "artifact_sha256": "b5bfe4abc1b4c6e58b633096682ec2b6297298add1527119936107d211adf0e8"
+  },
+  "fixture": {
+    "id": "audiobook-en-2277-149874-0000",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+    "pcm_samples": 248080,
+    "sample_rate_hz": 16000
+  },
+  "result": {
+    "status": "ok",
+    "boundary": "repository-owned C ABI over official MLX C++",
+    "reference_oracle": "benchmarks/oracles/qwen3-asr-0.6b.audiobook-en-2277-149874-0000.encoder.json",
+    "probe": {
+      "status": "ok",
+      "boundary": "official-mlx-cpp",
+      "stage": "qwen3-audio-encoder",
+      "device": "gpu",
+      "pcm_samples": 248080,
+      "feature_length": 1550,
+      "chunk_lengths": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 50],
+      "post_convolution_lengths": [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 7],
+      "aftercnn_length": 202,
+      "attention_windows": [0, 104, 202],
+      "elapsed_ms": 506.20325000000003,
+      "peak_memory_bytes": 1212305644,
+      "fingerprints": {
+        "input_features": {
+          "shape": [1, 128, 1550],
+          "source_dtype": "float32",
+          "mean": -0.064264763190501159,
+          "stddev": 0.43818890345829664,
+          "minimum": -0.78085887432098389,
+          "maximum": 1.2191411256790161,
+          "l1": 73251.294831871986,
+          "sample_indices": [0, 1, 2, 7, 31, 66133, 132266, 198399],
+          "sample_values": [-0.17713332176208496, -0.29436981678009033, -0.074864387512207031, 0.082077443599700928, 0.11295348405838013, 0.34614968299865723, -0.16441440582275391, -0.76550090312957764]
+        },
+        "conv2d1": {
+          "shape": [16, 64, 50, 480],
+          "source_dtype": "float32",
+          "mean": 0.0068045614308684058,
+          "stddev": 0.065925052525952932,
+          "minimum": -0.16997122764587402,
+          "maximum": 2.6899831295013428,
+          "l1": 780694.68353009503,
+          "sample_indices": [0, 1, 2, 7, 31, 8192000, 16384000, 24575999],
+          "sample_values": [-0.054689127951860428, 0.018694203346967697, 0.00047884270315989852, 0.042058885097503662, 0.0022103907540440559, 0.0046710190363228321, 0.016560027375817299, 0.025364838540554047]
+        },
+        "conv2d2": {
+          "shape": [16, 32, 25, 480],
+          "source_dtype": "float32",
+          "mean": -0.014858045434070721,
+          "stddev": 0.16676613980128741,
+          "minimum": -0.16997122764587402,
+          "maximum": 4.307589054107666,
+          "l1": 643781.97455251962,
+          "sample_indices": [0, 1, 2, 7, 31, 2048000, 4096000, 6143999],
+          "sample_values": [0.045717824250459671, -0.062970131635665894, 0.2703666090965271, 0.075393490493297577, -0.13585147261619568, -0.16946728527545929, -0.084761969745159149, -0.15315841138362885]
+        },
+        "conv2d3": {
+          "shape": [16, 16, 13, 480],
+          "source_dtype": "float32",
+          "mean": -0.050300904442403441,
+          "stddev": 0.1505377663302761,
+          "minimum": -0.16997122764587402,
+          "maximum": 2.831249475479126,
+          "l1": 188149.18122387936,
+          "sample_indices": [0, 1, 2, 7, 31, 532480, 1064960, 1597439],
+          "sample_values": [-0.025514733046293259, -0.08641660213470459, -0.070273429155349731, -0.1300363689661026, -0.14484141767024994, 0.79616528749465942, -0.16724623739719391, -0.081663563847541809]
+        },
+        "conv_out": {
+          "shape": [16, 13, 896],
+          "source_dtype": "float32",
+          "mean": 0.015996143720915706,
+          "stddev": 0.66094995822699176,
+          "minimum": -4.1121120452880859,
+          "maximum": 4.6624999046325684,
+          "l1": 98983.401115376095,
+          "sample_indices": [0, 1, 2, 7, 31, 62122, 124245, 186367],
+          "sample_values": [0.21162933111190796, 0.50277519226074219, 0.54600465297698975, 0.019241560250520706, 0.54382741451263428, 0.48005607724189758, 0.3790048360824585, -0.53857135772705078]
+        },
+        "encoder_input": {
+          "shape": [202, 896],
+          "source_dtype": "float32",
+          "mean": 0.48417332063953983,
+          "stddev": 0.56796255888992742,
+          "minimum": -4.2680025100708008,
+          "maximum": 5.657862663269043,
+          "l1": 108339.39249889046,
+          "sample_indices": [0, 1, 2, 7, 31, 60330, 120661, 180991],
+          "sample_values": [0.21162933111190796, 0.50277519226074219, 0.54600465297698975, 0.019241560250520706, 0.54382741451263428, 0.13645164668560028, 1.259501576423645, 0.079055249691009521]
+        },
+        "encoder_layer_0": {
+          "shape": [1, 202, 896],
+          "source_dtype": "float32",
+          "mean": 0.48962737633628112,
+          "stddev": 0.49924092432956768,
+          "minimum": -3.8546645641326904,
+          "maximum": 8.9381465911865234,
+          "l1": 100079.30464784056,
+          "sample_indices": [0, 1, 2, 7, 31, 60330, 120661, 180991],
+          "sample_values": [0.056517764925956726, 0.12356960773468018, 0.2002483606338501, -0.0077959615737199783, 0.45512270927429199, 0.39117592573165894, 1.0637563467025757, 0.47592863440513611]
+        },
+        "encoder_layer_17": {
+          "shape": [1, 202, 896],
+          "source_dtype": "float32",
+          "mean": 0.44531945867685496,
+          "stddev": 0.91425788630617466,
+          "minimum": -5.6887836456298828,
+          "maximum": 30.315893173217773,
+          "l1": 113195.18148263916,
+          "sample_indices": [0, 1, 2, 7, 31, 60330, 120661, 180991],
+          "sample_values": [1.1187988519668579, -0.087726548314094543, -0.63891959190368652, -0.63584333658218384, 1.6546763181686401, 1.6410973072052002, 0.28814685344696045, 0.14417336881160736]
+        },
+        "audio_features": {
+          "shape": [202, 1024],
+          "source_dtype": "float32",
+          "mean": 0.0010512807249558938,
+          "stddev": 0.018574480842920644,
+          "minimum": -0.11642765253782272,
+          "maximum": 0.13940659165382385,
+          "l1": 2989.791129826157,
+          "sample_indices": [0, 1, 2, 7, 31, 68949, 137898, 206847],
+          "sample_values": [-0.020686550065875053, -0.015568513423204422, -0.040306121110916138, 0.0076040294952690601, -0.010154357179999352, -0.013475800864398479, -0.016376372426748276, -0.0084732752293348312]
+        }
+      }
+    },
+    "parity": {
+      "status": "ok",
+      "sample_absolute_tolerance": 0.00001,
+      "aggregate_relative_tolerance": 0.00002,
+      "maximum_sample_absolute_error": 0.000004932284355163574,
+      "maximum_aggregate_relative_error": 0.0000016638209994815917
+    },
+    "cpu_smoke": {
+      "status": "ok",
+      "elapsed_ms": 508.573375,
+      "peak_memory_bytes": 488174416
+    }
+  },
+  "artifacts": {
+    "shim_dylib_bytes": 18824384,
+    "rust_probe_bytes": 549160
+  },
+  "next_gate": "Implement the Qwen tokenizer and exact ASR prompt layout, then replace audio-token embeddings with the 202 direct audio features."
+}
