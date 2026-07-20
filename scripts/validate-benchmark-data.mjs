@@ -1739,6 +1739,265 @@ function validateVoxtralRealtimeDirectTranscription(
   return errors;
 }
 
+function validateVoxtralRealtimeDirectStreaming(
+  run,
+  oracle,
+  modelManifest,
+  audiobookManifest,
+  delayMs,
+  chunkMs,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  const matchingOracleRuns = oracle.runs?.filter(
+    (candidate) => candidate.transcription_delay_ms === delayMs,
+  ) ?? [];
+  const expectedTexts = new Set(matchingOracleRuns.map((candidate) => candidate.text));
+  const expectedTokenCounts = new Set(
+    matchingOracleRuns.map((candidate) => candidate.streaming?.generated_tokens),
+  );
+  if (run.schema_version !== schemaVersion ||
+      run.status !== 'ok' ||
+      run.stage !== 'voxtral-incremental-streaming' ||
+      run.boundary !== 'repository-owned-rust-c-abi-over-official-mlx' ||
+      run.device !== 'gpu' ||
+      run.pins?.official_mlx_revision !== modelManifest.official_runtime?.revision ||
+      run.pins?.official_model_revision !== modelManifest.source?.revision ||
+      run.pins?.mlx_conversion_revision !== modelManifest.conversion?.revision) {
+    errors.push('direct stream must pin the owned official-MLX GPU boundary');
+  }
+  if (!fixture ||
+      run.fixture?.pcm_samples !== fixture.normalized?.sample_count ||
+      run.fixture?.duration_ms !== fixture.normalized?.duration_ms ||
+      run.transcription_delay_ms !== delayMs ||
+      run.procedure?.chunk_ms !== chunkMs ||
+      run.procedure?.chunk_samples !== chunkMs * 16 ||
+      run.procedure?.max_pending_samples !== 10240 ||
+      run.procedure?.max_ingest_samples_per_step !== 5120 ||
+      run.procedure?.max_decode_tokens_per_step !== 16 ||
+      run.procedure?.realtime_pacing !== true ||
+      run.procedure?.producer_thread_independent_from_mlx_executor !== true) {
+    errors.push('direct stream fixture, delay, pacing, or work budgets differ');
+  }
+  if (matchingOracleRuns.length === 0 ||
+      !expectedTexts.has(run.text) ||
+      !expectedTokenCounts.has(run.streaming?.generated_tokens)) {
+    errors.push('direct stream must preserve exact pinned streaming-oracle output');
+  }
+  if (run.streaming?.append_only !== true ||
+      run.streaming?.revoke_count !== 0 ||
+      run.streaming?.done !== true ||
+      !(run.streaming?.update_count > 0) ||
+      run.streaming?.total_ingested_samples !== run.fixture?.pcm_samples ||
+      !(run.streaming?.maximum_ingested_samples > 0) ||
+      run.streaming?.maximum_ingested_samples >
+        run.procedure?.max_ingest_samples_per_step ||
+      !Array.isArray(run.events) ||
+      run.events.length !== run.streaming?.update_count ||
+      run.events.map((event) => event.delta).join('') !== run.text) {
+    errors.push('direct stream must be bounded, complete, and append-only');
+  }
+  if (!(run.timing?.process_load_ms > 0) ||
+      !(run.timing?.first_append_ms > 0) ||
+      run.timing?.first_stable_ms !== run.timing?.first_append_ms ||
+      !(run.timing?.final_ms > run.timing?.first_append_ms) ||
+      !(run.timing?.maximum_step_wall_ms < 5000) ||
+      !(run.timing?.endpoint_finalization_ms < 5000) ||
+      !(run.resources?.peak_memory_bytes > modelManifest.conversion?.weight_bytes)) {
+    errors.push('direct stream timing or peak-memory evidence is invalid');
+  }
+  return errors;
+}
+
+function validateVoxtralRealtimeDirectLanguageControl(
+  control,
+  modelManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const expectedLanguages = ['de', 'en', 'es', 'fr', 'pt'];
+  const expectedDelays = [480, 2400];
+  const fixtureById = new Map(
+    audiobookManifest.fixtures.map((fixture) => [fixture.id, fixture]),
+  );
+  if (control.schema_version !== schemaVersion ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(control.captured_at ?? '') ||
+      !/^[0-9a-f]{40}$/.test(control.source_revision ?? '') ||
+      control.candidate?.id !== 'voxtral-mini-4b-realtime-mlx-direct' ||
+      !control.candidate?.boundary?.includes('repository-owned') ||
+      control.fixture_manifest_revision !== audiobookManifest.revision ||
+      JSON.stringify(control.procedure?.languages) !== JSON.stringify(expectedLanguages) ||
+      JSON.stringify(control.procedure?.transcription_delays_ms) !==
+        JSON.stringify(expectedDelays) ||
+      control.procedure?.chunk_ms !== 320 ||
+      control.procedure?.max_decode_tokens_per_step !== 16 ||
+      control.procedure?.fresh_process_per_run !== true ||
+      control.procedure?.run_count !== 10 ||
+      control.procedure?.scope !==
+        'multilingual live-operation control; not held-out model selection') {
+    errors.push('direct multilingual control identity or procedure differs');
+  }
+  if (control.artifacts?.adapter_dylib?.bytes !== 18999872 ||
+      control.artifacts?.rust_driver?.bytes !== 625912 ||
+      control.artifacts?.mlx_metallib?.bytes !== 130164152 ||
+      control.artifacts?.model_weights?.bytes !==
+        modelManifest.conversion?.weight_bytes) {
+    errors.push('direct multilingual artifact bytes differ from the measured build');
+  }
+
+  const observedCells = new Set();
+  for (const result of control.results ?? []) {
+    const fixture = fixtureById.get(result.fixture?.id);
+    const run = result.run;
+    const cell = `${result.fixture?.language}:${result.transcription_delay_ms}`;
+    if (observedCells.has(cell)) errors.push(`duplicate direct language cell ${cell}`);
+    observedCells.add(cell);
+    if (!fixture ||
+        fixture.language !== result.fixture?.language ||
+        fixture.gold_status !== result.fixture?.gold_status ||
+        fixture.reference_text !== result.fixture?.reference_text ||
+        fixture.normalized?.sha256 !== result.fixture?.audio_sha256 ||
+        fixture.normalized?.sample_count !== result.fixture?.sample_count ||
+        fixture.normalized?.duration_ms !== result.fixture?.duration_ms) {
+      errors.push(`${cell}: fixture does not match the pinned audiobook manifest`);
+      continue;
+    }
+    if (!expectedLanguages.includes(result.fixture.language) ||
+        !expectedDelays.includes(result.transcription_delay_ms) ||
+        run?.status !== 'ok' ||
+        run?.stage !== 'voxtral-incremental-streaming' ||
+        run?.boundary !== 'repository-owned-rust-c-abi-over-official-mlx' ||
+        run?.device !== 'gpu' ||
+        run?.pins?.official_mlx_revision !== modelManifest.official_runtime?.revision ||
+        run?.pins?.official_model_revision !== modelManifest.source?.revision ||
+        run?.pins?.mlx_conversion_revision !== modelManifest.conversion?.revision ||
+        run?.transcription_delay_ms !== result.transcription_delay_ms ||
+        run?.fixture?.pcm_samples !== result.fixture.sample_count ||
+        run?.procedure?.chunk_ms !== 320 ||
+        run?.procedure?.max_ingest_samples_per_step !== 5120 ||
+        run?.procedure?.max_decode_tokens_per_step !== 16) {
+      errors.push(`${cell}: direct streaming identity or bounds differ`);
+    }
+    if (run?.streaming?.append_only !== true ||
+        run?.streaming?.revoke_count !== 0 ||
+        run?.streaming?.done !== true ||
+        run?.streaming?.total_ingested_samples !== result.fixture.sample_count ||
+        run?.streaming?.maximum_ingested_samples > 5120 ||
+        !Array.isArray(run?.events) ||
+        run.events.map((event) => event.delta).join('') !== run.text) {
+      errors.push(`${cell}: direct stream is not complete, bounded, and append-only`);
+    }
+    if (!(run?.timing?.process_load_ms > 0) ||
+        !(run?.timing?.first_append_ms > 0) ||
+        run?.timing?.first_stable_ms !== run?.timing?.first_append_ms ||
+        !(run?.timing?.maximum_step_wall_ms < 5000) ||
+        !(run?.timing?.endpoint_finalization_ms < 5000) ||
+        !(run?.resources?.peak_memory_bytes > modelManifest.conversion?.weight_bytes)) {
+      errors.push(`${cell}: timing or memory evidence is invalid`);
+    }
+    const quality = directStreamingQuality(
+      result.fixture.reference_text,
+      run?.text ?? '',
+    );
+    for (const field of [
+      'word_edits',
+      'reference_word_count',
+      'wer',
+      'character_edits',
+      'reference_character_count',
+      'cer',
+    ]) {
+      if (result.quality?.[field] !== quality[field]) {
+        errors.push(`${cell}: quality.${field} differs from raw text`);
+      }
+    }
+  }
+  const expectedCells = new Set(
+    expectedLanguages.flatMap((language) =>
+      expectedDelays.map((delay) => `${language}:${delay}`)
+    ),
+  );
+  if (observedCells.size !== expectedCells.size ||
+      [...expectedCells].some((cell) => !observedCells.has(cell))) {
+    errors.push('direct multilingual control must preserve all language/delay cells');
+  }
+  for (const delay of expectedDelays) {
+    const matching = (control.results ?? []).filter(
+      (result) => result.transcription_delay_ms === delay,
+    );
+    const summary = control.summary?.by_delay_ms?.[String(delay)];
+    const expected = {
+      macro_wer: mean(matching.map((result) => result.quality.wer)),
+      macro_cer: mean(matching.map((result) => result.quality.cer)),
+      mean_first_append_ms: mean(
+        matching.map((result) => result.run.timing.first_append_ms),
+      ),
+      maximum_step_wall_ms: Math.max(
+        ...matching.map((result) => result.run.timing.maximum_step_wall_ms),
+      ),
+      maximum_endpoint_finalization_ms: Math.max(
+        ...matching.map(
+          (result) => result.run.timing.endpoint_finalization_ms,
+        ),
+      ),
+    };
+    for (const [field, value] of Object.entries(expected)) {
+      if (typeof summary?.[field] !== 'number' ||
+          Math.abs(summary[field] - value) > 1e-9) {
+        errors.push(`delay ${delay}: summary.${field} differs from raw cells`);
+      }
+    }
+  }
+  return errors;
+}
+
+function directStreamingQuality(reference, hypothesis) {
+  const referenceWords = directStreamingWords(reference);
+  const hypothesisWords = directStreamingWords(hypothesis);
+  const referenceCharacters = [...referenceWords.join('')];
+  const hypothesisCharacters = [...hypothesisWords.join('')];
+  const wordEdits = directStreamingEditDistance(referenceWords, hypothesisWords);
+  const characterEdits = directStreamingEditDistance(
+    referenceCharacters,
+    hypothesisCharacters,
+  );
+  return {
+    word_edits: wordEdits,
+    reference_word_count: referenceWords.length,
+    wer: wordEdits / referenceWords.length,
+    character_edits: characterEdits,
+    reference_character_count: referenceCharacters.length,
+    cer: characterEdits / referenceCharacters.length,
+  };
+}
+
+function directStreamingWords(text) {
+  return [...text.toLowerCase()]
+    .filter((character) => /[\p{L}\p{N}\s]/u.test(character))
+    .join('')
+    .split(/\s+/u)
+    .filter(Boolean);
+}
+
+function directStreamingEditDistance(reference, hypothesis) {
+  let previous = Array.from({ length: hypothesis.length + 1 }, (_, index) => index);
+  for (let referenceIndex = 1; referenceIndex <= reference.length; referenceIndex += 1) {
+    const current = [referenceIndex];
+    for (let hypothesisIndex = 1; hypothesisIndex <= hypothesis.length; hypothesisIndex += 1) {
+      current.push(Math.min(
+        previous[hypothesisIndex] + 1,
+        current[hypothesisIndex - 1] + 1,
+        previous[hypothesisIndex - 1] +
+          (reference[referenceIndex - 1] === hypothesis[hypothesisIndex - 1] ? 0 : 1),
+      ));
+    }
+    previous = current;
+  }
+  return previous.at(-1);
+}
+
 function validateVoxtralRealtimeAggregate(
   aggregate,
   modelManifest,
@@ -3255,6 +3514,22 @@ const voxtralRealtimeDirectTranscriptionPath = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.transcription-480ms-1/result.json',
 );
+const voxtralRealtimeDirectStreaming480Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-480ms-320ms-1/result.json',
+);
+const voxtralRealtimeDirectStreaming2400Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-2400ms-320ms-1/result.json',
+);
+const voxtralRealtimeDirectStreaming80Path = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-480ms-80ms-1/result.json',
+);
+const voxtralRealtimeDirectLanguageControlPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-language-control-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -3365,6 +3640,18 @@ const voxtralRealtimeDirectTranscriptionOracle = await readJson(
 );
 const voxtralRealtimeDirectTranscription = await readJson(
   voxtralRealtimeDirectTranscriptionPath,
+);
+const voxtralRealtimeDirectStreaming480 = await readJson(
+  voxtralRealtimeDirectStreaming480Path,
+);
+const voxtralRealtimeDirectStreaming2400 = await readJson(
+  voxtralRealtimeDirectStreaming2400Path,
+);
+const voxtralRealtimeDirectStreaming80 = await readJson(
+  voxtralRealtimeDirectStreaming80Path,
+);
+const voxtralRealtimeDirectLanguageControl = await readJson(
+  voxtralRealtimeDirectLanguageControlPath,
 );
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
@@ -3568,6 +3855,47 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     audiobookPilot,
   ).map((error) => `${voxtralRealtimeDirectTranscriptionPath}: ${error}`),
+);
+for (const [run, path, oracle, delayMs, chunkMs] of [
+  [
+    voxtralRealtimeDirectStreaming480,
+    voxtralRealtimeDirectStreaming480Path,
+    voxtralRealtimeStreaming320,
+    480,
+    320,
+  ],
+  [
+    voxtralRealtimeDirectStreaming2400,
+    voxtralRealtimeDirectStreaming2400Path,
+    voxtralRealtimeStreaming320,
+    2400,
+    320,
+  ],
+  [
+    voxtralRealtimeDirectStreaming80,
+    voxtralRealtimeDirectStreaming80Path,
+    voxtralRealtimeStreaming80,
+    480,
+    80,
+  ],
+]) {
+  failures.push(
+    ...validateVoxtralRealtimeDirectStreaming(
+      run,
+      oracle,
+      voxtralRealtimeDirectModelManifest,
+      audiobookPilot,
+      delayMs,
+      chunkMs,
+    ).map((error) => `${path}: ${error}`),
+  );
+}
+failures.push(
+  ...validateVoxtralRealtimeDirectLanguageControl(
+    voxtralRealtimeDirectLanguageControl,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralRealtimeDirectLanguageControlPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -3857,6 +4185,35 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject divergent direct Voxtral tokens',
     );
   }
+  const invalidVoxtralDirectStreaming = structuredClone(
+    voxtralRealtimeDirectStreaming480,
+  );
+  invalidVoxtralDirectStreaming.text += ' drift';
+  if (validateVoxtralRealtimeDirectStreaming(
+    invalidVoxtralDirectStreaming,
+    voxtralRealtimeStreaming320,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+    480,
+    320,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent direct Voxtral streaming text',
+    );
+  }
+  const invalidVoxtralDirectLanguageControl = structuredClone(
+    voxtralRealtimeDirectLanguageControl,
+  );
+  invalidVoxtralDirectLanguageControl.results[0].quality.word_edits += 1;
+  if (validateVoxtralRealtimeDirectLanguageControl(
+    invalidVoxtralDirectLanguageControl,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent direct Voxtral language metrics',
+    );
+  }
   const invalidVoxtralRealtimeAggregate = structuredClone(
     voxtralRealtime480,
   );
@@ -3940,6 +4297,8 @@ console.log(
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 direct Voxtral boundary record, 1 direct Voxtral frontend parity record, ` +
   `1 direct Voxtral encoder parity record, 1 direct Voxtral transcription parity record, ` +
+  `3 direct Voxtral streaming parity records, ` +
+  `1 direct Voxtral multilingual live control, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

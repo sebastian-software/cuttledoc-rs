@@ -67,8 +67,13 @@ if (
 ) {
   errors.push('evidence must use real-time pacing and an independent producer');
 }
-if (!(actual.timing?.first_append_ms > 0) || !(actual.timing?.final_ms > 0)) {
-  errors.push('first-append and final timing must be measured');
+if (
+  !(actual.timing?.process_load_ms > 0) ||
+  !(actual.timing?.first_append_ms > 0) ||
+  actual.timing?.first_stable_ms !== actual.timing?.first_append_ms ||
+  !(actual.timing?.final_ms > 0)
+) {
+  errors.push('process-load, first-append, and final timing must be measured');
 }
 if (actual.timing?.maximum_step_wall_ms >= 5_000) {
   errors.push('maximum bounded direct step must stay below the 5-second regression ceiling');

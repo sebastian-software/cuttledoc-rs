@@ -1,0 +1,2589 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-20T22:46:54Z",
+  "source_revision": "93b48a712a8ca2c95022c7599ce8d4be4d86476f",
+  "candidate": {
+    "id": "voxtral-mini-4b-realtime-mlx-direct",
+    "boundary": "repository-owned Rust/C ABI/C++ adapter over official MLX"
+  },
+  "fixture_manifest_revision": "audiobook-pilot-1",
+  "procedure": {
+    "fixture_selection": "one pinned development audiobook per language",
+    "languages": [
+      "de",
+      "en",
+      "es",
+      "fr",
+      "pt"
+    ],
+    "transcription_delays_ms": [
+      480,
+      2400
+    ],
+    "chunk_ms": 320,
+    "max_decode_tokens_per_step": 16,
+    "fresh_process_per_run": true,
+    "run_count": 10,
+    "scope": "multilingual live-operation control; not held-out model selection"
+  },
+  "artifacts": {
+    "adapter_dylib": {
+      "path": "/private/tmp/cuttledoc-voxtral-mlx-direct-build/libcuttledoc_voxtral_mlx_shim.dylib",
+      "bytes": 18999872
+    },
+    "rust_driver": {
+      "path": "/private/tmp/cuttledoc-voxtral-mlx-direct-build/cuttledoc-voxtral-mlx",
+      "bytes": 625912
+    },
+    "mlx_metallib": {
+      "path": "/private/tmp/cuttledoc-voxtral-mlx-direct-build/mlx.metallib",
+      "bytes": 130164152
+    },
+    "model_weights": {
+      "path": "/private/tmp/cuttledoc-voxtral-realtime-4b-mlx-4bit/model.safetensors",
+      "bytes": 3133798126
+    }
+  },
+  "summary": {
+    "by_delay_ms": {
+      "480": {
+        "macro_wer": 0.07360681114551083,
+        "macro_cer": 0.014969310010910144,
+        "mean_first_append_ms": 1699.8316997999998,
+        "maximum_step_wall_ms": 315.616875,
+        "maximum_endpoint_finalization_ms": 371.130584
+      },
+      "2400": {
+        "macro_wer": 0.04482714138286893,
+        "macro_cer": 0.01843383008186773,
+        "mean_first_append_ms": 3684.246725,
+        "maximum_step_wall_ms": 331.408166,
+        "maximum_endpoint_finalization_ms": 720.498209
+      }
+    }
+  },
+  "results": [
+    {
+      "fixture": {
+        "id": "audiobook-de-135_82_000105",
+        "language": "de",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "haltet den schnabel sir ich habe euch doch nur deshalb hinausgeschickt damit mein altes gun wieder einmal mitreden kann kehrt ihr zurück so sucht mich auf und erzählt was ihr erlebt und erfahren habt",
+        "audio_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+        "sample_count": 213440,
+        "duration_ms": 13340
+      },
+      "transcription_delay_ms": 480,
+      "quality": {
+        "word_edits": 0,
+        "reference_word_count": 34,
+        "wer": 0,
+        "character_edits": 0,
+        "reference_character_count": 166,
+        "cer": 0
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 480,
+        "fixture": {
+          "pcm_samples": 213440,
+          "duration_ms": 13340
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 327.696708,
+          "first_append_ms": 1697.35325,
+          "first_append_audio_fed_ms": 1600,
+          "audio_close_ms": 13343.581833,
+          "final_ms": 13700.258375,
+          "endpoint_finalization_ms": 356.676542,
+          "maximum_step_wall_ms": 301.369708,
+          "maximum_mlx_elapsed_ms": 301.342625,
+          "maximum_feed_schedule_lateness_ms": 10.055958,
+          "first_stable_ms": 1697.35325
+        },
+        "resources": {
+          "peak_memory_bytes": 5477155585
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 30,
+          "revoke_count": 0,
+          "audio_chunk_count": 42,
+          "step_call_count": 85,
+          "generated_tokens": 177,
+          "adapter_frames": 215,
+          "total_ingested_samples": 213440,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf und erzählt, was ihr erlebt und erfahren habt.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 1697.35325,
+            "audio_fed_ms": 1600,
+            "delta": "H"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 2022.314125,
+            "audio_fed_ms": 1920,
+            "delta": "altet den"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 2664.857541,
+            "audio_fed_ms": 2560,
+            "delta": " Schnabel,"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 2985.213541,
+            "audio_fed_ms": 2880,
+            "delta": " Sir."
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 3632.618083,
+            "audio_fed_ms": 3520,
+            "delta": " Ich"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 3950.487,
+            "audio_fed_ms": 3840,
+            "delta": " habe euch"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 4262.989,
+            "audio_fed_ms": 4160,
+            "delta": " doch nur"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 4898.990833,
+            "audio_fed_ms": 4800,
+            "delta": " deshalb"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 5539.619833,
+            "audio_fed_ms": 5440,
+            "delta": " hinaus"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 5867.398791,
+            "audio_fed_ms": 5760,
+            "delta": "geschickt,"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 6187.227083,
+            "audio_fed_ms": 6080,
+            "delta": " damit"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 6499.209791,
+            "audio_fed_ms": 6400,
+            "delta": " mein"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 6819.751208,
+            "audio_fed_ms": 6720,
+            "delta": " altes"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 7136.184583,
+            "audio_fed_ms": 7040,
+            "delta": " Gun"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 7453.828583,
+            "audio_fed_ms": 7360,
+            "delta": " wieder"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 7780.319083,
+            "audio_fed_ms": 7680,
+            "delta": " einmal"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 8101.188875,
+            "audio_fed_ms": 8000,
+            "delta": " mit"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 8421.535375,
+            "audio_fed_ms": 8320,
+            "delta": "reden"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 8753.770166,
+            "audio_fed_ms": 8640,
+            "delta": " kann."
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 9697.820416,
+            "audio_fed_ms": 9600,
+            "delta": " Kehrt ihr"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 10347.579583,
+            "audio_fed_ms": 10240,
+            "delta": " zurück, so"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 10665.328,
+            "audio_fed_ms": 10560,
+            "delta": " sucht"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 10984.801,
+            "audio_fed_ms": 10880,
+            "delta": " mich"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 11304.962,
+            "audio_fed_ms": 11200,
+            "delta": " auf"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 11620.225458,
+            "audio_fed_ms": 11520,
+            "delta": " und"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 12256.224166,
+            "audio_fed_ms": 12160,
+            "delta": " erzählt, was"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 12584.870583,
+            "audio_fed_ms": 12480,
+            "delta": " ihr"
+          },
+          {
+            "index": 27,
+            "elapsed_ms": 12902.516416,
+            "audio_fed_ms": 12800,
+            "delta": " erlebt"
+          },
+          {
+            "index": 28,
+            "elapsed_ms": 13237.422791,
+            "audio_fed_ms": 13120,
+            "delta": " und"
+          },
+          {
+            "index": 29,
+            "elapsed_ms": 13645.020583,
+            "audio_fed_ms": 13340,
+            "delta": " erfahren habt."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-de-135_82_000105",
+        "language": "de",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "haltet den schnabel sir ich habe euch doch nur deshalb hinausgeschickt damit mein altes gun wieder einmal mitreden kann kehrt ihr zurück so sucht mich auf und erzählt was ihr erlebt und erfahren habt",
+        "audio_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+        "sample_count": 213440,
+        "duration_ms": 13340
+      },
+      "transcription_delay_ms": 2400,
+      "quality": {
+        "word_edits": 0,
+        "reference_word_count": 34,
+        "wer": 0,
+        "character_edits": 0,
+        "reference_character_count": 166,
+        "cer": 0
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 2400,
+        "fixture": {
+          "pcm_samples": 213440,
+          "duration_ms": 13340
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 319.759167,
+          "first_append_ms": 3622.843833,
+          "first_append_audio_fed_ms": 3520,
+          "audio_close_ms": 13340.736541,
+          "final_ms": 14061.23475,
+          "endpoint_finalization_ms": 720.498209,
+          "maximum_step_wall_ms": 331.408166,
+          "maximum_mlx_elapsed_ms": 331.378875,
+          "maximum_feed_schedule_lateness_ms": 10.044958,
+          "first_stable_ms": 3622.843833
+        },
+        "resources": {
+          "peak_memory_bytes": 5537432321
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 27,
+          "revoke_count": 0,
+          "audio_chunk_count": 42,
+          "step_call_count": 86,
+          "generated_tokens": 177,
+          "adapter_frames": 239,
+          "total_ingested_samples": 213440,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Haltet den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf und erzählt, was ihr erlebt und erfahren habt.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 3622.843833,
+            "audio_fed_ms": 3520,
+            "delta": "H"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 3945.5535,
+            "audio_fed_ms": 3840,
+            "delta": "altet den"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 4582.298416,
+            "audio_fed_ms": 4480,
+            "delta": " Schnabel,"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 4897.774125,
+            "audio_fed_ms": 4800,
+            "delta": " Sir."
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 5553.4845,
+            "audio_fed_ms": 5440,
+            "delta": " Ich"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 5858.575666,
+            "audio_fed_ms": 5760,
+            "delta": " habe euch"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 6175.911,
+            "audio_fed_ms": 6080,
+            "delta": " doch nur"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 6829.7465,
+            "audio_fed_ms": 6720,
+            "delta": " deshalb"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 7467.18675,
+            "audio_fed_ms": 7360,
+            "delta": " hinaus"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 7779.972125,
+            "audio_fed_ms": 7680,
+            "delta": "geschickt,"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 8107.473458,
+            "audio_fed_ms": 8000,
+            "delta": " damit"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 8422.706458,
+            "audio_fed_ms": 8320,
+            "delta": " mein"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 8744.80925,
+            "audio_fed_ms": 8640,
+            "delta": " altes"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 9065.598875,
+            "audio_fed_ms": 8960,
+            "delta": " Gun"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 9380.92225,
+            "audio_fed_ms": 9280,
+            "delta": " wieder"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 9699.168625,
+            "audio_fed_ms": 9600,
+            "delta": " einmal"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 10025.643375,
+            "audio_fed_ms": 9920,
+            "delta": " mit"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 10346.272708,
+            "audio_fed_ms": 10240,
+            "delta": "reden"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 10664.839041,
+            "audio_fed_ms": 10560,
+            "delta": " kann."
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 11628.416166,
+            "audio_fed_ms": 11520,
+            "delta": " Kehrt ihr"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 12262.477,
+            "audio_fed_ms": 12160,
+            "delta": " zurück, so"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 12582.357375,
+            "audio_fed_ms": 12480,
+            "delta": " sucht"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 12909.805041,
+            "audio_fed_ms": 12800,
+            "delta": " mich"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 13225.39525,
+            "audio_fed_ms": 13120,
+            "delta": " auf"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 13673.261958,
+            "audio_fed_ms": 13340,
+            "delta": " und erzählt, was ihr"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 13894.933791,
+            "audio_fed_ms": 13340,
+            "delta": " erlebt und erfahren"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 14061.234625,
+            "audio_fed_ms": 13340,
+            "delta": " habt."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-en-2277-149874-0000",
+        "language": "en",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "MINNIE'S FLAT AS THE ONE FLOOR RESIDENT APARTMENTS WERE THEN BEING CALLED WAS IN A PART OF WEST VAN BUREN STREET INHABITED BY FAMILIES OF LABOURERS AND CLERKS MEN WHO HAD COME AND WERE STILL COMING WITH THE RUSH OF POPULATION POURING IN AT THE RATE OF FIFTY THOUSAND A YEAR",
+        "audio_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+        "sample_count": 248080,
+        "duration_ms": 15505
+      },
+      "transcription_delay_ms": 480,
+      "quality": {
+        "word_edits": 3,
+        "reference_word_count": 51,
+        "wer": 0.058823529411764705,
+        "character_edits": 1,
+        "reference_character_count": 222,
+        "cer": 0.0045045045045045045
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 480,
+        "fixture": {
+          "pcm_samples": 248080,
+          "duration_ms": 15505
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 318.759958,
+          "first_append_ms": 2023.366333,
+          "first_append_audio_fed_ms": 1920,
+          "audio_close_ms": 15515.027667,
+          "final_ms": 15853.687083,
+          "endpoint_finalization_ms": 338.659416,
+          "maximum_step_wall_ms": 296.462375,
+          "maximum_mlx_elapsed_ms": 296.426375,
+          "maximum_feed_schedule_lateness_ms": 10.54175,
+          "first_stable_ms": 2023.366333
+        },
+        "resources": {
+          "peak_memory_bytes": 5486868981
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 39,
+          "revoke_count": 0,
+          "audio_chunk_count": 49,
+          "step_call_count": 99,
+          "generated_tokens": 204,
+          "adapter_frames": 242,
+          "total_ingested_samples": 248080,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Minnie's flat as the one-floor resident apartments were then being called was in a part of west van buren street inhabited by families of laborers and clerks men who had come and were still coming with the rush of population pouring in at the rate of fifty thousand a year",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 2023.366333,
+            "audio_fed_ms": 1920,
+            "delta": "Minnie's flat"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 2347.024167,
+            "audio_fed_ms": 2240,
+            "delta": " as"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 2663.839917,
+            "audio_fed_ms": 2560,
+            "delta": " the"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 2980.2135,
+            "audio_fed_ms": 2880,
+            "delta": " one-f"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 3296.989708,
+            "audio_fed_ms": 3200,
+            "delta": "loor resident"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 3942.947667,
+            "audio_fed_ms": 3840,
+            "delta": " apartments were"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 4266.511375,
+            "audio_fed_ms": 4160,
+            "delta": " then"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 4581.356458,
+            "audio_fed_ms": 4480,
+            "delta": " being"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 5225.962375,
+            "audio_fed_ms": 5120,
+            "delta": " called"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 5547.348208,
+            "audio_fed_ms": 5440,
+            "delta": " was"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 5866.915083,
+            "audio_fed_ms": 5760,
+            "delta": " in a"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 6190.540375,
+            "audio_fed_ms": 6080,
+            "delta": " part of"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 6513.372292,
+            "audio_fed_ms": 6400,
+            "delta": " west"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 6815.337833,
+            "audio_fed_ms": 6720,
+            "delta": " van"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 7142.868333,
+            "audio_fed_ms": 7040,
+            "delta": " buren"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 7462.561708,
+            "audio_fed_ms": 7360,
+            "delta": " street"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 8099.677,
+            "audio_fed_ms": 8000,
+            "delta": " inhabited"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 8429.041833,
+            "audio_fed_ms": 8320,
+            "delta": " by"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 8740.931875,
+            "audio_fed_ms": 8640,
+            "delta": " families"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 9055.733833,
+            "audio_fed_ms": 8960,
+            "delta": " of"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 9375.225708,
+            "audio_fed_ms": 9280,
+            "delta": " labor"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 9712.282417,
+            "audio_fed_ms": 9600,
+            "delta": "ers and"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 10029.584542,
+            "audio_fed_ms": 9920,
+            "delta": " cler"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 10341.390792,
+            "audio_fed_ms": 10240,
+            "delta": "ks"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 10671.245458,
+            "audio_fed_ms": 10560,
+            "delta": " men who"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 10981.018208,
+            "audio_fed_ms": 10880,
+            "delta": " had"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 11310.528625,
+            "audio_fed_ms": 11200,
+            "delta": " come and"
+          },
+          {
+            "index": 27,
+            "elapsed_ms": 11627.419708,
+            "audio_fed_ms": 11520,
+            "delta": " were"
+          },
+          {
+            "index": 28,
+            "elapsed_ms": 11944.156833,
+            "audio_fed_ms": 11840,
+            "delta": " still"
+          },
+          {
+            "index": 29,
+            "elapsed_ms": 12257.793458,
+            "audio_fed_ms": 12160,
+            "delta": " coming"
+          },
+          {
+            "index": 30,
+            "elapsed_ms": 12582.022167,
+            "audio_fed_ms": 12480,
+            "delta": " with the"
+          },
+          {
+            "index": 31,
+            "elapsed_ms": 12896.165208,
+            "audio_fed_ms": 12800,
+            "delta": " rush of"
+          },
+          {
+            "index": 32,
+            "elapsed_ms": 13532.572917,
+            "audio_fed_ms": 13440,
+            "delta": " population"
+          },
+          {
+            "index": 33,
+            "elapsed_ms": 14186.191833,
+            "audio_fed_ms": 14080,
+            "delta": " pouring in"
+          },
+          {
+            "index": 34,
+            "elapsed_ms": 14503.531167,
+            "audio_fed_ms": 14400,
+            "delta": " at the"
+          },
+          {
+            "index": 35,
+            "elapsed_ms": 14815.630667,
+            "audio_fed_ms": 14720,
+            "delta": " rate of"
+          },
+          {
+            "index": 36,
+            "elapsed_ms": 15133.423083,
+            "audio_fed_ms": 15040,
+            "delta": " fifty"
+          },
+          {
+            "index": 37,
+            "elapsed_ms": 15451.239625,
+            "audio_fed_ms": 15360,
+            "delta": " thousand"
+          },
+          {
+            "index": 38,
+            "elapsed_ms": 15811.710583,
+            "audio_fed_ms": 15505,
+            "delta": " a year"
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-en-2277-149874-0000",
+        "language": "en",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "MINNIE'S FLAT AS THE ONE FLOOR RESIDENT APARTMENTS WERE THEN BEING CALLED WAS IN A PART OF WEST VAN BUREN STREET INHABITED BY FAMILIES OF LABOURERS AND CLERKS MEN WHO HAD COME AND WERE STILL COMING WITH THE RUSH OF POPULATION POURING IN AT THE RATE OF FIFTY THOUSAND A YEAR",
+        "audio_sha256": "e393548961cfd11b2ca59aa25e68984f551f952165ad1d18a485505b3bf16d41",
+        "sample_count": 248080,
+        "duration_ms": 15505
+      },
+      "transcription_delay_ms": 2400,
+      "quality": {
+        "word_edits": 5,
+        "reference_word_count": 51,
+        "wer": 0.09803921568627451,
+        "character_edits": 14,
+        "reference_character_count": 222,
+        "cer": 0.06306306306306306
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 2400,
+        "fixture": {
+          "pcm_samples": 248080,
+          "duration_ms": 15505
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 319.676584,
+          "first_append_ms": 3943.046625,
+          "first_append_audio_fed_ms": 3840,
+          "audio_close_ms": 15513.105792,
+          "final_ms": 16218.684833,
+          "endpoint_finalization_ms": 705.579041,
+          "maximum_step_wall_ms": 329.675875,
+          "maximum_mlx_elapsed_ms": 329.643459,
+          "maximum_feed_schedule_lateness_ms": 10.041333,
+          "first_stable_ms": 3943.046625
+        },
+        "resources": {
+          "peak_memory_bytes": 5547145717
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 35,
+          "revoke_count": 0,
+          "audio_chunk_count": 49,
+          "step_call_count": 100,
+          "generated_tokens": 204,
+          "adapter_frames": 266,
+          "total_ingested_samples": 248080,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Minnie's Flat, as the one-floor resident apartments were then being called, was in a part of West Van Buren Street inhabited by families of laborers and clerks, men who had come and were still coming, with the rush of population pouring in at the rate of 50,000 a year.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 3943.046625,
+            "audio_fed_ms": 3840,
+            "delta": "Minnie's Flat"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 4263.991875,
+            "audio_fed_ms": 4160,
+            "delta": ", as"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 4586.835875,
+            "audio_fed_ms": 4480,
+            "delta": " the"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 4902.803125,
+            "audio_fed_ms": 4800,
+            "delta": " one-f"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 5219.874167,
+            "audio_fed_ms": 5120,
+            "delta": "loor resident"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 5864.59675,
+            "audio_fed_ms": 5760,
+            "delta": " apartments were"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 6179.308792,
+            "audio_fed_ms": 6080,
+            "delta": " then"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 6495.133042,
+            "audio_fed_ms": 6400,
+            "delta": " being"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 7130.193458,
+            "audio_fed_ms": 7040,
+            "delta": " called,"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 7463.848542,
+            "audio_fed_ms": 7360,
+            "delta": " was"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 7783.598208,
+            "audio_fed_ms": 7680,
+            "delta": " in a"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 8102.120042,
+            "audio_fed_ms": 8000,
+            "delta": " part of"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 8418.658333,
+            "audio_fed_ms": 8320,
+            "delta": " West"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 8735.576042,
+            "audio_fed_ms": 8640,
+            "delta": " Van"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 9065.983292,
+            "audio_fed_ms": 8960,
+            "delta": " Buren"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 9380.96125,
+            "audio_fed_ms": 9280,
+            "delta": " Street"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 10016.929708,
+            "audio_fed_ms": 9920,
+            "delta": " inhabited"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 10331.658292,
+            "audio_fed_ms": 10240,
+            "delta": " by"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 10665.778583,
+            "audio_fed_ms": 10560,
+            "delta": " families"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 10986.45625,
+            "audio_fed_ms": 10880,
+            "delta": " of"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 11295.866583,
+            "audio_fed_ms": 11200,
+            "delta": " labor"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 11617.108375,
+            "audio_fed_ms": 11520,
+            "delta": "ers and"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 11951.694458,
+            "audio_fed_ms": 11840,
+            "delta": " cler"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 12262.196875,
+            "audio_fed_ms": 12160,
+            "delta": "ks,"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 12582.678375,
+            "audio_fed_ms": 12480,
+            "delta": " men who"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 12901.76525,
+            "audio_fed_ms": 12800,
+            "delta": " had"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 13216.003958,
+            "audio_fed_ms": 13120,
+            "delta": " come and"
+          },
+          {
+            "index": 27,
+            "elapsed_ms": 13539.264125,
+            "audio_fed_ms": 13440,
+            "delta": " were"
+          },
+          {
+            "index": 28,
+            "elapsed_ms": 13874.499,
+            "audio_fed_ms": 13760,
+            "delta": " still"
+          },
+          {
+            "index": 29,
+            "elapsed_ms": 14189.3005,
+            "audio_fed_ms": 14080,
+            "delta": " coming,"
+          },
+          {
+            "index": 30,
+            "elapsed_ms": 14506.07675,
+            "audio_fed_ms": 14400,
+            "delta": " with the"
+          },
+          {
+            "index": 31,
+            "elapsed_ms": 14833.089667,
+            "audio_fed_ms": 14720,
+            "delta": " rush of"
+          },
+          {
+            "index": 32,
+            "elapsed_ms": 15473.53125,
+            "audio_fed_ms": 15360,
+            "delta": " population"
+          },
+          {
+            "index": 33,
+            "elapsed_ms": 15842.89275,
+            "audio_fed_ms": 15505,
+            "delta": " pouring in at the rate of"
+          },
+          {
+            "index": 34,
+            "elapsed_ms": 16065.199083,
+            "audio_fed_ms": 15505,
+            "delta": " 50,000 a year."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-es-10367_10282_000000",
+        "language": "es",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "y á los hijos de los extranjeros que se allegaren á jehová para ministrarle y que amaren el nombre de jehová para ser sus siervos á todos los que guardaren el sábado de profanarlo y abrazaren mi pacto",
+        "audio_sha256": "03d6888d177b36ac04e9451bf5d6ff25f6cc2397382d7f6e42a3c596f7d80865",
+        "sample_count": 192160,
+        "duration_ms": 12010
+      },
+      "transcription_delay_ms": 480,
+      "quality": {
+        "word_edits": 7,
+        "reference_word_count": 38,
+        "wer": 0.18421052631578946,
+        "character_edits": 7,
+        "reference_character_count": 163,
+        "cer": 0.04294478527607362
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 480,
+        "fixture": {
+          "pcm_samples": 192160,
+          "duration_ms": 12010
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 327.593958,
+          "first_append_ms": 1384.306791,
+          "first_append_audio_fed_ms": 1280,
+          "audio_close_ms": 12010.626583,
+          "final_ms": 12348.918708,
+          "endpoint_finalization_ms": 338.292125,
+          "maximum_step_wall_ms": 295.009375,
+          "maximum_mlx_elapsed_ms": 294.977458,
+          "maximum_feed_schedule_lateness_ms": 10.124,
+          "first_stable_ms": 1384.306791
+        },
+        "resources": {
+          "peak_memory_bytes": 5460050689
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 27,
+          "revoke_count": 0,
+          "audio_chunk_count": 38,
+          "step_call_count": 77,
+          "generated_tokens": 160,
+          "adapter_frames": 198,
+          "total_ingested_samples": 192160,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaran el nombre de Jehová para ser sus siervos, a todos los que guardaran el sábado de profanarlo, y abrazaran mi pacto,",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 1384.306791,
+            "audio_fed_ms": 1280,
+            "delta": "Y"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 1703.5305,
+            "audio_fed_ms": 1600,
+            "delta": " a los"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 2022.577541,
+            "audio_fed_ms": 1920,
+            "delta": " hijos de"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 2352.264333,
+            "audio_fed_ms": 2240,
+            "delta": " los"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 2980.546666,
+            "audio_fed_ms": 2880,
+            "delta": " extranjeros que se"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 3619.874666,
+            "audio_fed_ms": 3520,
+            "delta": " allegaran"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 3940.121833,
+            "audio_fed_ms": 3840,
+            "delta": " a Je"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 4270.586541,
+            "audio_fed_ms": 4160,
+            "delta": "hová para"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 5216.29725,
+            "audio_fed_ms": 5120,
+            "delta": " ministrarle"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 5533.161625,
+            "audio_fed_ms": 5440,
+            "delta": ", y"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 5868.146166,
+            "audio_fed_ms": 5760,
+            "delta": " que"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 6181.6585,
+            "audio_fed_ms": 6080,
+            "delta": " amaran el"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 6500.517666,
+            "audio_fed_ms": 6400,
+            "delta": " nombre"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 6821.731166,
+            "audio_fed_ms": 6720,
+            "delta": " de"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 7141.953916,
+            "audio_fed_ms": 7040,
+            "delta": " Jehová para"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 7469.360791,
+            "audio_fed_ms": 7360,
+            "delta": " ser"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 7784.148708,
+            "audio_fed_ms": 7680,
+            "delta": " sus"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 8418.238916,
+            "audio_fed_ms": 8320,
+            "delta": " siervos,"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 8742.863958,
+            "audio_fed_ms": 8640,
+            "delta": " a"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 9053.817916,
+            "audio_fed_ms": 8960,
+            "delta": " todos"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 9389.371916,
+            "audio_fed_ms": 9280,
+            "delta": " los que"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 10017.921375,
+            "audio_fed_ms": 9920,
+            "delta": " guardaran el"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 10336.086416,
+            "audio_fed_ms": 10240,
+            "delta": " sábado"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 10660.22625,
+            "audio_fed_ms": 10560,
+            "delta": " de"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 11306.375833,
+            "audio_fed_ms": 11200,
+            "delta": " profan"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 11622.976166,
+            "audio_fed_ms": 11520,
+            "delta": "arlo, y"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 12307.447916,
+            "audio_fed_ms": 12010,
+            "delta": " abrazaran mi pacto,"
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-es-10367_10282_000000",
+        "language": "es",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "y á los hijos de los extranjeros que se allegaren á jehová para ministrarle y que amaren el nombre de jehová para ser sus siervos á todos los que guardaren el sábado de profanarlo y abrazaren mi pacto",
+        "audio_sha256": "03d6888d177b36ac04e9451bf5d6ff25f6cc2397382d7f6e42a3c596f7d80865",
+        "sample_count": 192160,
+        "duration_ms": 12010
+      },
+      "transcription_delay_ms": 2400,
+      "quality": {
+        "word_edits": 4,
+        "reference_word_count": 38,
+        "wer": 0.10526315789473684,
+        "character_edits": 4,
+        "reference_character_count": 163,
+        "cer": 0.024539877300613498
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 2400,
+        "fixture": {
+          "pcm_samples": 192160,
+          "duration_ms": 12010
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 315.359542,
+          "first_append_ms": 3291.2355,
+          "first_append_audio_fed_ms": 3200,
+          "audio_close_ms": 12018.990791,
+          "final_ms": 12726.043458,
+          "endpoint_finalization_ms": 707.052667,
+          "maximum_step_wall_ms": 330.847208,
+          "maximum_mlx_elapsed_ms": 330.7785,
+          "maximum_feed_schedule_lateness_ms": 10.029541,
+          "first_stable_ms": 3291.2355
+        },
+        "resources": {
+          "peak_memory_bytes": 5520360193
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 25,
+          "revoke_count": 0,
+          "audio_chunk_count": 38,
+          "step_call_count": 78,
+          "generated_tokens": 160,
+          "adapter_frames": 222,
+          "total_ingested_samples": 192160,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Y a los hijos de los extranjeros que se allegaran a Jehová para ministrarle, y que amaren el nombre de Jehová para ser sus siervos, a todos los que guardaren el sábado de profanarlo, y abrazaren mi pacto,",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 3291.2355,
+            "audio_fed_ms": 3200,
+            "delta": "Y"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 3611.488,
+            "audio_fed_ms": 3520,
+            "delta": " a los"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 3939.167375,
+            "audio_fed_ms": 3840,
+            "delta": " hijos de"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 4262.900625,
+            "audio_fed_ms": 4160,
+            "delta": " los"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 4902.556666,
+            "audio_fed_ms": 4800,
+            "delta": " extranjeros que se"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 5546.000083,
+            "audio_fed_ms": 5440,
+            "delta": " alleg"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 5862.636583,
+            "audio_fed_ms": 5760,
+            "delta": "aran a Jeh"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 6181.723958,
+            "audio_fed_ms": 6080,
+            "delta": "ová para"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 7144.728375,
+            "audio_fed_ms": 7040,
+            "delta": " ministrarle"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 7464.635166,
+            "audio_fed_ms": 7360,
+            "delta": ", y"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 7780.350166,
+            "audio_fed_ms": 7680,
+            "delta": " que"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 8112.208166,
+            "audio_fed_ms": 8000,
+            "delta": " amaren el"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 8416.272125,
+            "audio_fed_ms": 8320,
+            "delta": " nombre"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 8744.186291,
+            "audio_fed_ms": 8640,
+            "delta": " de"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 9058.741791,
+            "audio_fed_ms": 8960,
+            "delta": " Jehová"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 9377.271541,
+            "audio_fed_ms": 9280,
+            "delta": " para ser"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 9697.769791,
+            "audio_fed_ms": 9600,
+            "delta": " sus"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 10346.674333,
+            "audio_fed_ms": 10240,
+            "delta": " siervos,"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 10661.747708,
+            "audio_fed_ms": 10560,
+            "delta": " a"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 10978.09925,
+            "audio_fed_ms": 10880,
+            "delta": " todos"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 11298.560875,
+            "audio_fed_ms": 11200,
+            "delta": " los que"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 11947.477,
+            "audio_fed_ms": 11840,
+            "delta": " guardaren el"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 12351.351166,
+            "audio_fed_ms": 12010,
+            "delta": " sábado de profan"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 12572.00225,
+            "audio_fed_ms": 12010,
+            "delta": "arlo, y abrazaren mi"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 12726.042875,
+            "audio_fed_ms": 12010,
+            "delta": " pacto,"
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-fr-1591_1028_000000",
+        "language": "fr",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "cependant il envoya chercher le pêcheur à l'heure même et quand il fut arrivé pêcheur lui dit-il apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés car il est survenu un certain malheur qui a empêché qu'on ne les ait servis au sultan",
+        "audio_sha256": "a8283ff52df4e63887fe660ce2e8fbcf28c88f45b458c6f692a6e38877edb4f8",
+        "sample_count": 213280,
+        "duration_ms": 13330
+      },
+      "transcription_delay_ms": 480,
+      "quality": {
+        "word_edits": 6,
+        "reference_word_count": 48,
+        "wer": 0.125,
+        "character_edits": 6,
+        "reference_character_count": 219,
+        "cer": 0.0273972602739726
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 480,
+        "fixture": {
+          "pcm_samples": 213280,
+          "duration_ms": 13330
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 314.932167,
+          "first_append_ms": 1695.097042,
+          "first_append_audio_fed_ms": 1600,
+          "audio_close_ms": 13338.018833,
+          "final_ms": 13709.149417,
+          "endpoint_finalization_ms": 371.130584,
+          "maximum_step_wall_ms": 315.616875,
+          "maximum_mlx_elapsed_ms": 315.53225,
+          "maximum_feed_schedule_lateness_ms": 10.332792,
+          "first_stable_ms": 1695.097042
+        },
+        "resources": {
+          "peak_memory_bytes": 5477155585
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 33,
+          "revoke_count": 0,
+          "audio_chunk_count": 42,
+          "step_call_count": 85,
+          "generated_tokens": 177,
+          "adapter_frames": 215,
+          "total_ingested_samples": 213280,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Ce tendant, il a envoyé chercher le pêcheur à l'heure même, et quand il fut arrivé, le pêcheur lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 1695.097042,
+            "audio_fed_ms": 1600,
+            "delta": "Ce"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 2027.228375,
+            "audio_fed_ms": 1920,
+            "delta": " tendant,"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 2349.986458,
+            "audio_fed_ms": 2240,
+            "delta": " il a envoyé"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 2665.213417,
+            "audio_fed_ms": 2560,
+            "delta": " chercher le"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 2989.047583,
+            "audio_fed_ms": 2880,
+            "delta": " pêcheur"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 3292.06025,
+            "audio_fed_ms": 3200,
+            "delta": " à l'heure"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 3623.658667,
+            "audio_fed_ms": 3520,
+            "delta": " même,"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 3944.088125,
+            "audio_fed_ms": 3840,
+            "delta": " et quand"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 4259.261792,
+            "audio_fed_ms": 4160,
+            "delta": " il fut"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 4891.698667,
+            "audio_fed_ms": 4800,
+            "delta": " arrivé,"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 5543.707167,
+            "audio_fed_ms": 5440,
+            "delta": " le"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 5866.547208,
+            "audio_fed_ms": 5760,
+            "delta": " pêcheur lui"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 6506.423333,
+            "audio_fed_ms": 6400,
+            "delta": " dit-il,"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 7140.318833,
+            "audio_fed_ms": 7040,
+            "delta": " apporte-moi"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 7460.551792,
+            "audio_fed_ms": 7360,
+            "delta": " quatre autres"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 7772.660792,
+            "audio_fed_ms": 7680,
+            "delta": " poissons"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 8105.177875,
+            "audio_fed_ms": 8000,
+            "delta": " qui soient"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 8739.424917,
+            "audio_fed_ms": 8640,
+            "delta": " semblables à ceux"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 9065.202833,
+            "audio_fed_ms": 8960,
+            "delta": " que tu as"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 9388.284542,
+            "audio_fed_ms": 9280,
+            "delta": " déjà"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 9703.213167,
+            "audio_fed_ms": 9600,
+            "delta": " apport"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 10011.020667,
+            "audio_fed_ms": 9920,
+            "delta": "és,"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 10341.989125,
+            "audio_fed_ms": 10240,
+            "delta": " car"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 10654.332542,
+            "audio_fed_ms": 10560,
+            "delta": " il est"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 10988.704,
+            "audio_fed_ms": 10880,
+            "delta": " survenu"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 11310.54775,
+            "audio_fed_ms": 11200,
+            "delta": " d'un"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 11622.241083,
+            "audio_fed_ms": 11520,
+            "delta": " certain"
+          },
+          {
+            "index": 27,
+            "elapsed_ms": 11944.982875,
+            "audio_fed_ms": 11840,
+            "delta": " malheur"
+          },
+          {
+            "index": 28,
+            "elapsed_ms": 12262.34425,
+            "audio_fed_ms": 12160,
+            "delta": " qui a"
+          },
+          {
+            "index": 29,
+            "elapsed_ms": 12586.249625,
+            "audio_fed_ms": 12480,
+            "delta": " empêché"
+          },
+          {
+            "index": 30,
+            "elapsed_ms": 12905.888917,
+            "audio_fed_ms": 12800,
+            "delta": " qu'on ne les"
+          },
+          {
+            "index": 31,
+            "elapsed_ms": 13220.48,
+            "audio_fed_ms": 13120,
+            "delta": " ait serv"
+          },
+          {
+            "index": 32,
+            "elapsed_ms": 13653.649875,
+            "audio_fed_ms": 13330,
+            "delta": "is au sultan."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-fr-1591_1028_000000",
+        "language": "fr",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "cependant il envoya chercher le pêcheur à l'heure même et quand il fut arrivé pêcheur lui dit-il apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés car il est survenu un certain malheur qui a empêché qu'on ne les ait servis au sultan",
+        "audio_sha256": "a8283ff52df4e63887fe660ce2e8fbcf28c88f45b458c6f692a6e38877edb4f8",
+        "sample_count": 213280,
+        "duration_ms": 13330
+      },
+      "transcription_delay_ms": 2400,
+      "quality": {
+        "word_edits": 1,
+        "reference_word_count": 48,
+        "wer": 0.020833333333333332,
+        "character_edits": 1,
+        "reference_character_count": 219,
+        "cer": 0.0045662100456621
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 2400,
+        "fixture": {
+          "pcm_samples": 213280,
+          "duration_ms": 13330
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 327.246833,
+          "first_append_ms": 3938.295167,
+          "first_append_audio_fed_ms": 3840,
+          "audio_close_ms": 13337.370084,
+          "final_ms": 14053.171584,
+          "endpoint_finalization_ms": 715.8015,
+          "maximum_step_wall_ms": 326.863333,
+          "maximum_mlx_elapsed_ms": 326.781791,
+          "maximum_feed_schedule_lateness_ms": 10.042917,
+          "first_stable_ms": 3938.295167
+        },
+        "resources": {
+          "peak_memory_bytes": 5537432321
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 27,
+          "revoke_count": 0,
+          "audio_chunk_count": 42,
+          "step_call_count": 86,
+          "generated_tokens": 177,
+          "adapter_frames": 239,
+          "total_ingested_samples": 213280,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "Cependant, il envoya chercher le pêcheur à l'heure même, et quand il fut arrivé,« Pêcheur, lui dit-il, apporte-moi quatre autres poissons qui soient semblables à ceux que tu as déjà apportés, car il est survenu d'un certain malheur qui a empêché qu'on ne les ait servis au sultan.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 3938.295167,
+            "audio_fed_ms": 3840,
+            "delta": "Cependant, il"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 4258.733167,
+            "audio_fed_ms": 4160,
+            "delta": " envoya"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 4593.338042,
+            "audio_fed_ms": 4480,
+            "delta": " chercher le"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 4894.268334,
+            "audio_fed_ms": 4800,
+            "delta": " pêcheur"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 5224.749084,
+            "audio_fed_ms": 5120,
+            "delta": " à l'heure"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 5549.385875,
+            "audio_fed_ms": 5440,
+            "delta": " même,"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 5868.23125,
+            "audio_fed_ms": 5760,
+            "delta": " et quand"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 6178.759917,
+            "audio_fed_ms": 6080,
+            "delta": " il fut"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 6810.282334,
+            "audio_fed_ms": 6720,
+            "delta": " arrivé,«"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 7779.835042,
+            "audio_fed_ms": 7680,
+            "delta": " Pêcheur"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 8095.533584,
+            "audio_fed_ms": 8000,
+            "delta": ", lui"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 8428.295834,
+            "audio_fed_ms": 8320,
+            "delta": " dit-il,"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 9066.318542,
+            "audio_fed_ms": 8960,
+            "delta": " apporte-moi"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 9379.243125,
+            "audio_fed_ms": 9280,
+            "delta": " quatre autres"
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 9709.606167,
+            "audio_fed_ms": 9600,
+            "delta": " poissons"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 10024.926084,
+            "audio_fed_ms": 9920,
+            "delta": " qui soient"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 10660.892584,
+            "audio_fed_ms": 10560,
+            "delta": " semblables à ceux"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 10978.898459,
+            "audio_fed_ms": 10880,
+            "delta": " que tu as"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 11309.099709,
+            "audio_fed_ms": 11200,
+            "delta": " déjà"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 11612.049667,
+            "audio_fed_ms": 11520,
+            "delta": " apport"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 11939.922917,
+            "audio_fed_ms": 11840,
+            "delta": "és,"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 12261.588834,
+            "audio_fed_ms": 12160,
+            "delta": " car"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 12577.434167,
+            "audio_fed_ms": 12480,
+            "delta": " il est"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 12907.472084,
+            "audio_fed_ms": 12800,
+            "delta": " survenu"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 13233.070959,
+            "audio_fed_ms": 13120,
+            "delta": " d'un"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 13664.621709,
+            "audio_fed_ms": 13330,
+            "delta": " certain malheur qui a empêché"
+          },
+          {
+            "index": 26,
+            "elapsed_ms": 13886.154334,
+            "audio_fed_ms": 13330,
+            "delta": " qu'on ne les ait servis au sultan."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-pt-12710_10229_000000",
+        "language": "pt",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "a dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa tristeza tu me fazes ir até o fundo das remotas raízes do meu espírito",
+        "audio_sha256": "be15fd5575a7f177b7ca7c9cdc2a752f26faa941001dee37631a85304d392eb5",
+        "sample_count": 205440,
+        "duration_ms": 12840
+      },
+      "transcription_delay_ms": 480,
+      "quality": {
+        "word_edits": 0,
+        "reference_word_count": 28,
+        "wer": 0,
+        "character_edits": 0,
+        "reference_character_count": 121,
+        "cer": 0
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 480,
+        "fixture": {
+          "pcm_samples": 205440,
+          "duration_ms": 12840
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 320.345541,
+          "first_append_ms": 1699.035083,
+          "first_append_audio_fed_ms": 1600,
+          "audio_close_ms": 12841.408583,
+          "final_ms": 13204.308875,
+          "endpoint_finalization_ms": 362.900292,
+          "maximum_step_wall_ms": 270.918458,
+          "maximum_mlx_elapsed_ms": 270.899042,
+          "maximum_feed_schedule_lateness_ms": 10.085458,
+          "first_stable_ms": 1699.035083
+        },
+        "resources": {
+          "peak_memory_bytes": 5475238657
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 26,
+          "revoke_count": 0,
+          "audio_chunk_count": 41,
+          "step_call_count": 82,
+          "generated_tokens": 171,
+          "adapter_frames": 209,
+          "total_ingested_samples": 205440,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 1699.035083,
+            "audio_fed_ms": 1600,
+            "delta": "A"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 2018.574875,
+            "audio_fed_ms": 1920,
+            "delta": " dor"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 2333.737625,
+            "audio_fed_ms": 2240,
+            "delta": " é"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 3301.77875,
+            "audio_fed_ms": 3200,
+            "delta": " religiosa"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 3944.201792,
+            "audio_fed_ms": 3840,
+            "delta": " porque nos"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 4904.524125,
+            "audio_fed_ms": 4800,
+            "delta": " aperfe"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 5224.850375,
+            "audio_fed_ms": 5120,
+            "delta": "içoa e"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 5542.062292,
+            "audio_fed_ms": 5440,
+            "delta": " nos"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 6179.701208,
+            "audio_fed_ms": 6080,
+            "delta": " explica a"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 6820.095208,
+            "audio_fed_ms": 6720,
+            "delta": " nossa"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 7139.929375,
+            "audio_fed_ms": 7040,
+            "delta": " fra"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 7454.181,
+            "audio_fed_ms": 7360,
+            "delta": "queza"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 7771.373042,
+            "audio_fed_ms": 7680,
+            "delta": " nativa"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 8106.305833,
+            "audio_fed_ms": 8000,
+            "delta": "."
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 9053.186292,
+            "audio_fed_ms": 8960,
+            "delta": " Tr"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 9385.037083,
+            "audio_fed_ms": 9280,
+            "delta": "isteza,"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 9696.684083,
+            "audio_fed_ms": 9600,
+            "delta": " tu me"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 10335.7725,
+            "audio_fed_ms": 10240,
+            "delta": " fazes"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 10667.423792,
+            "audio_fed_ms": 10560,
+            "delta": " ir até"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 10987.885667,
+            "audio_fed_ms": 10880,
+            "delta": " o"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 11301.791167,
+            "audio_fed_ms": 11200,
+            "delta": " fundo"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 11624.078375,
+            "audio_fed_ms": 11520,
+            "delta": " das"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 12258.104875,
+            "audio_fed_ms": 12160,
+            "delta": " remotas"
+          },
+          {
+            "index": 23,
+            "elapsed_ms": 12584.082875,
+            "audio_fed_ms": 12480,
+            "delta": " raízes"
+          },
+          {
+            "index": 24,
+            "elapsed_ms": 12905.584292,
+            "audio_fed_ms": 12840,
+            "delta": " do meu"
+          },
+          {
+            "index": 25,
+            "elapsed_ms": 13176.512833,
+            "audio_fed_ms": 12840,
+            "delta": " espírito."
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "audiobook-pt-12710_10229_000000",
+        "language": "pt",
+        "gold_status": "dataset-transcript-unverified",
+        "reference_text": "a dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa tristeza tu me fazes ir até o fundo das remotas raízes do meu espírito",
+        "audio_sha256": "be15fd5575a7f177b7ca7c9cdc2a752f26faa941001dee37631a85304d392eb5",
+        "sample_count": 205440,
+        "duration_ms": 12840
+      },
+      "transcription_delay_ms": 2400,
+      "quality": {
+        "word_edits": 0,
+        "reference_word_count": 28,
+        "wer": 0,
+        "character_edits": 0,
+        "reference_character_count": 121,
+        "cer": 0
+      },
+      "run": {
+        "schema_version": "1.0.0",
+        "status": "ok",
+        "boundary": "repository-owned-rust-c-abi-over-official-mlx",
+        "stage": "voxtral-incremental-streaming",
+        "device": "gpu",
+        "pins": {
+          "official_mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+          "official_model_revision": "2769294da9567371363522aac9bbcfdd19447add",
+          "mlx_conversion_revision": "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e"
+        },
+        "transcription_delay_ms": 2400,
+        "fixture": {
+          "pcm_samples": 205440,
+          "duration_ms": 12840
+        },
+        "procedure": {
+          "realtime_pacing": true,
+          "producer_thread_independent_from_mlx_executor": true,
+          "chunk_ms": 320,
+          "chunk_samples": 5120,
+          "max_pending_samples": 10240,
+          "max_ingest_samples_per_step": 5120,
+          "max_decode_tokens_per_step": 16
+        },
+        "timing": {
+          "process_load_ms": 320.445041,
+          "first_append_ms": 3625.8125,
+          "first_append_audio_fed_ms": 3520,
+          "audio_close_ms": 12843.620917,
+          "final_ms": 13558.500542,
+          "endpoint_finalization_ms": 714.879625,
+          "maximum_step_wall_ms": 294.959625,
+          "maximum_mlx_elapsed_ms": 294.939583,
+          "maximum_feed_schedule_lateness_ms": 10.028167,
+          "first_stable_ms": 3625.8125
+        },
+        "resources": {
+          "peak_memory_bytes": 5535531777
+        },
+        "streaming": {
+          "append_only": true,
+          "update_count": 23,
+          "revoke_count": 0,
+          "audio_chunk_count": 41,
+          "step_call_count": 83,
+          "generated_tokens": 171,
+          "adapter_frames": 233,
+          "total_ingested_samples": 205440,
+          "maximum_ingested_samples": 5120,
+          "backpressure_count": 0,
+          "done": true
+        },
+        "text": "A dor é religiosa porque nos aperfeiçoa e nos explica a nossa fraqueza nativa. Tristeza, tu me fazes ir até o fundo das remotas raízes do meu espírito.",
+        "events": [
+          {
+            "index": 0,
+            "elapsed_ms": 3625.8125,
+            "audio_fed_ms": 3520,
+            "delta": "A"
+          },
+          {
+            "index": 1,
+            "elapsed_ms": 3937.095459,
+            "audio_fed_ms": 3840,
+            "delta": " dor"
+          },
+          {
+            "index": 2,
+            "elapsed_ms": 4250.964084,
+            "audio_fed_ms": 4160,
+            "delta": " é"
+          },
+          {
+            "index": 3,
+            "elapsed_ms": 5222.056792,
+            "audio_fed_ms": 5120,
+            "delta": " religiosa"
+          },
+          {
+            "index": 4,
+            "elapsed_ms": 5855.564125,
+            "audio_fed_ms": 5760,
+            "delta": " porque nos"
+          },
+          {
+            "index": 5,
+            "elapsed_ms": 6818.124167,
+            "audio_fed_ms": 6720,
+            "delta": " aperfe"
+          },
+          {
+            "index": 6,
+            "elapsed_ms": 7141.879,
+            "audio_fed_ms": 7040,
+            "delta": "içoa e"
+          },
+          {
+            "index": 7,
+            "elapsed_ms": 7467.6995,
+            "audio_fed_ms": 7360,
+            "delta": " nos"
+          },
+          {
+            "index": 8,
+            "elapsed_ms": 8096.564875,
+            "audio_fed_ms": 8000,
+            "delta": " explica a"
+          },
+          {
+            "index": 9,
+            "elapsed_ms": 8737.449,
+            "audio_fed_ms": 8640,
+            "delta": " nossa"
+          },
+          {
+            "index": 10,
+            "elapsed_ms": 9053.121667,
+            "audio_fed_ms": 8960,
+            "delta": " fra"
+          },
+          {
+            "index": 11,
+            "elapsed_ms": 9381.796584,
+            "audio_fed_ms": 9280,
+            "delta": "queza"
+          },
+          {
+            "index": 12,
+            "elapsed_ms": 9704.63975,
+            "audio_fed_ms": 9600,
+            "delta": " nativa"
+          },
+          {
+            "index": 13,
+            "elapsed_ms": 10021.212875,
+            "audio_fed_ms": 9920,
+            "delta": "."
+          },
+          {
+            "index": 14,
+            "elapsed_ms": 10985.085084,
+            "audio_fed_ms": 10880,
+            "delta": " Tr"
+          },
+          {
+            "index": 15,
+            "elapsed_ms": 11301.143042,
+            "audio_fed_ms": 11200,
+            "delta": "isteza,"
+          },
+          {
+            "index": 16,
+            "elapsed_ms": 11622.979417,
+            "audio_fed_ms": 11520,
+            "delta": " tu me"
+          },
+          {
+            "index": 17,
+            "elapsed_ms": 12267.063542,
+            "audio_fed_ms": 12160,
+            "delta": " fazes"
+          },
+          {
+            "index": 18,
+            "elapsed_ms": 12590.875834,
+            "audio_fed_ms": 12480,
+            "delta": " ir até"
+          },
+          {
+            "index": 19,
+            "elapsed_ms": 12902.87675,
+            "audio_fed_ms": 12840,
+            "delta": " o"
+          },
+          {
+            "index": 20,
+            "elapsed_ms": 13197.847834,
+            "audio_fed_ms": 12840,
+            "delta": " fundo das remotas"
+          },
+          {
+            "index": 21,
+            "elapsed_ms": 13419.643167,
+            "audio_fed_ms": 12840,
+            "delta": " raízes do meu espírito"
+          },
+          {
+            "index": 22,
+            "elapsed_ms": 13558.500125,
+            "audio_fed_ms": 12840,
+            "delta": "."
+          }
+        ]
+      }
+    }
+  ]
+}

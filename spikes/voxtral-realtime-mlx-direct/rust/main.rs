@@ -3,7 +3,7 @@ use std::{
     ffi::{CStr, CString, c_char, c_void},
     fs, ptr,
     sync::{
-        Arc,
+        Arc, Barrier,
         atomic::{AtomicBool, AtomicUsize, Ordering},
     },
     thread,
@@ -13,6 +13,7 @@ use std::{
 const OK: i32 = 0;
 const INVALID_ARGUMENT: i32 = 1;
 const CANCELLED: i32 = 3;
+const BUSY: i32 = 4;
 const BACKPRESSURE: i32 = 5;
 const NEEDS_AUDIO: i32 = 6;
 const DONE: i32 = 7;
@@ -22,6 +23,9 @@ const MAX_PENDING_SAMPLES: usize = 10_240;
 const MAX_INGEST_SAMPLES_PER_STEP: usize = 5_120;
 const SAMPLE_RATE_HZ: usize = 16_000;
 const MAX_GENERATED_TOKENS: usize = 4_096;
+const MLX_REVISION: &str = "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247";
+const MODEL_REVISION: &str = "2769294da9567371363522aac9bbcfdd19447add";
+const CONVERSION_REVISION: &str = "fdebf7b2af834a1db4b8a3c99ab7480b333adf9e";
 
 unsafe extern "C" {
     fn cuttledoc_voxtral_mlx_inspect_model(
@@ -367,6 +371,45 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
         ));
     }
 
+    let barrier = Arc::new(Barrier::new(3));
+    let mut workers = Vec::new();
+    for _ in 0..2 {
+        let worker_barrier = Arc::clone(&barrier);
+        let worker_handle = session.handle as usize;
+        workers.push(thread::spawn(move || {
+            worker_barrier.wait();
+            step(worker_handle as *mut c_void)
+        }));
+    }
+    barrier.wait();
+    let concurrent_statuses = workers
+        .into_iter()
+        .map(|worker| {
+            worker
+                .join()
+                .map_err(|_| "concurrent step worker panicked".to_owned())
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    if concurrent_statuses
+        .iter()
+        .filter(|response| response.status == BUSY)
+        .count()
+        != 1
+        || concurrent_statuses
+            .iter()
+            .filter(|response| response.status == OK)
+            .count()
+            != 1
+    {
+        return Err(format!(
+            "concurrent steps returned statuses {:?}, expected one OK and one BUSY",
+            concurrent_statuses
+                .iter()
+                .map(|response| response.status)
+                .collect::<Vec<_>>()
+        ));
+    }
+
     let closed = close(session.handle);
     if closed.status != OK {
         return Err(closed
@@ -391,13 +434,14 @@ fn contract(model_directory: &str, pcm_path: &str, device: &str) -> Result<(), S
     }
 
     println!(
-        "{{\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-streaming-lifecycle\",\"device\":{},\"input_chunk_samples\":{},\"queue_capacity_samples\":{},\"max_ingest_samples_per_step\":{},\"stable_statuses\":{{\"invalid_argument\":{},\"cancelled\":{},\"backpressure\":{},\"needs_audio\":{},\"done\":{}}},\"capabilities\":{{\"bounded_ingestion\":true,\"backpressure\":true,\"cancellation\":true,\"persistent_model_state\":true,\"transcription\":true}}}}",
+        "{{\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-streaming-lifecycle\",\"device\":{},\"input_chunk_samples\":{},\"queue_capacity_samples\":{},\"max_ingest_samples_per_step\":{},\"stable_statuses\":{{\"invalid_argument\":{},\"cancelled\":{},\"busy\":{},\"backpressure\":{},\"needs_audio\":{},\"done\":{}}},\"capabilities\":{{\"bounded_ingestion\":true,\"backpressure\":true,\"busy_rejection\":true,\"cancellation\":true,\"persistent_model_state\":true,\"transcription\":true}}}}",
         json_string(device),
         INPUT_CHUNK_SAMPLES,
         MAX_PENDING_SAMPLES,
         MAX_INGEST_SAMPLES_PER_STEP,
         INVALID_ARGUMENT,
         CANCELLED,
+        BUSY,
         BACKPRESSURE,
         NEEDS_AUDIO,
         DONE,
@@ -465,7 +509,9 @@ fn stream(
         ));
     }
     let device_kind = parse_device(device)?;
+    let load_started = Instant::now();
     let session = create_session(&model_directory, delay_ms, max_decode_tokens, device_kind)?;
+    let process_load_ms = load_started.elapsed().as_secs_f64() * 1_000.0;
     let initial = step(session.handle);
     if initial.status != NEEDS_AUDIO || initial.json.is_none() {
         return Err(format!(
@@ -505,7 +551,7 @@ fn stream(
     let mut append_events = Vec::new();
     let mut wait_after_fed_samples = None;
 
-    let (final_text, generated_tokens, adapter_frames) = loop {
+    let (final_text, generated_tokens, adapter_frames, peak_memory_bytes) = loop {
         if let Some(observed) = wait_after_fed_samples {
             while fed_samples.load(Ordering::Acquire) == observed
                 && !producer_finished.load(Ordering::Acquire)
@@ -537,6 +583,7 @@ fn stream(
                     maximum_mlx_elapsed_ms.max(json_number(json, "mlx_elapsed_ms")?);
                 let current_generated_tokens = json_usize(json, "generated_tokens")?;
                 let current_adapter_frames = json_usize(json, "adapter_frames")?;
+                let current_peak_memory_bytes = json_usize(json, "peak_memory_bytes")?;
                 let text = json_string_field(json, "text")?;
                 let delta = json_string_field(json, "text_delta")?;
                 if !text.starts_with(&previous_text) {
@@ -561,7 +608,12 @@ fn stream(
                 }
                 previous_text = text.clone();
                 if response.status == DONE {
-                    break (text, current_generated_tokens, current_adapter_frames);
+                    break (
+                        text,
+                        current_generated_tokens,
+                        current_adapter_frames,
+                        current_peak_memory_bytes,
+                    );
                 }
                 if response.status == NEEDS_AUDIO {
                     wait_after_fed_samples = Some(fed_samples.load(Ordering::Acquire));
@@ -589,8 +641,11 @@ fn stream(
     let endpoint_finalization_ms = final_ms - producer.audio_close_ms;
 
     print!(
-        "{{\"schema_version\":\"1.0.0\",\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-incremental-streaming\",\"device\":{},\"transcription_delay_ms\":{},\"fixture\":{{\"pcm_samples\":{},\"duration_ms\":{:.6}}},\"procedure\":{{\"realtime_pacing\":true,\"producer_thread_independent_from_mlx_executor\":true,\"chunk_ms\":{},\"chunk_samples\":{},\"max_pending_samples\":{},\"max_ingest_samples_per_step\":{},\"max_decode_tokens_per_step\":{}}},\"timing\":{{\"first_append_ms\":{:.6},\"first_append_audio_fed_ms\":{:.6},\"audio_close_ms\":{:.6},\"final_ms\":{:.6},\"endpoint_finalization_ms\":{:.6},\"maximum_step_wall_ms\":{:.6},\"maximum_mlx_elapsed_ms\":{:.6},\"maximum_feed_schedule_lateness_ms\":{:.6}}},\"streaming\":{{\"append_only\":true,\"update_count\":{},\"revoke_count\":0,\"audio_chunk_count\":{},\"step_call_count\":{},\"generated_tokens\":{},\"adapter_frames\":{},\"total_ingested_samples\":{},\"maximum_ingested_samples\":{},\"backpressure_count\":{},\"done\":true}},\"text\":{},\"events\":[",
+        "{{\"schema_version\":\"1.0.0\",\"status\":\"ok\",\"boundary\":\"repository-owned-rust-c-abi-over-official-mlx\",\"stage\":\"voxtral-incremental-streaming\",\"device\":{},\"pins\":{{\"official_mlx_revision\":{},\"official_model_revision\":{},\"mlx_conversion_revision\":{}}},\"transcription_delay_ms\":{},\"fixture\":{{\"pcm_samples\":{},\"duration_ms\":{:.6}}},\"procedure\":{{\"realtime_pacing\":true,\"producer_thread_independent_from_mlx_executor\":true,\"chunk_ms\":{},\"chunk_samples\":{},\"max_pending_samples\":{},\"max_ingest_samples_per_step\":{},\"max_decode_tokens_per_step\":{}}},\"timing\":{{\"process_load_ms\":{:.6},\"first_append_ms\":{:.6},\"first_stable_ms\":{:.6},\"first_append_audio_fed_ms\":{:.6},\"audio_close_ms\":{:.6},\"final_ms\":{:.6},\"endpoint_finalization_ms\":{:.6},\"maximum_step_wall_ms\":{:.6},\"maximum_mlx_elapsed_ms\":{:.6},\"maximum_feed_schedule_lateness_ms\":{:.6}}},\"resources\":{{\"peak_memory_bytes\":{}}},\"streaming\":{{\"append_only\":true,\"update_count\":{},\"revoke_count\":0,\"audio_chunk_count\":{},\"step_call_count\":{},\"generated_tokens\":{},\"adapter_frames\":{},\"total_ingested_samples\":{},\"maximum_ingested_samples\":{},\"backpressure_count\":{},\"done\":true}},\"text\":{},\"events\":[",
         json_string(device),
+        json_string(MLX_REVISION),
+        json_string(MODEL_REVISION),
+        json_string(CONVERSION_REVISION),
         delay_ms,
         audio.len(),
         audio.len() as f64 / SAMPLE_RATE_HZ as f64 * 1_000.0,
@@ -599,6 +654,8 @@ fn stream(
         MAX_PENDING_SAMPLES,
         MAX_INGEST_SAMPLES_PER_STEP,
         max_decode_tokens,
+        process_load_ms,
+        first_append.elapsed_ms,
         first_append.elapsed_ms,
         first_append.audio_fed_ms,
         producer.audio_close_ms,
@@ -607,6 +664,7 @@ fn stream(
         maximum_step_wall_ms,
         maximum_mlx_elapsed_ms,
         producer.maximum_schedule_lateness_ms,
+        peak_memory_bytes,
         append_events.len(),
         producer.chunk_count,
         step_call_count,
@@ -651,9 +709,8 @@ fn produce_audio(
         if let Some(remaining) = target.checked_sub(started.elapsed()) {
             thread::sleep(remaining);
         }
-        maximum_schedule_lateness_ms = maximum_schedule_lateness_ms.max(
-            (started.elapsed().as_secs_f64() - target.as_secs_f64()).max(0.0) * 1_000.0,
-        );
+        maximum_schedule_lateness_ms = maximum_schedule_lateness_ms
+            .max((started.elapsed().as_secs_f64() - target.as_secs_f64()).max(0.0) * 1_000.0);
         loop {
             let response = feed(handle, &audio[offset..end]);
             match response.status {
@@ -663,9 +720,9 @@ fn produce_audio(
                     thread::sleep(Duration::from_millis(1));
                 }
                 status => {
-                    return Err(response
-                        .error
-                        .unwrap_or_else(|| format!("audio producer feed returned status {status}")));
+                    return Err(response.error.unwrap_or_else(|| {
+                        format!("audio producer feed returned status {status}")
+                    }));
                 }
             }
         }
@@ -675,9 +732,9 @@ fn produce_audio(
     }
     let response = close(handle);
     if response.status != OK {
-        return Err(response
-            .error
-            .unwrap_or_else(|| format!("audio producer close returned status {}", response.status)));
+        return Err(response.error.unwrap_or_else(|| {
+            format!("audio producer close returned status {}", response.status)
+        }));
     }
     Ok(ProducerStats {
         audio_close_ms: started.elapsed().as_secs_f64() * 1_000.0,
@@ -850,22 +907,21 @@ fn json_string_field(json: &str, key: &str) -> Result<String, String> {
                 'u' => {
                     let digits = (0..4)
                         .map(|_| {
-                            characters.next().ok_or_else(|| {
-                                format!("short Unicode escape in JSON field {key}")
-                            })
+                            characters
+                                .next()
+                                .ok_or_else(|| format!("short Unicode escape in JSON field {key}"))
                         })
                         .collect::<Result<String, String>>()?;
                     let value = u32::from_str_radix(&digits, 16).map_err(|error| {
                         format!("invalid Unicode escape in JSON field {key}: {error}")
                     })?;
-                    result.push(char::from_u32(value).ok_or_else(|| {
-                        format!("invalid Unicode scalar in JSON field {key}")
-                    })?);
+                    result
+                        .push(char::from_u32(value).ok_or_else(|| {
+                            format!("invalid Unicode scalar in JSON field {key}")
+                        })?);
                 }
                 escape => {
-                    return Err(format!(
-                        "unsupported JSON escape \\{escape} in field {key}"
-                    ));
+                    return Err(format!("unsupported JSON escape \\{escape} in field {key}"));
                 }
             },
             character => result.push(character),

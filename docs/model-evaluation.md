@@ -194,19 +194,13 @@ reason to abandon the first-class MLX platform.
 
 ### Repository-owned official-MLX boundary
 
-The first direct boundary now implements that lifecycle without linking
-`mlx-audio`. Its C++ adapter loads and validates the complete pinned model with
-official MLX, while Rust owns the opaque handle, hard queue capacity, per-step
-audio budget, end-of-audio, backpressure, cancellation, and stable statuses.
-
-On the same 13.34-second German audiobook fixture, the contract probe fed
-213,440 samples in 80 ms slices into a 640 ms queue. It observed 40 explicit
-backpressure responses in each of two runs, consumed all audio in 42 steps,
-and never admitted more than 320 ms into one step. The slower repetition's
-maximum step was 70.7 ms, versus the reference runtime's 25.15-second maximum
-under 80 ms production. The official-MLX sum-of-squares fingerprint matched a
-CPU control within `1.24e-8` relative error. Cancellation, closed-input,
-needs-audio, and done states also returned their pinned statuses.
+The direct boundary implements that lifecycle without linking `mlx-audio`.
+Its C++ adapter loads and validates the complete pinned model with official
+MLX, while Rust owns the opaque handle, hard queue capacity, per-step audio and
+decode budgets, end-of-audio, backpressure, cancellation, stable statuses, and
+append-only output. Filling the 640 ms queue without stepping produces the
+pinned all-or-nothing backpressure status; empty, closed, and cancelled states
+remain separate from normal completion.
 
 The next direct milestone now executes the exact offline-streaming padding,
 128-bin log-mel frontend, and both causal Conv1d/GELU stages with official MLX
@@ -237,9 +231,63 @@ remain stage-specific and keep their original capability ceilings. The new
 executes delay conditioning, all 26 GQA decoder layers, decoder KV caches, the
 tied language-model head, greedy generation, and repository-owned Tekken
 decoding. It emits the same 178 token IDs and exact German text as the pinned
-Python oracle. This proves a usable complete-buffer Rust transcription path,
-not held-out WER, timestamps, or live-input first-text latency. Those remaining
-claims require moving the proven graph behind the bounded session.
+Python batch oracle.
+
+That graph now also lives behind the bounded session. Persistent local state
+tracks the streaming mel frontier, both causal convolutions, 32 rotating
+encoder caches, downsampling remainder, 26 decoder caches, generated tokens,
+and text. Official MLX supplies tensor execution and Metal kernels; it does not
+contain or receive a call to a prebuilt Voxtral/session implementation.
+
+| Direct input | Delay | First append | Maximum step | Endpoint finalization | Peak MLX allocation |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 320 ms | 480 ms | 1.71 s | 315 ms | 371 ms | 5.48 GB |
+| 320 ms | 2,400 ms | 3.62 s | 337 ms | 727 ms | 5.54 GB |
+| 80 ms | 480 ms | 1.64 s | 1.62 s | 791 ms | 5.48 GB |
+
+All three independent-producer runs ingest every sample once, finish with the
+same 177-token streaming-oracle text, and reconstruct it from append-only
+deltas without revocation. The 320 ms input path is the usable result. The
+80 ms path is a stress gate: the direct snapshot cannot grow while MLX runs,
+but observed GPU steps remain variable and a 640 ms queue applies heavy
+backpressure. It therefore fixes the reference session's unbounded ingestion
+semantics without claiming that 80 ms is a production-ready cadence.
+
+The checked records are the direct
+[`480 ms / 320 ms`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-480ms-320ms-1/result.json),
+[`2,400 ms / 320 ms`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-2400ms-320ms-1/result.json),
+and
+[`480 ms / 80 ms`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-480ms-80ms-1/result.json)
+runs. This remains development-fixture operational evidence, not held-out WER,
+timestamps, long-audio stability, or a final product-engine decision.
+Fresh-process construction with a warm host file cache took 312-346 ms. The
+local build's adapter dylib is 19.0 MB, the Rust driver 0.63 MB, and the shared
+MLX metallib 130.2 MB; the model remains a separately delivered 3.13 GB
+artifact. Clean-host cache-miss load and delivery are still unmeasured.
+
+The 320 ms path then ran one pinned development audiobook per language at both
+delays in ten fresh processes:
+
+| Language | 480 ms WER / CER | 2,400 ms WER / CER | First stable 480 / 2,400 |
+| --- | ---: | ---: | ---: |
+| German | 0.00% / 0.00% | 0.00% / 0.00% | 1.70 / 3.62 s |
+| English | 5.88% / 0.45% | 9.80% / 6.31% | 2.02 / 3.94 s |
+| Spanish | 18.42% / 4.29% | 10.53% / 2.45% | 1.38 / 3.29 s |
+| French | 12.50% / 2.74% | 2.08% / 0.46% | 1.70 / 3.94 s |
+| Portuguese | 0.00% / 0.00% | 0.00% / 0.00% | 1.70 / 3.63 s |
+
+At 2,400 ms the five-clip macro WER improves from 7.36% to 4.48%, while macro
+CER moves from 1.50% to 1.84%. The language cells explain the apparent
+contradiction. Spanish corrects several verb endings and French removes real
+word/phrase errors. German and Portuguese are identical. English changes
+`fifty thousand` to `50,000`; the literal scorer penalizes that useful surface
+normalization heavily, alongside the `labourers`/`laborers` spelling variant.
+This is not evidence that 2,400 ms is globally worse for English content.
+
+The machine-readable
+[`language control`](../benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-language-control-1/result.json)
+keeps every raw text and timing cell. One development-exposed clip per language
+is an operational/routing diagnostic, not statistical quality evidence.
 
 ## Artifact and license pins
 
@@ -298,13 +346,13 @@ timestamp detail, and streaming behavior.
    repeated Rust-owned lifecycle, exact transcript, busy, error, and
    cancellation checks. Keep the community runtime as reference-only. See the
    [direct Qwen3-ASR spike](spikes/qwen3-mlx-direct.md).
-2. Continue Voxtral Realtime as a measured model candidate. The first
-   repository-owned official-MLX path now proves bounded ingestion,
-   backpressure, cancellation, and exact complete-buffer transcript parity.
-   Move that proven frontend/encoder/decoder state behind the bounded session,
-   retain exact final text while adding incremental updates, and then compare
-   the completed narrow adapter with pure C/MPS; do not adopt `mlx-audio` as
-   the product boundary.
+2. Continue Voxtral Realtime as a measured model candidate. The repository-
+   owned official-MLX path now proves bounded ingestion, backpressure,
+   cancellation, persistent incremental model state, append-only updates, and
+   exact streaming-oracle text at both configured delays. Carry the 320 ms
+   path into held-out, long-audio, and common-engine gates; retain 80 ms as a
+   stress test and compare lifecycle/packaging with pure C/MPS. Do not adopt
+   `mlx-audio` as the product boundary.
 3. Acquire held-out German-first professional-podcast material and independent
    audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
    Voxtral on the identical language/domain cells.

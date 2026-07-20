@@ -78,10 +78,10 @@ Evidence snapshot: 2026-07-20.
 | Official MLX feasibility (#6) | Complete | The official C++ core, owned C ABI, two-release upgrade, packaging, and repeated encoder lifecycle are proven. |
 | End-to-end MLX ASR (#15) | Complete | The common-schema record now contains quality, lifecycle, timing, memory, model, and artifact evidence. Broader languages and product behavior move to #4, #12, and the selected vertical slice. |
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
-| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements; held-out and true-streaming gates remain. |
+| Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements and a bounded repository-owned live session; held-out, long-audio, and product-integration gates remain. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical Apple/Whisper/Qwen/Parakeet/Voxtral runs remain. |
-| Voxtral Realtime live streaming (#19) | In progress | The repository-owned official-MLX path now performs usable complete-buffer Rust transcription: delay conditioning, all 26 GQA decoder layers, decoder cache, tied head, greedy generation, and Tekken decoding match the pinned reference with identical 178 tokens and exact German text. The bounded feed/step session still runs only its lifecycle fingerprint; integrating the proven model state incrementally, then live/held-out gates and the C/MPS comparison remain. |
+| Voxtral Realtime live streaming (#19) | In progress | The repository-owned official-MLX session now retains incremental mel, causal-convolution, 32-layer encoder, downsampler, 26-layer decoder, token, and text state behind the bounded Rust/C ABI. Real-time 480/2,400 ms runs reproduce the pinned 177-token streaming text exactly with append-only deltas; a ten-run DE/EN/ES/FR/PT control preserves language/delay cells and confirms 320 ms input as the stable path. The checked 80 ms stress run applies backpressure but still exposes multi-second MLX steps. Held-out data, full-pilot breadth, common-engine integration, long audio, clean-host delivery, and the focused C/MPS lifecycle/packaging comparison remain. |
 | Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
@@ -300,12 +300,11 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    Parakeet, and Voxtral Realtime on identical language/domain cells. Retain
    raw output, surface scores, semantic-severity review, and backend-specific
    error profiles.
-3. Move the now parity-proven official-MLX Voxtral frontend, encoder,
-   delay-conditioned decoder, and Tekken output behind the bounded session.
-   Preserve the 320 ms step budget, backpressure, cooperative cancellation, and
-   exact final text while adding incremental updates; then compare the complete
-   boundary with pure C/MPS. Do not adopt the reference runtime's unbounded
-   live queue.
+3. Carry the now streaming-parity-proven official-MLX Voxtral adapter into the
+   held-out and common-engine gates. Keep 320 ms as the measured default,
+   retain the 80 ms backpressure stress gate, add long-audio cache/memory
+   coverage, and compare only lifecycle, packaging, and maintenance with pure
+   C/MPS. Do not adopt the reference runtime's unbounded live queue.
 4. Use those real raw outputs to execute the frozen surface-only and bounded
    lexical postprocessing candidates under #7. Keep corrected text separate
    from raw ASR ranking and reject critical semantic regressions.
