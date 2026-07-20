@@ -106,6 +106,20 @@ results validate lifecycle and expose pronunciation/recognition failures, but
 the plan explicitly forbids using them as held-out target-domain or
 release-acceptance evidence. See
 [`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md).
+Materialize the nine digest-pinned passage files and their CC BY-SA
+attribution package outside Git with:
+
+```sh
+node scripts/materialize-synthetic-roundtrip.mjs \
+  --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip
+```
+
+The command retrieves the two exact MediaWiki revisions, verifies page and
+parent revision metadata, resolves fixed section/paragraph selectors, and
+rejects any character-count or SHA-256 drift. The checked-in
+[`synthetic-roundtrip-selection.json`](fixtures/synthetic-roundtrip-selection.json)
+contains selectors and digests, not the licensed passage text or generated
+audio.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

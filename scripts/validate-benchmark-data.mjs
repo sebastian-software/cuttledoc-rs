@@ -583,6 +583,123 @@ function validateSyntheticRoundtripPlan(plan) {
   return errors;
 }
 
+function validateSyntheticRoundtripSelection(selection, plan) {
+  const errors = [];
+  if (selection.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (selection.plan_revision !== plan.revision) {
+    errors.push('plan_revision must match the synthetic roundtrip plan');
+  }
+  if (selection.purpose !== 'diagnostic-materialization' ||
+      selection.text_encoding !== 'utf-8' ||
+      selection.paragraph_joiner !== '\n\n' ||
+      selection.spoken_transform !== 'none' ||
+      selection.generated_assets !== 'local-required') {
+    errors.push('selection policy must preserve local diagnostic materialization');
+  }
+  const expectedSources = new Map(
+    plan.text_sources.map((source) => [source.id, source]),
+  );
+  const sourceIds = new Set();
+  const passageIds = new Set();
+  const localeCounts = new Map();
+  const coveredGermanPhenomena = new Set();
+  for (const source of selection.sources ?? []) {
+    if (sourceIds.has(source.id)) errors.push(`duplicate source id: ${source.id}`);
+    sourceIds.add(source.id);
+    const expected = expectedSources.get(source.id);
+    if (!expected) {
+      errors.push(`unknown source id: ${source.id}`);
+    } else if (source.locale !== expected.locale ||
+        source.title !== expected.title ||
+        String(source.revision_id) !== expected.revision ||
+        source.revision_url !== expected.revision_url ||
+        source.history_url !== expected.history_url ||
+        source.license !== expected.license) {
+      errors.push(`${source.id}: source metadata differs from the accepted plan`);
+    }
+    if (!(Number.isInteger(source.page_id) && source.page_id > 0) ||
+        !(Number.isInteger(source.revision_id) && source.revision_id > 0) ||
+        !(Number.isInteger(source.parent_revision_id) &&
+          source.parent_revision_id > 0) ||
+        !/^\d{4}-\d{2}-\d{2}T/.test(source.revision_timestamp ?? '')) {
+      errors.push(`${source.id}: invalid pinned MediaWiki metadata`);
+    }
+    for (const field of ['api_url', 'license_url']) {
+      try {
+        if (new URL(source[field]).protocol !== 'https:') {
+          errors.push(`${source.id}.${field} must use HTTPS`);
+        }
+      } catch {
+        errors.push(`${source.id}.${field} must be an absolute URL`);
+      }
+    }
+    if (!(source.attribution?.length > 0)) {
+      errors.push(`${source.id}: attribution must be a non-empty string`);
+    }
+    localeCounts.set(
+      source.locale,
+      (localeCounts.get(source.locale) ?? 0) + (source.passages?.length ?? 0),
+    );
+    for (const passage of source.passages ?? []) {
+      if (passageIds.has(passage.id)) {
+        errors.push(`duplicate passage id: ${passage.id}`);
+      }
+      passageIds.add(passage.id);
+      if (!Array.isArray(passage.segments) || passage.segments.length === 0) {
+        errors.push(`${passage.id}: segments must be a non-empty array`);
+      }
+      for (const segment of passage.segments ?? []) {
+        if (!Array.isArray(segment.section_path) ||
+            segment.section_path.length === 0 ||
+            segment.section_path.some(
+              (part) => typeof part !== 'string' || part.length === 0,
+            ) ||
+            !(Number.isInteger(segment.paragraph_index) &&
+              segment.paragraph_index >= 0)) {
+          errors.push(`${passage.id}: invalid paragraph selector`);
+        }
+      }
+      if (!(Number.isInteger(passage.character_count) &&
+          passage.character_count > 0)) {
+        errors.push(`${passage.id}: character_count must be a positive integer`);
+      }
+      if (!/^[0-9a-f]{64}$/.test(passage.verbatim_sha256 ?? '') ||
+          passage.verbatim_sha256 !== passage.spoken_sha256) {
+        errors.push(`${passage.id}: invalid or divergent text digests`);
+      }
+      if (!Array.isArray(passage.phenomena) ||
+          passage.phenomena.length === 0 ||
+          new Set(passage.phenomena).size !== passage.phenomena.length) {
+        errors.push(`${passage.id}: phenomena must be a non-empty unique array`);
+      }
+      if (source.locale === 'de-DE') {
+        for (const phenomenon of passage.phenomena ?? []) {
+          coveredGermanPhenomena.add(phenomenon);
+        }
+      }
+    }
+  }
+  if (sourceIds.size !== expectedSources.size ||
+      [...expectedSources.keys()].some((id) => !sourceIds.has(id))) {
+    errors.push('selection must cover every accepted text source exactly once');
+  }
+  for (const [locale, minimum] of Object.entries(
+    plan.initial_scope.minimum_passages_per_locale,
+  )) {
+    if ((localeCounts.get(locale) ?? 0) < minimum) {
+      errors.push(`${locale}: selection does not meet the minimum passage count`);
+    }
+  }
+  for (const phenomenon of plan.initial_scope.required_text_phenomena) {
+    if (!coveredGermanPhenomena.has(phenomenon)) {
+      errors.push(`German selection does not cover required phenomenon: ${phenomenon}`);
+    }
+  }
+  return errors;
+}
+
 function validateSourceRightsReview(
   review,
   sourceCandidates,
@@ -1376,6 +1493,10 @@ const syntheticRoundtripPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/synthetic-roundtrip-plan.json',
 );
+const syntheticRoundtripSelectionPath = join(
+  repoRoot,
+  'benchmarks/fixtures/synthetic-roundtrip-selection.json',
+);
 const sourceRightsDirectory = join(repoRoot, 'benchmarks/rights');
 const audiobookPilotPath = join(
   repoRoot,
@@ -1396,6 +1517,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
+  join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-selection.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
@@ -1414,6 +1536,9 @@ const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const targetDomainPlan = await readJson(targetDomainPlanPath);
 const syntheticRoundtripPlan = await readJson(syntheticRoundtripPlanPath);
+const syntheticRoundtripSelection = await readJson(
+  syntheticRoundtripSelectionPath,
+);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -1451,6 +1576,12 @@ failures.push(
   ...validateSyntheticRoundtripPlan(syntheticRoundtripPlan).map(
     (error) => `${syntheticRoundtripPlanPath}: ${error}`,
   ),
+);
+failures.push(
+  ...validateSyntheticRoundtripSelection(
+    syntheticRoundtripSelection,
+    syntheticRoundtripPlan,
+  ).map((error) => `${syntheticRoundtripSelectionPath}: ${error}`),
 );
 const rightsReviewIds = new Set();
 const reviewedCandidateIds = new Set();
@@ -1590,6 +1721,17 @@ if (process.argv.includes('--self-test')) {
   if (validateSyntheticRoundtripPlan(invalidSyntheticRoundtripPlan).length === 0) {
     failures.push('validator self-test failed to reject synthetic model-selection evidence');
   }
+  const invalidSyntheticRoundtripSelection = structuredClone(
+    syntheticRoundtripSelection,
+  );
+  invalidSyntheticRoundtripSelection.sources[0].passages[0]
+    .verbatim_sha256 = '0'.repeat(64);
+  if (validateSyntheticRoundtripSelection(
+    invalidSyntheticRoundtripSelection,
+    syntheticRoundtripPlan,
+  ).length === 0) {
+    failures.push('validator self-test failed to reject synthetic text digest drift');
+  }
   const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
   invalidRightsReview.disposition = 'accepted';
   if (validateSourceRightsReview(
@@ -1627,6 +1769,7 @@ console.log(
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
+  `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +

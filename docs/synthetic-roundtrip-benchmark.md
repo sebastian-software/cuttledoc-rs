@@ -1,6 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** accepted diagnostic plan; no measured TTS result yet
+**Status:** diagnostic text materialized and verified; no measured TTS result
+yet
 
 ## Purpose
 
@@ -24,6 +25,17 @@ ASR model or satisfy a release-quality gate.
 
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
+
+The exact nine-passage selection is
+[`synthetic-roundtrip-selection.json`](../benchmarks/fixtures/synthetic-roundtrip-selection.json).
+On 2026-07-20, the repository materializer retrieved both pinned revisions
+and reproduced all nine expected text digests. The CC BY-SA passage text and
+attribution package remain in the caller-selected local output directory.
+
+```sh
+node scripts/materialize-synthetic-roundtrip.mjs \
+  --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip
+```
 
 ## Initial text source
 
@@ -109,6 +121,7 @@ the shared audio, or left unresolved when the evidence is ambiguous.
 
 1. Materialize and hash the German and English passages from both pinned
    Wikipedia revisions, including attribution and change metadata.
+   **Complete:** nine selectors reproduce their expected SHA-256 digests.
 2. Build the Apple system-voice Rust vertical slice and validate generated
    audio ownership plus cancellation.
 3. Pin the converted Qwen3-TTS artifact and build the `mlx-audio` reference

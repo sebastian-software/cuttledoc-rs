@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "synthetic-roundtrip-passages-1",
+  "plan_revision": "synthetic-roundtrip-pilot-1",
+  "purpose": "diagnostic-materialization",
+  "text_encoding": "utf-8",
+  "paragraph_joiner": "\n\n",
+  "spoken_transform": "none",
+  "generated_assets": "local-required",
+  "sources": [
+    {
+      "id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "locale": "de-DE",
+      "api_url": "https://de.wikipedia.org/w/api.php",
+      "page_id": 2653,
+      "title": "Künstliche Intelligenz",
+      "revision_id": 268935951,
+      "parent_revision_id": 268899942,
+      "revision_timestamp": "2026-07-19T06:42:46Z",
+      "revision_url": "https://de.wikipedia.org/w/index.php?oldid=268935951&title=K%C3%BCnstliche_Intelligenz",
+      "history_url": "https://de.wikipedia.org/w/index.php?title=K%C3%BCnstliche_Intelligenz&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Künstliche Intelligenz, revision 268935951",
+      "passages": [
+        {
+          "id": "synthetic-de-description",
+          "segments": [
+            {
+              "section_path": [
+                "Beschreibung"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1237,
+          "verbatim_sha256": "4a9c0678593fbec2c71432ebaa4b6fd4c96b606f7475ae27af3648f3121fce82",
+          "spoken_sha256": "4a9c0678593fbec2c71432ebaa4b6fd4c96b606f7475ae27af3648f3121fce82",
+          "phenomena": [
+            "German compounds",
+            "English technical terms",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-de-origin",
+          "segments": [
+            {
+              "section_path": [
+                "Geschichte",
+                "Begriffsherkunft"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 811,
+          "verbatim_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+          "spoken_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+          "phenomena": [
+            "proper names",
+            "English technical terms",
+            "numbers and dates",
+            "abbreviations"
+          ]
+        },
+        {
+          "id": "synthetic-de-precursors",
+          "segments": [
+            {
+              "section_path": [
+                "Geschichte",
+                "Vorläufer"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1207,
+          "verbatim_sha256": "4ea1c01d3c919cc8b9bcd9ecdf0d344d158074cd38d3709896ce6e591806205d",
+          "spoken_sha256": "4ea1c01d3c919cc8b9bcd9ecdf0d344d158074cd38d3709896ce6e591806205d",
+          "phenomena": [
+            "proper names",
+            "English technical terms",
+            "numbers and dates",
+            "abbreviations",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-de-turing-test",
+          "segments": [
+            {
+              "section_path": [
+                "Definitionen und Kategorien Künstlicher Intelligenz",
+                "Definitionskategorien nach Russell und Norvig",
+                "Nachbildung menschlichen Verhaltens"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 874,
+          "verbatim_sha256": "a5a0a29fff343dac343dc3a144f7394e5997c4150705185a3fca214ea7ba12cf",
+          "spoken_sha256": "a5a0a29fff343dac343dc3a144f7394e5997c4150705185a3fca214ea7ba12cf",
+          "phenomena": [
+            "proper names",
+            "parenthetical punctuation",
+            "numbers and dates",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-de-methods",
+          "segments": [
+            {
+              "section_path": [
+                "Methoden",
+                "Logisches Schließen"
+              ],
+              "paragraph_index": 0
+            },
+            {
+              "section_path": [
+                "Methoden",
+                "Approximationsmethoden"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1098,
+          "verbatim_sha256": "9dbdd82937b9432e336d0b4393219a0a0ef1beabf789e91bfabd16b4689b253b",
+          "spoken_sha256": "9dbdd82937b9432e336d0b4393219a0a0ef1beabf789e91bfabd16b4689b253b",
+          "phenomena": [
+            "German compounds",
+            "abbreviations",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-de-applications",
+          "segments": [
+            {
+              "section_path": [
+                "Anwendungen"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 937,
+          "verbatim_sha256": "42fd1588c01755206aeee81fbe5997ef05ea079ce9cb6832e1fe1ee01af54295",
+          "spoken_sha256": "42fd1588c01755206aeee81fbe5997ef05ea079ce9cb6832e1fe1ee01af54295",
+          "phenomena": [
+            "German compounds",
+            "proper names",
+            "numbers and dates",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "en-wikipedia-artificial-intelligence-1365114492",
+      "locale": "en-US",
+      "api_url": "https://en.wikipedia.org/w/api.php",
+      "page_id": 1164,
+      "title": "Artificial intelligence",
+      "revision_id": 1365114492,
+      "parent_revision_id": 1365114154,
+      "revision_timestamp": "2026-07-20T09:44:31Z",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1365114492&title=Artificial_intelligence",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Artificial_intelligence&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Artificial intelligence, revision 1365114492",
+      "passages": [
+        {
+          "id": "synthetic-en-reasoning",
+          "segments": [
+            {
+              "section_path": [
+                "Goals",
+                "Reasoning and problem-solving"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 854,
+          "verbatim_sha256": "63d587259aed7d00052bec5c96dadb63dcfc4fbcd1ff7f8fa974335c00647a80",
+          "spoken_sha256": "63d587259aed7d00052bec5c96dadb63dcfc4fbcd1ff7f8fa974335c00647a80",
+          "phenomena": [
+            "technical terms",
+            "numbers and dates",
+            "quoted phrases",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-en-nlp",
+          "segments": [
+            {
+              "section_path": [
+                "Goals",
+                "Natural language processing"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1227,
+          "verbatim_sha256": "1b362376ced7d229cef257c0d225d61085c6fdd32ffc1b754eee960bd325041f",
+          "spoken_sha256": "1b362376ced7d229cef257c0d225d61085c6fdd32ffc1b754eee960bd325041f",
+          "phenomena": [
+            "abbreviations",
+            "proper names",
+            "technical terms",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-en-gpt",
+          "segments": [
+            {
+              "section_path": [
+                "Techniques",
+                "GPT"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1185,
+          "verbatim_sha256": "6dc10f3b6a7998614231ed50f5b0d0d64eb0225e15e4111996ed9c7f14ec1c76",
+          "spoken_sha256": "6dc10f3b6a7998614231ed50f5b0d0d64eb0225e15e4111996ed9c7f14ec1c76",
+          "phenomena": [
+            "abbreviations",
+            "proper names",
+            "technical terms",
+            "numbers and dates",
+            "long sentences"
+          ]
+        }
+      ]
+    }
+  ]
+}
