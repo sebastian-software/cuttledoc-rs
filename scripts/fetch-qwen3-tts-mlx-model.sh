@@ -57,9 +57,19 @@ done < <(
 )
 
 actual_snapshot_bytes=$(
-  find "$model_dir" -type f ! -name '*.partial' -print0 |
-    xargs -0 stat -f '%z' |
-    awk '{sum += $1} END {print sum + 0}'
+  node -e '
+    const { statSync } = require("node:fs");
+    const { join } = require("node:path");
+    const manifest = require(process.argv[1]);
+    const modelDir = process.argv[2];
+    console.log(
+      manifest.artifacts.reduce(
+        (bytes, artifact) =>
+          bytes + statSync(join(modelDir, artifact.path)).size,
+        0,
+      ),
+    );
+  ' "$manifest" "$model_dir"
 )
 expected_snapshot_bytes=$(
   node -e 'console.log(require(process.argv[1]).conversion.snapshot_bytes)' \
