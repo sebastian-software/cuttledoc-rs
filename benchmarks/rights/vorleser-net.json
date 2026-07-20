@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "vorleser-net-candidate-1",
+  "source_candidate_id": "vorleser-net",
+  "source_group_id": null,
+  "scope": "candidate",
+  "evidence_date": "2026-07-20",
+  "review_authority": "repository-evidence-review",
+  "disposition": "blocked",
+  "benchmark_role": "target-domain",
+  "allowed_domains": [
+    "audiobook"
+  ],
+  "allowed_locales": [
+    "de-DE"
+  ],
+  "evidence": [
+    {
+      "kind": "official-terms",
+      "url": "https://www.vorleser.net/agb",
+      "finding": "The October 2025 terms limit downloads to private noncommercial use; prohibit AI, automated analysis, machine learning, NLP, speech-to-text, scraping, editing, shortening, and reuse of excerpts; and require prior written BUCHFUNK GmbH permission for research, development, or testing."
+    },
+    {
+      "kind": "official-catalog",
+      "url": "https://www.vorleser.net/",
+      "finding": "The catalog provides professionally presented German audiobooks with named speakers and durations; many title pages offer downloadable audio and PDF text, making the source operationally strong if explicit permission is obtained."
+    }
+  ],
+  "rights": {
+    "audio": {
+      "status": "rejected",
+      "basis": null,
+      "evidence_urls": [
+        "https://www.vorleser.net/agb"
+      ],
+      "conditions": [
+        "Prior written permission from BUCHFUNK GmbH is required."
+      ]
+    },
+    "transcript": {
+      "status": "rejected",
+      "basis": null,
+      "evidence_urls": [
+        "https://www.vorleser.net/agb"
+      ],
+      "conditions": [
+        "Speech-to-text, NLP, and automated analysis are prohibited without prior written permission."
+      ]
+    },
+    "derived_clips": {
+      "status": "rejected",
+      "basis": null,
+      "evidence_urls": [
+        "https://www.vorleser.net/agb"
+      ],
+      "conditions": [
+        "Shortening, editing, and use of excerpts are prohibited without prior written permission."
+      ]
+    },
+    "commercial_benchmark_use": {
+      "status": "rejected",
+      "basis": null,
+      "evidence_urls": [
+        "https://www.vorleser.net/agb"
+      ],
+      "conditions": [
+        "Commercial use and research, development, or testing require prior written permission."
+      ]
+    },
+    "redistribution": "denied"
+  },
+  "development_isolation": {
+    "status": "unverified",
+    "compared_source_ids": [
+      "fleurs",
+      "multilingual-librispeech",
+      "librispeech-clean"
+    ],
+    "evidence": []
+  },
+  "acquisition": {
+    "status": "blocked",
+    "method": null,
+    "source_url": null,
+    "expected_source_sha256": null,
+    "artifact_name": null
+  },
+  "blockers": [
+    "Obtain prior written BUCHFUNK GmbH permission for exact named titles and speakers.",
+    "Permission must cover local download, speech-to-text model evaluation, automated analysis, normalization, exact clip extraction, transcript correction, commercial product research, retention, and publication of aggregate metrics and short error examples.",
+    "Select at least three independent works and speakers, then prove that they do not overlap MLS/LibriSpeech development source groups."
+  ],
+  "notes": [
+    "Do not download or stream files for benchmark analysis before permission is recorded.",
+    "The terms provide info@buchfunk.de for license, AI, media, and research requests.",
+    "If permission is granted, create one accepted source-group review per complete work before local import."
+  ]
+}

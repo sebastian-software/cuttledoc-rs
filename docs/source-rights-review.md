@@ -26,6 +26,11 @@ questions remain. It can never authorize acquisition. Current reviews are:
 - [`hui-audio-corpus-german.json`](../benchmarks/rights/hui-audio-corpus-german.json):
   strong German audiobook fit, blocked because the generator license does not
   establish rights to generated LibriVox audio and per-work text; and
+- [`vorleser-net.json`](../benchmarks/rights/vorleser-net.json): strong
+  professionally presented German audiobook fit, but explicitly permission
+  only because the current terms prohibit the required STT/ML analysis,
+  research/testing, editing, and commercial use without prior written
+  permission; and
 - [`gigaspeech.json`](../benchmarks/rights/gigaspeech.json): strong English
   target-domain fit, blocked until each underlying source group is reviewed.
 

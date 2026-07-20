@@ -120,6 +120,25 @@
       "decision": "Retain as the leading independent German audiobook candidate, with multiple speakers and clean 44.1 kHz archives. Do not infer dataset or audio rights from the generator's Apache-2.0 license; admit only work and speaker groups whose audio, text, and development-set isolation are accepted."
     },
     {
+      "id": "vorleser-net",
+      "status": "selected-pending-rights-review",
+      "domains": [
+        "audiobook"
+      ],
+      "languages": [
+        "de-DE"
+      ],
+      "source_revision": null,
+      "dataset_version": "Website and terms reviewed on the evidence date; terms dated October 2025",
+      "license": "Proprietary; written permission required for AI, automated analysis, research, development, testing, editing, and commercial use",
+      "redistribution": "denied-without-explicit-written-permission",
+      "evidence_urls": [
+        "https://www.vorleser.net/",
+        "https://www.vorleser.net/agb"
+      ],
+      "decision": "Prioritize as a permission-only German audiobook candidate because it offers professionally presented recordings, named speakers, durations, and downloadable text for many works. Do not download, transcribe, normalize, crop, or analyze any file unless BUCHFUNK GmbH grants prior written permission covering the exact benchmark workflow."
+    },
+    {
       "id": "voxpopuli",
       "status": "selected-as-domain-bridge",
       "domains": [

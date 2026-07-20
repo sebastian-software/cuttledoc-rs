@@ -108,6 +108,7 @@
       "domain": "audiobook",
       "status": "acquisition-required",
       "source_candidate_ids": [
+        "vorleser-net",
         "hui-audio-corpus-german",
         "cuttledoc-professional-audiobook-gold"
       ]
