@@ -558,6 +558,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
+  join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);

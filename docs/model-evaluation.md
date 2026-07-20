@@ -38,9 +38,11 @@ timestamps, and no repository-distributed model. Phase 2 should put the Rust
 domain contract in front of the existing repository-owned Swift C ABI; product
 logic must not move into Swift.
 
-Qwen3-ASR 0.6B is the strongest new-model signal: the reference run slightly
-beats Whisper's macro WER at less than half its warm latency and model size.
-The result advances Qwen as the third candidate through an owned adapter over
+Qwen3-ASR 0.6B is the strongest new-model signal: its recorded phase-0 WER
+slightly beats Whisper at less than half Whisper's warm latency and model size.
+The boundary-preserving review view below instead favors Whisper by 3.60% to
+4.15%, exposing how sensitive this tiny set is to token normalization. The
+result still advances Qwen as the third candidate through an owned adapter over
 official MLX. It does not make the community Python port product-ready, and it
 does not displace Apple's default because it still uses about 52 times Apple's
 process RSS, has slower first output, and has no aligned timestamps.
@@ -86,6 +88,29 @@ capitalization, and spelling mistakes: it represents word substitutions,
 insertions, or omissions after normalization. Later evaluation must retain
 this content-oriented metric while separately measuring surface form and
 classifying errors by semantic severity.
+
+The deterministic
+[`phase0.multilingual-fleurs-10-1.errors.json`](../benchmarks/analysis/phase0.multilingual-fleurs-10-1.errors.json)
+trace reproduces the recorded WER and adds a boundary-preserving review
+alignment grouped by candidate and language. The second view no longer counts
+`T-Rex` as `trex` or `25-30` as `2530`; it does not silently equate semantically
+different numbers. Its risk hints are mechanical, and semantic severity remains
+deliberately unreviewed until a human classifies the changed content.
+
+The review view changes the aggregate and language numbers as follows:
+
+| Candidate | Aggregate | English | German | Spanish | French | Portuguese |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Apple SpeechTranscriber | 6.62% | 7.39% | 2.78% | 6.15% | 1.72% | 15.04% |
+| Qwen3-ASR 0.6B MLX reference | 4.15% | 7.39% | 0.00% | 7.61% | 0.00% | 5.74% |
+| Whisper large-v3-turbo | 3.60% | 10.03% | 0.00% | 2.70% | 1.72% | 3.56% |
+| Parakeet TDT 0.6B v3 | 9.31% | 23.18% | 8.33% | 2.70% | 5.22% | 7.13% |
+| Whisper Tiny on MLX | 25.41% | 12.16% | 36.51% | 19.41% | 25.18% | 33.82% |
+
+This still is not semantic WER. For example, `3` versus `III` remains a
+reviewable numeric representation difference, while `3` versus `XI` is a
+critical content error. The report flags both rather than silently deciding
+that they are equivalent.
 
 ## Artifact and license pins
 

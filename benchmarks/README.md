@@ -135,6 +135,25 @@ WER and CER are lowercase, punctuation-insensitive Levenshtein distance divided
 by reference word or character count. CER removes whitespace after the common
 word normalization. Values in JSON are fractions, so `0.2105` is 21.05%.
 
+Generate deterministic word-level edit alignments for every checked-in
+multilingual aggregate:
+
+```sh
+node scripts/analyze-asr-errors.mjs \
+  --output benchmarks/analysis/phase0.multilingual-fleurs-10-1.errors.json
+
+node scripts/analyze-asr-errors.mjs \
+  --check benchmarks/analysis/phase0.multilingual-fleurs-10-1.errors.json
+```
+
+The report reproduces the immutable phase-0 WER and also provides a review
+view that preserves boundaries around hyphens, dashes, and slashes. This avoids
+reviewing `T-Rex` as `trex` or `25-30` as `2530`. It separates substitutions,
+omissions, and insertions by candidate, language, and fixture. Numeric and
+negation changes receive mechanical risk hints. Semantic severity remains an
+explicit review field; the script never pretends it can infer whether a lexical
+difference is harmless.
+
 ## Timing and resource procedure
 
 1. Record chip, RAM, OS build, power state, source revision, runtime/model

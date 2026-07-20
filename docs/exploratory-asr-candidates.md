@@ -64,6 +64,12 @@ The exact aggregate is
 [`result.json`](../benchmarks/raw/phase0.qwen3-asr-0.6b-mlx-reference.multilingual-fleurs-10-1/result.json).
 It preserves two measured repetitions per fixture and every token emission.
 
+The recorded 5.10% WER uses the immutable phase-0 punctuation-deletion
+normalization. The later boundary-preserving error review reports 4.15% for
+Qwen and 3.60% for Whisper because it no longer collapses `T-Rex` or `25-30`
+into one token. This reinforces the need for more independent fixtures and
+semantic review; it does not reverse the Qwen/MLX adapter decision.
+
 This is strong model and platform evidence, not dependency acceptance. The
 Python adapter and community conversion are an oracle for fixtures, shape
 mapping, and expected text only. The product experiment must load converted
