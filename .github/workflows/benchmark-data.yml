@@ -12,6 +12,8 @@ on:
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
+      - "scripts/run-qwen3-tts-voicedesign-calibration.sh"
+      - "scripts/run-tts-calibration-asr.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
@@ -30,6 +32,8 @@ on:
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
+      - "scripts/run-qwen3-tts-voicedesign-calibration.sh"
+      - "scripts/run-tts-calibration-asr.mjs"
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
@@ -49,6 +53,11 @@ jobs:
         run: node scripts/validate-benchmark-data.mjs --self-test
       - name: Validate pinned TTS calibration models
         run: node scripts/validate-tts-calibration-manifests.mjs --self-test
+      - name: Check TTS calibration runners
+        run: |
+          node --check scripts/run-tts-calibration-asr.mjs
+          python -m py_compile spikes/tts-calibration/run_qwen_voicedesign.py
+          bash -n scripts/run-qwen3-tts-voicedesign-calibration.sh
       - name: Validate committed Opus fixture and codec control
         run: node scripts/validate-opus-codec-control.mjs --self-test
       - name: Verify rights-gated local source import

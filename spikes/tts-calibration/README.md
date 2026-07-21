@@ -40,6 +40,21 @@ The runner verifies every model file by byte count and SHA-256 before loading
 it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the four fixed Qwen profiles;
 the default is `qwen-de-clear-documentary`.
 
+Cross one completed local TTS result through the five required ASR backends:
+
+```sh
+node scripts/run-tts-calibration-asr.mjs \
+  --result /absolute/path/to/result.json \
+  --audio /absolute/path/to/audio.f32le \
+  --reference /absolute/path/to/synthetic-de-origin.txt \
+  --output /absolute/path/to/result-with-asr.json
+```
+
+The local default paths reproduce the reviewed host setup. Every backend path
+has an explicit CLI override for another machine. Normalization starts at the
+f32 synthesis master rather than the convenience PCM16 WAV, avoiding an
+unnecessary quantization before the five receivers see the shared 16 kHz PCM.
+
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
 cell.
