@@ -50,6 +50,7 @@
             "enum": [
               "active-diagnostic",
               "active-development-pilot",
+              "active-target-domain-source",
               "selected-for-acquisition",
               "selected-pending-rights-review",
               "selected-as-domain-bridge",

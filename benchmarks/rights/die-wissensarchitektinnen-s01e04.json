@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "die-wissensarchitektinnen-s01e04-rights-1",
+  "source_candidate_id": "die-wissensarchitektinnen",
+  "source_group_id": "die-wissensarchitektinnen-s01e04",
+  "scope": "source-group",
+  "evidence_date": "2026-07-21",
+  "review_authority": "repository-evidence-review",
+  "disposition": "accepted",
+  "benchmark_role": "target-domain",
+  "allowed_domains": [
+    "podcast"
+  ],
+  "allowed_locales": [
+    "de-DE"
+  ],
+  "evidence": [
+    {
+      "kind": "official-podcast-feed",
+      "url": "https://podcasts.homes/@Die_Wissensarchitekt_innen/feed.xml",
+      "finding": "The publisher identifies Ulrike Wuttke as owner, licenses the podcast episodes under CC BY 4.0, links the transcript location, and pins season 1 episode 4 to the admitted audio URL, publication date, duration, and named guest."
+    },
+    {
+      "kind": "official-episode-page",
+      "url": "https://podcasts.homes/@Die_Wissensarchitekt_innen/episodes/von-stop-tracking-science-zu-open-research-europe-wie-kann-die-wende-des-wissenschaftlichen-publikationssystems-gelingen",
+      "finding": "The episode page identifies the 88 minute professionally produced interview with host Ulrike Wuttke and guest Bjoern Brembs and displays CC BY 4.0."
+    },
+    {
+      "kind": "license-deed",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "finding": "CC BY 4.0 permits sharing and adaptation, including commercial use, subject to attribution, license notice, and change indication."
+    }
+  ],
+  "rights": {
+    "audio": {
+      "status": "accepted",
+      "basis": "permissive-license",
+      "evidence_urls": [
+        "https://podcasts.homes/@Die_Wissensarchitekt_innen/feed.xml",
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "conditions": [
+        "Attribute Ulrike Wuttke and Bjoern Brembs, link CC BY 4.0, and identify normalization or excerpting."
+      ]
+    },
+    "transcript": {
+      "status": "accepted",
+      "basis": "permissive-license",
+      "evidence_urls": [
+        "https://podcasts.homes/@Die_Wissensarchitekt_innen/feed.xml",
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "conditions": [
+        "Treat the publisher transcript as draft material; the admitted gold transcript must be a separately digest-pinned derivative verified against the exact audio."
+      ]
+    },
+    "derived_clips": {
+      "status": "accepted",
+      "basis": "permissive-license",
+      "evidence_urls": [
+        "https://podcasts.homes/@Die_Wissensarchitekt_innen/feed.xml",
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "conditions": [
+        "Preserve attribution and identify each time-range extraction and normalization as a change."
+      ]
+    },
+    "commercial_benchmark_use": {
+      "status": "accepted",
+      "basis": "permissive-license",
+      "evidence_urls": [
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "conditions": [
+        "Comply with the CC BY 4.0 attribution and change-notice requirements."
+      ]
+    },
+    "redistribution": "allowed"
+  },
+  "development_isolation": {
+    "status": "accepted",
+    "compared_source_ids": [
+      "fleurs",
+      "multilingual-librispeech",
+      "librispeech-clean"
+    ],
+    "evidence": [
+      "This independently published May 2026 podcast episode is neither FLEURS read speech nor a LibriVox audiobook source used by MLS or LibriSpeech.",
+      "The source-group key contains the complete show, season, and episode identity; no derivative from this episode exists in the checked-in development manifests."
+    ]
+  },
+  "acquisition": {
+    "status": "allowed",
+    "method": "manual-local-file",
+    "source_url": "https://podcasts.homes/audio/@Die_Wissensarchitekt_innen/von-stop-tracking-science-zu-open-research-europe-wie-kann-die-wende-des-wissenschaftlichen-publikationssystems-gelingen.mp3",
+    "expected_source_sha256": "b5dfcf937f7fdfdd8e7df70cd1bb1b66c32ff44f2491094bc48c5879ae7239e5",
+    "artifact_name": "die-wissensarchitektinnen-s01e04.mp3"
+  },
+  "blockers": [],
+  "notes": [
+    "The original contains 5302.897551 seconds of audio and 77212716 bytes.",
+    "Gold review is a separate gate and is not implied by this rights disposition."
+  ]
+}

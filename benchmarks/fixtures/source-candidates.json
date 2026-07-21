@@ -101,6 +101,26 @@
       "decision": "Retain as the strongest identified German podcast candidate because it supplies episode metadata and aligned text for professionally produced weekly podcasts. Do not run its downloader or admit any audio until the exact source item, transcript, and derived-clip rights are accepted."
     },
     {
+      "id": "die-wissensarchitektinnen",
+      "status": "active-target-domain-source",
+      "domains": [
+        "podcast"
+      ],
+      "languages": [
+        "de-DE"
+      ],
+      "source_revision": "RSS retrieved 2026-07-21T05:12:31Z; immutable original audio is digest-pinned per episode",
+      "dataset_version": "Season 1, episodes 1, 2, and 4",
+      "license": "CC-BY-4.0",
+      "redistribution": "allowed-with-attribution",
+      "evidence_urls": [
+        "https://podcasts.homes/@Die_Wissensarchitekt_innen/feed.xml",
+        "https://podcasts.homes/@Die_Wissensarchitekt_innen/episodes",
+        "https://ulrikewuttke.wordpress.com/die-wissensarchitektinnen/"
+      ],
+      "decision": "Admit episodes 1, 2, and 4 as the first German held-out podcast source groups. The official feed licenses podcast episodes under CC BY 4.0, the selected originals are digest-pinned, and the published lightly smoothed transcripts remain draft material until an independent reviewer verifies repository-owned exact-audio gold transcripts."
+    },
+    {
       "id": "hui-audio-corpus-german",
       "status": "selected-pending-rights-review",
       "domains": [

@@ -152,6 +152,7 @@ function validateSourceCandidates(registry) {
   const statuses = new Set([
     'active-diagnostic',
     'active-development-pilot',
+    'active-target-domain-source',
     'selected-for-acquisition',
     'selected-pending-rights-review',
     'selected-as-domain-bridge',
@@ -4438,7 +4439,10 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject divergent Voxtral level control',
     );
   }
-  const invalidRightsReview = structuredClone(sourceRightsReviews[0]);
+  const candidateRightsReview = sourceRightsReviews.find(
+    (review) => review.scope === 'candidate',
+  );
+  const invalidRightsReview = structuredClone(candidateRightsReview);
   invalidRightsReview.disposition = 'accepted';
   if (validateSourceRightsReview(
     invalidRightsReview,

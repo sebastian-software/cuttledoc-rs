@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "revision": "target-domain-held-out-1",
-  "evidence_date": "2026-07-20",
+  "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/18",
   "purpose": "held-out",
   "priority_order": [
@@ -95,8 +95,9 @@
       "priority": 1,
       "locale": "de-DE",
       "domain": "podcast",
-      "status": "acquisition-required",
+      "status": "gold-review",
       "source_candidate_ids": [
+        "die-wissensarchitektinnen",
         "merkel-podcast-corpus",
         "cuttledoc-professional-podcast-gold"
       ]
