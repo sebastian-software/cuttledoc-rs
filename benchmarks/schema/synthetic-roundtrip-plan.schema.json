@@ -14,6 +14,7 @@
     "text_sources",
     "tts_candidates",
     "external_evidence",
+    "candidate_review",
     "asr_backends",
     "execution_policy",
     "metrics",
@@ -260,6 +261,9 @@
           "locales": {
             "$ref": "#/$defs/nonEmptyUniqueStrings"
           },
+          "supported_languages": {
+            "$ref": "#/$defs/nonEmptyUniqueStrings"
+          },
           "decision_after_pilot": {
             "$ref": "#/$defs/nonEmptyString"
           }
@@ -319,9 +323,58 @@
         "additionalProperties": false
       }
     },
+    "candidate_review": {
+      "type": "object",
+      "required": [
+        "revision",
+        "review_date",
+        "required_tts_candidate_ids",
+        "challenger_tts_candidate_ids",
+        "historical_preflight_tts_candidate_ids",
+        "deferred_tts_candidate_ids",
+        "required_asr_backend_ids",
+        "qualification_asr_backend_ids",
+        "calibration_passage_ids",
+        "promotion_rule"
+      ],
+      "properties": {
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "review_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "required_tts_candidate_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "challenger_tts_candidate_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "historical_preflight_tts_candidate_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "deferred_tts_candidate_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "required_asr_backend_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "qualification_asr_backend_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "calibration_passage_ids": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "promotion_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
     "asr_backends": {
       "type": "array",
-      "minItems": 4,
+      "minItems": 5,
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/nonEmptyString"

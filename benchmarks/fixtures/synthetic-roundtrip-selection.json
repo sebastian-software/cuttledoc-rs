@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "revision": "synthetic-roundtrip-passages-1",
-  "plan_revision": "synthetic-roundtrip-pilot-2",
+  "plan_revision": "synthetic-roundtrip-pilot-3",
   "purpose": "diagnostic-materialization",
   "text_encoding": "utf-8",
   "paragraph_joiner": "\n\n",

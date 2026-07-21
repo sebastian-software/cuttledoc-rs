@@ -83,6 +83,7 @@ This slice must load a model, transcribe a real fixture, release resources, and 
 - [Delivery plan](PLAN.md)
 - [Target architecture](docs/architecture.md)
 - [Audio use cases and preprocessing scope](docs/audio-use-cases.md)
+- [July 2026 speech-engine shortlist](docs/speech-engine-shortlist-2026-07.md)
 - [Proposed public APIs](docs/public-api.md)
 - [Migration inventory](docs/migration-inventory.md)
 - [Compatibility matrix and quality gates](docs/compatibility-matrix.md)

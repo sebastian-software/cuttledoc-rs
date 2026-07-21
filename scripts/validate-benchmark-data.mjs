@@ -208,7 +208,7 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
       decisionScope?.backend_selection_blocking !== false ||
       decisionScope?.current_required_cell !== 'de-DE/podcast' ||
       decisionScope?.primary_comparison_plan_revision !==
-        'synthetic-roundtrip-pilot-2' ||
+        'synthetic-roundtrip-pilot-3' ||
       decisionScope?.numeric_quality_claims_require_human_gold !== true ||
       !(decisionScope?.reason?.length > 0)) {
     errors.push('decision_scope must keep the corpus an optional German podcast control');
@@ -570,11 +570,15 @@ function validateSyntheticRoundtripPlan(plan) {
     'whisper-large-v3-turbo-coreml-whispercpp',
     'qwen3-asr-0.6b-mlx-direct',
     'parakeet-tdt-0.6b-v3-coreml',
+    'voxtral-realtime-4b-mlx-direct-2400ms',
   ];
   const requiredCandidateIds = [
     'apple-avspeechsynthesizer',
     'qwen3-tts-0.6b-customvoice-mlx-audio',
+    'qwen3-tts-1.7b-voicedesign-mlx-audio',
     'voxtral-tts-4b-mlx-audio',
+    'voxtral-tts-4b-bf16-mlx-audio',
+    'kugelaudio-0-open-mlx-audio',
     'chatterbox-multilingual-mlx-audio',
     'qwen-audio-3.0-tts-plus-api',
   ];
@@ -715,21 +719,72 @@ function validateSyntheticRoundtripPlan(plan) {
       errors.push(`${candidate.id}: locales must be a non-empty unique string array`);
     }
   }
-  const mlxCandidates = candidates.filter(
-    (candidate) => candidate.runtime?.startsWith('Blaizzy/mlx-audio'),
+  const measuredMlxCandidateIds = new Set([
+    'qwen3-tts-0.6b-customvoice-mlx-audio',
+    'voxtral-tts-4b-mlx-audio',
+  ]);
+  const measuredMlxCandidates = candidates.filter(
+    (candidate) => measuredMlxCandidateIds.has(candidate.id),
   );
-  if (mlxCandidates.length !== 3 ||
-      mlxCandidates.some(
+  if (measuredMlxCandidates.length !== 2 ||
+      measuredMlxCandidates.some(
         (candidate) => candidate.source_revision !==
           '64e8416c303fb3b3463dab8eb4ebd78c55a87c1a',
       )) {
-    errors.push('local MLX candidates must pin the reviewed mlx-audio revision');
+    errors.push('measured MLX TTS preflights must preserve the reviewed runtime revision');
   }
   const remoteCandidate = candidates.find(
     (candidate) => candidate.id === 'qwen-audio-3.0-tts-plus-api',
   );
   if (!arrayEquals(remoteCandidate?.locales ?? [], ['en-US'])) {
     errors.push('Qwen-Audio-3.0-TTS-Plus must remain an English-only quality control');
+  }
+
+  const review = plan.candidate_review;
+  const expectedReview = {
+    required_tts_candidate_ids: [
+      'apple-avspeechsynthesizer',
+      'qwen3-tts-1.7b-voicedesign-mlx-audio',
+      'voxtral-tts-4b-bf16-mlx-audio',
+    ],
+    challenger_tts_candidate_ids: ['kugelaudio-0-open-mlx-audio'],
+    historical_preflight_tts_candidate_ids: [
+      'qwen3-tts-0.6b-customvoice-mlx-audio',
+      'voxtral-tts-4b-mlx-audio',
+    ],
+    deferred_tts_candidate_ids: [
+      'chatterbox-multilingual-mlx-audio',
+      'qwen-audio-3.0-tts-plus-api',
+    ],
+    required_asr_backend_ids: requiredBackends,
+    qualification_asr_backend_ids: [
+      'qwen3-asr-1.7b-mlx-reference',
+      'nemotron-3.5-asr-streaming-0.6b-mlx-reference',
+    ],
+    calibration_passage_ids: [
+      'synthetic-de-origin',
+      'synthetic-en-reasoning',
+    ],
+  };
+  if (review?.revision !== 'speech-engine-shortlist-2026-07-21' ||
+      review?.review_date !== '2026-07-21' ||
+      !(review?.promotion_rule?.length > 0)) {
+    errors.push('candidate_review identity, date, and promotion rule must remain pinned');
+  }
+  for (const [field, expected] of Object.entries(expectedReview)) {
+    if (!arrayEquals(review?.[field] ?? [], expected)) {
+      errors.push(`candidate_review.${field} differs from the accepted shortlist`);
+    }
+  }
+  for (const candidateId of [
+    ...(review?.required_tts_candidate_ids ?? []),
+    ...(review?.challenger_tts_candidate_ids ?? []),
+    ...(review?.historical_preflight_tts_candidate_ids ?? []),
+    ...(review?.deferred_tts_candidate_ids ?? []),
+  ]) {
+    if (!candidateIdSet.has(candidateId)) {
+      errors.push(`candidate_review names unknown TTS candidate ${candidateId}`);
+    }
   }
 
   const evidence = plan.external_evidence ?? [];
@@ -761,7 +816,7 @@ function validateSyntheticRoundtripPlan(plan) {
   }
 
   if (!arrayEquals(plan.asr_backends ?? [], requiredBackends)) {
-    errors.push('asr_backends must contain the four frozen candidates in execution order');
+    errors.push('asr_backends must contain the five frozen candidates in execution order');
   }
   const execution = plan.execution_policy;
   for (const field of [
@@ -781,7 +836,7 @@ function validateSyntheticRoundtripPlan(plan) {
   if (!(execution?.matrix?.length > 0) ||
       !(execution?.voice_selection?.length > 0) ||
       execution?.minimum_distinct_voices_per_locale < 3 ||
-      execution?.minimum_tts_engines_per_locale < 2 ||
+      execution?.minimum_tts_engines_per_locale < 3 ||
       execution?.minimum_repetitions < 2) {
     errors.push('execution policy requires multi-voice, multi-engine coverage and at least two repetitions');
   }
@@ -4467,6 +4522,13 @@ if (process.argv.includes('--self-test')) {
     .minimum_distinct_voices_per_locale = 1;
   if (validateSyntheticRoundtripPlan(invalidSyntheticVoiceCoverage).length === 0) {
     failures.push('validator self-test failed to reject single-voice synthetic evidence');
+  }
+  const invalidSyntheticCandidateReview = structuredClone(
+    syntheticRoundtripPlan,
+  );
+  invalidSyntheticCandidateReview.candidate_review.required_asr_backend_ids.pop();
+  if (validateSyntheticRoundtripPlan(invalidSyntheticCandidateReview).length === 0) {
+    failures.push('validator self-test failed to reject a divergent engine shortlist');
   }
   const invalidSyntheticRoundtripSelection = structuredClone(
     syntheticRoundtripSelection,

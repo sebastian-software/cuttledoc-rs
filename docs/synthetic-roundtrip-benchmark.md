@@ -25,9 +25,9 @@ release-quality real-world WER. The professional German podcast corpus remains
 a separate long-form control, and users can select any supported ASR engine.
 
 Single-voice diagnostics already checked in do not satisfy the revised matrix.
-Each measured locale must cover at least three pinned voices across at least
-two TTS engines. Results remain split by locale, TTS engine, and voice so a
-strong or weak voice cannot disappear inside one aggregate.
+Each measured locale must cover at least three pinned voices across all three
+required TTS engines. Results remain split by locale, TTS engine, and voice so
+a strong or weak voice cannot disappear inside one aggregate.
 
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
@@ -65,21 +65,25 @@ redistribution package has been reviewed. This isolation also prevents
 CC BY-SA benchmark assets from being mistaken for code covered by the
 repository license.
 
-## First candidate set
+## Calibration shortlist
 
-| Candidate | Initial role | First boundary | Why it is included |
+| Candidate | Disposition | First boundary | Why it is included |
 | --- | --- | --- | --- |
-| Apple `AVSpeechSynthesizer` | system baseline | narrow Swift-to-C ABI called from Rust | fastest path to validate the synthesis lifecycle and capture an installed German voice |
-| Qwen3-TTS 0.6B CustomVoice | primary open MLX candidate | pinned `mlx-audio` Python reference runner | German-capable, comparatively bounded model and a practical Apple Silicon implementation |
-| Voxtral 4B TTS 2603 | native European-language quality candidate | pinned 4-bit `mlx-audio` reference runner | native German/French/Spanish/Italian/Portuguese/Dutch voices and strong publisher-reported European-language results |
-| Chatterbox multilingual | expressive open MLX comparator | pinned `mlx-audio` Python reference runner | German support and a different quality/prosody trade-off |
-| Qwen-Audio-3.0-TTS-Plus | remote English quality ceiling | Alibaba Cloud API reference runner | current provider-voice leader; prevents the local comparison from defining quality only relative to weak baselines |
+| Apple `AVSpeechSynthesizer` | required system baseline | narrow Swift-to-C ABI called from Rust | two installed voices per locale exercise the platform path without a bundled model |
+| Qwen3-TTS 1.7B VoiceDesign | required open multilingual generator | current `mlx-audio` reference, pinned before execution | description-pinned voices avoid third-party prompt audio and give German and English distinct controlled presentations |
+| Voxtral 4B TTS 2603 BF16 | required European-language hypothesis; reference-only | current `mlx-audio` reference, pinned before execution | native German and other European-language presets plus BF16 isolate model behavior from the first 4-bit diagnostic |
+| KugelAudio-0-Open | bounded German challenger | current `mlx-audio` reference, pinned before execution | German/European focus and three built-in voices justify one short calibration despite the roughly 9B-parameter footprint |
+| Chatterbox Multilingual V3 | deferred | upstream reference; current MLX conversion still to verify | multi-voice comparison requires reference audio whose rights, digests, and provenance must be accepted first |
+| Qwen-Audio-3.0-TTS-Plus | optional remote English ceiling | Alibaba Cloud API reference runner | provider evidence remains useful for English listening, but does not block the local or German matrix |
 
 `mlx-audio` is a serious candidate, not a rejected integration shortcut. The
-initial reference runner pins commit
+historical reference runner pins commit
 `64e8416c303fb3b3463dab8eb4ebd78c55a87c1a`. It gives the spike a working
-Apple Silicon implementation for Qwen3-TTS and Chatterbox quickly enough to
-measure model behavior. The measurements then decide between:
+Apple Silicon implementation for Qwen3-TTS 0.6B and Voxtral 4-bit quickly
+enough to measure model behavior. Those diagnostic pins remain immutable.
+The current Qwen VoiceDesign, Voxtral BF16, and KugelAudio model conversions
+and runtime revision must receive new manifests before calibration. The
+measurements then decide between:
 
 1. retaining the broader `mlx-audio` dependency;
 2. owning a narrow adapter for the selected model directly over official MLX,
@@ -90,6 +94,10 @@ measure model behavior. The measurements then decide between:
 The reference path must not silently define the future Rust API. It exists to
 produce evidence for the repository-owned synthesis contract required by
 ADR-0009.
+
+The dated rationale, rejected alternatives, ASR receivers, and staged
+execution gate are recorded in
+[`speech-engine-shortlist-2026-07.md`](speech-engine-shortlist-2026-07.md).
 
 Voxtral is evaluated separately for synthesis and recognition. For TTS, the
 official model provides 20 presets across nine languages, including native
@@ -114,8 +122,9 @@ has the same quality.
 Each voice has a stable provider/model voice ID and fixed generation
 parameters. The same passages are used across voices. Every artifact's
 digest-checked normalized PCM is passed unchanged to Apple Speech, Whisper,
-direct Qwen3-ASR over MLX, and Parakeet. Raw generated audio and raw ASR text
-are retained locally.
+direct Qwen3-ASR over MLX, Parakeet, and direct Voxtral Realtime over MLX at
+the 2,400 ms quality configuration. Raw generated audio and raw ASR text are
+retained locally.
 
 The report keeps two text views:
 
@@ -228,24 +237,26 @@ artifact also remains reference-only under CC BY-NC 4.0.
    audio ownership plus cancellation.
    **Complete:** real PCM, timing, busy, cancellation, and execution-context
    behavior are recorded.
-3. Pin the converted Qwen3-TTS artifact and build the `mlx-audio` reference
+3. Pin the historical Qwen3-TTS 0.6B artifact and build the `mlx-audio` reference
    runner at the selected commit.
    **Artifact complete:** revision `6415d95f88be018ff9e46813119dc3bc12261328`,
    its 2.49 GB snapshot, every file digest, the runtime revision, and the
    cross-lingual German generation contract are frozen in
    [`model-manifest.json`](../spikes/qwen3-tts-mlx-reference/model-manifest.json).
    **Reference run complete:** real PCM, timing, resource use, termination, and
-   all four ASR content checks are recorded. Listening is still open.
-4. Run the local/system candidates through all four ASR backends, add the
-   remote Qwen English ceiling when credentials are available, and produce the
-   first language-aware roundtrip report.
-   **Local matrix in progress:** Qwen3-TTS and Voxtral are complete on the
-   German origin passage; Apple and the English/provider cells remain.
-5. Run Voxtral TTS with its native German preset, then add Chatterbox only
-   after the runner and report contract are stable.
-   **First diagnostic complete:** the model/runtime artifact, real PCM,
-   timing, resources, four raw-level ASR checks, and a +12 dB level control are
-   recorded. Listening, generation-variance, and BF16/provider controls remain.
+   all four historical ASR content checks are recorded. Listening is still
+   open.
+4. Re-evaluate current TTS and ASR engines before multiplying the matrix.
+   **Complete:** the July 2026 shortlist selects Apple, Qwen VoiceDesign, and
+   Voxtral BF16 as required generators, KugelAudio as a bounded German
+   challenger, and five required ASR receivers including direct Voxtral
+   Realtime.
+5. Pin the new model/runtime artifacts and run one German and one English
+   calibration passage before the full matrix. Generate two voices each for
+   Apple, Qwen, and Voxtral, plus one German KugelAudio voice; run the five
+   required ASR receivers and the two bounded ASR qualifiers. Freeze only the
+   candidates that pass fidelity, stability, listening, and operational-cost
+   gates.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

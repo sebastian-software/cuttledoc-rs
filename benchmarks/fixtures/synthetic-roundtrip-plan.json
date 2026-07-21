@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-pilot-2",
+  "revision": "synthetic-roundtrip-pilot-3",
   "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
   "purpose": "decision-support",
@@ -121,6 +121,22 @@
       "decision_after_pilot": "Compare accepting mlx-audio with owning only the required Qwen3-TTS path directly over official MLX."
     },
     {
+      "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+      "role": "required-multilingual-voice-design-calibration",
+      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
+      "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16; immutable execution revision pending",
+      "integration": "pinned Python reference runner first; direct repository-owned MLX boundary only after calibration",
+      "source_url": "https://github.com/QwenLM/Qwen3-TTS",
+      "source_revision": "upstream-and-mlx-conversion-pin-required",
+      "license": "Apache-2.0 upstream model and MIT reference runtime; exact revisions and converted artifact license must be verified",
+      "status": "selected-for-calibration-pending-model-and-runtime-pin",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Advance two description-pinned voices per locale only if German and English content fidelity and operational cost justify the 1.7B variant."
+    },
+    {
       "id": "voxtral-tts-4b-mlx-audio",
       "role": "native-european-language-quality-candidate",
       "runtime": "Blaizzy/mlx-audio over official Apple MLX",
@@ -148,15 +164,47 @@
       "decision_after_pilot": "If native German and other European-language quality materially lead, evaluate the hosted Mistral API or a commercial weight license; do not ship the CC-BY-NC artifact."
     },
     {
+      "id": "voxtral-tts-4b-bf16-mlx-audio",
+      "role": "required-native-european-bf16-calibration",
+      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
+      "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16; immutable execution revision pending",
+      "integration": "pinned Python reference runner with two native voices per locale; reference-only under current model license",
+      "source_url": "https://huggingface.co/mistralai/Voxtral-4B-TTS-2603",
+      "source_revision": "upstream-and-mlx-conversion-pin-required",
+      "license": "CC-BY-NC-4.0 model and supplied voice references; MIT reference runtime; local evaluation only",
+      "status": "selected-for-calibration-pending-model-and-runtime-pin",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Use BF16 to separate quantization effects from model-family quality; production still requires hosted use or another commercial license."
+    },
+    {
+      "id": "kugelaudio-0-open-mlx-audio",
+      "role": "German-European-open-challenger",
+      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
+      "model": "kugelaudio/kugelaudio-0-open; immutable execution revision pending",
+      "integration": "one-passage German calibration before any full-matrix promotion",
+      "source_url": "https://huggingface.co/kugelaudio/kugelaudio-0-open",
+      "source_revision": "upstream-and-mlx-runtime-pin-required",
+      "license": "MIT model; exact runtime, voice artifacts, AudioSeal dependency, and model tree must be pinned",
+      "status": "selected-for-German-calibration-only",
+      "locales": [
+        "de-DE",
+        "en-US"
+      ],
+      "decision_after_pilot": "Advance only if the German-focused quality materially adds value despite the roughly 9B-parameter and 19 GB inference footprint."
+    },
+    {
       "id": "chatterbox-multilingual-mlx-audio",
-      "role": "expressive-open-mlx-comparator",
-      "runtime": "Blaizzy/mlx-audio over official Apple MLX",
-      "model": "mlx-community/chatterbox-fp16",
-      "integration": "pinned Python reference runner; direct repository-owned MLX boundary considered only if the model materially outperforms the primary candidate",
-      "source_url": "https://github.com/Blaizzy/mlx-audio",
-      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
-      "license": "MIT runtime and upstream model family; converted artifact license and revision must be verified before execution",
-      "status": "selected-for-second-pass-pending-model-artifact-pin",
+      "role": "deferred-reference-audio-voice-cloning-comparator",
+      "runtime": "Resemble upstream PyTorch/MPS reference; current MLX conversion requires separate verification",
+      "model": "Chatterbox Multilingual V3 500M",
+      "integration": "deferred until voice-prompt rights, digests, and current Apple-Silicon runtime are accepted",
+      "source_url": "https://github.com/resemble-ai/chatterbox",
+      "source_revision": "upstream-v3-pin-required-before-execution",
+      "license": "MIT code/model family; every reference voice and converted artifact requires separate rights and provenance review",
+      "status": "deferred-reference-voice-rights-and-runtime",
       "locales": [
         "de-DE",
         "en-US"
@@ -192,19 +240,56 @@
       "scope": "Provider-selected voices in the provider-voice arena; this is not German-language or local-runtime evidence."
     }
   ],
+  "candidate_review": {
+    "revision": "speech-engine-shortlist-2026-07-21",
+    "review_date": "2026-07-21",
+    "required_tts_candidate_ids": [
+      "apple-avspeechsynthesizer",
+      "qwen3-tts-1.7b-voicedesign-mlx-audio",
+      "voxtral-tts-4b-bf16-mlx-audio"
+    ],
+    "challenger_tts_candidate_ids": [
+      "kugelaudio-0-open-mlx-audio"
+    ],
+    "historical_preflight_tts_candidate_ids": [
+      "qwen3-tts-0.6b-customvoice-mlx-audio",
+      "voxtral-tts-4b-mlx-audio"
+    ],
+    "deferred_tts_candidate_ids": [
+      "chatterbox-multilingual-mlx-audio",
+      "qwen-audio-3.0-tts-plus-api"
+    ],
+    "required_asr_backend_ids": [
+      "apple-speechtranscriber",
+      "whisper-large-v3-turbo-coreml-whispercpp",
+      "qwen3-asr-0.6b-mlx-direct",
+      "parakeet-tdt-0.6b-v3-coreml",
+      "voxtral-realtime-4b-mlx-direct-2400ms"
+    ],
+    "qualification_asr_backend_ids": [
+      "qwen3-asr-1.7b-mlx-reference",
+      "nemotron-3.5-asr-streaming-0.6b-mlx-reference"
+    ],
+    "calibration_passage_ids": [
+      "synthetic-de-origin",
+      "synthetic-en-reasoning"
+    ],
+    "promotion_rule": "Pin every artifact first, run the bounded German/English calibration, reject unstable or unjustifiably expensive candidates, then freeze the surviving full matrix before materializing all passages."
+  },
   "asr_backends": [
     "apple-speechtranscriber",
     "whisper-large-v3-turbo-coreml-whispercpp",
     "qwen3-asr-0.6b-mlx-direct",
-    "parakeet-tdt-0.6b-v3-coreml"
+    "parakeet-tdt-0.6b-v3-coreml",
+    "voxtral-realtime-4b-mlx-direct-2400ms"
   ],
   "execution_policy": {
-    "matrix": "Each locale covers at least three pinned voices across at least two TTS engines. Every generated artifact is transcribed by every ASR backend using identical digest-checked normalized PCM.",
+    "matrix": "Calibrate one passage per locale before the full run. The surviving matrix targets two voices each from Apple, Qwen3 VoiceDesign, and Voxtral BF16; every generated artifact is transcribed by the five required ASR backends using identical digest-checked normalized PCM.",
     "retain_raw_tts_audio": true,
     "retain_raw_asr_output": true,
     "pin_every_voice_configuration": true,
     "minimum_distinct_voices_per_locale": 3,
-    "minimum_tts_engines_per_locale": 2,
+    "minimum_tts_engines_per_locale": 3,
     "same_passages_across_voices": true,
     "report_per_voice": true,
     "voice_selection": "Prefer distinct native-locale voices and different presentation profiles when metadata permits; record stable provider or model voice IDs and do not infer demographic traits from voice names.",
@@ -243,8 +328,9 @@
     "All source text and model artifacts are revision- and digest-pinned before measured execution.",
     "The Apple system baseline completes a Rust-owned synthesis lifecycle including cancellation and generated-audio ownership.",
     "Qwen3-TTS completes the same German passage set through the pinned mlx-audio reference runner.",
-    "Each measured locale covers at least three pinned voices across at least two TTS engines, with results reported per voice.",
-    "All generated PCM is passed unchanged to all four ASR backends.",
+    "The bounded engine calibration freezes exact Qwen VoiceDesign, Voxtral BF16, and any promoted challenger artifacts before the full multi-voice run.",
+    "Each measured locale covers at least three pinned voices across all three required TTS engines, with results reported per voice.",
+    "All generated PCM is passed unchanged to all five required ASR backends.",
     "Results separate lexical content errors from punctuation and capitalization differences.",
     "At least one blinded pronunciation and prosody review is recorded per candidate.",
     "The evidence supports a written dependency decision: retain mlx-audio, build a narrow direct official-MLX adapter, or stop the candidate."

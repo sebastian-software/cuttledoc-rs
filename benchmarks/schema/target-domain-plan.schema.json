@@ -64,7 +64,7 @@
           "const": "de-DE/podcast"
         },
         "primary_comparison_plan_revision": {
-          "const": "synthetic-roundtrip-pilot-2"
+          "const": "synthetic-roundtrip-pilot-3"
         },
         "numeric_quality_claims_require_human_gold": {
           "const": true

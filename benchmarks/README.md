@@ -112,17 +112,22 @@ The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 under issue #13. It starts with
 German and reports English separately, pins exact Wikipedia revisions, and
-requires at least three pinned voices per locale across at least two TTS
-engines before producing a recommendation. Every generated artifact crosses
-the same four ASR backends. Apple
-`AVSpeechSynthesizer` is the system baseline; Qwen3-TTS and Chatterbox use a
-pinned MLX-Audio reference before a direct-official-MLX dependency decision;
-Qwen-Audio-3.0-TTS-Plus is an English remote quality ceiling. Synthetic
+requires at least three pinned voices per locale across all three required TTS
+engines before producing a recommendation. A bounded German/English
+calibration runs before the full matrix. Every generated artifact crosses the
+same five ASR backends: Apple SpeechTranscriber, Whisper, direct Qwen3-ASR,
+Parakeet, and direct Voxtral Realtime. Apple `AVSpeechSynthesizer` is the
+system baseline; Qwen3-TTS 1.7B VoiceDesign and Voxtral TTS BF16 are the two
+required MLX reference generators. KugelAudio receives one German challenger
+run, while Chatterbox and the remote Qwen provider ceiling are deferred and
+optional respectively. Synthetic
 results may inform the default model recommendation for clean produced speech,
 but do not establish universal superiority or release-quality real-world WER.
 The professional German podcast corpus remains a separate optional long-form
 control. See
-[`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md).
+[`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md)
+and the dated
+[`docs/speech-engine-shortlist-2026-07.md`](../docs/speech-engine-shortlist-2026-07.md).
 Materialize the nine digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:
 
