@@ -29,6 +29,17 @@ bash scripts/fetch-tts-calibration-model.sh \
   /absolute/path/to/model
 ```
 
+Run the first pinned Qwen VoiceDesign profile after materializing the passage
+selection and model:
+
+```sh
+bash scripts/run-qwen3-tts-voicedesign-calibration.sh
+```
+
+The runner verifies every model file by byte count and SHA-256 before loading
+it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the four fixed Qwen profiles;
+the default is `qwen-de-clear-documentary`.
+
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
 cell.

@@ -36,7 +36,10 @@
       "$ref": "#/$defs/nonEmptyString"
     },
     "purpose": {
-      "const": "development-diagnostic"
+      "enum": [
+        "development-diagnostic",
+        "calibration"
+      ]
     },
     "candidate": {
       "type": "object",
