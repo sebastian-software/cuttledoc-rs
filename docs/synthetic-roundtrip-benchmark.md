@@ -265,10 +265,30 @@ The receivers otherwise recover the full text and broadly agree on names and
 technical content. Their independent, incompatible failures at the same
 `1962` position localize a probable synthesis pronunciation error. The clear
 profile therefore fails the critical-token gate provisionally. The shorter
-duration is faster delivery, not truncation. Run the warm German profile next
-to determine whether this is profile-specific before accepting or rejecting
-Qwen VoiceDesign for the full matrix. Listening remains required for the exact
-audible realization and prosody.
+duration is faster delivery, not truncation.
+
+The paired
+[`qwen-de-warm-podcast`](../benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-podcast.1/result.json)
+run generated 56.00 seconds at RTF 0.448 and stopped normally at 700 of 1,200
+tokens. Its separately licensed
+[`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-origin/manifest.json)
+provides the positive replay control. All five receivers return the complete
+passage and recover `1962` exactly:
+
+| Backend | Clear WER | Warm WER | Warm-profile observation |
+| --- | ---: | ---: | --- |
+| Apple Speech | 6.80% | 0.97% | one `on`/`an` error; `1962` exact |
+| Whisper large-v3-turbo | 4.85% | 2.91% | three orthographic/tokenization edits; `1962` exact |
+| Direct Voxtral Realtime 4B/MLX | 4.85% | 2.91% | three orthographic/tokenization edits; `1962` exact |
+| Direct Qwen3-ASR 0.6B/MLX | 6.80% | 3.88% | four minor phrase-boundary edits; `1962` exact |
+| Parakeet TDT 0.6B v3 | 3.88% | 5.83% | six edits concentrated around embedded English; `1962` exact |
+
+The opposite result on the same text, model revision, seed, and five receivers
+shows that the critical failure is specific to the designed voice/profile, not
+the Qwen VoiceDesign family. Retain the warm German profile and reject the
+clear German profile. Listening remains required for audible realization and
+prosody, and one English profile remains the next gate before full-matrix
+promotion.
 
 ## Voxtral TTS MLX reference result
 

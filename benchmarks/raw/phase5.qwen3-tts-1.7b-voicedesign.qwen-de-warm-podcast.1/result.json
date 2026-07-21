@@ -1,0 +1,376 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-podcast.1",
+  "captured_at": "2026-07-21T11:33:41.392420Z",
+  "source_revision": "82c044b2d04e3daf97a65530fa9b9b3dc90ee71f",
+  "selection_revision": "synthetic-roundtrip-passages-1",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-de-warm-podcast",
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "German",
+      "locale": "de-DE",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-origin",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "locale": "de-DE",
+    "character_count": 811,
+    "text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-de-warm-podcast",
+      "passage_id": "synthetic-de-origin",
+      "locale": "de-DE",
+      "language": "German",
+      "voice": null,
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1344000,
+      "byte_count": 5376000,
+      "duration_ms": 56000,
+      "sha256": "d47fe6927ad81229a098f6ed91bb4c80b8379a826c95eeb8d53f682edf1a2e6c",
+      "minimum_sample": -0.5504820346832275,
+      "maximum_sample": 0.7386329174041748,
+      "rms": 0.08810871583294405,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1525.92475,
+      "first_audio_ms": 24682.098459,
+      "complete_synthesis_ms": 25103.357459,
+      "real_time_factor": 0.4482742403392857,
+      "output_count": 1,
+      "token_count": 700
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4712628224,
+      "mlx_peak_memory_bytes": 13157449065,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1344000,
+        "sample_rate_hz": 24000,
+        "token_count": 700,
+        "processing_time_seconds": 24.681936264038086,
+        "mlx_audio_reported_duration_over_processing": 2.268865756759641,
+        "peak_memory_gb_decimal": 13.157449065,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 896000,
+        "byte_count": 3584000,
+        "duration_ms": 56000,
+        "sha256": "ea4e03f9659576ea9f6dcbffbd9447b6c50a91f46b1044bd9d65bb5d6d3d08b1"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T11:34:04.554Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "de",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "4b026aec9b4358023747f4775c31a4243ea1a24c0bc4da8c3c22034fb840319e",
+            "segment_count": 7,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 3,
+            "wer": 0.02912621359223301,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 695,
+            "character_edits": 3,
+            "cer": 0.004335260115606936
+          },
+          "timing": {
+            "cold_load_ms": 1068.8610410000001,
+            "complete_inference_ms": 1663.108791,
+            "real_time_factor": 0.029698371267857144
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1953595392
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:34:06.857Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligence, wurde 1955 vom US-Amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth Summer Research Project on the artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligenz-Augmentation vor. Seiner Ansicht nach sei das Ziel, Durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, Anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "232615d0f5b4a2707e05456d08cdbdce10422f52469193bf7500fb0ed511194a",
+            "segment_count": 8,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 6,
+            "wer": 0.05825242718446602,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 695,
+            "character_edits": 7,
+            "cer": 0.010115606936416185
+          },
+          "timing": {
+            "cold_load_ms": 261.246625,
+            "complete_inference_ms": 865.230292,
+            "real_time_factor": 0.015450540928571429
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 161726464
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:34:08.748Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "de",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Laufe der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktions Paradigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "c18e0fd42ba47a2b42a9a52b6ec97d8779ea8af93e648045b742ef339c676361",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 4,
+            "wer": 0.038834951456310676,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 696,
+            "character_edits": 4,
+            "cer": 0.005780346820809248
+          },
+          "timing": {
+            "complete_inference_ms": 1757.855084,
+            "real_time_factor": 0.031390269357142855
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2700481520
+          },
+          "generation": {
+            "token_count": 207,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:34:25.828Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "de",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computer-Pionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "47e7206970197af15b60ca6e84cc959cbedc63a19f15254d15554deea89fbbbc",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 104,
+            "word_edits": 3,
+            "wer": 0.02912621359223301,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 695,
+            "character_edits": 3,
+            "cer": 0.004335260115606936
+          },
+          "timing": {
+            "complete_inference_ms": 15114.244833,
+            "real_time_factor": 0.2698972291607143
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5318804660
+          },
+          "generation": {
+            "token_count": 711,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:34:27.830Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "de-DE",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project an Artificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+            "sha256": "9320736ea6bff083c308d68fea3db2622eb6fe4572bfa29f6e1b13179edc2ae0",
+            "segment_count": 105,
+            "update_count": 209,
+            "final_update_count": 3,
+            "volatile_update_count": 206,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 103,
+            "hypothesis_word_count": 103,
+            "word_edits": 1,
+            "wer": 0.009708737864077669,
+            "reference_character_count": 692,
+            "hypothesis_character_count": 692,
+            "character_edits": 1,
+            "cer": 0.001445086705202312
+          },
+          "timing": {
+            "first_result_ms": 77.006417,
+            "complete_inference_ms": 614.252,
+            "real_time_factor": 0.010968785714285714
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "apple-speechtranscriber"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest and returned the complete passage.",
+          "All five ASR backends recovered the critical source token 1962 exactly.",
+          "Apple made one word edit; Whisper and Voxtral made three, Qwen made four, and Parakeet made six, mainly around embedded English terminology.",
+          "The warm profile passes the lexical critical-token gate provisionally; listening review remains required for pronunciation, voice identity, and prosody."
+        ],
+        "critical_findings": {
+          "shared_content_omission": false,
+          "shared_truncation": false,
+          "year_1962_recovered_by_all_backends": true,
+          "probable_tts_content_error": false
+        }
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "calibration_disposition": "passed-lexical-critical-token-gate",
+    "second_profile_required": false,
+    "listening_required": true,
+    "next": "Retain the warm German profile, reject the clear German profile, then run one English Qwen profile before deciding full-matrix promotion."
+  }
+}

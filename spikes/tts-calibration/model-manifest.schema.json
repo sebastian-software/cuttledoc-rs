@@ -218,7 +218,8 @@
           "enum": [
             "pinned-pending-execution",
             "pinned-capability-limited-pending-execution",
-            "first-profile-measured-critical-token-failure"
+            "first-profile-measured-critical-token-failure",
+            "two-german-profiles-measured-warm-passed-clear-failed"
           ]
         },
         "voice_mode": {

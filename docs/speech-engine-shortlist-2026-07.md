@@ -71,13 +71,13 @@ NVIDIA offline family at lower model size.
 1. **Complete:** exact runtime/model revisions and artifact digests are pinned
    for Qwen VoiceDesign, Voxtral BF16, and KugelAudio without changing the
    historical measured pins.
-2. **In progress:** the first German Qwen VoiceDesign profile is materialized
-   and measured. It contains the full passage but provisionally fails the
-   `1962` critical-token gate; run the warm German profile next. The English,
-   Apple, Voxtral, and KugelAudio cells remain open.
+2. **In progress:** both German Qwen VoiceDesign profiles are materialized and
+   measured. All five receivers miss `1962` for the clear profile and recover
+   it for the warm profile. Retain warm, reject clear, and run one English
+   profile next. The Apple, Voxtral, and KugelAudio cells remain open.
 3. **Partially complete:** the five required ASR backends received identical
-   normalized PCM for the first Qwen profile. Listening, Qwen3-ASR 1.7B, and
-   Nemotron remain open for the bounded calibration set.
+   normalized PCM per Qwen profile. Listening, Qwen3-ASR 1.7B, and Nemotron
+   remain open for the bounded calibration set.
 4. Reject a generator with repeated omissions, insertions, truncation,
    non-finite audio, unstable completion, or unjustified operational cost.
 5. Freeze the surviving three-engine, six-voice-per-locale matrix and expand it

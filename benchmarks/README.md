@@ -148,7 +148,8 @@ rejects any character-count or SHA-256 drift. The checked-in
 contains selectors and digests. Lossless generated audio remains local. The
 separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
 Opus copies with complete attribution and a passed codec control; it currently
-contains the first `synthetic-de-origin` Qwen fixture.
+contains the codec-control Qwen fixture and the paired clear and warm Qwen
+VoiceDesign calibration fixtures.
 
 Validate its five-engine lossless/48/64/96 kbit/s evidence and the committed
 asset hashes with:
@@ -165,12 +166,15 @@ process-context control. The raw CC BY-SA-derived audio remains local.
 The reviewed compact Qwen codec-control copy is committed separately under
 `benchmarks/assets`; it is not a replacement for the lossless TTS artifact.
 
-The first current Qwen VoiceDesign calibration is
-[`qwen-de-clear-documentary`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1/result.json).
-It records the pinned model/profile, f32 synthesis metrics, and five ASR
-receivers on one normalized PCM digest. The complete passage is present, but
-all five receivers fail independently at the spoken year `1962`; the warm
-German profile is required before a model-family decision.
+The current German Qwen VoiceDesign calibrations are the paired
+[`qwen-de-clear-documentary`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1/result.json)
+and
+[`qwen-de-warm-podcast`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-podcast.1/result.json)
+runs. Both record the pinned model/profile, f32 synthesis metrics, and five ASR
+receivers on one normalized PCM digest per run. All five receivers fail at
+`1962` for the clear profile and recover it for the warm profile, proving the
+critical failure is voice/profile-specific. English and listening gates remain
+open before a model-family promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

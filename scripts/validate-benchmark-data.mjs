@@ -4808,7 +4808,7 @@ console.log(
   `${targetDomainCorpus.cells.length} selected target-domain corpus cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
-  `3 measured TTS diagnostics, 1 measured TTS calibration, ` +
+  `3 measured TTS diagnostics, 2 measured TTS calibrations, ` +
   `${sourceRightsReviews.length} source rights review(s), ` +
   `${audiobookPilot.fixtures.length} audiobook pilot fixture(s), ` +
   `1 direct Voxtral boundary record, 1 direct Voxtral frontend parity record, ` +

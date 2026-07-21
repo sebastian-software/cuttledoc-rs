@@ -20,7 +20,10 @@ SHA-256 in each asset manifest. The first Qwen 0.6B fixture is the codec
 selection control. The
 [`qwen-de-clear-documentary`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-clear/synthetic-de-origin/manifest.json)
 fixture preserves a current-model `1962` pronunciation failure for replay; it
-is decision evidence, not an accepted quality exemplar.
+is decision evidence, not an accepted quality exemplar. The
+[`qwen-de-warm-podcast`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-origin/manifest.json)
+fixture is the paired positive control: all five receivers recover `1962`,
+although listening review remains open.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis
@@ -39,8 +42,8 @@ node scripts/encode-benchmark-opus.mjs \
   --check
 ```
 
-Use the same command with the path recorded in the VoiceDesign asset manifest
-to reproduce or check the second fixture.
+Use the same command with the paths recorded in the VoiceDesign asset manifests
+to reproduce or check the two current-model fixtures.
 
 See [LICENSE.md](LICENSE.md) for the directory-level licensing rule. The
 adjacent `.license` sidecars are the machine-readable SPDX declarations for
