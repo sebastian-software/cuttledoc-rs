@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "two-german-profiles-measured-warm-passed-clear-failed",
+    "status": "german-and-english-warm-profiles-passed-lexical-gate",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

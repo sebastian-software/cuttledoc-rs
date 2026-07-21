@@ -1,0 +1,380 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1",
+  "captured_at": "2026-07-21T11:44:22.637776Z",
+  "source_revision": "6143f888fd4629e7f5bac6630646806d93c5ce9a",
+  "selection_revision": "synthetic-roundtrip-passages-1",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-en-warm-podcast",
+      "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "English",
+      "locale": "en-US",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-en-reasoning",
+    "source_id": "en-wikipedia-artificial-intelligence-1365114492",
+    "locale": "en-US",
+    "character_count": 854,
+    "text_sha256": "63d587259aed7d00052bec5c96dadb63dcfc4fbcd1ff7f8fa974335c00647a80",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-en-warm-podcast",
+      "passage_id": "synthetic-en-reasoning",
+      "locale": "en-US",
+      "language": "English",
+      "voice": null,
+      "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1361280,
+      "byte_count": 5445120,
+      "duration_ms": 56720,
+      "sha256": "6ec75583ea12ac8151e047e0917511b2d3c6751375629c1e16724770325699f5",
+      "minimum_sample": -0.4396975338459015,
+      "maximum_sample": 0.6210187077522278,
+      "rms": 0.06945491693565328,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1596.138667,
+      "first_audio_ms": 26574.803209,
+      "complete_synthesis_ms": 27102.726042,
+      "real_time_factor": 0.4778336749294781,
+      "output_count": 1,
+      "token_count": 709
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4715069440,
+      "mlx_peak_memory_bytes": 13258964905,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1361280,
+        "sample_rate_hz": 24000,
+        "token_count": 709,
+        "processing_time_seconds": 26.574921131134033,
+        "mlx_audio_reported_duration_over_processing": 2.134343116960347,
+        "peak_memory_gb_decimal": 13.258964905,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 907520,
+        "byte_count": 3630080,
+        "duration_ms": 56720,
+        "sha256": "73bde213ff46e32c6b6ba49defd7cf4fe328fb4a2c07e6a14cd903635e3b79c3"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T11:45:58.581Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "en",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Early researchers developed algorithms that imitated step-by-step reasoning that humans use when solving puzzles or making logical deductions. By the late 1980s and 1990s, methods were developed for dealing with uncertain or incomplete information, employing concepts from probability and economics. Many of these algorithms were insufficient for solving large reasoning problems because they experienced a combinatorial explosion, meaning they become exponentially slower as the problems grow. Even humans rarely use the step-by-step deduction that early AI research could model. Humans solve most of their problems using fast, intuitive judgments. Reasoning models, a type of large language model, LLM, trained to generate intermediate chains of thought, emerged in 2024 and allowed improved performance on complex problems in mathematics and coding.",
+            "sha256": "e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134",
+            "segment_count": 6,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 117,
+            "hypothesis_word_count": 119,
+            "word_edits": 3,
+            "wer": 0.02564102564102564,
+            "reference_character_count": 716,
+            "hypothesis_character_count": 716,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "cold_load_ms": 1036.8185,
+            "complete_inference_ms": 2418.886666,
+            "real_time_factor": 0.042646097778561355
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1953398784
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:46:01.267Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Early researchers developed algorithms that imitated step-by-step reasoning that humans use when solving puzzles or making logical deductions. By the late 1980s and 1990s, methods were developed for dealing with uncertain or incomplete information. Employing concepts from probability and economics. Many of these algorithms were insufficient for solving large reasoning problems because they experienced a combinatorial explosion. meaning they become exponentially slower as the problems grow. Even humans rarely use the step-by-step deduction that early AI research could model. Humans solve most of their problems using fast, intuitive judgments. Reasoning models, a type of large language model, LLM Trained to generate intermediate chains of thought. Emerged in 2024 and allowed improved performance on complex problems in mathematics and coding.",
+            "sha256": "d597a30767e36bd118cd03feae2593fb39fb24cf083046437bf56c2ef394adbb",
+            "segment_count": 11,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 117,
+            "hypothesis_word_count": 119,
+            "word_edits": 3,
+            "wer": 0.02564102564102564,
+            "reference_character_count": 716,
+            "hypothesis_character_count": 716,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "cold_load_ms": 263.907292,
+            "complete_inference_ms": 1049.280208,
+            "real_time_factor": 0.01849929844851904
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 161497088
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:46:02.880Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "en",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Early researchers developed algorithms that imitated step-by-step reasoning that humans use when solving puzzles or making logical deductions. By the late 1980s and 1990s, methods were developed for dealing with uncertain or incomplete information, employing concepts from probability and economics. Many of these algorithms were insufficient for solving large reasoning problems because they experienced a combinatorial explosion, meaning they become exponentially slower as the problems grow. Even humans rarely use the step-by-step deduction that early AI research could model. Humans solve most of their problems using fast intuitive judgments. Reasoning models, a type of large language model (LLM) trained to generate intermediate chains of thought, emerged in 2024 and allowed improved performance on complex problems in mathematics and coding.",
+            "sha256": "d66a0a1bb9c4d1305863cabde172f26c1437efe64ca0bc77448dee74f825579e",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 117,
+            "hypothesis_word_count": 119,
+            "word_edits": 3,
+            "wer": 0.02564102564102564,
+            "reference_character_count": 716,
+            "hypothesis_character_count": 716,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "complete_inference_ms": 1472.949167,
+            "real_time_factor": 0.025968779389985895
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2710719252
+          },
+          "generation": {
+            "token_count": 155,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:46:16.016Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Early researchers developed algorithms that imitated step-by-step reasoning that humans use when solving puzzles or making logical deductions. By the late 1980s and 1990s, methods were developed for dealing with uncertain or incomplete information, employing concepts from probability and economics. Many of these algorithms were insufficient for solving large reasoning problems because they experienced a combinatorial explosion, meaning they become exponentially slower as the problems grow. Even humans rarely use the step-by-step deduction that early AI research could model. Humans solve most of their problems using fast, intuitive judgments. Reasoning models, a type of large language model, LLM, trained to generate intermediate chains of thought, emerged in 2024 and allowed improved performance on complex problems in mathematics and coding.",
+            "sha256": "e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 117,
+            "hypothesis_word_count": 119,
+            "word_edits": 3,
+            "wer": 0.02564102564102564,
+            "reference_character_count": 716,
+            "hypothesis_character_count": 716,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "complete_inference_ms": 12863.355166,
+            "real_time_factor": 0.22678693875176303
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5322958004
+          },
+          "generation": {
+            "token_count": 720,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T11:46:17.764Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "en-US",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Early researchers developed algorithms that imitated step-by-step reasoning that humans use when solving puzzles or making logical deductions. By the late 1980s and 1990s, methods were developed for dealing with uncertain or incomplete information, employing concepts from probability and economics. Many of these algorithms were insufficient for solving large reasoning problems because they experienced a combinatorial explosion, meaning they become exponentially slower as the problems grow. Even humans rarely use the step-by-step deduction that early AI research could model. Humans solve most of their problems using fast, intuitive judgments. Reasoning models, a type of large language model, LLM, trained to generate intermediate chains of thought, emerged in 2024 and allowed improved performance on complex problems in mathematics and coding.",
+            "sha256": "e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134",
+            "segment_count": 119,
+            "update_count": 234,
+            "final_update_count": 6,
+            "volatile_update_count": 228,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 117,
+            "hypothesis_word_count": 119,
+            "word_edits": 3,
+            "wer": 0.02564102564102564,
+            "reference_character_count": 716,
+            "hypothesis_character_count": 716,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "first_result_ms": 36.74425,
+            "complete_inference_ms": 1277.001917,
+            "real_time_factor": 0.022514138169957686
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp",
+          "parakeet-tdt-0.6b-v3-coreml",
+          "qwen3-asr-0.6b-mlx-direct",
+          "voxtral-realtime-4b-mlx-direct-2400ms",
+          "apple-speechtranscriber"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest and returned the complete passage.",
+          "All five backends produced zero character edits after the benchmark normalization.",
+          "Each backend records three word edits solely because the reference token chains-of-thought becomes three spoken tokens.",
+          "The English warm profile passes the lexical content gate; listening review remains required for pronunciation, voice identity, and prosody."
+        ],
+        "critical_findings": {
+          "shared_content_omission": false,
+          "shared_truncation": false,
+          "exact_normalized_character_content_by_all_backends": true,
+          "probable_tts_content_error": false
+        }
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "calibration_disposition": "passed-lexical-content-gate",
+    "full_matrix_promotion_ready": false,
+    "listening_required": true,
+    "next": "Perform listening review; if it passes, promote the warm Qwen profiles to the full matrix and begin Voxtral BF16 calibration."
+  }
+}

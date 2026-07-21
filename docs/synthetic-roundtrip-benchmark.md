@@ -287,8 +287,22 @@ The opposite result on the same text, model revision, seed, and five receivers
 shows that the critical failure is specific to the designed voice/profile, not
 the Qwen VoiceDesign family. Retain the warm German profile and reject the
 clear German profile. Listening remains required for audible realization and
-prosody, and one English profile remains the next gate before full-matrix
-promotion.
+prosody.
+
+The
+[`qwen-en-warm-podcast`](../benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1/result.json)
+cross-language gate generated 56.72 seconds at RTF 0.478 and stopped normally
+at 709 of 1,200 tokens. All five receivers return the complete passage with
+zero normalized character edits. Each reports the same 3/117 word edits
+(2.56% WER) solely because the hyphenated reference token
+`chains-of-thought` is spoken as three words. The separately licensed
+[`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
+preserves this positive control.
+
+The bounded German/English lexical calibration therefore accepts the warm
+Qwen profiles and rejects the clear German profile. Listening is the remaining
+Qwen gate before full-matrix promotion; the next engine calibration is Voxtral
+BF16.
 
 ## Voxtral TTS MLX reference result
 

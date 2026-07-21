@@ -219,7 +219,8 @@
             "pinned-pending-execution",
             "pinned-capability-limited-pending-execution",
             "first-profile-measured-critical-token-failure",
-            "two-german-profiles-measured-warm-passed-clear-failed"
+            "two-german-profiles-measured-warm-passed-clear-failed",
+            "german-and-english-warm-profiles-passed-lexical-gate"
           ]
         },
         "voice_mode": {

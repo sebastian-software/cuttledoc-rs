@@ -48,6 +48,14 @@ const qwenWarmCalibrationRun = JSON.parse(await readFile(
   ),
   'utf8',
 ));
+const qwenEnglishCalibrationRun = JSON.parse(await readFile(
+  join(
+    repoRoot,
+    'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-en-warm-podcast.1/result.json',
+  ),
+  'utf8',
+));
 const calibrationAssetDirectory = join(
   repoRoot,
   'benchmarks/assets/synthetic/de-DE/qwen3-tts-1.7b-voicedesign-clear/' +
@@ -78,6 +86,21 @@ const [qwenWarmCalibrationAudio, qwenWarmCalibrationReference,
   readFile(join(warmCalibrationAssetDirectory, 'reference.txt')),
   readFile(join(warmCalibrationAssetDirectory, 'ATTRIBUTION.md'), 'utf8'),
 ]);
+const englishCalibrationAssetDirectory = join(
+  repoRoot,
+  'benchmarks/assets/synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/' +
+    'synthetic-en-reasoning',
+);
+const qwenEnglishCalibrationAsset = JSON.parse(await readFile(
+  join(englishCalibrationAssetDirectory, 'manifest.json'),
+  'utf8',
+));
+const [qwenEnglishCalibrationAudio, qwenEnglishCalibrationReference,
+  qwenEnglishCalibrationAttribution] = await Promise.all([
+  readFile(join(englishCalibrationAssetDirectory, 'audio.opus')),
+  readFile(join(englishCalibrationAssetDirectory, 'reference.txt')),
+  readFile(join(englishCalibrationAssetDirectory, 'ATTRIBUTION.md'), 'utf8'),
+]);
 
 const failures = validate(manifests, plan);
 failures.push(...validateQwenCalibrationRun(
@@ -103,6 +126,18 @@ failures.push(...validateQwenWarmCalibrationAsset(
   qwenWarmCalibrationReference,
   qwenWarmCalibrationAttribution,
   qwenWarmCalibrationRun,
+));
+failures.push(...validateQwenEnglishCalibrationRun(
+  qwenEnglishCalibrationRun,
+  manifests[0].data,
+  selection,
+));
+failures.push(...validateQwenEnglishCalibrationAsset(
+  qwenEnglishCalibrationAsset,
+  qwenEnglishCalibrationAudio,
+  qwenEnglishCalibrationReference,
+  qwenEnglishCalibrationAttribution,
+  qwenEnglishCalibrationRun,
 ));
 if (values['self-test']) {
   const changed = structuredClone(manifests);
@@ -150,6 +185,26 @@ if (values['self-test']) {
   ).length === 0) {
     failures.push('self-test failed to reject changed warm-profile asset bytes');
   }
+  const changedEnglishRun = structuredClone(qwenEnglishCalibrationRun);
+  changedEnglishRun.result.asr_content_checks.backends[0].quality.character_edits += 1;
+  if (validateQwenEnglishCalibrationRun(
+    changedEnglishRun,
+    manifests[0].data,
+    selection,
+  ).length === 0) {
+    failures.push('self-test failed to reject changed English-profile evidence');
+  }
+  const changedEnglishAsset = structuredClone(qwenEnglishCalibrationAsset);
+  changedEnglishAsset.archive.bytes += 1;
+  if (validateQwenEnglishCalibrationAsset(
+    changedEnglishAsset,
+    qwenEnglishCalibrationAudio,
+    qwenEnglishCalibrationReference,
+    qwenEnglishCalibrationAttribution,
+    qwenEnglishCalibrationRun,
+  ).length === 0) {
+    failures.push('self-test failed to reject changed English-profile asset bytes');
+  }
 }
 if (failures.length > 0) {
   for (const failure of failures) process.stderr.write(`- ${failure}\n`);
@@ -158,7 +213,7 @@ if (failures.length > 0) {
 process.stdout.write(
   `Validated ${manifests.length} TTS calibration manifests: ` +
     `${manifests.reduce((sum, item) => sum + item.data.artifact.snapshot_bytes, 0)} ` +
-    'total snapshot bytes, 2 measured calibration profiles, and 2 Opus assets\n',
+    'total snapshot bytes, 3 measured calibration profiles, and 3 Opus assets\n',
 );
 
 function validate(items, acceptedPlan) {
@@ -175,7 +230,7 @@ function validate(items, acceptedPlan) {
       snapshotBytes: 4520194992,
       artifactCount: 14,
       role: 'required-generator',
-      status: 'two-german-profiles-measured-warm-passed-clear-failed',
+      status: 'german-and-english-warm-profiles-passed-lexical-gate',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -183,7 +238,7 @@ function validate(items, acceptedPlan) {
         'qwen-en-clear-documentary',
         'qwen-en-warm-podcast',
       ],
-      planStatus: 'calibration-in-progress-warm-German-profile-passed-English-pending',
+      planStatus: 'calibration-passed-lexical-listening-pending',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',
@@ -777,6 +832,224 @@ function validateQwenWarmCalibrationAsset(
       !attribution.includes('CC BY-SA 4.0') ||
       !attribution.includes('passes the lexical calibration')) {
     errors.push(`${prefix}finding or attribution caveat differs`);
+  }
+  return errors;
+}
+
+function validateQwenEnglishCalibrationRun(run, manifest, acceptedSelection) {
+  const errors = [];
+  const prefix = 'Qwen VoiceDesign English warm-profile result: ';
+  const profile = manifest.calibration.profiles.find(
+    (item) => item.id === 'qwen-en-warm-podcast',
+  );
+  const passage = acceptedSelection.sources
+    .flatMap((source) => source.passages.map((item) => ({ source, item })))
+    .find(({ item }) => item.id === profile.passage_id);
+  if (run.schema_version !== '1.0.0' ||
+      run.run_id !==
+        'phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1' ||
+      run.source_revision !== '6143f888fd4629e7f5bac6630646806d93c5ce9a' ||
+      run.selection_revision !== acceptedSelection.revision ||
+      run.purpose !== 'calibration') {
+    errors.push(`${prefix}identity or revisions differ`);
+  }
+  if (run.candidate?.id !== 'qwen3-tts-1.7b-voicedesign-mlx-audio' ||
+      run.candidate?.model?.repository !== manifest.artifact.repository ||
+      run.candidate?.model?.revision !== manifest.artifact.revision ||
+      run.candidate?.model?.snapshot_bytes !== manifest.artifact.snapshot_bytes ||
+      run.candidate?.runtime?.revision !== manifest.reference_runtime.revision ||
+      run.candidate?.runtime?.version !== manifest.reference_runtime.version ||
+      run.candidate?.voice?.profile_id !== profile.id ||
+      run.candidate?.voice?.instruction !== profile.instruction ||
+      run.candidate?.voice?.locale !== profile.locale ||
+      run.candidate?.voice?.seed !== profile.seed) {
+    errors.push(`${prefix}candidate, runtime, or voice profile differs`);
+  }
+  if (!passage ||
+      run.input?.passage_id !== passage.item.id ||
+      run.input?.source_id !== passage.source.id ||
+      run.input?.locale !== passage.source.locale ||
+      run.input?.character_count !== passage.item.character_count ||
+      run.input?.text_sha256 !== passage.item.spoken_sha256 ||
+      run.input?.license !== passage.source.license) {
+    errors.push(`${prefix}input differs from the pinned passage`);
+  }
+  const expectedGeneration = {
+    profile_id: profile.id,
+    passage_id: profile.passage_id,
+    locale: profile.locale,
+    language: profile.language,
+    voice: profile.voice,
+    instruction: profile.instruction,
+    seed: profile.seed,
+    ...manifest.calibration.generation,
+    sample_rate_hz: manifest.calibration.sample_rate_hz,
+  };
+  if (JSON.stringify(run.procedure?.generation) !==
+        JSON.stringify(expectedGeneration) ||
+      run.procedure?.stream !== false ||
+      !run.procedure?.command?.includes(
+        'scripts/run-qwen3-tts-voicedesign-calibration.sh',
+      ) ||
+      !run.procedure?.model_verification?.includes('SHA-256')) {
+    errors.push(`${prefix}execution contract differs`);
+  }
+
+  const audio = run.result?.audio;
+  const timing = run.result?.timing;
+  if (run.result?.status !== 'measured' ||
+      audio?.sample_format !== 'f32le' ||
+      audio?.sample_rate_hz !== 24_000 ||
+      audio?.channel_count !== 1 ||
+      audio?.sample_count !== 1_361_280 ||
+      audio?.byte_count !== 5_445_120 ||
+      audio?.duration_ms !== 56_720 ||
+      audio?.sha256 !==
+        '6ec75583ea12ac8151e047e0917511b2d3c6751375629c1e16724770325699f5' ||
+      audio?.non_finite_sample_count !== 0 ||
+      !(audio?.rms > 0 && audio.rms < 1) ||
+      !(timing?.model_load_ms > 0) ||
+      !(timing?.first_audio_ms > 0) ||
+      !(timing?.complete_synthesis_ms >= timing?.first_audio_ms) ||
+      timing?.output_count !== 1 ||
+      timing?.token_count !== 709 ||
+      Math.abs(timing?.real_time_factor -
+        timing?.complete_synthesis_ms / audio?.duration_ms) > 1e-12 ||
+      run.result?.termination?.reached_max_tokens !== false ||
+      run.result?.termination?.configured_max_tokens !== 1_200 ||
+      run.result?.resources?.model_snapshot_bytes !==
+        manifest.artifact.snapshot_bytes ||
+      !(run.result?.resources?.mlx_peak_memory_bytes > 0)) {
+    errors.push(`${prefix}audio, timing, resources, or termination differ`);
+  }
+
+  const checks = run.result?.asr_content_checks;
+  if (checks?.status !== 'complete' ||
+      checks?.normalized_audio?.sample_format !== 'f32le' ||
+      checks?.normalized_audio?.sample_rate_hz !== 16_000 ||
+      checks?.normalized_audio?.channel_count !== 1 ||
+      checks?.normalized_audio?.sample_count !== 907_520 ||
+      checks?.normalized_audio?.byte_count !== 3_630_080 ||
+      checks?.normalized_audio?.duration_ms !== audio?.duration_ms ||
+      checks?.normalized_audio?.sha256 !==
+        '73bde213ff46e32c6b6ba49defd7cf4fe328fb4a2c07e6a14cd903635e3b79c3') {
+    errors.push(`${prefix}normalized PCM evidence differs`);
+  }
+  const expectedBackends = new Map([
+    ['whisper-large-v3-turbo-coreml-whispercpp', [
+      'en', 'e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134',
+    ]],
+    ['parakeet-tdt-0.6b-v3-coreml', [
+      'model-managed',
+      'd597a30767e36bd118cd03feae2593fb39fb24cf083046437bf56c2ef394adbb',
+    ]],
+    ['qwen3-asr-0.6b-mlx-direct', [
+      'en', 'd66a0a1bb9c4d1305863cabde172f26c1437efe64ca0bc77448dee74f825579e',
+    ]],
+    ['voxtral-realtime-4b-mlx-direct-2400ms', [
+      'model-managed',
+      'e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134',
+    ]],
+    ['apple-speechtranscriber', [
+      'en-US', 'e16eebe08cc6456c6019ece2986e8393ff1c3be9de5f11ce6121277e55c15134',
+    ]],
+  ]);
+  const measuredBackends = checks?.backends ?? [];
+  if (measuredBackends.length !== 5 ||
+      new Set(measuredBackends.map((item) => item.backend?.id)).size !== 5) {
+    errors.push(`${prefix}must contain five unique ASR backends`);
+  }
+  for (const check of measuredBackends) {
+    const expected = expectedBackends.get(check.backend?.id);
+    const quality = check.quality;
+    const digest = createHash('sha256')
+      .update(check.transcript?.text ?? '')
+      .digest('hex');
+    if (!expected ||
+        check.backend?.locale !== expected[0] ||
+        check.transcript?.sha256 !== digest ||
+        check.transcript?.sha256 !== expected[1] ||
+        quality?.reference_word_count !== 117 ||
+        quality?.hypothesis_word_count !== 119 ||
+        quality?.word_edits !== 3 ||
+        Math.abs(quality?.wer - 3 / 117) > 1e-15 ||
+        quality?.reference_character_count !== 716 ||
+        quality?.hypothesis_character_count !== 716 ||
+        quality?.character_edits !== 0 ||
+        quality?.cer !== 0 ||
+        !(check.timing?.complete_inference_ms > 0) ||
+        Math.abs(check.timing?.real_time_factor -
+          check.timing?.complete_inference_ms / audio?.duration_ms) > 1e-12) {
+      errors.push(`${prefix}${check.backend?.id}: transcript or metrics differ`);
+    }
+  }
+  if (checks?.comparison?.completed_backend_count !== 5 ||
+      checks?.comparison?.expected_backend_count !== 5 ||
+      checks?.comparison?.critical_findings?.shared_content_omission !== false ||
+      checks?.comparison?.critical_findings?.shared_truncation !== false ||
+      checks?.comparison?.critical_findings
+        ?.exact_normalized_character_content_by_all_backends !== true ||
+      checks?.comparison?.critical_findings?.probable_tts_content_error !== false ||
+      run.conclusion?.calibration_disposition !== 'passed-lexical-content-gate' ||
+      run.conclusion?.full_matrix_promotion_ready !== false ||
+      run.conclusion?.listening_required !== true) {
+    errors.push(`${prefix}critical finding or disposition differs`);
+  }
+  return errors;
+}
+
+function validateQwenEnglishCalibrationAsset(
+  asset,
+  audio,
+  reference,
+  attribution,
+  run,
+) {
+  const errors = [];
+  const prefix = 'Qwen VoiceDesign English warm-profile asset: ';
+  const audioDigest = createHash('sha256').update(audio).digest('hex');
+  const referenceDigest = createHash('sha256').update(reference).digest('hex');
+  if (asset.schema_version !== '1.0.0' ||
+      asset.asset_id !==
+        'synthetic-en-reasoning.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1' ||
+      asset.purpose !== 'reproducible-passed-calibration-profile' ||
+      asset.license !== 'CC-BY-SA-4.0' ||
+      asset.reference?.bytes !== reference.length ||
+      asset.reference?.characters !== run.input.character_count ||
+      asset.reference?.sha256 !== referenceDigest ||
+      asset.reference?.spoken_text_sha256 !== run.input.text_sha256 ||
+      asset.reference?.source_id !== run.input.source_id ||
+      asset.reference?.passage_id !== run.input.passage_id) {
+    errors.push(`${prefix}identity, license, or reference differs`);
+  }
+  if (asset.generation?.run_id !== run.run_id ||
+      asset.generation?.model_revision !== run.candidate.model.revision ||
+      asset.generation?.voice_profile !== run.candidate.voice.profile_id ||
+      asset.generation?.voice_instruction !== run.candidate.voice.instruction ||
+      asset.generation?.seed !== run.candidate.voice.seed ||
+      asset.generation?.locale !== 'en-US' ||
+      asset.generation?.lossless_f32le?.sample_count !==
+        run.result.audio.sample_count ||
+      asset.generation?.lossless_f32le?.bytes !== run.result.audio.byte_count ||
+      asset.generation?.lossless_f32le?.sha256 !== run.result.audio.sha256) {
+    errors.push(`${prefix}generation provenance differs from the run`);
+  }
+  if (asset.archive?.path !== 'audio.opus' ||
+      asset.archive?.codec !== 'Opus' ||
+      asset.archive?.bytes !== audio.length ||
+      asset.archive?.sha256 !== audioDigest ||
+      asset.archive?.target_bit_rate_bps !== 64_000 ||
+      asset.archive?.variable_bit_rate !== true ||
+      asset.archive?.application !== 'audio' ||
+      asset.archive?.frame_duration_ms !== 20 ||
+      asset.archive?.deterministic_repeat_sha256_match !== true ||
+      asset.calibration_finding?.disposition !==
+        run.conclusion.calibration_disposition ||
+      asset.calibration_finding?.receiver_count !== 5 ||
+      asset.calibration_finding?.receiver_exact_normalized_character_count !== 5 ||
+      !attribution.includes('CC BY-SA 4.0') ||
+      !attribution.includes('lexical calibration gate')) {
+    errors.push(`${prefix}archive, finding, or attribution caveat differs`);
   }
   return errors;
 }

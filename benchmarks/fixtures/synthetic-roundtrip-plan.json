@@ -129,7 +129,7 @@
       "source_url": "https://github.com/QwenLM/Qwen3-TTS",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
       "license": "Apache-2.0 converted model and MIT reference runtime; all 14 snapshot files are byte-counted and SHA-256 pinned in spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json",
-      "status": "calibration-in-progress-warm-German-profile-passed-English-pending",
+      "status": "calibration-passed-lexical-listening-pending",
       "locales": [
         "de-DE",
         "en-US"

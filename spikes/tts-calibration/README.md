@@ -63,7 +63,13 @@ receivers failed at the spoken year `1962`. In contrast, all five receivers
 recover `1962` from `qwen-de-warm-podcast`, with WER from 0.97% to 5.83%.
 This localizes the failure to the designed voice/profile rather than the model
 family. Retain the warm profile, reject the clear profile, perform listening
-review, and run one English profile before promoting Qwen to the full matrix.
+review, and use the warm profile for German.
+
+The `qwen-en-warm-podcast` profile also passes the lexical gate. All five ASR
+backends reproduce the exact normalized character sequence; its uniform 2.56%
+WER is only the spoken expansion of the hyphenated `chains-of-thought` token.
+The bounded German/English lexical calibration therefore accepts the warm
+profiles. Listening remains the final Qwen gate before full-matrix promotion.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration

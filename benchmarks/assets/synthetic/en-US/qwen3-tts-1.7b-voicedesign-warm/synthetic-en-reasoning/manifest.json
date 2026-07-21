@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-en-reasoning.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-calibration-profile",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 855,
+    "characters": 854,
+    "sha256": "eb3263d48aee95ba305ce6f033b87a6c5d3659d21e537aa530cca429f8ceaedb",
+    "spoken_text_sha256": "63d587259aed7d00052bec5c96dadb63dcfc4fbcd1ff7f8fa974335c00647a80",
+    "source_id": "en-wikipedia-artificial-intelligence-1365114492",
+    "passage_id": "synthetic-en-reasoning",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-en-warm-podcast",
+    "voice_instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "en-US",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1361280,
+      "bytes": 5445120,
+      "sha256": "6ec75583ea12ac8151e047e0917511b2d3c6751375629c1e16724770325699f5"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "3cf26f94bff3a37317954e77770b323ecd9350ab2e9245f7dfecb8609a305a25"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 501931,
+    "sha256": "58ca1ed1a86da2a3456bee9e2b66cb7893b40c7a95a9369038b6f9931481bfe3",
+    "duration_ms": 56726.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 70786,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "FFmpeg 8.1.2 libopus 1.6.1",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-lexical-content-gate",
+    "receiver_count": 5,
+    "receiver_exact_normalized_character_count": 5,
+    "word_edit_cause": "spoken expansion of the hyphenated reference token chains-of-thought"
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}
+

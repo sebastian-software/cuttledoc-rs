@@ -23,7 +23,10 @@ fixture preserves a current-model `1962` pronunciation failure for replay; it
 is decision evidence, not an accepted quality exemplar. The
 [`qwen-de-warm-podcast`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-origin/manifest.json)
 fixture is the paired positive control: all five receivers recover `1962`,
-although listening review remains open.
+although listening review remains open. The English
+[`qwen-en-warm-podcast`](synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
+fixture provides the cross-language positive control with exact normalized
+character content from all five receivers.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis

@@ -148,8 +148,8 @@ rejects any character-count or SHA-256 drift. The checked-in
 contains selectors and digests. Lossless generated audio remains local. The
 separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
 Opus copies with complete attribution and a passed codec control; it currently
-contains the codec-control Qwen fixture and the paired clear and warm Qwen
-VoiceDesign calibration fixtures.
+contains the codec-control Qwen fixture, paired clear and warm German Qwen
+VoiceDesign fixtures, and the warm English Qwen VoiceDesign fixture.
 
 Validate its five-engine lossless/48/64/96 kbit/s evidence and the committed
 asset hashes with:
@@ -173,8 +173,10 @@ and
 runs. Both record the pinned model/profile, f32 synthesis metrics, and five ASR
 receivers on one normalized PCM digest per run. All five receivers fail at
 `1962` for the clear profile and recover it for the warm profile, proving the
-critical failure is voice/profile-specific. English and listening gates remain
-open before a model-family promotion.
+critical failure is voice/profile-specific. The subsequent
+[`qwen-en-warm-podcast`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1/result.json)
+run passes the English lexical gate with exact normalized character content
+from all five receivers. Only the Qwen listening gate remains before promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
