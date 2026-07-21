@@ -1,9 +1,23 @@
 {
   "schema_version": "1.0.0",
-  "revision": "target-domain-held-out-1",
+  "revision": "target-domain-held-out-2",
   "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/18",
   "purpose": "held-out",
+  "decision_scope": {
+    "role": "optional-real-world-control",
+    "release_blocking": false,
+    "backend_selection_blocking": false,
+    "current_required_cell": "de-DE/podcast",
+    "primary_comparison_plan_revision": "synthetic-roundtrip-pilot-2",
+    "numeric_quality_claims_require_human_gold": true,
+    "paused_work": [
+      "mandatory-independent-human-gold",
+      "German-audiobook-acquisition",
+      "additional-language-domain-cells"
+    ],
+    "reason": "The product optimizes clean produced speech and keeps multiple ASR engines selectable. Synthetic multi-voice evidence is the reproducible primary comparison; this corpus is a long-form reality check, not a universal ranking gate."
+  },
   "priority_order": [
     "de-DE/podcast",
     "de-DE/audiobook",

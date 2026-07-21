@@ -1,15 +1,15 @@
 # Benchmark source rights review
 
 **Status:** accepted acquisition gate; three German podcast source groups are
-accepted and materialized locally. German audiobook acquisition remains blocked.
+accepted and materialized locally. Further target-domain acquisition is paused.
 
 **Evidence date:** 2026-07-21.
 
-Issue [#18](https://github.com/sebastian-software/cuttledoc-rs/issues/18)
-requires professionally recorded, held-out podcast and audiobook audio. Public
-availability is not permission to acquire, derive clips from, use, or
+The current real-world control uses professionally recorded podcast audio.
+Public availability is not permission to acquire, derive clips from, use, or
 redistribute a recording. The benchmark therefore treats rights review as an
-executable gate rather than a prose note.
+executable gate rather than a prose note, even though further audiobook and
+language-cell acquisition is not a current release requirement.
 
 This process records engineering evidence and enforces project policy. It is
 not legal advice. Unclear evidence remains blocked until the rightsholder,

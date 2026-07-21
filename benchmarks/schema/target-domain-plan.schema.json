@@ -9,6 +9,7 @@
     "evidence_date",
     "tracking_issue",
     "purpose",
+    "decision_scope",
     "priority_order",
     "candidate_backends",
     "excluded_development_sources",
@@ -36,6 +37,47 @@
     },
     "purpose": {
       "const": "held-out"
+    },
+    "decision_scope": {
+      "type": "object",
+      "required": [
+        "role",
+        "release_blocking",
+        "backend_selection_blocking",
+        "current_required_cell",
+        "primary_comparison_plan_revision",
+        "numeric_quality_claims_require_human_gold",
+        "paused_work",
+        "reason"
+      ],
+      "properties": {
+        "role": {
+          "const": "optional-real-world-control"
+        },
+        "release_blocking": {
+          "const": false
+        },
+        "backend_selection_blocking": {
+          "const": false
+        },
+        "current_required_cell": {
+          "const": "de-DE/podcast"
+        },
+        "primary_comparison_plan_revision": {
+          "const": "synthetic-roundtrip-pilot-2"
+        },
+        "numeric_quality_claims_require_human_gold": {
+          "const": true
+        },
+        "paused_work": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
     },
     "priority_order": {
       "type": "array",

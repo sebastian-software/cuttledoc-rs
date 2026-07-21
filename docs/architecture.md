@@ -158,6 +158,13 @@ Owns:
 
 The compatibility-first implementation may continue invoking FFmpeg. Replacing selected audio-only formats with Rust decoders is an optimization, not a prerequisite.
 
+The default path is deliberately conservative for the primary clean podcast
+and audiobook workload. Denoising, dereverberation, source separation, and
+other restoration are optional stages before recognition, not hidden behavior
+inside an ASR adapter. Any such stage must preserve the original input and be
+measured as part of the selected pipeline. See
+[`audio-use-cases.md`](audio-use-cases.md).
+
 ### `cuttledoc-openai`
 
 Owns cloud transcription requests and response conversion. It receives credentials from in-memory configuration and must never persist or log them.

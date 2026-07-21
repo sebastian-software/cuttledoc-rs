@@ -1,14 +1,16 @@
 # Target-domain gold review
 
-**Status:** German podcast selection ready for independent human review;
-German audiobook source acquisition still blocked.
+**Status:** optional German podcast gold extension available; no current
+release or backend-selection gate depends on completing it.
 
 **Evidence date:** 2026-07-21.
 
-Issue [#18](https://github.com/sebastian-software/cuttledoc-rs/issues/18)
-requires references that a human independently verifies against the exact audio.
-Publisher transcripts and ASR output are draft material only. Automation may
-prepare a review bundle, but it cannot promote its own transcript to gold.
+The pragmatic benchmark uses reproducible multi-voice synthetic speech as its
+primary comparison and this corpus as a real-world long-form control. Exact WER
+or other publishable numeric quality claims on these podcast passages still
+require a human to verify references against the exact audio. Publisher
+transcripts and ASR output remain draft material only. Automation may prepare a
+review bundle, but it cannot promote its own transcript to gold.
 
 ## Frozen German podcast selection
 
@@ -46,10 +48,10 @@ The validator fails closed: pending entries must not contain reviewer or transcr
 digests, while `human-verified` entries require complete reviewer evidence. Raw ASR
 results must be frozen separately and may never overwrite these references.
 
-## Remaining external gate
+## Optional stronger-evidence path
 
 The podcast cell cannot claim its 30 minutes as human-verified until a person
-completes the procedure above. The audiobook cell also needs three professionally
-recorded German works with three speakers and explicit rights covering audio,
-transcription, derived clips, and commercial benchmark use. LibriVox/HUI material
-remains diagnostic because it is crowd-read; Vorleser.net remains permission-only.
+completes the procedure above. That does not block the current product work.
+German audiobook acquisition and additional language/domain gold cells are
+paused. They should resume only if a future decision needs stronger real-world
+WER evidence than the synthetic comparison and podcast control provide.

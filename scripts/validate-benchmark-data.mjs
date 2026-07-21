@@ -202,6 +202,23 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
   if (plan.purpose !== 'held-out') {
     errors.push('purpose must be held-out');
   }
+  const decisionScope = plan.decision_scope;
+  if (decisionScope?.role !== 'optional-real-world-control' ||
+      decisionScope?.release_blocking !== false ||
+      decisionScope?.backend_selection_blocking !== false ||
+      decisionScope?.current_required_cell !== 'de-DE/podcast' ||
+      decisionScope?.primary_comparison_plan_revision !==
+        'synthetic-roundtrip-pilot-2' ||
+      decisionScope?.numeric_quality_claims_require_human_gold !== true ||
+      !(decisionScope?.reason?.length > 0)) {
+    errors.push('decision_scope must keep the corpus an optional German podcast control');
+  }
+  if (!Array.isArray(decisionScope?.paused_work) ||
+      decisionScope.paused_work.length === 0 ||
+      new Set(decisionScope.paused_work).size !==
+        decisionScope.paused_work.length) {
+    errors.push('decision_scope.paused_work must be a non-empty unique array');
+  }
 
   const requiredBackends = [
     'apple-speechtranscriber',
