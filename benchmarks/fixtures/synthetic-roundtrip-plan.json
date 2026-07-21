@@ -123,13 +123,13 @@
     {
       "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
       "role": "required-multilingual-voice-design-calibration",
-      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
-      "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16; immutable execution revision pending",
+      "runtime": "Blaizzy/mlx-audio 0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official Apple MLX",
+      "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16@7d3824abff87e49756bb0f83fb5411de75d160c4",
       "integration": "pinned Python reference runner first; direct repository-owned MLX boundary only after calibration",
       "source_url": "https://github.com/QwenLM/Qwen3-TTS",
-      "source_revision": "upstream-and-mlx-conversion-pin-required",
-      "license": "Apache-2.0 upstream model and MIT reference runtime; exact revisions and converted artifact license must be verified",
-      "status": "selected-for-calibration-pending-model-and-runtime-pin",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "Apache-2.0 converted model and MIT reference runtime; all 14 snapshot files are byte-counted and SHA-256 pinned in spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json",
+      "status": "pinned-for-calibration",
       "locales": [
         "de-DE",
         "en-US"
@@ -166,13 +166,13 @@
     {
       "id": "voxtral-tts-4b-bf16-mlx-audio",
       "role": "required-native-european-bf16-calibration",
-      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
-      "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16; immutable execution revision pending",
+      "runtime": "Blaizzy/mlx-audio 0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official Apple MLX",
+      "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16@dd85c02adbae551f5bb29ded35ee60ccdfb90927",
       "integration": "pinned Python reference runner with two native voices per locale; reference-only under current model license",
       "source_url": "https://huggingface.co/mistralai/Voxtral-4B-TTS-2603",
-      "source_revision": "upstream-and-mlx-conversion-pin-required",
-      "license": "CC-BY-NC-4.0 model and supplied voice references; MIT reference runtime; local evaluation only",
-      "status": "selected-for-calibration-pending-model-and-runtime-pin",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "CC-BY-NC-4.0 model and supplied voice references; MIT reference runtime; all 27 snapshot files are byte-counted and SHA-256 pinned in spikes/tts-calibration/voxtral-tts-4b-mlx-bf16.json",
+      "status": "pinned-for-calibration-reference-only",
       "locales": [
         "de-DE",
         "en-US"
@@ -182,13 +182,13 @@
     {
       "id": "kugelaudio-0-open-mlx-audio",
       "role": "German-European-open-challenger",
-      "runtime": "Current Blaizzy/mlx-audio over official Apple MLX; immutable execution revision pending",
-      "model": "kugelaudio/kugelaudio-0-open; immutable execution revision pending",
+      "runtime": "Blaizzy/mlx-audio 0.4.5@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a over official Apple MLX",
+      "model": "kugelaudio/kugelaudio-0-open@22d6ed9b8627394d4bf3e5af35285ad37c4d72b6",
       "integration": "one-passage German calibration before any full-matrix promotion",
       "source_url": "https://huggingface.co/kugelaudio/kugelaudio-0-open",
-      "source_revision": "upstream-and-mlx-runtime-pin-required",
-      "license": "MIT model; exact runtime, voice artifacts, AudioSeal dependency, and model tree must be pinned",
-      "status": "selected-for-German-calibration-only",
+      "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "license": "MIT model and runtime; all 14 snapshot files are pinned, while absent advertised voice files and the inactive AudioSeal path are explicit capability limits in spikes/tts-calibration/kugelaudio-0-open-bf16.json",
+      "status": "pinned-for-German-calibration-capability-limited",
       "locales": [
         "de-DE",
         "en-US"

@@ -4025,6 +4025,7 @@ const schemaPaths = [
     repoRoot,
     'spikes/qwen3-tts-mlx-reference/model-manifest.schema.json',
   ),
+  join(repoRoot, 'spikes/tts-calibration/model-manifest.schema.json'),
   join(
     repoRoot,
     'spikes/voxtral-realtime-mlx-reference/model-manifest.schema.json',

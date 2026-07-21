@@ -10,8 +10,12 @@ on:
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/encode-benchmark-opus.mjs"
+      - "scripts/capture-huggingface-model-metadata.mjs"
+      - "scripts/fetch-tts-calibration-model.sh"
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
+      - "scripts/validate-tts-calibration-manifests.mjs"
+      - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
   push:
@@ -24,8 +28,12 @@ on:
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/encode-benchmark-opus.mjs"
+      - "scripts/capture-huggingface-model-metadata.mjs"
+      - "scripts/fetch-tts-calibration-model.sh"
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
+      - "scripts/validate-tts-calibration-manifests.mjs"
+      - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
 
@@ -39,6 +47,8 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Validate schemas, fixtures, and run records
         run: node scripts/validate-benchmark-data.mjs --self-test
+      - name: Validate pinned TTS calibration models
+        run: node scripts/validate-tts-calibration-manifests.mjs --self-test
       - name: Validate committed Opus fixture and codec control
         run: node scripts/validate-opus-codec-control.mjs --self-test
       - name: Verify rights-gated local source import

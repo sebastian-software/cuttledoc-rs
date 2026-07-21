@@ -1,0 +1,204 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "qwen3-tts-12hz-1.7b-voicedesign-mlx-bf16",
+  "task": "tts",
+  "source": {
+    "repository": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+    "observed_revision": "5ecdb67327fd37bb2e042aab12ff7391903235d3",
+    "license": "Apache-2.0",
+    "supported_languages": [
+      "Chinese",
+      "English",
+      "Japanese",
+      "Korean",
+      "German",
+      "French",
+      "Russian",
+      "Portuguese",
+      "Spanish",
+      "Italian"
+    ],
+    "provenance_limit": "The converted model card names this official repository and mlx-audio 0.3.0, but not the exact conversion-input commit. The observed source revision pins capability and license evidence without asserting lineage to the converted bytes."
+  },
+  "artifact": {
+    "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "license": "Apache-2.0",
+    "format": "MLX BF16 safetensors",
+    "conversion_tool": "mlx-audio",
+    "conversion_tool_version": "0.3.0",
+    "weight_bytes": 4515695681,
+    "snapshot_bytes": 4520194992,
+    "artifacts": [
+      {
+        "path": ".gitattributes",
+        "bytes": 1519,
+        "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "README.md",
+        "bytes": 1068,
+        "sha256": "3a00062ef04f72e43a728c4f414799fdc65d8b71bc47bb03099385b7ea79b02b",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "config.json",
+        "bytes": 5232,
+        "sha256": "8a9be83c045ee9ab9d2e6609655f547b9291a070f5acae3428c3ff07a365de40",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 245,
+        "sha256": "f1b90b4513f3b34c62851049e2492d7b4c5940daf1276f89c82b8ef04127f3aa",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "merges.txt",
+        "bytes": 1671839,
+        "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 3833402589,
+        "sha256": "96ae28bec2205ec0b5e0c750bea2b8a5deac4f14d33a8a25a5f753299486b70e",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "bytes": 32458,
+        "sha256": "abf019e063dcc595d7aef7c9554d2806ffdc58746a7ac6238cb26177af8d431f",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "preprocessor_config.json",
+        "bytes": 127,
+        "sha256": "efdde1022ea9d76928bf7a9cd53139138f5ba2e466e837f08f6105ab1af1c119",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "speech_tokenizer/config.json",
+        "bytes": 2336,
+        "sha256": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "speech_tokenizer/configuration.json",
+        "bytes": 76,
+        "sha256": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "speech_tokenizer/model.safetensors",
+        "bytes": 682293092,
+        "sha256": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "speech_tokenizer/preprocessor_config.json",
+        "bytes": 234,
+        "sha256": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 7344,
+        "sha256": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "vocab.json",
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "digest_source": "downloaded-at-pinned-revision"
+      }
+    ]
+  },
+  "reference_runtime": {
+    "repository": "Blaizzy/mlx-audio",
+    "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "version": "0.4.5",
+    "license": "MIT",
+    "boundary": "Pinned Python reference runner over official Apple MLX"
+  },
+  "calibration": {
+    "role": "required-generator",
+    "status": "pinned-pending-execution",
+    "voice_mode": "description",
+    "sample_rate_hz": 24000,
+    "profiles": [
+      {
+        "id": "qwen-de-clear-documentary",
+        "locale": "de-DE",
+        "language": "German",
+        "passage_id": "synthetic-de-origin",
+        "voice": null,
+        "instruction": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady documentary narration.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-de-warm-podcast",
+        "locale": "de-DE",
+        "language": "German",
+        "passage_id": "synthetic-de-origin",
+        "voice": null,
+        "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-en-clear-documentary",
+        "locale": "en-US",
+        "language": "English",
+        "passage_id": "synthetic-en-reasoning",
+        "voice": null,
+        "instruction": "A clear, calm American English voice with precise articulation, restrained expression, and steady documentary narration.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-en-warm-podcast",
+        "locale": "en-US",
+        "language": "English",
+        "passage_id": "synthetic-en-reasoning",
+        "voice": null,
+        "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      }
+    ],
+    "generation": {
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false
+    }
+  },
+  "architecture": {
+    "model_type": "voice_design",
+    "model_size": "1b7",
+    "sample_rate_hz": 24000,
+    "talker_layers": 28,
+    "talker_hidden_size": 2048,
+    "code_predictor_layers": 5,
+    "code_predictor_hidden_size": 1024,
+    "language_ids": [
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "constraints": [
+    "Voice identity is generated from the exact instruction and seed; there is no reusable speaker identifier.",
+    "The first calibration must verify that German voice design does not silently fall back to English pronunciation.",
+    "The model snapshot is benchmark-only until the dependency and packaging decision is accepted."
+  ]
+}

@@ -20,9 +20,9 @@ support, not a universal winner; every accepted ASR backend remains selectable.
 | Candidate | Disposition | Calibration role |
 | --- | --- | --- |
 | Apple `AVSpeechSynthesizer` | required | Two installed voices per locale provide the system baseline. Record voice identifier, quality, locale, host OS, and generated-audio digest because installed inventories vary by host. |
-| Qwen3-TTS 1.7B VoiceDesign | required | Two description-pinned voices per locale provide an open multilingual family without third-party reference audio. Pin the current MLX conversion and runtime before use. |
+| Qwen3-TTS 1.7B VoiceDesign | required | Two description-pinned voices per locale provide an open multilingual family without third-party reference audio. The BF16 conversion and MLX runtime are now immutable and digest-pinned. |
 | Voxtral 4B TTS BF16 | required, reference-only | Two native-locale presets per locale provide the strongest European-language hypothesis. Use BF16 to avoid treating the existing 4-bit result as a model-family verdict. The CC BY-NC 4.0 weights and voices keep artifacts local and prohibit production adoption without another license. |
-| KugelAudio-0-Open | German challenger | Run one German voice on one passage first. It is German/European-focused, MIT-licensed, exposes three fixed voices, and uses deterministic decoding, but its roughly 9B-parameter/19 GB footprint and young ecosystem do not justify full-matrix cost before calibration. |
+| KugelAudio-0-Open | German challenger | Run its implicit German default voice on one passage first. It is German/European-focused and MIT-licensed, but the pinned snapshot lacks the advertised preset files and the current MLX path ignores voice selection. Its roughly 19 GB footprint does not justify full-matrix cost before calibration. |
 | Chatterbox Multilingual V3 | deferred | Current upstream V3 supports German and 23+ languages, but multi-voice use depends on reference audio. Voice rights, prompt digests, and the current Apple-Silicon conversion must be resolved first. |
 | Qwen-Audio-3.0-TTS-Plus API | optional English ceiling | Hosted, mutable, credentialed, and not German evidence. It may remain an English listening control but does not block the local matrix. |
 
@@ -68,9 +68,9 @@ NVIDIA offline family at lower model size.
 
 ## Calibration sequence
 
-1. Pin exact current runtime/model revisions and artifact digests for Qwen
-   VoiceDesign, Voxtral BF16, and KugelAudio. Do not update the historical
-   measured pins in place.
+1. **Complete:** exact runtime/model revisions and artifact digests are pinned
+   for Qwen VoiceDesign, Voxtral BF16, and KugelAudio without changing the
+   historical measured pins.
 2. Materialize one German and one English passage. Generate two voices for
    Apple, Qwen, and Voxtral; add one German KugelAudio challenger.
 3. Perform basic listening and run the five required ASR backends on identical
@@ -111,5 +111,5 @@ a candidate that fails one representative passage.
   https://huggingface.co/openai/whisper-large-v3-turbo
 - Nemotron 3.5 ASR Streaming 0.6B:
   https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b
-- Current MLX-Audio discovery surface, not yet an accepted execution pin:
+- Accepted shared MLX-Audio calibration runtime:
   https://github.com/Blaizzy/mlx-audio

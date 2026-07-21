@@ -1,0 +1,180 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "kugelaudio-0-open-bf16",
+  "task": "tts",
+  "source": {
+    "repository": "kugelaudio/kugelaudio-0-open",
+    "observed_revision": "22d6ed9b8627394d4bf3e5af35285ad37c4d72b6",
+    "license": "MIT",
+    "supported_languages": [
+      "English",
+      "German",
+      "French",
+      "Spanish",
+      "Italian",
+      "Portuguese",
+      "Dutch",
+      "Polish",
+      "Russian",
+      "Ukrainian",
+      "Czech",
+      "Romanian",
+      "Hungarian",
+      "Swedish",
+      "Danish",
+      "Finnish",
+      "Norwegian",
+      "Greek",
+      "Bulgarian",
+      "Slovak",
+      "Croatian",
+      "Serbian",
+      "Turkish"
+    ],
+    "provenance_limit": "The original BF16 Hugging Face snapshot is loaded directly and remapped by mlx-audio; no separate converted model repository is involved. The repository model card declares MIT for the model but does not separately license the four documentation sample recordings."
+  },
+  "artifact": {
+    "repository": "kugelaudio/kugelaudio-0-open",
+    "revision": "22d6ed9b8627394d4bf3e5af35285ad37c4d72b6",
+    "license": "MIT",
+    "format": "Original BF16 sharded safetensors remapped at load time",
+    "conversion_tool": "mlx-audio sanitize() runtime remapping",
+    "conversion_tool_version": "0.4.5",
+    "weight_bytes": 18686870230,
+    "snapshot_bytes": 18688088739,
+    "artifacts": [
+      {
+        "path": ".gitattributes",
+        "bytes": 2048,
+        "sha256": "29e4d5a29c7946b5aebde20ee86616d6a84abfcde2aed2731d6fe2938d644a70",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "README.md",
+        "bytes": 15019,
+        "sha256": "9213aad7997a2ef986e9091ecd2f22034b4290b4768ce0cf889ec8ce0183ed29",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "config.json",
+        "bytes": 2989,
+        "sha256": "f3b44f0dd4bd62aa1f682980be528782754330bd0183bd53050f2fadda5d5ad6",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 74,
+        "sha256": "4a0ede46fd1d2cbaa71908173ea846fd8203160b7133aec4d3e01e406d72976a",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "model-00001-of-00004.safetensors",
+        "bytes": 4877662532,
+        "sha256": "b4209041f36d8de076ceaad966b026e951d2e58337466f653a1bbf3142c8ab10",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "model-00002-of-00004.safetensors",
+        "bytes": 4932752840,
+        "sha256": "d236dd36482846352f570d21685661d7683bade9926e0a4d855f43ba1c4ea148",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "model-00003-of-00004.safetensors",
+        "bytes": 4982901128,
+        "sha256": "6e5feac1d14fd375e1e0b1ceeab31cd130517280f66dc630aac6f5b42c6795b9",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "model-00004-of-00004.safetensors",
+        "bytes": 3893553730,
+        "sha256": "3bbbeec7dacf727e2b086f3ef7796b17bcf00c8c25834a27df2031a1cf3774ea",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "bytes": 122675,
+        "sha256": "1f451fbe615ce51646322a1fc7dfdfae4801c268c10b74b19b7c913ffb37cc45",
+        "digest_source": "downloaded-at-pinned-revision"
+      },
+      {
+        "path": "samples/258_Lukas_der_Flüsterer.wav",
+        "bytes": 320044,
+        "sha256": "75309e892ff871fce2ee1d4f971ce1c168e4b65290b2498e8869561da3bf69cf",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "samples/261_Sauerer_Felix.wav",
+        "bytes": 185644,
+        "sha256": "f5b098fca73349f848e69a02fb13a647853caaf4cec4c5756a7ce4e0e99c3fc7",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "samples/266_Petra_die_Vorleserin.wav",
+        "bytes": 256044,
+        "sha256": "b24761c0a67b3164bc088291b524203287c67b51e777b3df9e86433e76c2dc45",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "samples/277_Radio_Lars.wav",
+        "bytes": 313644,
+        "sha256": "e1844e12b490ee1aa37117c9e5139164f51d97e85b0ae60e81a8c10990924f4e",
+        "digest_source": "hugging-face-lfs-metadata"
+      },
+      {
+        "path": "voices/voices.json",
+        "bytes": 328,
+        "sha256": "b14733ae51c9c354399524e3992da425c9bc7efaa333126f1aa679eeb94d582f",
+        "digest_source": "downloaded-at-pinned-revision"
+      }
+    ]
+  },
+  "reference_runtime": {
+    "repository": "Blaizzy/mlx-audio",
+    "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "version": "0.4.5",
+    "license": "MIT",
+    "boundary": "Pinned Python reference runner over official Apple MLX"
+  },
+  "calibration": {
+    "role": "bounded-challenger",
+    "status": "pinned-capability-limited-pending-execution",
+    "voice_mode": "implicit-default",
+    "sample_rate_hz": 24000,
+    "profiles": [
+      {
+        "id": "kugel-de-implicit-default",
+        "locale": "de-DE",
+        "language": "German",
+        "passage_id": "synthetic-de-origin",
+        "voice": null,
+        "instruction": null,
+        "seed": 0
+      }
+    ],
+    "generation": {
+      "cfg_scale": 3,
+      "ddpm_steps": 10,
+      "max_tokens": 2048,
+      "stream": false
+    }
+  },
+  "architecture": {
+    "model_type": "kugelaudio",
+    "publisher_parameter_label": "7B",
+    "hub_parameter_inventory_label": "9B",
+    "sample_rate_hz": 24000,
+    "language_model_layers": 28,
+    "language_model_hidden_size": 3584,
+    "diffusion_head_layers": 4,
+    "diffusion_inference_steps": 20,
+    "watermark": "AudioSeal claimed by publisher; not invoked by the pinned mlx-audio generation path"
+  },
+  "constraints": [
+    "The 18.69 GB snapshot is a bounded German challenger and must not be downloaded for the required Qwen/Voxtral matrix.",
+    "The Hub voices.json references default.pt, warm.pt, and clear.pt, but those files are absent from the pinned snapshot.",
+    "The pinned mlx-audio implementation ignores its voice argument and generates with one implicit default voice; KugelAudio therefore cannot satisfy multi-voice coverage.",
+    "The runtime path does not call AudioSeal even though the publisher model card claims generated audio is automatically watermarked.",
+    "The four documentation sample recordings are not used as voice prompts and have no separate license statement beyond the repository-level MIT declaration."
+  ]
+}

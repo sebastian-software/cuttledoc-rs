@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/spikes/tts-calibration/model-manifest.schema.json",
+  "title": "Pinned TTS calibration model manifest",
+  "type": "object",
+  "required": [
+    "$schema",
+    "id",
+    "task",
+    "source",
+    "artifact",
+    "reference_runtime",
+    "calibration",
+    "architecture",
+    "constraints"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./model-manifest.schema.json"
+    },
+    "id": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "task": {
+      "const": "tts"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "artifact": {
+      "$ref": "#/$defs/artifact"
+    },
+    "reference_runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "calibration": {
+      "$ref": "#/$defs/calibration"
+    },
+    "architecture": {
+      "type": "object",
+      "minProperties": 2
+    },
+    "constraints": {
+      "$ref": "#/$defs/nonEmptyUniqueStrings"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha40": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "repository",
+        "observed_revision",
+        "license",
+        "supported_languages",
+        "provenance_limit"
+      ],
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "observed_revision": {
+          "$ref": "#/$defs/sha40"
+        },
+        "license": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "supported_languages": {
+          "$ref": "#/$defs/nonEmptyUniqueStrings"
+        },
+        "provenance_limit": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": [
+        "repository",
+        "revision",
+        "license",
+        "format",
+        "conversion_tool",
+        "conversion_tool_version",
+        "weight_bytes",
+        "snapshot_bytes",
+        "artifacts"
+      ],
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "$ref": "#/$defs/sha40"
+        },
+        "license": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "format": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "conversion_tool": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "conversion_tool_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "weight_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "snapshot_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "digest_source"
+            ],
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "digest_source": {
+                "enum": [
+                  "downloaded-at-pinned-revision",
+                  "hugging-face-lfs-metadata"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "repository",
+        "revision",
+        "version",
+        "license",
+        "boundary"
+      ],
+      "properties": {
+        "repository": {
+          "const": "Blaizzy/mlx-audio"
+        },
+        "revision": {
+          "$ref": "#/$defs/sha40"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license": {
+          "const": "MIT"
+        },
+        "boundary": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "calibration": {
+      "type": "object",
+      "required": [
+        "role",
+        "status",
+        "voice_mode",
+        "sample_rate_hz",
+        "profiles",
+        "generation"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "required-generator",
+            "bounded-challenger"
+          ]
+        },
+        "status": {
+          "enum": [
+            "pinned-pending-execution",
+            "pinned-capability-limited-pending-execution"
+          ]
+        },
+        "voice_mode": {
+          "enum": [
+            "description",
+            "preset",
+            "implicit-default"
+          ]
+        },
+        "sample_rate_hz": {
+          "const": 24000
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "locale",
+              "language",
+              "passage_id",
+              "voice",
+              "instruction",
+              "seed"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "locale": {
+                "enum": [
+                  "de-DE",
+                  "en-US"
+                ]
+              },
+              "language": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "passage_id": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "voice": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "instruction": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "generation": {
+          "type": "object",
+          "minProperties": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

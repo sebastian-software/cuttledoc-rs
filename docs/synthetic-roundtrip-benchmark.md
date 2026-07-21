@@ -73,9 +73,9 @@ the repository MIT license.
 | Candidate | Disposition | First boundary | Why it is included |
 | --- | --- | --- | --- |
 | Apple `AVSpeechSynthesizer` | required system baseline | narrow Swift-to-C ABI called from Rust | two installed voices per locale exercise the platform path without a bundled model |
-| Qwen3-TTS 1.7B VoiceDesign | required open multilingual generator | current `mlx-audio` reference, pinned before execution | description-pinned voices avoid third-party prompt audio and give German and English distinct controlled presentations |
-| Voxtral 4B TTS 2603 BF16 | required European-language hypothesis; reference-only | current `mlx-audio` reference, pinned before execution | native German and other European-language presets plus BF16 isolate model behavior from the first 4-bit diagnostic |
-| KugelAudio-0-Open | bounded German challenger | current `mlx-audio` reference, pinned before execution | German/European focus and three built-in voices justify one short calibration despite the roughly 9B-parameter footprint |
+| Qwen3-TTS 1.7B VoiceDesign | required open multilingual generator | `mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16@7d3824ab` through `mlx-audio@64e8416c` | description-pinned voices avoid third-party prompt audio and give German and English distinct controlled presentations |
+| Voxtral 4B TTS 2603 BF16 | required European-language hypothesis; reference-only | `mlx-community/Voxtral-4B-TTS-2603-mlx-bf16@dd85c02a` through `mlx-audio@64e8416c` | native German and other European-language presets plus BF16 isolate model behavior from the first 4-bit diagnostic |
+| KugelAudio-0-Open | bounded German challenger | `kugelaudio/kugelaudio-0-open@22d6ed9b` through `mlx-audio@64e8416c` | German/European focus justifies one short calibration, but the current MLX path exposes only an implicit default voice |
 | Chatterbox Multilingual V3 | deferred | upstream reference; current MLX conversion still to verify | multi-voice comparison requires reference audio whose rights, digests, and provenance must be accepted first |
 | Qwen-Audio-3.0-TTS-Plus | optional remote English ceiling | Alibaba Cloud API reference runner | provider evidence remains useful for English listening, but does not block the local or German matrix |
 
@@ -84,9 +84,11 @@ historical reference runner pins commit
 `64e8416c303fb3b3463dab8eb4ebd78c55a87c1a`. It gives the spike a working
 Apple Silicon implementation for Qwen3-TTS 0.6B and Voxtral 4-bit quickly
 enough to measure model behavior. Those diagnostic pins remain immutable.
-The current Qwen VoiceDesign, Voxtral BF16, and KugelAudio model conversions
-and runtime revision must receive new manifests before calibration. The
-measurements then decide between:
+The current Qwen VoiceDesign, Voxtral BF16, and KugelAudio snapshots and their
+shared runtime are frozen in
+[`spikes/tts-calibration`](../spikes/tts-calibration/README.md). The manifests
+pin all Hub files by byte count and SHA-256; the generic fetcher rejects any
+download drift. The measurements now decide between:
 
 1. retaining the broader `mlx-audio` dependency;
 2. owning a narrow adapter for the selected model directly over official MLX,
@@ -97,6 +99,12 @@ measurements then decide between:
 The reference path must not silently define the future Rust API. It exists to
 produce evidence for the repository-owned synthesis contract required by
 ADR-0009.
+
+KugelAudio remains a single-voice challenger at this checkpoint. Although its
+Hub metadata names three `.pt` voice presets, those files are absent from the
+pinned snapshot and `mlx-audio` 0.4.5 ignores the `voice` argument for this
+model. The implicit default path remains runnable, but cannot contribute to
+the required multi-voice coverage.
 
 The dated rationale, rejected alternatives, ASR receivers, and staged
 execution gate are recorded in

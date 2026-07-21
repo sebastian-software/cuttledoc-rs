@@ -128,6 +128,11 @@ control. See
 [`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md)
 and the dated
 [`docs/speech-engine-shortlist-2026-07.md`](../docs/speech-engine-shortlist-2026-07.md).
+The exact model/runtime revisions, artifact digests, fixed voice profiles, and
+generic verified fetch command live in
+[`spikes/tts-calibration`](../spikes/tts-calibration/README.md). KugelAudio is
+currently limited to an implicit default voice and does not satisfy
+multi-voice coverage.
 Materialize the nine digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:
 
