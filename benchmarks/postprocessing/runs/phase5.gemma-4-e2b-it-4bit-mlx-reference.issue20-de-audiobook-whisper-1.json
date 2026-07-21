@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.gemma-4-e2b-it-4bit-mlx-reference.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-21T18:58:49.600128Z",
+  "source_revision": "12b60a89712fb949dd9b9ff46b83970f2a0a1bfc",
+  "purpose": "development-runtime-probe",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "gemma-4-e2b-it-4bit-mlx",
+    "role": "primary-quality-candidate",
+    "model": {
+      "repository": "mlx-community/gemma-4-e2b-it-4bit",
+      "revision": "238767527555cb75a05732a84dff5d6ba0dd6809",
+      "license": "Gemma",
+      "format": "MLX 4-bit safetensors with multimodal towers",
+      "converter": "mlx-vlm.convert at an unpinned local checkout",
+      "quantization_bits": 4,
+      "quantization_group_size": 64,
+      "weight_bytes": 3550670554,
+      "snapshot_bytes": 3583086498,
+      "provenance_limit": "The conversion card pins its source model revision but does not pin the mlx-vlm converter commit. The repository license tag is Gemma even though the observed official source revision is tagged Apache-2.0; product selection requires an explicit rights disposition."
+    },
+    "source_model": {
+      "repository": "google/gemma-4-E2B-it",
+      "observed_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "conversion_source_revision": "70af34e20bd4b7a91f0de6b22675850c43922a03",
+      "license": "Apache-2.0",
+      "effective_parameter_count": 2300000000,
+      "parameter_count_including_embeddings": 5100000000,
+      "advertised_languages": "140+",
+      "context_tokens": 131072,
+      "provenance_limit": "The conversion card names exact source revision 70af34e20bd4b7a91f0de6b22675850c43922a03. The separate observed revision records source main when this manifest was created."
+    },
+    "runtime": {
+      "repository": "ml-explore/mlx-lm",
+      "revision": "ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+      "version": "0.31.3",
+      "license": "MIT",
+      "mlx_repository": "ml-explore/mlx",
+      "mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+      "mlx_version": "0.32.0",
+      "boundary": "Pinned Python reference over official Apple MLX; not an accepted product dependency or stable API"
+    }
+  },
+  "fixture": {
+    "id": "issue7-de-audiobook-whisper",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "procedure": {
+    "model_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "generation": {
+      "prompt_id": "surface-only-v1",
+      "prompt_path": "benchmarks/postprocessing/prompts/surface-only-v1.txt",
+      "prompt_sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
+      "chat_template": "pinned model tokenizer template with enable_thinking=false",
+      "chat_template_options": {
+        "enable_thinking": false
+      },
+      "seed": 0,
+      "temperature": 0.0,
+      "max_tokens": 256,
+      "stream": true,
+      "cancellation_probe_after_tokens": 4,
+      "rationale": "Greedy non-thinking decoding isolates surface-formatting behavior and makes the development runtime probe repeatable."
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "domain",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "command": "CUTTLEDOC_TEXT_GENERATION_MANIFEST=/repo/candidate.json CUTTLEDOC_TEXT_GENERATION_MODEL_DIR=/local/model CUTTLEDOC_TEXT_GENERATION_OUTPUT=/tmp/result.json bash scripts/run-text-generation-mlx-reference.sh"
+  },
+  "measurements": {
+    "model_load_ms": 1917.548041,
+    "first_token_ms": 1467.24225,
+    "complete_generation_ms": 1997.682875,
+    "prompt_tokens": 272,
+    "generation_tokens": 56,
+    "prompt_tokens_per_second": 214.51519275956073,
+    "generation_tokens_per_second": 108.12110142525556,
+    "maximum_resident_set_size_bytes": 7372849152,
+    "mlx_peak_memory_bytes": 2944960854,
+    "model_snapshot_bytes": 3583086498,
+    "deterministic_repeat": {
+      "text_identical": true,
+      "token_ids_identical": true,
+      "complete_generation_ms": 803.254209,
+      "first_token_ms": 282.460709
+    }
+  },
+  "streaming": {
+    "supported": true,
+    "update_count": 56,
+    "update_semantics": "append-only text deltas with token identifiers and one terminal finish reason",
+    "finish_reason": "stop",
+    "cancellation": {
+      "requested_after_tokens": 4,
+      "observed_tokens": 4,
+      "cooperative_stop_ms": 320.666167,
+      "process_remained_usable": true,
+      "semantics": "The consumer closes generation between token updates; no thread or process termination is required."
+    }
+  },
+  "output": {
+    "text": "wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+    "text_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "token_ids": [
+      25679,
+      12558,
+      12543,
+      7406,
+      10211,
+      4238,
+      84231,
+      494,
+      9040,
+      941,
+      94131,
+      4058,
+      1474,
+      4520,
+      6838,
+      15438,
+      6838,
+      7406,
+      9898,
+      957,
+      18052,
+      173062,
+      195341,
+      5679,
+      528,
+      117353,
+      692,
+      1117,
+      196908,
+      501,
+      38637,
+      42261,
+      518,
+      788,
+      1725,
+      517,
+      33971,
+      113636,
+      4238,
+      2034,
+      13019,
+      540,
+      1021,
+      789,
+      501,
+      2838,
+      236802,
+      21849,
+      92713,
+      9315,
+      6840,
+      7089,
+      59390,
+      1197,
+      2391,
+      106
+    ],
+    "gates": {
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": true,
+      "accepted": true
+    },
+    "development_quality": {
+      "input_wer": 0.02564102564102564,
+      "output_wer": 0.02564102564102564,
+      "claim_limit": "The dataset transcript is unverified and the fixture is development-exposed; these values are diagnostic only."
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-lm": "0.31.3",
+      "tokenizers": "0.22.2",
+      "transformers": "5.12.1"
+    }
+  },
+  "conclusion": {
+    "reference_runtime_executed": true,
+    "surface_candidate_accepted": true,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "reason": "The runtime path is independent of the output gate. A development fixture can establish execution, mechanical policy behavior, streaming, cancellation, determinism, and cost; it cannot select a correction model or promote the Python reference into the product."
+  }
+}
