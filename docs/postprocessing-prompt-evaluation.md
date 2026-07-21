@@ -1,7 +1,8 @@
 # Prompt-controlled transcript correction
 
-**Status:** prompt candidates and evaluation contract defined; model runs
-pending representative audiobook and podcast gold data.
+**Status:** prompt candidates and evaluation contract defined; first embedded
+runtime probe complete; model selection still awaits representative audiobook
+and podcast gold data.
 
 **Evidence date:** 2026-07-20.
 
@@ -131,9 +132,16 @@ separate candidate rather than silently replacing the English prompt.
 
 ## First experiment
 
-1. Use Gemma 3n E4B as the historical local-model candidate and deterministic
-   decoding where the runtime supports it.
-2. Run raw/no-op, historical, surface-only, and conservative prompts on
+The issue-#7 Qwen3 0.6B MLX probe was an intentionally small runtime test, not
+the quality experiment below. It streamed and repeated deterministically, but
+changed `fielen` to `fiel` under `surface-only-v1`; the lexical gate rejected
+the output. That exact tuple is not a correction candidate. See
+[`text-generation-runtime-evaluation.md`](text-generation-runtime-evaluation.md).
+
+1. Use Gemma 3n E4B only to reproduce the historical Ollama candidate, and use
+   deterministic decoding where that provider/model supports it. Do not infer
+   an embedded-runtime choice from the historical result.
+2. Compare raw/no-op, historical, surface-only, and conservative prompts on
    development data from real Apple, Whisper, and Qwen outputs.
 3. Build suspect spans only from product-available signals; never use gold
    alignment at inference.

@@ -23,15 +23,16 @@
       "parameter_count": 600000000,
       "non_embedding_parameter_count": 440000000,
       "advertised_languages": "100+",
-      "context_tokens": 32768
+      "context_tokens": 32768,
+      "provenance_limit": "The converted model identifies Qwen/Qwen3-0.6B as its base model but does not name the exact source commit used for conversion. The observed revision pins current capability and license evidence; it is not asserted to be the conversion input."
     },
     "runtime": {
       "repository": "ml-explore/mlx-lm",
-      "revision": "cf10f962b7a20e63a6df43dbf0faf06070153d40",
+      "revision": "ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
       "version": "0.31.3",
       "license": "MIT",
       "mlx_repository": "ml-explore/mlx",
-      "mlx_revision": "30a19f7234abfb4d136af58623eaac289e63f5d2",
+      "mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
       "mlx_version": "0.32.0",
       "boundary": "Pinned Python reference over official Apple MLX; not an accepted product dependency or stable API"
     }

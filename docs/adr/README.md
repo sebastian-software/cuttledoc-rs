@@ -16,6 +16,7 @@ ADRs capture decisions that materially constrain the implementation. Proposed AD
 | [0010](0010-capability-oriented-engine-ownership.md)                   | Capability-oriented engine ownership and backend identity | Accepted |
 | [0011](0011-us-english-project-language.md)                            | US English as the project language                   | Accepted |
 | [0012](0012-official-mlx-boundary-for-voxtral.md)                      | Official MLX boundary for Voxtral                    | Accepted |
+| [0013](0013-defer-embedded-text-generation-and-prefer-official-mlx.md) | Defer embedded text generation and prefer official MLX | Accepted |
 
 Status values: proposed, accepted, superseded, rejected.
 

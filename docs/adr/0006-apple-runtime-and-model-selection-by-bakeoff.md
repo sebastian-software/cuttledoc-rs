@@ -56,4 +56,4 @@ LLM/transcript-enhancement runtime selection is evaluated separately because aut
 
 ## Validation
 
-The Phase 0 milestone ends with a machine-readable benchmark record, a model/runtime recommendation, and follow-up ADRs for the selected ASR and optional LLM paths.
+The Phase 0 milestone ends with a machine-readable benchmark record, a model/runtime recommendation, and follow-up ADRs for the selected ASR and optional LLM paths. ADR-0013 records the issue-#7 LLM outcome: defer the initial embedded backend while retaining official MLX as the preferred future Apple-local foundation.

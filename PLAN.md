@@ -194,6 +194,11 @@ Evaluate independently:
 
 Gate:
 
+- Issue #7 defers an embedded enhancement backend from the initial v3 scope.
+  Keep OpenAI and Ollama independently implementable behind the runtime-neutral
+  text-generation contract; when embedded work resumes, evaluate a narrow
+  owned adapter over official MLX first and retain llama.cpp/GGUF as the
+  cross-platform fallback.
 - Keep enhancement only where measured transcript quality, install size, and operational complexity justify it.
 - Do not select an immature runtime merely because its model experiment succeeds.
 - Preserve raw transcription as a complete product regardless of this decision.

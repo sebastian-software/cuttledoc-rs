@@ -48,7 +48,8 @@ function validate(manifest, fixture, result, promptBytes) {
   }
   if (manifest.source?.license !== 'Apache-2.0' ||
       manifest.conversion?.license !== 'Apache-2.0' ||
-      manifest.reference_runtime?.license !== 'MIT') {
+      manifest.reference_runtime?.license !== 'MIT' ||
+      !(manifest.source?.provenance_limit?.length > 0)) {
     errors.push('model, conversion, and runtime licenses must remain explicit');
   }
   if (manifest.reference_runtime?.boundary !==

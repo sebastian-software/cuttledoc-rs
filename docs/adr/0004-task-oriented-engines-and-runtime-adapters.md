@@ -63,6 +63,9 @@ MLX task ABI all map behind recognition-oriented domain types without exposing
 runtime handles. ADR-0010 fixes the remaining backend identity, capability,
 worker, queue, cancellation, and shutdown semantics.
 
-Text generation still requires its own vertical slice and delta contract.
+Issue #7 now validates the separate text-generation delta, deterministic-option,
+streaming, cancellation, and mechanical-output-gate boundary. ADR-0013 defers
+an embedded model from initial v3 while keeping remote OpenAI, local Ollama,
+and future official-MLX or llama.cpp adapters independently implementable.
 Phase 5 validates speech synthesis before accepting its contract (ADR-0009);
-it must not be retrofitted through the recognition API.
+it must not be retrofitted through recognition or text generation.

@@ -79,8 +79,69 @@ pub struct GenerationUpdate {
     pub text_delta: String,
     pub token_ids: Option<Vec<u32>>,
     pub finish_reason: Option<FinishReason>,
+    pub usage: Option<GenerationUsage>,
 }
 ```
+
+The generation request is provider- and runtime-neutral:
+
+```rust
+pub struct GenerationRequest {
+    pub model: Option<ModelId>,
+    pub messages: Vec<GenerationMessage>,
+    pub output_format: GenerationOutputFormat,
+    pub options: GenerationOptions,
+}
+
+pub struct GenerationMessage {
+    pub role: GenerationRole,
+    pub content: String,
+}
+
+pub enum GenerationRole {
+    System,
+    User,
+    Assistant,
+}
+
+pub enum GenerationOutputFormat {
+    Text,
+    JsonObject,
+}
+
+pub struct GenerationOptions {
+    pub max_output_tokens: Option<u32>,
+    pub temperature: Option<f32>,
+    pub top_p: Option<f32>,
+    pub top_k: Option<u32>,
+    pub seed: Option<u64>,
+    pub stop: Vec<String>,
+}
+```
+
+Every option is optional because support varies by backend and model. The
+capability record states whether seeded determinism, greedy decoding,
+structured output, token identifiers, and each sampler control are supported.
+An explicitly requested unsupported option returns a capability error; an
+adapter never silently approximates or discards it. Credentials, provider
+URLs, local process discovery, and runtime preferences remain context/provider
+configuration rather than fields on a generation request.
+
+Generation updates are ordered and append-only. `sequence` starts at zero and
+increases by one. Text deltas never rewrite or revoke prior text; a completion-
+only provider may emit one update. `token_ids` are optional diagnostics rather
+than portable text identity. Exactly one terminal update contains
+`finish_reason` and optional usage. Bounded backpressure never drops deltas,
+and cancellation terminates the stream with the common cancelled error at the
+backend's advertised safe boundary.
+
+Transcript enhancement is orchestration above this engine. It selects and
+hashes prompts, chunks long transcripts, supplies language/domain context,
+compares the generated output with the raw input, applies protected-span and
+lexical guards, and retains both raw and accepted text. Consequently OpenAI,
+Ollama, a future official-MLX adapter, and a possible llama.cpp adapter can
+implement the same engine without moving prompt policy into a runtime adapter.
+STT output is never overwritten in place.
 
 Both streams define cancellation and backpressure behavior. Phase 5 must use a
 real TTS runtime to validate output sample ownership, chunk timing, format
