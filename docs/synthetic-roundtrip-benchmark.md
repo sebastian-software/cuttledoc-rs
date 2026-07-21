@@ -1,9 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** German and Spanish pass all three Qwen content cells; English
-technical and native-factual pass while English dialogue fails; French native-
-factual passes while technical and dialogue fail; Portuguese and listening
-review remain pending
+**Status:** the 15-cell Qwen primary-locale calibration is complete with 11
+passes and four retained failures; listening review remains pending
 
 ## Purpose
 
@@ -372,8 +370,30 @@ termination below the token limit; all receivers therefore exceed 43% WER.
 The dialogue stops after “Jonas sourit”, repeats unintelligible material until
 the 1,200-token limit, and leaves the remaining dialogue unsynthesized. This
 rules out a general inability to speak French and points instead to
-content-structure-sensitive generation failures. Portuguese is the final
-bounded Qwen language block.
+content-structure-sensitive generation failures.
+
+Portuguese completes the bounded five-locale block. The native-factual cell
+finishes normally and ranges from 0.69% WER (Voxtral) to 8.28% (Qwen-ASR);
+the dialogue ranges from 0.70% (Qwen-ASR) to 2.82% (Parakeet and Apple). Both
+pass because all five receivers recover their full passages without a shared
+content error. The technical cell also finishes its passage, but every
+receiver renders the embedded critical term “Agentic AI” as incompatible
+nonsense. Its 6.12–23.47% WER spread is secondary to that shared localized
+failure, so the cell is retained as a failed pronunciation control.
+
+The completed first-voice content matrix is:
+
+| Locale | Technical | Native-factual | Dialogue |
+| --- | --- | --- | --- |
+| `de-DE` | pass | pass | pass |
+| `en-US` | pass | pass | fail: repetition and truncation |
+| `es-419` | pass | pass: pronunciation review | pass |
+| `fr-FR` | fail: mid-list truncation | pass | fail: repetition and truncation |
+| `pt-BR` | fail: critical-term pronunciation | pass | pass |
+
+These are lexical/synthesis gates, not final voice-quality verdicts. Listening
+review remains necessary, and the results describe only the pinned passages,
+voice descriptions, and regional proxies rather than whole languages.
 
 ## Voxtral TTS MLX reference result
 
@@ -445,12 +465,14 @@ artifact also remains reference-only under CC BY-NC 4.0.
    required ASR receivers and the two bounded ASR qualifiers. Freeze only the
    candidates that pass fidelity, stability, listening, and operational-cost
    gates.
-   **In progress:** all three model/runtime snapshots are pinned. German's
+   **Content calibration complete:** all three model/runtime snapshots are
+   pinned. German's
    three Qwen cells pass the lexical gate, the English technical and
    native-factual cells pass, the English dialogue has a pinned repeat-and-
-   truncate failure, all three Spanish cells complete, and the remaining six
-   French cells now provide one pass and two pinned failures; the remaining
-   three Portuguese Qwen cells are frozen for execution.
+   truncate failure, all three Spanish cells pass, French provides one pass
+   and two pinned failures, and Portuguese provides two passes plus one
+   critical-term pronunciation failure. Across the 15 cells, 11 pass and four
+   remain reproducible failed controls. Listening review is the next gate.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

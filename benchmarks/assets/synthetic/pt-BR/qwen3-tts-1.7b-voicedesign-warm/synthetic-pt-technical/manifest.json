@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-pt-technical.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-failed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 682,
+    "characters": 659,
+    "sha256": "a87cadad5308bb5eeb339ce680f7624a35ccc724e6a20dc0897069cd65ae736d",
+    "spoken_text_sha256": "a87cadad5308bb5eeb339ce680f7624a35ccc724e6a20dc0897069cd65ae736d",
+    "source_id": "pt-wikipedia-inteligencia-artificial-72427477",
+    "passage_id": "synthetic-pt-technical",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-technical.1",
+    "record_sha256": "3dc0957ec6efbeb36b5b4f54eaf4e32aadfdc59997c6ac184e71dda139861926",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-pt-warm-technical",
+    "voice_instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "pt-BR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1182720,
+      "bytes": 4730880,
+      "sha256": "1c1a1222e1f8a75ec5c0399ef922ebda846fd4f1a28202082c0c400538b14ef8"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "09c60d9d4ebd694273ac5849bc3bfa6cf17a94563eb1d9414817c28a0fe3ad47"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 436543,
+    "sha256": "a4310b905aeb861857e45a99641043cdc6cf3ea5f646e053a8c8be5f927e2443",
+    "duration_ms": 49286.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 70858,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "failed-critical-technical-term-pronunciation",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.061224489795918366,
+      0.23469387755102042
+    ],
+    "summary": "All five receivers garble the embedded critical term “Agentic AI” into incompatible nonsensical forms. The remaining Portuguese passage is complete, so this is a localized synthesis pronunciation failure rather than truncation."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

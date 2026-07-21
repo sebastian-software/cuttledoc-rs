@@ -138,7 +138,7 @@ The selection contains technical, native-factual, and conversational-dialogue
 cells for each primary locale. Spanish and Portuguese remain explicit regional
 proxies: results apply to the pinned text and voice, not to every `es-419` or
 `pt-BR` variety.
-Materialize the eleven digest-pinned passage files and their CC BY-SA
+Materialize the 22 digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:
 
 ```sh
@@ -146,10 +146,10 @@ node scripts/materialize-synthetic-roundtrip.mjs \
   --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip
 ```
 
-The command retrieves three exact MediaWiki revisions, verifies page and parent
-revision metadata, reads one repository-authored source at its pinned SHA-256,
-resolves fixed section/paragraph selectors, and rejects any character-count or
-digest drift. The checked-in
+The command retrieves ten exact MediaWiki revisions, verifies page and parent
+revision metadata, reads five repository-authored sources at their pinned
+SHA-256 digests, resolves fixed section/paragraph selectors, and rejects any
+character-count or digest drift. The checked-in
 [`synthetic-roundtrip-selection.json`](fixtures/synthetic-roundtrip-selection.json)
 contains selectors and digests. Lossless generated audio remains local. The
 separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
@@ -194,8 +194,11 @@ Qwen repeats one question until the 1,200-token limit and omits the last 32
 reference words. All three Spanish cells complete without a shared content
 omission, although “a elegir” remains open for pronunciation review. French
 native-factual speech passes, while its technical list and dialogue expose two
-pinned truncation failures. Portuguese is next; listening review precedes
-full-matrix promotion.
+pinned truncation failures. Portuguese native-factual and dialogue speech
+pass; its technical passage is complete but fails because all five receivers
+garble “Agentic AI”. The five-locale content slice therefore closes with 11
+passes and four retained failed controls. Listening review precedes full-
+matrix promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

@@ -271,6 +271,52 @@ const additionalQwenCalibrationSpecs = [
     reachedMaxTokens: true,
     attributionNeedle: 'dialogue stops after “Jonas sourit”',
   },
+  {
+    profileId: 'qwen-pt-warm-technical',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-pt-warm-technical.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/pt-BR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-pt-technical',
+    purpose: 'reproducible-failed-content-type-calibration',
+    disposition: 'failed-critical-technical-term-pronunciation',
+    resultDisposition: 'failed-critical-technical-term-pronunciation',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'garble the embedded critical term “Agentic AI”',
+  },
+  {
+    profileId: 'qwen-pt-warm-native',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-pt-warm-native.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/pt-BR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-pt-native',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-native-content-gate-receiver-spread',
+    resultDisposition:
+      'passed-native-content-gate-receiver-spread-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'Voxtral makes one word edit',
+  },
+  {
+    profileId: 'qwen-pt-warm-dialogue',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-pt-warm-dialogue.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/pt-BR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-pt-dialogue',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-dialogue-content-gate',
+    resultDisposition: 'passed-dialogue-content-gate-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'complete dialogue with one to four word edits',
+  },
 ];
 const additionalQwenCalibrationEvidence = await Promise.all(
   additionalQwenCalibrationSpecs.map(async (spec) => {
@@ -690,8 +736,8 @@ function validate(items, acceptedPlan) {
       artifactCount: 14,
       role: 'required-generator',
       status:
-        'multilingual-content-type-expansion-in-progress-' +
-        'French-failures-recorded',
+        'multilingual-content-type-expansion-complete-four-failures-' +
+        'listening-pending',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -713,8 +759,8 @@ function validate(items, acceptedPlan) {
         'qwen-pt-warm-dialogue',
       ],
       planStatus:
-        'multilingual-content-type-expansion-in-progress-' +
-        'French-failures-recorded',
+        'multilingual-content-type-expansion-complete-four-failures-' +
+        'listening-pending',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',

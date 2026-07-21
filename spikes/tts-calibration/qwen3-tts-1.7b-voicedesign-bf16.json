@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "multilingual-content-type-expansion-in-progress-French-failures-recorded",
+    "status": "multilingual-content-type-expansion-complete-four-failures-listening-pending",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

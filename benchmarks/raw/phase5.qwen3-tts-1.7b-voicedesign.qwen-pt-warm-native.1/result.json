@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-native.1",
+  "captured_at": "2026-07-21T14:27:43.764615Z",
+  "source_revision": "118cb85e81c4857d0264e1d6dceb4a6e52080ffa",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-pt-warm-native",
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "Portuguese",
+      "locale": "pt-BR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-pt-native",
+    "source_id": "pt-wikipedia-audiolivro-64246519",
+    "locale": "pt-BR",
+    "character_count": 887,
+    "text_sha256": "b4af10b2da192113abb8b6127c2dbe0d50c192a86fb192eb0e8d40bd2d3205b7",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-pt-warm-native",
+      "passage_id": "synthetic-pt-native",
+      "locale": "pt-BR",
+      "language": "Portuguese",
+      "voice": null,
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1516800,
+      "byte_count": 6067200,
+      "duration_ms": 63200,
+      "sha256": "23127a92f1260af8692607f18b009d7dc857219524555741cc3c2a23f3ca5b66",
+      "minimum_sample": -0.5567913055419922,
+      "maximum_sample": 0.6451207995414734,
+      "rms": 0.09406452040814922,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1236.319959,
+      "first_audio_ms": 29864.67675,
+      "complete_synthesis_ms": 30271.587458,
+      "real_time_factor": 0.4789808142088608,
+      "output_count": 1,
+      "token_count": 791
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4715986944,
+      "mlx_peak_memory_bytes": 14215664677,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1516800,
+        "sample_rate_hz": 24000,
+        "token_count": 791,
+        "processing_time_seconds": 29.8646559715271,
+        "mlx_audio_reported_duration_over_processing": 2.1162138971316042,
+        "peak_memory_gb_decimal": 14.215664677,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1011200,
+        "byte_count": 4044800,
+        "duration_ms": 63200,
+        "sha256": "970512a9c86f53ab55054196ebb894af34ec75ef76850d6cb3cde8b8fde050f1"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:28:07.197Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "pt",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "A nomenclatura audiolivro é muitas vezes usada como sinônimo para o livro falado. No entanto, enquanto o audiolivro pode ou não ter vozes dramatizadas, sonoplastia, fundo musical e outros, o livro falado não é interpretado e não pode, em hipótese alguma, ter efeitos sonoros, pois ele tenta ser uma versão a mais aproximada possível do livro em tinta, a chamada leitura branca, que, mesmo desprovida de recursos artísticos e de sonoplastia, obedece às regras da boa impostação de voz e pontuação, pois parte do princípio de que quem tem de construir o sentido do que está sendo lido é o leitor e não o ledor, pessoas que utilizam a voz para mediar o acesso ao texto impresso em tinta para pessoas visualmente limitadas. Fundações como a Dorina No Will têm um enorme acervo de audiolivros gratuitos para deficientes visuais. Basta cadastrar-se para receber gratuitamente pelos correios.",
+            "sha256": "649b6e824b9cf459300ba5b792b34b11b75cf7738bc1509d77f1ff8ee607d361",
+            "segment_count": 10,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 145,
+            "hypothesis_word_count": 146,
+            "word_edits": 2,
+            "wer": 0.013793103448275862,
+            "reference_character_count": 722,
+            "hypothesis_character_count": 722,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "cold_load_ms": 932.803667,
+            "complete_inference_ms": 2728.2032090000002,
+            "real_time_factor": 0.043167772294303804
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1955594240
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:28:09.453Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "A nomenclatura audiolivro é muitas vezes usada como sinonimo para o livro falado. No entanto, enquanto o audiolivro pode ou não ter vozes dramatizadas, sonoplastia, fundo musical e outros, o livro falado não é interpretado e não pode, em hipótese alguma, ter efeitos sonoros, pois ele tenta ser uma versão a mais aproximada possível do livro em tinta, a chamada Leitura Branca, que, mesmo desprovida de recursos artísticos e de sonoplastia, obedece às regras da boa impostação de voz e pontuação. pois parte do princípio de que quem tem construir o sentido do que está sendo lido é o leitor e não o ledor, pessoas que utilizam a voz para mediar o acesso ao texto impresso em tinta para pessoas visualmente limitadas. Fundações como a Dorina No Will têm um enorme acervo de audiolivros gratuitos para deficientes visuais. Basta cadastrar-se para receber gratuitamente pelos correios.",
+            "sha256": "b08c61361eda6bbd7f1ebd730f0595f23bb474e3387bd8606e7bfac88b1815bc",
+            "segment_count": 6,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 145,
+            "hypothesis_word_count": 145,
+            "word_edits": 4,
+            "wer": 0.027586206896551724,
+            "reference_character_count": 722,
+            "hypothesis_character_count": 720,
+            "character_edits": 3,
+            "cer": 0.004155124653739612
+          },
+          "timing": {
+            "cold_load_ms": 206.17174999999997,
+            "complete_inference_ms": 866.7205840000001,
+            "real_time_factor": 0.013713933291139242
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 164036608
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:28:11.759Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "pt",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "A nome cláural de o livro é muitas vezes usada como sinônimo para o livro falado. No entanto, enquanto o audiobook pode ou não ter vozes dramatizadas, sonoplastia, fundo musical e outros, o livro falado não é interpretado e não pode, em hipótese alguma, ter efeitos sonoros, pois ele tenta ser uma versão a mais aproximada possível do livro em tinta, a chamada leitura branca, que, mesmo desprovida de recursos artísticos e de sonoplastia, obedece as regras da boa impostação de voz e pontuação, pois parte do princípio de que quem entende construir o sentido do que está sendo lido é o leitor e não o leitor. Pessoas que utilizam a voz para mediar o acesso ao texto impresso em tinta para pessoas visualmente limitadas. Fundações como a Dorina Noeill têm um enorme acervo de audiólivros gratuitos para deficientes visuais. Basta cadastrar-se para receber gratuitamente pelos correios.",
+            "sha256": "5b6e7c5cbbb706900577272b9768a89792510f9bbfe7d3bf1f280d0251647cbe",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 145,
+            "hypothesis_word_count": 147,
+            "word_edits": 12,
+            "wer": 0.08275862068965517,
+            "reference_character_count": 722,
+            "hypothesis_character_count": 721,
+            "character_edits": 19,
+            "cer": 0.02631578947368421
+          },
+          "timing": {
+            "complete_inference_ms": 2162.888,
+            "real_time_factor": 0.03422291139240506
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 1875161216
+          },
+          "generation": {
+            "token_count": 238,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:28:26.848Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "A nomenclatura audiolivro é muitas vezes usada como sinônimo para o livro falado. No entanto, enquanto o audiolivro pode ou não ter vozes dramatizadas, sonoplastia, fundo musical e outros, o livro falado não é interpretado e não pode, em hipótese alguma, ter efeitos sonoros, pois ele tenta ser uma versão a mais aproximada possível do livro em tinta, a chamada leitura branca, que, mesmo desprovida de recursos artísticos e de sonoplastia, obedece às regras da boa impostação de voz e pontuação, pois parte do princípio de que quem tem de construir o sentido do que está sendo lido é o leitor e não o leitor, pessoas que utilizam a voz para mediar o acesso ao texto impresso em tinta para pessoas visualmente limitadas. Fundações como a Dorina Nowill têm um enorme acervo de audiolivros gratuitos para deficientes visuais. Basta cadastrar-se para receber gratuitamente pelos correios.",
+            "sha256": "b84241bc7f518ca5ee8961c332d495c94c6681b7dba0238e2635bf2a24c3dd12",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 145,
+            "hypothesis_word_count": 145,
+            "word_edits": 1,
+            "wer": 0.006896551724137931,
+            "reference_character_count": 722,
+            "hypothesis_character_count": 723,
+            "character_edits": 2,
+            "cer": 0.002770083102493075
+          },
+          "timing": {
+            "complete_inference_ms": 14784.437584,
+            "real_time_factor": 0.23393097443037975
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5358806196
+          },
+          "generation": {
+            "token_count": 801,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:28:29.800Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "pt-BR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "A nomenclatura de o livro é muitas vezes usada como sinônimo para o livro falado. No entanto, enquanto o audiolivro pode ou não ter vozes dramatizadas, sonoplastia, fundo musical e outros. O livro falado não é interpretado e não pode. em hipótese alguma, ter efeitos sonoros, pois ele tenta ser uma versão a mais aproximada possível do livro em tinta, a chamada leitura branca, que mesmo desprovida de recursos artísticos e de sonoplastia, obedece às regras da boa imtação de voz e pontuação, pois parte do princípio de que quem tem de construir o sentido do que está sendo lido é o leitor e não o ledor. Pessoas que utilizam a voz para mediar o acesso ao texto impresso em tinta para pessoas visualmente limitadas. Fundações como a Dorina Nowill têm um enorme acervo de audiolivros gratuitos para deficientes visuais. Basta cadastrar-se para receber gratuitamente pelos Correios.",
+            "sha256": "01330ae00e73dc361aa73474518973f91aed22b352148bfc6d26ee40ea31f9d1",
+            "segment_count": 149,
+            "update_count": 248,
+            "final_update_count": 4,
+            "volatile_update_count": 244,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 145,
+            "hypothesis_word_count": 147,
+            "word_edits": 4,
+            "wer": 0.027586206896551724,
+            "reference_character_count": 722,
+            "hypothesis_character_count": 717,
+            "character_edits": 6,
+            "cer": 0.008310249307479225
+          },
+          "timing": {
+            "first_result_ms": 68.437708,
+            "complete_inference_ms": 768.821458,
+            "real_time_factor": 0.012164896487341773
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "voxtral-realtime-4b-mlx-direct-2400ms"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Complete listening review before promoting this voice and content cell.",
+    "calibration_disposition": "passed-native-content-gate-receiver-spread-listening-pending"
+  }
+}

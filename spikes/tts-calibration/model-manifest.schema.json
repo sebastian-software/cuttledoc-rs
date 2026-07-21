@@ -227,7 +227,8 @@
             "multilingual-content-type-expansion-pending",
             "multilingual-content-type-expansion-in-progress-English-dialogue-failed",
             "multilingual-content-type-expansion-in-progress-English-dialogue-failed-Spanish-passed",
-            "multilingual-content-type-expansion-in-progress-French-failures-recorded"
+            "multilingual-content-type-expansion-in-progress-French-failures-recorded",
+            "multilingual-content-type-expansion-complete-four-failures-listening-pending"
           ]
         },
         "voice_mode": {

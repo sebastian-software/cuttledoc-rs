@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-pt-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 947,
+    "characters": 887,
+    "sha256": "bb590041c9d73bd943cec7a14e92fb5eccd6ab57fa7df12743b291103303a6e1",
+    "spoken_text_sha256": "bb590041c9d73bd943cec7a14e92fb5eccd6ab57fa7df12743b291103303a6e1",
+    "source_id": "cuttledoc-authored-pt-dialogue-1",
+    "passage_id": "synthetic-pt-dialogue",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-dialogue.1",
+    "record_sha256": "083d7d4454ad730433b48240694695033dd4bd51e094602e2e4f69cf09c587e5",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-pt-warm-dialogue",
+    "voice_instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "pt-BR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1804800,
+      "bytes": 7219200,
+      "sha256": "8c677612f57b5b242f837d111ebc9e71818b5003db5210c81f51e79153f5dafd"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "f4e7463ff20967636374b74a556a4e778e397bff598b42881b1e3cedaf3f5725"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 647365,
+    "sha256": "3e02287942acbe8d132744e9c47f6b3dde6bff95a46d2dee08d589dcd1fda5f2",
+    "duration_ms": 75206.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 68862,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-dialogue-content-gate",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.007042253521126761,
+      0.028169014084507043
+    ],
+    "summary": "All five receivers recover the complete dialogue with one to four word edits. No receiver shows a shared omission, insertion loop, or critical-name failure."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

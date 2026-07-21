@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-dialogue.1",
+  "captured_at": "2026-07-21T14:29:26.154967Z",
+  "source_revision": "118cb85e81c4857d0264e1d6dceb4a6e52080ffa",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-pt-warm-dialogue",
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "Portuguese",
+      "locale": "pt-BR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-pt-dialogue",
+    "source_id": "cuttledoc-authored-pt-dialogue-1",
+    "locale": "pt-BR",
+    "character_count": 887,
+    "text_sha256": "bb590041c9d73bd943cec7a14e92fb5eccd6ab57fa7df12743b291103303a6e1",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-pt-warm-dialogue",
+      "passage_id": "synthetic-pt-dialogue",
+      "locale": "pt-BR",
+      "language": "Portuguese",
+      "voice": null,
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1804800,
+      "byte_count": 7219200,
+      "duration_ms": 75200,
+      "sha256": "8c677612f57b5b242f837d111ebc9e71818b5003db5210c81f51e79153f5dafd",
+      "minimum_sample": -0.6850875616073608,
+      "maximum_sample": 0.5940112471580505,
+      "rms": 0.09079060544132239,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1542.662584,
+      "first_audio_ms": 37377.67675,
+      "complete_synthesis_ms": 38218.596083,
+      "real_time_factor": 0.5082260117420212,
+      "output_count": 1,
+      "token_count": 940
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4721623040,
+      "mlx_peak_memory_bytes": 15770319825,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1804800,
+        "sample_rate_hz": 24000,
+        "token_count": 940,
+        "processing_time_seconds": 37.37433075904846,
+        "mlx_audio_reported_duration_over_processing": 2.012076162241214,
+        "peak_memory_gb_decimal": 15.770319825,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1203200,
+        "byte_count": 4812800,
+        "duration_ms": 75200,
+        "sha256": "29eb804c8980706d8321ba3e315121f54865f6d85da83475f27146602e16881a"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:29:47.622Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "pt",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "O que faz uma gravação ser fácil de entender? Pergunta Mara. O ambiente tranquilo ajuda, mas a constância é igualmente importante, responde Jonas. Mantenha o microfone a uma distância estável e fala da forma mais natural possível. Mara aproxima um pouco a cadeira. Um equipamento caro resolva a maioria dos problemas. Não sozinho. Um bom posicionamento, uma postura confortável e um teste de som cuidadoso costumam importar mais do que um preço impressionante. O que acontece quando alguém vira a cabeça enquanto fala? Jonas sorri. A voz fica mais baixa e o timbre muda. Por isso, é melhor sentar-se confortavelmente, respirar com liberdade e não forçar cada frase. Mara faz uma pausa antes de perguntar outra vez. Então a melhor técnica é quase invisível? Exatamente. Os ouvintes devem pensar na história, não no microfone, na sala ou na edição feita nos bastidores.",
+            "sha256": "054f9870aa9719c900f12330ee25fa9ffbcc4d5dd79e2170087aa51bc67bd562",
+            "segment_count": 15,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 142,
+            "hypothesis_word_count": 142,
+            "word_edits": 3,
+            "wer": 0.02112676056338028,
+            "reference_character_count": 703,
+            "hypothesis_character_count": 702,
+            "character_edits": 4,
+            "cer": 0.005689900426742532
+          },
+          "timing": {
+            "cold_load_ms": 1086.068,
+            "complete_inference_ms": 2715.3101669999996,
+            "real_time_factor": 0.03610784796542553
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1955512320
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:29:51.404Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "O que faz uma gravação ser fácil de entender? Pergunta Mara. O ambiente tranquilo ajuda, mas a constância é igualmente importante. Responde Jonas. Mantenha o microfone a uma distância estável e fala da forma mais natural possível. Mara aproxima um pouco a cadeira. Um equipamento caro resolva a maioria dos problemas. Não sozinho. Um bom posicionamento, uma postura confortável e um teste de som cuidadoso costumam importar mais do que um preço impressionante. O que acontece quando alguém vira a cabeça enquanto fala? Jonas sorri. A voz fica mais baixa e o timbre muda. Por isso, é melhor sentar-se confortavelmente. Com liberdade e não forçar cada frase. Mara faz uma pausa antes de perguntar outra vez. Então a melhor técnica é quase invisível. Exatamente. Os ouvintes devem pensar na história, não no microfone. Na sala ou na edição feita nos bastidores.",
+            "sha256": "7c287a287ebac1cfbf1836123d26d7370037fd8fc8c39b7d11879f62b9da0a19",
+            "segment_count": 19,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 142,
+            "hypothesis_word_count": 141,
+            "word_edits": 4,
+            "wer": 0.028169014084507043,
+            "reference_character_count": 703,
+            "hypothesis_character_count": 694,
+            "character_edits": 12,
+            "cer": 0.017069701280227598
+          },
+          "timing": {
+            "cold_load_ms": 249.216208,
+            "complete_inference_ms": 1584.4581669999998,
+            "real_time_factor": 0.021069922433510635
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 165560320
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:29:53.449Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "pt",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "O que faz uma gravação ser fácil de entender? pergunta Mara. Um ambiente tranquilo ajuda, mas a constância é igualmente importante, responde Jonas. Mantenha o microfone a uma distância estável e fala da forma mais natural possível. Mara aproxima um pouco a cadeira. Um equipamento caro resolve a maioria dos problemas. Não sozinho. Um bom posicionamento, uma postura confortável e um teste de som cuidadoso costumam importar mais do que um preço impressionante. O que acontece quando alguém vira a cabeça enquanto fala? Jonas sorri. A voz fica mais baixa e o timbre muda. Por isso é melhor sentar-se confortavelmente, respirar com liberdade e não forçar cada frase. Mara faz uma pausa antes de perguntar outra vez. Então a melhor técnica é quase invisível. Exatamente. Os ouvintes devem pensar na história, não no microfone, na sala ou na edição feita nos bastidores.",
+            "sha256": "b81efb859281fbe08f601df1476a8a7dea5a8de42fc0508426955ca8e00ce857",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 142,
+            "hypothesis_word_count": 142,
+            "word_edits": 1,
+            "wer": 0.007042253521126761,
+            "reference_character_count": 703,
+            "hypothesis_character_count": 703,
+            "character_edits": 1,
+            "cer": 0.001422475106685633
+          },
+          "timing": {
+            "complete_inference_ms": 1884.4005,
+            "real_time_factor": 0.02505851728723404
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2950216664
+          },
+          "generation": {
+            "token_count": 222,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:30:20.564Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "O que faz uma gravação ser fácil de entender? Pergunta Mara. O ambiente tranquilo ajuda, mas a constância é igualmente importante, responde Jonas. Mantenha o microfone a uma distância estável e fala da forma mais natural possível. Mara aproxima um pouco a cadeira. Um equipamento caro resolve a maioria dos problemas. Não sozinho. Um bom posicionamento, uma postura confortável e um teste de som cuidadoso costumam importar mais do que um preço impressionante. O que acontece quando alguém vira a cabeça enquanto fala? Jonas sorri. A voz fica mais baixa e o timbre muda. Por isso, é melhor sentar-se confortavelmente, respirar com liberdade e não forçar cada frase. Mara faz uma pausa antes de perguntar outra vez. Então a melhor técnica é quase invisível? Exatamente. Os ouvintes devem pensar na história, não no microfone, na sala ou na edição feita nos bastidores.",
+            "sha256": "c259ff210c471500a2fc2485017bcefb28a5499ed4801d00db194813d0a25b71",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 142,
+            "hypothesis_word_count": 142,
+            "word_edits": 2,
+            "wer": 0.014084507042253521,
+            "reference_character_count": 703,
+            "hypothesis_character_count": 702,
+            "character_edits": 3,
+            "cer": 0.004267425320056899
+          },
+          "timing": {
+            "complete_inference_ms": 23973.411416,
+            "real_time_factor": 0.31879536457446805
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5520043716
+          },
+          "generation": {
+            "token_count": 951,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:30:23.728Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "pt-BR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "O que faz uma gravação ser fácil de entender? Pergunta Mara. O ambiente tranquilo ajuda, mas a constância é igualmente importante. responde Jonas. Mantenha o microfone a uma distância estável e fala da forma mais natural possível. Mara aproxima um pouco a cadeira. Um equipamento caro resolve a maioria dos problemas. Não sozinho. Um bom posicionamento, uma postura confortável e um teste de som cuidadoso costumam importar mais do que um preço impressionante. O que acontece quando alguém vira a cabeça enquanto fala? Jonas sorri. A voz fica mais baixa e o tim bermuda. Por isso, é melhor sentar-se confortavelmente, respirar com liberdade e não forçar cada frase. Mara faz uma pausa antes de perguntar outra vez. Então a melhor técnica é quase invisível. Exatamente. Os ouvintes devem pensar na história, não no microfone, na sala ou na edição feita nos bastidores.",
+            "sha256": "d51fd092ea64946b67d173dd49659c8040ff958ea16a74ef95d275418e4459fb",
+            "segment_count": 142,
+            "update_count": 222,
+            "final_update_count": 5,
+            "volatile_update_count": 217,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 142,
+            "hypothesis_word_count": 142,
+            "word_edits": 4,
+            "wer": 0.028169014084507043,
+            "reference_character_count": 703,
+            "hypothesis_character_count": 702,
+            "character_edits": 5,
+            "cer": 0.007112375533428165
+          },
+          "timing": {
+            "first_result_ms": 84.013583,
+            "complete_inference_ms": 740.051875,
+            "real_time_factor": 0.009841115359042554
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "qwen3-asr-0.6b-mlx-direct"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Complete listening review before promoting this voice and content cell.",
+    "calibration_disposition": "passed-dialogue-content-gate-listening-pending"
+  }
+}

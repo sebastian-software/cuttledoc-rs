@@ -45,6 +45,9 @@ without collapsing it into one language-wide score.
 The three `fr-FR` fixtures retain one native-factual pass and two failed
 controls: a technical mid-list truncation below the token limit and a dialogue
 repeat/truncation at the limit.
+The three `pt-BR` fixtures retain native-factual and dialogue passes plus a
+technical failed control whose complete passage consistently garbles the
+critical term “Agentic AI”.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis

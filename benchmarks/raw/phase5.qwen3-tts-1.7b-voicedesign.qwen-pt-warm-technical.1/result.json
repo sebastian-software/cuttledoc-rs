@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-technical.1",
+  "captured_at": "2026-07-21T14:26:09.877909Z",
+  "source_revision": "118cb85e81c4857d0264e1d6dceb4a6e52080ffa",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-pt-warm-technical",
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "Portuguese",
+      "locale": "pt-BR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-pt-technical",
+    "source_id": "pt-wikipedia-inteligencia-artificial-72427477",
+    "locale": "pt-BR",
+    "character_count": 659,
+    "text_sha256": "a87cadad5308bb5eeb339ce680f7624a35ccc724e6a20dc0897069cd65ae736d",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-pt-warm-technical",
+      "passage_id": "synthetic-pt-technical",
+      "locale": "pt-BR",
+      "language": "Portuguese",
+      "voice": null,
+      "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1182720,
+      "byte_count": 4730880,
+      "duration_ms": 49280,
+      "sha256": "1c1a1222e1f8a75ec5c0399ef922ebda846fd4f1a28202082c0c400538b14ef8",
+      "minimum_sample": -0.5567913055419922,
+      "maximum_sample": 0.5540447235107422,
+      "rms": 0.09007305674965915,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1635.704667,
+      "first_audio_ms": 22582.339,
+      "complete_synthesis_ms": 22673.351708,
+      "real_time_factor": 0.4600923642045454,
+      "output_count": 1,
+      "token_count": 618
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4736401408,
+      "mlx_peak_memory_bytes": 12230258753,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1182720,
+        "sample_rate_hz": 24000,
+        "token_count": 618,
+        "processing_time_seconds": 22.582300901412964,
+        "mlx_audio_reported_duration_over_processing": 2.18223998586949,
+        "peak_memory_gb_decimal": 12.230258753,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 788480,
+        "byte_count": 3153920,
+        "duration_ms": 49280,
+        "sha256": "75e82f9c56524146b3707f0cfc5ec0b86676b700d22c9f4505d85ec74668b662"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:26:32.626Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "pt",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "A IA Agêntica, Engêntica e a Chico, opera por meio de agentes autônomos que executam tarefas interpretando o contexto e os objetivos estipulados. Ela toma decisões e realiza ações com base em metas predefinidas, permitindo a automação de fluxos de trabalho complexos de múltiplas etapas por meio de raciocínio lógico e planejamento iterativo. Esse tipo de sistema otimiza-se em tempo real sem a necessidade de intervenção humana constante, transformando o conhecimento diretamente em execução prática. Embora seja mais avançada que a IA convencional, seu propósito não é emular a cognição global da agir, mas sim automatizar processos complexos em cenários específicos.",
+            "sha256": "3d40fbe6b0856ee35189c4069f3b57da71b0bf5aaec1b03e9f4eb62a6a21884c",
+            "segment_count": 7,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 98,
+            "hypothesis_word_count": 101,
+            "word_edits": 6,
+            "wer": 0.061224489795918366,
+            "reference_character_count": 549,
+            "hypothesis_character_count": 558,
+            "character_edits": 11,
+            "cer": 0.020036429872495445
+          },
+          "timing": {
+            "cold_load_ms": 1078.2664160000002,
+            "complete_inference_ms": 1839.0525830000001,
+            "real_time_factor": 0.03731843715503247
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1953464320
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:26:34.872Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "A Yaha Agentika, Engentica I e a Chico, opera por meio de agentes autonômos que executam tarefas interpretando o contexto e os objetivos estipulados. Toma decisões e realiza ações com base em metas pré-definidas. permitindo a automação de fluxos de trabalho complexos de múltipletas por meio de raciocínio lógico e planejamento iterativo. Esse tipo de sistema otimiza-se em tempo real sem a necessidade de intervenção humana constante. transformando o conhecimento diretamente em execução prática. Embora seja mais avançada que a IA convencional, Seu propósito não é emular a cognição global da AGI, mas sim automatizar processos complexos em cenários específicos.",
+            "sha256": "6ac901cbf882bf378169d1305d8ab3fc3aeb92b78e1a7c7bcc25e56a9701bd0f",
+            "segment_count": 8,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 98,
+            "hypothesis_word_count": 100,
+            "word_edits": 13,
+            "wer": 0.1326530612244898,
+            "reference_character_count": 549,
+            "hypothesis_character_count": 553,
+            "character_edits": 25,
+            "cer": 0.04553734061930783
+          },
+          "timing": {
+            "cold_load_ms": 264.657792,
+            "complete_inference_ms": 844.701208,
+            "real_time_factor": 0.017140852435064934
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 156532736
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:26:36.614Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "pt",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "A IA agentica, agentica I, a Chico, opera por meio de agentes autônomos que executam tarefas interpretando o contexto e os objetivos estipulados. Ela toma decisões e realiza ações com base em metas predefinidas, permitindo a automação de fluxos de trabalho complexos de múltiplas etapas por meio de raciocínio lógico e planejamento iterativo. Esse tipo de sistema otimiza sem tempo real, sem a necessidade de intervenção humana constante, transformando o conhecimento diretamente em execução prática. Embora seja mais avançada que a IA convencional, seu propósito não é imular a cognição global da IA, mas sim automatizar processos complexos em cenários específicos.",
+            "sha256": "f90a6538fabd36be229686e35a9ede94c072df0d5bf5e6bc84002a015b9f2b25",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 98,
+            "hypothesis_word_count": 101,
+            "word_edits": 10,
+            "wer": 0.10204081632653061,
+            "reference_character_count": 549,
+            "hypothesis_character_count": 554,
+            "character_edits": 13,
+            "cer": 0.023679417122040074
+          },
+          "timing": {
+            "complete_inference_ms": 1616.526375,
+            "real_time_factor": 0.03280288910308441
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2281698964
+          },
+          "generation": {
+            "token_count": 176,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:26:48.429Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Ela toma decisões e realiza ações com base em metas pré-definidas, permitindo a automação de fluxos de trabalho complexos de múltiplas etapas por meio de raciocínio lógico e planejamento iterativo. Esse tipo de sistema otimiza-se em tempo real sem a necessidade de intervenção humana constante, transformando o conhecimento diretamente em execução prática. Embora seja mais avançada que a IA convencional, seu propósito não é emular a cognição global da AGI, mas sim automatizar processos complexos em cenários específicos.",
+            "sha256": "abece25b7324f2406d55c96f91037d83e0edea3c6aa263615993f9f9020b7847",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 98,
+            "hypothesis_word_count": 78,
+            "word_edits": 23,
+            "wer": 0.23469387755102042,
+            "reference_character_count": 549,
+            "hypothesis_character_count": 437,
+            "character_edits": 115,
+            "cer": 0.20947176684881602
+          },
+          "timing": {
+            "complete_inference_ms": 11620.860291,
+            "real_time_factor": 0.23581291174918834
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5281305780
+          },
+          "generation": {
+            "token_count": 627,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:26:51.467Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "pt-BR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Aáentica em Jenticaí, a Chico, opera por meio de agentes autônomos que executam tarefas interpretando o contexto e os objetivos estipulados. Ela toma decisões e realiza ações com base em metas predefinidas, permitindo a automação de fluxos de trabalho complexos de múltiplas etapas por meio de raciocínio lógico e planejamento interativo. Esse tipo de sistema otimiza-se em tempo real sem a necessidade de intervenção humana constante, transformando o conhecimento diretamente em execução prática. Embora seja mais avançada que a IA convencional, seu propósito não é emular a cognição global da AG, mas sim automatizar processos complexos em cenários específicos.",
+            "sha256": "d0589850fe373e1b8589c43fbdd9bc3135f2e29a93af4f4a2b169a568eed3c26",
+            "segment_count": 100,
+            "update_count": 178,
+            "final_update_count": 4,
+            "volatile_update_count": 174,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 98,
+            "hypothesis_word_count": 99,
+            "word_edits": 8,
+            "wer": 0.08163265306122448,
+            "reference_character_count": 549,
+            "hypothesis_character_count": 554,
+            "character_edits": 17,
+            "cer": 0.030965391621129327
+          },
+          "timing": {
+            "first_result_ms": 78.51075,
+            "complete_inference_ms": 585.505667,
+            "real_time_factor": 0.011881202658279221
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Keep this failed output as reproducible evidence and require a predeclared control before promotion.",
+    "calibration_disposition": "failed-critical-technical-term-pronunciation"
+  }
+}

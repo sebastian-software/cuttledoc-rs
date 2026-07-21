@@ -111,6 +111,14 @@ stops after three of five list items below the token limit; the dialogue stops
 after “Jonas sourit” and repeats until the limit. These are retained as failed
 controls rather than averaged into the successful French result.
 
+Portuguese completes the 15-cell primary-locale content calibration. The
+native-factual and dialogue cells finish normally and pass with 0.69–8.28%
+and 0.70–2.82% WER respectively. The technical cell speaks the complete
+passage but all five receivers garble the embedded critical term “Agentic
+AI”; it is retained as a failed pronunciation control. The five-locale total
+is 11 passes and four failures, with listening still pending before the
+multi-voice matrix.
+
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
 cell.

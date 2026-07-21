@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-pt-native.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 909,
+    "characters": 887,
+    "sha256": "b4af10b2da192113abb8b6127c2dbe0d50c192a86fb192eb0e8d40bd2d3205b7",
+    "spoken_text_sha256": "b4af10b2da192113abb8b6127c2dbe0d50c192a86fb192eb0e8d40bd2d3205b7",
+    "source_id": "pt-wikipedia-audiolivro-64246519",
+    "passage_id": "synthetic-pt-native",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-pt-warm-native.1",
+    "record_sha256": "d3db120a6b13ccafa453f685b56f19e23113113562e1733fea52a661b37502ad",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-pt-warm-native",
+    "voice_instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "pt-BR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1516800,
+      "bytes": 6067200,
+      "sha256": "23127a92f1260af8692607f18b009d7dc857219524555741cc3c2a23f3ca5b66"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "3f41e6f91fa3bf1fa8cb69caebf0d9396546164e5120707efbf8fe2c9643f84a"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 550968,
+    "sha256": "6d76eb3fb97379d3924315439e1bc6fa4f56307bddc419b2f39db3ae0dfac71c",
+    "duration_ms": 63206.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 69735,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-native-content-gate-receiver-spread",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.006896551724137931,
+      0.08275862068965517
+    ],
+    "summary": "All five receivers recover the complete native-factual passage. Voxtral makes one word edit, Whisper two, Parakeet and Apple four, while Qwen-ASR alone makes twelve."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}
