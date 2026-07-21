@@ -4,6 +4,39 @@
 
 **Plan date:** 2026-07-21.
 
+## Development-matrix outcome
+
+Stage A is complete for the three pinned candidates and three prompts on the
+German audiobook development fixture. It selects **no quality winner**. The
+fixture has an unverified dataset transcript, has influenced prompt design, and
+contains only one known disagreement (`schautete` versus `schauderte`) in 39
+words. Its WER values are diagnostics, not quality claims.
+
+| Candidate | `surface-only-v1` | Historical prompt | Conservative structured prompt | Development disposition |
+| --- | --- | --- | --- | --- |
+| Gemma 4 E2B 4-bit | Returned the input unchanged; lexical gate passed | Returned the input unchanged | Wrapped otherwise valid JSON in Markdown fences; the strict parser rejected it | Runtime viable; prompt/contract tuple not selected |
+| Qwen 3.5 0.8B 4-bit | Returned the input unchanged; lexical gate passed | Made three unsupported rewrites; diagnostic WER rose from 1/39 to 3/39 | Made four lexical changes while reporting no matching edits; audit rejected it and diagnostic WER rose to 4/39 | Fastest and smallest candidate, but unsafe on both lexical prompts |
+| SmolLM3 3B 4-bit | Changed `keiner weise` to `keiner weisen`; lexical gate rejected it and diagnostic WER rose to 2/39 | Returned the input unchanged | Returned valid JSON and made no edits; the policy contract passed but quality did not improve | Most conservative structured behavior; no demonstrated benefit |
+
+All nine runs repeated deterministically and retained token, streaming,
+cancellation, output-diff, policy, latency, memory, and artifact evidence. The
+conservative prompt deliberately received only an error-class profile derived
+from two other development clips; the target reference and suspect span were
+not visible to the models. The complete machine-readable records are under
+[`benchmarks/postprocessing/runs`](../benchmarks/postprocessing/runs).
+
+The result is useful negative evidence: the external parser, lexical audit, and
+protected-span checks caught failures that prompt wording alone did not prevent.
+It is not evidence that all three models are equally weak. A one-error fixture
+cannot measure edit precision or distinguish a deliberately conservative model
+from a model that cannot correct useful errors.
+
+Stage B is now the selection gate. Before any Core ML conversion or owned MLX
+product adapter is justified, build a small source-grouped set of
+human-verified German podcast and audiobook transcripts, run identical raw ASR
+outputs through the frozen candidates, and measure beneficial and harmful edits
+per source. Runtime work resumes only for a quality survivor.
+
 ## Question
 
 Which model can safely improve professionally recorded podcast and audiobook
@@ -49,7 +82,7 @@ reference transcript is never rendered into the inference prompt.
 
 ## Evaluation stages
 
-### Stage A: executable development matrix
+### Stage A: executable development matrix — complete
 
 - Generalize the issue-#7 runner and validator to consume candidate manifests
   rather than hard-coded Qwen identifiers.

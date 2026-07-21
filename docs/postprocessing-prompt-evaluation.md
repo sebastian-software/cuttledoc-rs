@@ -3,7 +3,7 @@
 **Status:** prompt candidates and evaluation contract defined; first embedded
 runtime probe complete; model-first bakeoff in progress under issue #20.
 
-**Evidence date:** 2026-07-20.
+**Evidence date:** 2026-07-21.
 
 Prompt behavior is part of the correction candidate. A result is identified by
 the complete tuple:
@@ -153,3 +153,12 @@ the output. That exact tuple is not a correction candidate. See
 6. Port only the quality survivor or survivors through repository-owned
    official-MLX and Core ML paths, then select the embedded runtime from
    conversion parity and measured product cost.
+
+The three-model development matrix has completed steps 1 and 2 for the
+available fixture. It validates the intended separation of responsibilities:
+Gemma's fenced JSON failed parsing, Qwen's unreported rewrites failed the
+external edit audit, and SmolLM3's surface-only lexical change failed the token
+invariant. SmolLM3 was the only candidate to satisfy the conservative
+structured contract, but it returned a no-op and therefore demonstrated no
+quality gain. No prompt/model tuple advances until the same controls run on
+human-verified German professional-audio references.

@@ -110,3 +110,12 @@ define the corrective experiment. Final validation requires independent,
 human-verified professional podcast and audiobook sources, German first,
 followed by the agreed primary European languages. A later ADR records the
 selected model, runtime, conversion, interop boundary, and shipment scope.
+
+The first issue-#20 development matrix is complete. Across the three frozen
+prompts, Gemma returned two no-ops and one fenced structured response that the
+strict parser rejected; Qwen returned one no-op plus unsupported three- and
+four-edit rewrites; SmolLM3 returned two no-ops and one harmful surface-only
+edit. All candidates executed and repeated deterministically, but none showed a
+verified quality gain. This confirms the decision to defer model-specific Core
+ML and owned-MLX product work until human-verified held-out evidence identifies
+a survivor.

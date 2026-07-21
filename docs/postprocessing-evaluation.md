@@ -3,7 +3,7 @@
 **Status:** historical evidence imported; model-first Cuttledoc 3 bakeoff in
 progress under issue #20.
 
-**Evidence date:** 2026-07-20.
+**Evidence date:** 2026-07-21.
 
 The Cuttledoc 2 correction path used a constrained transcript-proofreading
 prompt and local Ollama models. The CLI default was **Gemma 3n E4B**
@@ -91,6 +91,15 @@ selection. Only the quality survivor proceeds to an official-MLX versus Core ML
 product-runtime comparison. Synthetic TTS remains a smoke/control condition,
 not the acceptance population. See
 [`transcript-enhancement-model-bakeoff.md`](transcript-enhancement-model-bakeoff.md).
+
+The first development matrix is now complete. Gemma produced no lexical change
+under the surface and historical prompts but violated the structured output
+contract by adding Markdown fences. Qwen made unsupported lexical rewrites
+under both permissive prompts. SmolLM3 passed the structured contract with a
+no-op but made one harmful edit under the surface-only prompt. These runs prove
+the candidates and external gates execute; the single unverified fixture cannot
+select a model. The selection gate remains human-verified, source-grouped German
+podcast and audiobook data.
 
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus

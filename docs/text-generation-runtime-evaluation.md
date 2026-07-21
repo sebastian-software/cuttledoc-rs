@@ -33,6 +33,28 @@ comparison because it supports the three candidates on the target hardware.
 That is an experimental convenience, not a product-runtime decision. See the
 [`transcript-enhancement model bakeoff`](transcript-enhancement-model-bakeoff.md).
 
+## Representative-candidate development result
+
+The issue-#20 Stage-A matrix has now executed Gemma 4 E2B, Qwen 3.5 0.8B, and
+SmolLM3 3B through the same pinned official-MLX reference environment. All
+three load, stream, cancel cooperatively, and repeat deterministically. None is
+yet a quality winner on the single German audiobook development fixture:
+
+| Candidate | Snapshot | Load | First token, conservative prompt | Generation | Peak MLX / process RSS | Quality observation |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Gemma 4 E2B 4-bit | 3.58 GB | 1.95 s | 494 ms | 106 tok/s | 3.32 / 7.37 GB | Unchanged under two prompts; fenced JSON rejected under the structured prompt |
+| Qwen 3.5 0.8B 4-bit | 652 MB | 1.25 s | 376 ms | 251 tok/s | 1.40 / 1.64 GB | Fast and compact, but produced four unaudited lexical changes under the structured prompt |
+| SmolLM3 3B 4-bit | 1.75 GB | 912 ms | 827 ms | 121 tok/s | 2.40 / 3.89 GB | Structured contract passed with a no-op; a separate surface-only run made one harmful edit |
+
+These are warm-host process observations; OS file and Metal caches were not
+cleared. Gemma's conversion also contains multimodal towers, so its snapshot is
+not a text-only architecture comparison. The measurements can screen delivery
+cost, but the unverified, development-exposed one-error fixture cannot rank
+correction quality. Consequently neither an owned official-MLX adapter nor a
+Core ML conversion has been started for these models. The next justified step
+is held-out human-verified German professional audio, not premature runtime
+porting.
+
 ## Candidate review
 
 The maintenance signals below are a dated snapshot, not a popularity contest.
@@ -130,7 +152,7 @@ impractical candidates. Raw text is always retained. No aggregate gain may hide
 a regression in a product-priority language cell or a critical change to a
 name, number, date, unit, technical term, or negation.
 
-Only the quality survivor proceeds to the MLX/Core ML comparison. That stage
+Only a quality survivor proceeds to the MLX/Core ML comparison. That stage
 adds conversion parity, actual compute placement, first-token latency,
 throughput, load, memory, model and artifact size, energy procedure,
 cancellation, lifecycle, and repeated determinism.
