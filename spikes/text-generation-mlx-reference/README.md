@@ -53,6 +53,20 @@ prompt path/hash, chat-template options, decoding contract, fixture, and result
 identity. MLX-LM is only the common quality-reference layer; issue #20 compares
 the quality survivor through owned official-MLX and Core ML product paths.
 
+The issue-#20 development candidates are pinned under `candidates/`:
+
+| Candidate | Conversion revision | Verified runtime snapshot |
+| --- | --- | ---: |
+| Gemma 4 E2B IT 4-bit | `238767527555cb75a05732a84dff5d6ba0dd6809` | 3,583,086,498 bytes |
+| Qwen 3.5 0.8B 4-bit | `da28692b5f139cb0ec58a356b437486b7dac7462` | 652,027,143 bytes |
+| SmolLM3 3B 4-bit | `d3a7e0594d6642dbcfb7d149bed8b0bdf49f95ce` | 1,747,378,363 bytes |
+
+The Gemma conversion repository is tagged with the Gemma license even though
+the observed official source is Apache-2.0. The reference may be evaluated,
+but a product decision requires an explicit rights disposition. Its conversion
+also includes vision and audio towers, so the Stage-A snapshot size is not a
+text-only product-size estimate.
+
 The run records cold model load, first-token latency, throughput, peak process
 and MLX memory, exact output/token identifiers, mechanical gates, and a
 cooperative cancellation probe. It is not a quality benchmark: one

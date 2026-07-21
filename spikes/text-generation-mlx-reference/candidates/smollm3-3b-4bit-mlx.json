@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0.0",
+  "id": "smollm3-3b-4bit-mlx",
+  "task": "text-generation",
+  "candidate_role": "multilingual-product-size-compromise",
+  "source": {
+    "repository": "HuggingFaceTB/SmolLM3-3B",
+    "observed_revision": "a07cc9a04f16550a088caea529712d1d335b0ac1",
+    "license": "Apache-2.0",
+    "parameter_count": 3000000000,
+    "advertised_primary_languages": [
+      "English",
+      "French",
+      "Spanish",
+      "German",
+      "Italian",
+      "Portuguese"
+    ],
+    "context_tokens": 65536,
+    "provenance_limit": "The conversion identifies HuggingFaceTB/SmolLM3-3B but does not name the exact source commit used. The observed revision pins capability and license evidence without claiming conversion identity."
+  },
+  "conversion": {
+    "repository": "mlx-community/SmolLM3-3B-4bit",
+    "revision": "d3a7e0594d6642dbcfb7d149bed8b0bdf49f95ce",
+    "license": "Apache-2.0",
+    "format": "MLX 4-bit safetensors",
+    "converter": "mlx-lm 0.25.3",
+    "quantization_bits": 4,
+    "quantization_group_size": 64,
+    "weight_bytes": 1730051993,
+    "snapshot_bytes": 1747378363,
+    "provenance_limit": "The conversion card pins mlx-lm 0.25.3 but not its source-model commit."
+  },
+  "reference_runtime": {
+    "repository": "ml-explore/mlx-lm",
+    "revision": "ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+    "version": "0.31.3",
+    "license": "MIT",
+    "mlx_repository": "ml-explore/mlx",
+    "mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+    "mlx_version": "0.32.0",
+    "boundary": "Pinned Python reference over official Apple MLX; not an accepted product dependency or stable API"
+  },
+  "generation_contract": {
+    "prompt_id": "surface-only-v1",
+    "prompt_path": "benchmarks/postprocessing/prompts/surface-only-v1.txt",
+    "prompt_sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
+    "chat_template": "pinned model tokenizer template with enable_thinking=false",
+    "chat_template_options": {
+      "enable_thinking": false
+    },
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 256,
+    "stream": true,
+    "cancellation_probe_after_tokens": 4,
+    "rationale": "Greedy non-thinking decoding isolates surface-formatting behavior and makes the development runtime probe repeatable."
+  },
+  "result_contract": {
+    "run_id": "phase5.smollm3-3b-4bit-mlx-reference.issue20-de-audiobook-whisper-1",
+    "purpose": "development-runtime-probe",
+    "fixture_path": "benchmarks/postprocessing/fixtures/issue7-de-audiobook-whisper.json",
+    "result_path": "benchmarks/postprocessing/runs/phase5.smollm3-3b-4bit-mlx-reference.issue20-de-audiobook-whisper-1.json",
+    "result_required": false
+  },
+  "artifacts": [
+    {
+      "path": "chat_template.jinja",
+      "bytes": 5499,
+      "sha256": "0dab472abbdc499c8d82acae3ad6e8404f672d2d50d9df582181daf062f66eb7"
+    },
+    {
+      "path": "config.json",
+      "bytes": 2394,
+      "sha256": "6d0046fc9fc07c74601b25107b8ff96077dc9c63941492f2856743eabc2a3d99"
+    },
+    {
+      "path": "generation_config.json",
+      "bytes": 182,
+      "sha256": "3458d62b3f9654f4bbe285223b0f4e5a1e67cae61c92bb6aeaadf04468bf9e01"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 1730051993,
+      "sha256": "d501e6193d7eb84e10d3c377007d1fc4b4b2fa08799dd10fa4f6a75033334a70"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "bytes": 58800,
+      "sha256": "64148ac05ad909f2fc69ec126ef9efe38545512a41914bdba17d1dc29437c19d"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 289,
+      "sha256": "12403efb970f069ba62ddf3b66166a27254be4a198166b61ad1ee604bd3a4515"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 17208819,
+      "sha256": "7b6a500b662a34eb3f0374db856ba4ad7de4c81040571d78dc0d357238930005"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 50387,
+      "sha256": "59a64b39f05ee0acf7479bbccf99a44d9e481c1a4a494eb03838ae3c35eb29be"
+    }
+  ]
+}
