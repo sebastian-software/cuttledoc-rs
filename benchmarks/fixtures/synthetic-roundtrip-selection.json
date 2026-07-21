@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-passages-2",
-  "plan_revision": "synthetic-roundtrip-pilot-4",
+  "revision": "synthetic-roundtrip-passages-3",
+  "plan_revision": "synthetic-roundtrip-pilot-5",
   "purpose": "diagnostic-materialization",
   "text_encoding": "utf-8",
   "paragraph_joiner": "\n\n",
@@ -255,7 +255,7 @@
       "passages": [
         {
           "id": "synthetic-en-reasoning",
-          "content_type": "en-factual",
+          "content_type": "en-technical",
           "segments": [
             {
               "section_path": [
@@ -317,6 +317,424 @@
             "technical terms",
             "numbers and dates",
             "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "en-wikipedia-audiobook-1355975145",
+      "kind": "mediawiki",
+      "locale": "en-US",
+      "api_url": "https://en.wikipedia.org/w/api.php",
+      "page_id": 1437235,
+      "title": "Audiobook",
+      "revision_id": 1355975145,
+      "parent_revision_id": 1345215369,
+      "revision_timestamp": "2026-05-25T01:10:25Z",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1355975145&title=Audiobook",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Audiobook&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Audiobook, revision 1355975145",
+      "passages": [
+        {
+          "id": "synthetic-en-native",
+          "content_type": "en-native",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 653,
+          "verbatim_sha256": "489d5486cd56662352fd765c117038dda6a65b5eef5598ca77fb5b28dcedb6d4",
+          "spoken_sha256": "489d5486cd56662352fd765c117038dda6a65b5eef5598ca77fb5b28dcedb6d4",
+          "phenomena": [
+            "native-language factual prose",
+            "numbers and dates",
+            "quoted terminology",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-en-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "en-US",
+      "path": "benchmarks/fixtures/text/synthetic-en-dialogue.txt",
+      "title": "A quiet recording",
+      "revision": "15d65971c36965761b02557d172a849c683d4541e16c84fef5965583ee988939",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-en-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-en-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, A quiet recording, revision 15d65971c369",
+      "passages": [
+        {
+          "id": "synthetic-en-dialogue",
+          "content_type": "en-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 843,
+          "verbatim_sha256": "40161c3a50b3b878aecd39e1465eeaf8871cf5fd72ea0996a1d2e8a03d8dfb0f",
+          "spoken_sha256": "40161c3a50b3b878aecd39e1465eeaf8871cf5fd72ea0996a1d2e8a03d8dfb0f",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "microphone terminology"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "es-wikipedia-inteligencia-artificial-174423117",
+      "kind": "mediawiki",
+      "locale": "es-419",
+      "api_url": "https://es.wikipedia.org/w/api.php",
+      "page_id": 1503,
+      "title": "Inteligencia artificial",
+      "revision_id": 174423117,
+      "parent_revision_id": 174421385,
+      "revision_timestamp": "2026-07-18T00:53:41Z",
+      "revision_url": "https://es.wikipedia.org/w/index.php?oldid=174423117&title=Inteligencia_artificial",
+      "history_url": "https://es.wikipedia.org/w/index.php?title=Inteligencia_artificial&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Inteligencia artificial, revision 174423117",
+      "passages": [
+        {
+          "id": "synthetic-es-technical",
+          "content_type": "es-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Tendencias"
+              ],
+              "paragraph_index": 1
+            }
+          ],
+          "character_count": 1100,
+          "verbatim_sha256": "b848e8732d5504bd3abab34419a3eefe89289ffb53b948a7376becc93e3eef4c",
+          "spoken_sha256": "b848e8732d5504bd3abab34419a3eefe89289ffb53b948a7376becc93e3eef4c",
+          "phenomena": [
+            "technical terminology and abbreviations",
+            "embedded English terms where natural",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "es-wikipedia-audiolibro-174385246",
+      "kind": "mediawiki",
+      "locale": "es-419",
+      "api_url": "https://es.wikipedia.org/w/api.php",
+      "page_id": 149075,
+      "title": "Audiolibro",
+      "revision_id": 174385246,
+      "parent_revision_id": 173570828,
+      "revision_timestamp": "2026-07-15T11:31:38Z",
+      "revision_url": "https://es.wikipedia.org/w/index.php?oldid=174385246&title=Audiolibro",
+      "history_url": "https://es.wikipedia.org/w/index.php?title=Audiolibro&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Audiolibro, revision 174385246",
+      "passages": [
+        {
+          "id": "synthetic-es-native",
+          "content_type": "es-native",
+          "segments": [
+            {
+              "section_path": [
+                "Características"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1206,
+          "verbatim_sha256": "fdb0965a2006c4181b55329565437d81341bf6b180ae9317355bcc20f0e2e418",
+          "spoken_sha256": "fdb0965a2006c4181b55329565437d81341bf6b180ae9317355bcc20f0e2e418",
+          "phenomena": [
+            "native-language factual prose",
+            "enumeration",
+            "punctuation",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-es-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "es-419",
+      "path": "benchmarks/fixtures/text/synthetic-es-dialogue.txt",
+      "title": "Una grabación tranquila",
+      "revision": "1a1f35ebd4ecedb1e0123402f88ff310006f831f916c03676e37708a783d435e",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-es-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-es-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Una grabación tranquila, revision 1a1f35ebd4ec",
+      "passages": [
+        {
+          "id": "synthetic-es-dialogue",
+          "content_type": "es-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 888,
+          "verbatim_sha256": "3d5455265d7b370e041b81bf5d234204eb2eb2c18d538c696ed2e9bb51d7525b",
+          "spoken_sha256": "3d5455265d7b370e041b81bf5d234204eb2eb2c18d538c696ed2e9bb51d7525b",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "microphone terminology"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fr-wikipedia-intelligence-artificielle-237681031",
+      "kind": "mediawiki",
+      "locale": "fr-FR",
+      "api_url": "https://fr.wikipedia.org/w/api.php",
+      "page_id": 1548,
+      "title": "Intelligence artificielle",
+      "revision_id": 237681031,
+      "parent_revision_id": 237049574,
+      "revision_timestamp": "2026-07-09T11:53:33Z",
+      "revision_url": "https://fr.wikipedia.org/w/index.php?oldid=237681031&title=Intelligence_artificielle",
+      "history_url": "https://fr.wikipedia.org/w/index.php?title=Intelligence_artificielle&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Intelligence artificielle, revision 237681031",
+      "passages": [
+        {
+          "id": "synthetic-fr-technical",
+          "content_type": "fr-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Définition"
+              ],
+              "paragraph_index": 4
+            }
+          ],
+          "character_count": 959,
+          "verbatim_sha256": "68e1e728182d3082922cb646cc4c2a6c84d346734cee014a9e27f42fc9390c78",
+          "spoken_sha256": "68e1e728182d3082922cb646cc4c2a6c84d346734cee014a9e27f42fc9390c78",
+          "phenomena": [
+            "technical terminology and abbreviations",
+            "embedded English terms where natural",
+            "enumeration",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fr-wikipedia-livre-audio-235403403",
+      "kind": "mediawiki",
+      "locale": "fr-FR",
+      "api_url": "https://fr.wikipedia.org/w/api.php",
+      "page_id": 882329,
+      "title": "Livre audio",
+      "revision_id": 235403403,
+      "parent_revision_id": 233986500,
+      "revision_timestamp": "2026-04-21T10:18:41Z",
+      "revision_url": "https://fr.wikipedia.org/w/index.php?oldid=235403403&title=Livre_audio",
+      "history_url": "https://fr.wikipedia.org/w/index.php?title=Livre_audio&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Livre audio, revision 235403403",
+      "passages": [
+        {
+          "id": "synthetic-fr-native",
+          "content_type": "fr-native",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 814,
+          "verbatim_sha256": "6161a49a2c27652e8d1100d93c572f11244271da80ba4a28b12f3229b39b3fd1",
+          "spoken_sha256": "6161a49a2c27652e8d1100d93c572f11244271da80ba4a28b12f3229b39b3fd1",
+          "phenomena": [
+            "native-language factual prose",
+            "parenthetical punctuation",
+            "numbers and dates",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-fr-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "fr-FR",
+      "path": "benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "title": "Un enregistrement calme",
+      "revision": "03703f7c33e12ea120df1844383194f8231593e35212b4306e947f76a370c70b",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Un enregistrement calme, revision 03703f7c33e1",
+      "passages": [
+        {
+          "id": "synthetic-fr-dialogue",
+          "content_type": "fr-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 943,
+          "verbatim_sha256": "c26bef000e9b23e3a2d44c716e4dde3f405b9d6007fdd85d459e8ff8a3a98ca8",
+          "spoken_sha256": "c26bef000e9b23e3a2d44c716e4dde3f405b9d6007fdd85d459e8ff8a3a98ca8",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "microphone terminology"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pt-wikipedia-inteligencia-artificial-72427477",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "api_url": "https://pt.wikipedia.org/w/api.php",
+      "page_id": 12722,
+      "title": "Inteligência artificial",
+      "revision_id": 72427477,
+      "parent_revision_id": 72427457,
+      "revision_timestamp": "2026-06-13T16:30:06Z",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=72427477&title=Intelig%C3%AAncia_artificial",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Intelig%C3%AAncia_artificial&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Inteligência artificial, revision 72427477",
+      "passages": [
+        {
+          "id": "synthetic-pt-technical",
+          "content_type": "pt-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Classificações e subcampos",
+                "Agêntica"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 659,
+          "verbatim_sha256": "a87cadad5308bb5eeb339ce680f7624a35ccc724e6a20dc0897069cd65ae736d",
+          "spoken_sha256": "a87cadad5308bb5eeb339ce680f7624a35ccc724e6a20dc0897069cd65ae736d",
+          "phenomena": [
+            "technical terminology and abbreviations",
+            "embedded English terms where natural",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pt-wikipedia-audiolivro-64246519",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "api_url": "https://pt.wikipedia.org/w/api.php",
+      "page_id": 1120298,
+      "title": "Audiolivro",
+      "revision_id": 64246519,
+      "parent_revision_id": 56555647,
+      "revision_timestamp": "2022-08-22T14:12:02Z",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=64246519&title=Audiolivro",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Audiolivro&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Audiolivro, revision 64246519",
+      "passages": [
+        {
+          "id": "synthetic-pt-native",
+          "content_type": "pt-native",
+          "segments": [
+            {
+              "section_path": [
+                "Livro falado para pessoas com deficiência visual"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 887,
+          "verbatim_sha256": "b4af10b2da192113abb8b6127c2dbe0d50c192a86fb192eb0e8d40bd2d3205b7",
+          "spoken_sha256": "b4af10b2da192113abb8b6127c2dbe0d50c192a86fb192eb0e8d40bd2d3205b7",
+          "phenomena": [
+            "native-language factual prose",
+            "parenthetical punctuation",
+            "proper names",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-pt-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "pt-BR",
+      "path": "benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "title": "Uma gravação tranquila",
+      "revision": "876ebf34ab63a75fc39364195fd7ffa751e077cb37eab23b6605a307ef54b1e2",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Uma gravação tranquila, revision 876ebf34ab63",
+      "passages": [
+        {
+          "id": "synthetic-pt-dialogue",
+          "content_type": "pt-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 887,
+          "verbatim_sha256": "bb590041c9d73bd943cec7a14e92fb5eccd6ab57fa7df12743b291103303a6e1",
+          "spoken_sha256": "bb590041c9d73bd943cec7a14e92fb5eccd6ab57fa7df12743b291103303a6e1",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "microphone terminology"
           ]
         }
       ]

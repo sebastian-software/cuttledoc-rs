@@ -1,7 +1,8 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** all three German Qwen content cells pass the lexical gate;
-listening review and the multi-voice matrix remain to be run
+**Status:** all three German Qwen content cells pass the lexical gate; the same
+three-cell slice is materialized for English, Spanish, French, and Portuguese,
+with multilingual Qwen execution and listening review still pending
 
 ## Purpose
 
@@ -32,10 +33,10 @@ a strong or weak voice cannot disappear inside one aggregate.
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
 
-The exact eleven-passage selection is
+The exact 22-passage selection is
 [`synthetic-roundtrip-selection.json`](../benchmarks/fixtures/synthetic-roundtrip-selection.json).
-The repository materializer retrieves three pinned MediaWiki revisions, reads
-one digest-pinned repository-authored source, and reproduces all eleven
+The repository materializer retrieves ten pinned MediaWiki revisions, reads
+five digest-pinned repository-authored sources, and reproduces all 22
 expected text digests. It writes the full CC BY-SA passage and attribution
 package to the caller-selected local output directory. Reviewed fixtures may
 additionally enter `benchmarks/assets` with an explicit per-asset license and
@@ -55,19 +56,29 @@ The selected sections provide technical terminology, proper names, dates,
 abbreviations, compounds, parenthetical phrases, and long sentences without
 inventing a benchmark text around one model's behavior.
 
-An English control selects three passages from exact revision `1365114492` of
-["Artificial intelligence"](https://en.wikipedia.org/w/index.php?oldid=1365114492&title=Artificial_intelligence).
-German and English are separate result cells; aggregate WER must not obscure
-language-specific behavior.
+The primary non-Asian locale set is `de-DE`, `en-US`, `es-419`, `fr-FR`, and
+`pt-BR`. Each locale has a separate three-part calibration slice so aggregate
+WER cannot obscure language- or content-specific behavior:
 
-Before comparing additional engines, the German calibration deliberately
-separates three content types:
+| Locale | Technical cell | Native-factual cell | Dialogue cell |
+| --- | --- | --- | --- |
+| `de-DE` | `synthetic-de-origin` | `synthetic-de-native` | `synthetic-de-dialogue` |
+| `en-US` | `synthetic-en-reasoning` | `synthetic-en-native` | `synthetic-en-dialogue` |
+| `es-419` | `synthetic-es-technical` | `synthetic-es-native` | `synthetic-es-dialogue` |
+| `fr-FR` | `synthetic-fr-technical` | `synthetic-fr-native` | `synthetic-fr-dialogue` |
+| `pt-BR` | `synthetic-pt-technical` | `synthetic-pt-native` | `synthetic-pt-dialogue` |
 
-| Cell | Passage | Purpose |
-| --- | --- | --- |
-| `de-codeswitch` | `synthetic-de-origin` | Technical German with embedded English terms and proper names |
-| `de-native` | `synthetic-de-native` | Largely native German factual prose from the pinned “Buchdruck” lead |
-| `de-dialogue` | `synthetic-de-dialogue` | Repository-authored conversational prose with quoted turns |
+The technical and native-factual cells use exact, digest-pinned Wikipedia
+revisions. The dialogues are repository-authored and idiomatically adapted
+around the same recording scenario; they are comparable in intent but are not
+claimed to have identical linguistic difficulty.
+
+The Spanish and Portuguese source editions provide practical clean-speech
+controls, not universal regional coverage. In particular, an `es-419` result
+must not be generalized to every Latin American variety, and a `pt-BR` result
+must not be generalized beyond the actual text and generated voice. Future
+native-variety material may strengthen those cells without changing this
+limitation.
 
 The dialogue is currently synthesized by one described voice. It isolates the
 effect of conversational text and punctuation; it is not a two-speaker or
@@ -313,11 +324,10 @@ zero normalized character edits. Each reports the same 3/117 word edits
 [`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
 preserves this positive control.
 
-The bounded Qwen content step keeps that accepted warm voice description fixed
-and changes only the German content cell: first `synthetic-de-native`, then
-`synthetic-de-dialogue`. This directly tests whether the earlier German spread
-comes from English code-switching or from the synthesis/recognition path more
-generally before the larger Voxtral calibration begins.
+The bounded Qwen content step keeps the accepted warm voice description fixed
+while changing the content cell. German established the method first; the
+same technical, native-factual, and dialogue structure is now frozen for the
+other four primary locales before the larger Voxtral calibration begins.
 
 The `synthetic-de-native` run is now complete. Qwen generated 54.88 seconds of
 finite audio and stopped normally at 686 of 1,200 tokens. All five receivers
@@ -337,10 +347,11 @@ evidence identifies a receiver-specific Parakeet weakness rather than a shared
 Qwen content error. The dialogue cell passes the lexical content gate; one
 voice reads the full exchange, and listening review remains open.
 
-The bounded German/English lexical calibration therefore accepts the warm
-Qwen profiles and rejects the clear German profile. Listening is the remaining
-Qwen gate before full-matrix promotion; the next engine calibration is Voxtral
-BF16.
+The completed German/English lexical calibrations accept the warm Qwen
+profiles and reject the clear German profile. English native-factual and
+dialogue runs plus all three Spanish, French, and Portuguese cells are the
+next bounded Qwen step. Listening remains a separate gate before full-matrix
+promotion.
 
 ## Voxtral TTS MLX reference result
 
@@ -380,9 +391,10 @@ artifact also remains reference-only under CC BY-NC 4.0.
 
 ## Implementation sequence
 
-1. Materialize and hash the German and English passages from both pinned
-   Wikipedia revisions, including attribution and change metadata.
-   **Complete:** nine selectors reproduce their expected SHA-256 digests.
+1. Materialize and hash the five primary-language slices from ten pinned
+   Wikipedia revisions and five repository-authored dialogues, including
+   attribution and change metadata.
+   **Complete:** 22 selectors reproduce their expected SHA-256 digests.
 2. Build the Apple system-voice Rust vertical slice and validate generated
    audio ownership plus cancellation.
    **Complete:** real PCM, timing, busy, cancellation, and execution-context
@@ -405,16 +417,15 @@ artifact also remains reference-only under CC BY-NC 4.0.
    accepts 64 kbit/s Ogg Opus for reviewed clean-speech Git fixtures. The first
    CC BY-SA asset, attribution, reproduction script, and validation record are
    checked in; lossless generation PCM remains local.
-5. Pin the new model/runtime artifacts and run one German and one English
-   calibration passage before the full matrix. Generate two voices each for
-   Apple, Qwen, and Voxtral, plus one German KugelAudio voice; run the five
+5. Pin the new model/runtime artifacts and run the three content cells in each
+   primary locale before the full multi-voice matrix. Generate two voices each
+   for Apple, Qwen, and Voxtral, plus one German KugelAudio voice; run the five
    required ASR receivers and the two bounded ASR qualifiers. Freeze only the
    candidates that pass fidelity, stability, listening, and operational-cost
    gates.
-   **In progress:** all three model/runtime snapshots are pinned. The first
-   Qwen clear-documentary German profile completed all five required ASR
-   receivers but provisionally failed the `1962` critical-token gate. The
-   second German Qwen profile is the next bounded discriminator.
+   **In progress:** all three model/runtime snapshots are pinned. German's
+   three Qwen cells pass the lexical gate, the English technical cell passes,
+   and the remaining eleven multilingual Qwen cells are frozen for execution.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

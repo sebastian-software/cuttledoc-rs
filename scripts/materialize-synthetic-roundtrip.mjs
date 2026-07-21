@@ -152,9 +152,17 @@ function validateSelection(selection) {
       }
     }
   }
-  if ((localeCounts.get('de-DE') ?? 0) < 8 ||
-      (localeCounts.get('en-US') ?? 0) < 3) {
-    errors.push('selection requires at least eight German and three English passages');
+  const minimumPassages = new Map([
+    ['de-DE', 8],
+    ['en-US', 5],
+    ['es-419', 3],
+    ['fr-FR', 3],
+    ['pt-BR', 3],
+  ]);
+  for (const [locale, minimum] of minimumPassages) {
+    if ((localeCounts.get(locale) ?? 0) < minimum) {
+      errors.push(`${locale}: selection requires at least ${minimum} passages`);
+    }
   }
   return errors;
 }

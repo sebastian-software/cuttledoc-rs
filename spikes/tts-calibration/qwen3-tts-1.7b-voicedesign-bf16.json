@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "three-German-content-types-passed-listening-pending",
+    "status": "multilingual-content-type-expansion-pending",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [
@@ -181,6 +181,105 @@
         "passage_id": "synthetic-en-reasoning",
         "voice": null,
         "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-en-warm-native",
+        "locale": "en-US",
+        "language": "English",
+        "passage_id": "synthetic-en-native",
+        "voice": null,
+        "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-en-warm-dialogue",
+        "locale": "en-US",
+        "language": "English",
+        "passage_id": "synthetic-en-dialogue",
+        "voice": null,
+        "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-es-warm-technical",
+        "locale": "es-419",
+        "language": "Spanish",
+        "passage_id": "synthetic-es-technical",
+        "voice": null,
+        "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-es-warm-native",
+        "locale": "es-419",
+        "language": "Spanish",
+        "passage_id": "synthetic-es-native",
+        "voice": null,
+        "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-es-warm-dialogue",
+        "locale": "es-419",
+        "language": "Spanish",
+        "passage_id": "synthetic-es-dialogue",
+        "voice": null,
+        "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-fr-warm-technical",
+        "locale": "fr-FR",
+        "language": "French",
+        "passage_id": "synthetic-fr-technical",
+        "voice": null,
+        "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-fr-warm-native",
+        "locale": "fr-FR",
+        "language": "French",
+        "passage_id": "synthetic-fr-native",
+        "voice": null,
+        "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-fr-warm-dialogue",
+        "locale": "fr-FR",
+        "language": "French",
+        "passage_id": "synthetic-fr-dialogue",
+        "voice": null,
+        "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-pt-warm-technical",
+        "locale": "pt-BR",
+        "language": "Portuguese",
+        "passage_id": "synthetic-pt-technical",
+        "voice": null,
+        "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-pt-warm-native",
+        "locale": "pt-BR",
+        "language": "Portuguese",
+        "passage_id": "synthetic-pt-native",
+        "voice": null,
+        "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-pt-warm-dialogue",
+        "locale": "pt-BR",
+        "language": "Portuguese",
+        "passage_id": "synthetic-pt-dialogue",
+        "voice": null,
+        "instruction": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
         "seed": 0
       }
     ],

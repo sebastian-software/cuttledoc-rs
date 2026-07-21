@@ -110,11 +110,11 @@ node scripts/materialize-target-domain-corpus.mjs \
 
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
-under issue #13. It starts with
-German and reports English separately, pins exact source revisions or digests, and
+under issue #13. It keeps German primary and reports `de-DE`, `en-US`,
+`es-419`, `fr-FR`, and `pt-BR` separately, pins exact source revisions or digests, and
 requires at least three pinned voices per locale across all three required TTS
-engines before producing a recommendation. A bounded German/English
-calibration runs before the full matrix. Every generated artifact crosses the
+engines before producing a recommendation. A bounded three-content-type
+calibration runs per primary locale before the full matrix. Every generated artifact crosses the
 same five ASR backends: Apple SpeechTranscriber, Whisper, direct Qwen3-ASR,
 Parakeet, and direct Voxtral Realtime. Apple `AVSpeechSynthesizer` is the
 system baseline; Qwen3-TTS 1.7B VoiceDesign and Voxtral TTS BF16 are the two
@@ -133,6 +133,11 @@ generic verified fetch command live in
 [`spikes/tts-calibration`](../spikes/tts-calibration/README.md). KugelAudio is
 currently limited to an implicit default voice and does not satisfy
 multi-voice coverage.
+
+The selection contains technical, native-factual, and conversational-dialogue
+cells for each primary locale. Spanish and Portuguese remain explicit regional
+proxies: results apply to the pinned text and voice, not to every `es-419` or
+`pt-BR` variety.
 Materialize the eleven digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:
 

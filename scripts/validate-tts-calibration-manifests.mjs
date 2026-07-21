@@ -340,7 +340,7 @@ function validate(items, acceptedPlan) {
       snapshotBytes: 4520194992,
       artifactCount: 14,
       role: 'required-generator',
-      status: 'three-German-content-types-passed-listening-pending',
+      status: 'multilingual-content-type-expansion-pending',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -349,8 +349,19 @@ function validate(items, acceptedPlan) {
         'qwen-de-warm-dialogue',
         'qwen-en-clear-documentary',
         'qwen-en-warm-podcast',
+        'qwen-en-warm-native',
+        'qwen-en-warm-dialogue',
+        'qwen-es-warm-technical',
+        'qwen-es-warm-native',
+        'qwen-es-warm-dialogue',
+        'qwen-fr-warm-technical',
+        'qwen-fr-warm-native',
+        'qwen-fr-warm-dialogue',
+        'qwen-pt-warm-technical',
+        'qwen-pt-warm-native',
+        'qwen-pt-warm-dialogue',
       ],
-      planStatus: 'calibration-three-German-content-types-passed-listening-pending',
+      planStatus: 'multilingual-content-type-expansion-pending',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',
@@ -449,17 +460,38 @@ function validate(items, acceptedPlan) {
           JSON.stringify(contract.profiles)) {
       errors.push(`${prefix}calibration role, voice mode, or profiles differ`);
     }
+    const acceptedPassagesByLocale = new Map([
+      ['de-DE', new Set([
+        'synthetic-de-origin',
+        'synthetic-de-native',
+        'synthetic-de-dialogue',
+      ])],
+      ['en-US', new Set([
+        'synthetic-en-reasoning',
+        'synthetic-en-native',
+        'synthetic-en-dialogue',
+      ])],
+      ['es-419', new Set([
+        'synthetic-es-technical',
+        'synthetic-es-native',
+        'synthetic-es-dialogue',
+      ])],
+      ['fr-FR', new Set([
+        'synthetic-fr-technical',
+        'synthetic-fr-native',
+        'synthetic-fr-dialogue',
+      ])],
+      ['pt-BR', new Set([
+        'synthetic-pt-technical',
+        'synthetic-pt-native',
+        'synthetic-pt-dialogue',
+      ])],
+    ]);
     for (const profile of data.calibration?.profiles ?? []) {
-      if (profile.locale === 'de-DE' &&
-          ![
-            'synthetic-de-origin',
-            'synthetic-de-native',
-            'synthetic-de-dialogue',
-          ].includes(profile.passage_id)) {
-        errors.push(`${prefix}${profile.id}: German profile uses an unknown calibration cell`);
-      }
-      if (profile.locale === 'en-US' && profile.passage_id !== 'synthetic-en-reasoning') {
-        errors.push(`${prefix}${profile.id}: English profile must use synthetic-en-reasoning`);
+      const acceptedPassages = acceptedPassagesByLocale.get(profile.locale);
+      if (contract.candidate === 'qwen3-tts-1.7b-voicedesign-mlx-audio' &&
+          (!acceptedPassages || !acceptedPassages.has(profile.passage_id))) {
+        errors.push(`${prefix}${profile.id}: profile uses an unknown locale/content cell`);
       }
       if (contract.voiceMode === 'description' &&
           (profile.voice !== null || !(profile.instruction?.length > 0))) {
@@ -492,7 +524,8 @@ function validate(items, acceptedPlan) {
 
 function acceptedSelectionRevision(revision, selection) {
   return revision === selection.revision ||
-    revision === 'synthetic-roundtrip-passages-1';
+    revision === 'synthetic-roundtrip-passages-1' ||
+    revision === 'synthetic-roundtrip-passages-2';
 }
 
 function validateQwenCalibrationRun(run, manifest, acceptedSelection) {
@@ -1189,7 +1222,7 @@ function validateQwenNativeCalibrationRun(run, manifest, acceptedSelection) {
       run.run_id !==
         'phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-native.1' ||
       run.source_revision !== 'ebaee27d51511b858e9a008b8d2bf939183d56f1' ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}identity or revisions differ`);
   }
@@ -1399,7 +1432,7 @@ function validateQwenDialogueCalibrationRun(run, manifest, acceptedSelection) {
       run.run_id !==
         'phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-dialogue.1' ||
       run.source_revision !== '8a1561681999eda4d51b9de126b2ec41393a7dac' ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}identity or revisions differ`);
   }

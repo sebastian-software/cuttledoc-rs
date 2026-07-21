@@ -223,7 +223,8 @@
             "german-and-english-warm-profiles-passed-lexical-gate",
             "content-type-expansion-pending-native-and-dialogue",
             "content-type-expansion-pending-dialogue",
-            "three-German-content-types-passed-listening-pending"
+            "three-German-content-types-passed-listening-pending",
+            "multilingual-content-type-expansion-pending"
           ]
         },
         "voice_mode": {

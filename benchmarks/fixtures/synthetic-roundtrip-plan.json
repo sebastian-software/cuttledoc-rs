@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-pilot-4",
+  "revision": "synthetic-roundtrip-pilot-5",
   "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
   "purpose": "decision-support",
@@ -13,25 +13,30 @@
   "initial_scope": {
     "locales": [
       "de-DE",
-      "en-US"
+      "en-US",
+      "es-419",
+      "fr-FR",
+      "pt-BR"
     ],
     "primary_locale": "de-DE",
     "topic": "clean-produced-speech",
     "minimum_passages_per_locale": {
       "de-DE": 8,
-      "en-US": 3
+      "en-US": 5,
+      "es-419": 3,
+      "fr-FR": 3,
+      "pt-BR": 3
     },
     "minimum_passage_duration_ms": 45000,
     "maximum_passage_duration_ms": 90000,
     "required_text_phenomena": [
-      "German compounds",
-      "English technical terms",
+      "technical terminology and abbreviations",
+      "embedded English terms where natural",
       "proper names",
-      "abbreviations",
       "numbers and dates",
       "parenthetical punctuation",
       "long sentences",
-      "native German factual prose",
+      "native-language factual prose",
       "conversational dialogue"
     ]
   },
@@ -135,6 +140,260 @@
         "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
         "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
       }
+    },
+    {
+      "id": "en-wikipedia-audiobook-1355975145",
+      "kind": "mediawiki",
+      "locale": "en-US",
+      "title": "Audiobook",
+      "revision": "1355975145",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1355975145&title=Audiobook",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Audiobook&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-en-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "en-US",
+      "title": "A quiet recording",
+      "revision": "15d65971c36965761b02557d172a849c683d4541e16c84fef5965583ee988939",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-en-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-en-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "es-wikipedia-inteligencia-artificial-174423117",
+      "kind": "mediawiki",
+      "locale": "es-419",
+      "title": "Inteligencia artificial",
+      "revision": "174423117",
+      "revision_url": "https://es.wikipedia.org/w/index.php?oldid=174423117&title=Inteligencia_artificial",
+      "history_url": "https://es.wikipedia.org/w/index.php?title=Inteligencia_artificial&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "Tendencias"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "es-wikipedia-audiolibro-174385246",
+      "kind": "mediawiki",
+      "locale": "es-419",
+      "title": "Audiolibro",
+      "revision": "174385246",
+      "revision_url": "https://es.wikipedia.org/w/index.php?oldid=174385246&title=Audiolibro",
+      "history_url": "https://es.wikipedia.org/w/index.php?title=Audiolibro&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "Características"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-es-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "es-419",
+      "title": "Una grabación tranquila",
+      "revision": "1a1f35ebd4ecedb1e0123402f88ff310006f831f916c03676e37708a783d435e",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-es-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-es-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "fr-wikipedia-intelligence-artificielle-237681031",
+      "kind": "mediawiki",
+      "locale": "fr-FR",
+      "title": "Intelligence artificielle",
+      "revision": "237681031",
+      "revision_url": "https://fr.wikipedia.org/w/index.php?oldid=237681031&title=Intelligence_artificielle",
+      "history_url": "https://fr.wikipedia.org/w/index.php?title=Intelligence_artificielle&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "Définition"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "fr-wikipedia-livre-audio-235403403",
+      "kind": "mediawiki",
+      "locale": "fr-FR",
+      "title": "Livre audio",
+      "revision": "235403403",
+      "revision_url": "https://fr.wikipedia.org/w/index.php?oldid=235403403&title=Livre_audio",
+      "history_url": "https://fr.wikipedia.org/w/index.php?title=Livre_audio&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-fr-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "fr-FR",
+      "title": "Un enregistrement calme",
+      "revision": "03703f7c33e12ea120df1844383194f8231593e35212b4306e947f76a370c70b",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "pt-wikipedia-inteligencia-artificial-72427477",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "title": "Inteligência artificial",
+      "revision": "72427477",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=72427477&title=Intelig%C3%AAncia_artificial",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Intelig%C3%AAncia_artificial&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "Classificações e subcampos",
+        "Agêntica"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "pt-wikipedia-audiolivro-64246519",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "title": "Audiolivro",
+      "revision": "64246519",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=64246519&title=Audiolivro",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Audiolivro&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "Livro falado para pessoas com deficiência visual"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-pt-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "pt-BR",
+      "title": "Uma gravação tranquila",
+      "revision": "876ebf34ab63a75fc39364195fd7ffa751e077cb37eab23b6605a307ef54b1e2",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
     }
   ],
   "tts_candidates": [
@@ -150,7 +409,10 @@
       "status": "selected-for-first-slice",
       "locales": [
         "de-DE",
-        "en-US"
+        "en-US",
+        "es-419",
+        "fr-FR",
+        "pt-BR"
       ],
       "decision_after_pilot": "Retain as the deterministic platform baseline even if an open model wins product selection."
     },
@@ -179,12 +441,15 @@
       "source_url": "https://github.com/QwenLM/Qwen3-TTS",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
       "license": "Apache-2.0 converted model and MIT reference runtime; all 14 snapshot files are byte-counted and SHA-256 pinned in spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json",
-      "status": "calibration-three-German-content-types-passed-listening-pending",
+      "status": "multilingual-content-type-expansion-pending",
       "locales": [
         "de-DE",
-        "en-US"
+        "en-US",
+        "es-419",
+        "fr-FR",
+        "pt-BR"
       ],
-      "decision_after_pilot": "Advance two description-pinned voices per locale only if German and English content fidelity and operational cost justify the 1.7B variant."
+      "decision_after_pilot": "Advance two description-pinned voices per locale only if the five primary non-Asian locale calibrations justify the 1.7B variant; es-419 and pt-BR remain regional proxies until native-variety controls are added."
     },
     {
       "id": "voxtral-tts-4b-mlx-audio",
@@ -324,9 +589,20 @@
       "synthetic-de-origin",
       "synthetic-de-native",
       "synthetic-de-dialogue",
-      "synthetic-en-reasoning"
+      "synthetic-en-reasoning",
+      "synthetic-en-native",
+      "synthetic-en-dialogue",
+      "synthetic-es-technical",
+      "synthetic-es-native",
+      "synthetic-es-dialogue",
+      "synthetic-fr-technical",
+      "synthetic-fr-native",
+      "synthetic-fr-dialogue",
+      "synthetic-pt-technical",
+      "synthetic-pt-native",
+      "synthetic-pt-dialogue"
     ],
-    "promotion_rule": "Pin every artifact first, run the bounded German/English calibration, reject unstable or unjustifiably expensive candidates, then freeze the surviving full matrix before materializing all passages."
+    "promotion_rule": "Pin every artifact first, run the bounded three-content-type calibration for de-DE, en-US, es-419, fr-FR, and pt-BR, reject unstable or unjustifiably expensive candidates, then freeze the surviving full matrix before materializing all passages."
   },
   "asr_backends": [
     "apple-speechtranscriber",

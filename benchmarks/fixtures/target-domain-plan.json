@@ -9,7 +9,7 @@
     "release_blocking": false,
     "backend_selection_blocking": false,
     "current_required_cell": "de-DE/podcast",
-    "primary_comparison_plan_revision": "synthetic-roundtrip-pilot-4",
+    "primary_comparison_plan_revision": "synthetic-roundtrip-pilot-5",
     "numeric_quality_claims_require_human_gold": true,
     "paused_work": [
       "mandatory-independent-human-gold",

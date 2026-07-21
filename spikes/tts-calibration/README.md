@@ -37,7 +37,7 @@ bash scripts/run-qwen3-tts-voicedesign-calibration.sh
 ```
 
 The runner verifies every model file by byte count and SHA-256 before loading
-it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the six fixed Qwen profiles;
+it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the 17 fixed Qwen profiles;
 the default is `qwen-de-clear-documentary`.
 
 Cross one completed local TTS result through the five required ASR backends:
@@ -77,6 +77,13 @@ Parakeet alone makes seven. The three content cells therefore pass the Qwen
 lexical gate without letting embedded English terms dominate the comparison.
 Listening remains the final Qwen gate before Voxtral and full-matrix
 promotion.
+
+The manifest now adds the same three cells for `en-US`, `es-419`, `fr-FR`,
+and `pt-BR`. Each uses one fixed warm, conversational description within its
+locale so the first comparison changes content rather than voice design.
+Spanish and Portuguese are regional calibration proxies; their labels do not
+turn a single synthesized voice or source edition into universal dialect
+coverage.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
