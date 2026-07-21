@@ -38,7 +38,7 @@ Rust failure to a rejected Promise, and rejects cancelled work.
 Node 22 is part of the intended support floor but was not installed on the
 development machine. The repository workflow ran the exact same build-pack-
 install-test script successfully on Node 22 and 24 in
-[CI run 29841265536](https://github.com/sebastian-software/cuttledoc-rs/actions/runs/29841265536).
+[CI run 29841483324](https://github.com/sebastian-software/cuttledoc-rs/actions/runs/29841483324).
 The workflow uses current Node-24-based GitHub Actions so the artifact test does
 not depend on GitHub's deprecated Node 20 action runtime.
 
