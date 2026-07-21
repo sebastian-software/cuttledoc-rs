@@ -35,6 +35,6 @@
     "purpose": "development-runtime-probe",
     "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json",
     "result_path": "benchmarks/postprocessing/runs/phase5.smollm3-3b-4bit-mlx-reference.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
-    "result_required": false
+    "result_required": true
   }
 }

@@ -1,0 +1,283 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.smollm3-3b-4bit-mlx-reference.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-21T19:14:44.087573Z",
+  "source_revision": "681ba062a2d5c8e963d443edca4cbaf32d7f16df",
+  "purpose": "development-runtime-probe",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "smollm3-3b-4bit-mlx",
+    "role": "multilingual-product-size-compromise",
+    "model": {
+      "repository": "mlx-community/SmolLM3-3B-4bit",
+      "revision": "d3a7e0594d6642dbcfb7d149bed8b0bdf49f95ce",
+      "license": "Apache-2.0",
+      "format": "MLX 4-bit safetensors",
+      "converter": "mlx-lm 0.25.3",
+      "quantization_bits": 4,
+      "quantization_group_size": 64,
+      "weight_bytes": 1730051993,
+      "snapshot_bytes": 1747378363,
+      "provenance_limit": "The conversion card pins mlx-lm 0.25.3 but not its source-model commit."
+    },
+    "source_model": {
+      "repository": "HuggingFaceTB/SmolLM3-3B",
+      "observed_revision": "a07cc9a04f16550a088caea529712d1d335b0ac1",
+      "license": "Apache-2.0",
+      "parameter_count": 3000000000,
+      "advertised_primary_languages": [
+        "English",
+        "French",
+        "Spanish",
+        "German",
+        "Italian",
+        "Portuguese"
+      ],
+      "context_tokens": 65536,
+      "provenance_limit": "The conversion identifies HuggingFaceTB/SmolLM3-3B but does not name the exact source commit used. The observed revision pins capability and license evidence without claiming conversion identity."
+    },
+    "runtime": {
+      "repository": "ml-explore/mlx-lm",
+      "revision": "ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+      "version": "0.31.3",
+      "license": "MIT",
+      "mlx_repository": "ml-explore/mlx",
+      "mlx_revision": "7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247",
+      "mlx_version": "0.32.0",
+      "boundary": "Pinned Python reference over official Apple MLX; not an accepted product dependency or stable API"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-audiobook-whisper-conservative",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "procedure": {
+    "experiment_id": "smollm3-3b.conservative-error-profile-v1.de-audiobook",
+    "model_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "generation": {
+      "prompt_id": "conservative-error-profile-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-edits",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "chat_template": "pinned model tokenizer template with enable_thinking=false",
+      "chat_template_options": {
+        "enable_thinking": false
+      },
+      "seed": 0,
+      "temperature": 0.0,
+      "max_tokens": 384,
+      "stream": true,
+      "cancellation_probe_after_tokens": 4,
+      "rationale": "The bounded prompt receives an error-class profile from two independent development clips, no target reference, no suspect span, and one protected phrase."
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "command": "CUTTLEDOC_TEXT_GENERATION_MANIFEST=/repo/candidate.json CUTTLEDOC_TEXT_GENERATION_MODEL_DIR=/local/model CUTTLEDOC_TEXT_GENERATION_OUTPUT=/tmp/result.json bash scripts/run-text-generation-mlx-reference.sh"
+  },
+  "measurements": {
+    "model_load_ms": 911.739084,
+    "first_token_ms": 826.900291,
+    "complete_generation_ms": 1534.18125,
+    "prompt_tokens": 707,
+    "generation_tokens": 84,
+    "prompt_tokens_per_second": 928.8667509490042,
+    "generation_tokens_per_second": 120.63653003351482,
+    "maximum_resident_set_size_bytes": 3887267840,
+    "mlx_peak_memory_bytes": 2401426316,
+    "model_snapshot_bytes": 1747378363,
+    "deterministic_repeat": {
+      "text_identical": true,
+      "token_ids_identical": true,
+      "complete_generation_ms": 1438.658458,
+      "first_token_ms": 746.02575
+    }
+  },
+  "streaming": {
+    "supported": true,
+    "update_count": 84,
+    "update_semantics": "append-only text deltas with token identifiers and one terminal finish reason",
+    "finish_reason": "stop",
+    "cancellation": {
+      "requested_after_tokens": 4,
+      "observed_tokens": 4,
+      "cooperative_stop_ms": 784.521042,
+      "process_remained_usable": true,
+      "semantics": "The consumer closes generation between token updates; no thread or process termination is required."
+    }
+  },
+  "output": {
+    "raw_text": "{\n  \"text\": \"wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches\",\n  \"edits\": [],\n  \"confidence\": 1.0\n}",
+    "raw_text_sha256": "9b28d307a5ce43df23b1621983f91aa64141c7d7bbcca1764ec86b83083decb2",
+    "text": "wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+    "text_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "token_ids": [
+      517,
+      220,
+      330,
+      1342,
+      794,
+      330,
+      46802,
+      19649,
+      34761,
+      10112,
+      12694,
+      7367,
+      82312,
+      259,
+      16438,
+      2073,
+      4208,
+      372,
+      5817,
+      2784,
+      7870,
+      10864,
+      22850,
+      10864,
+      10112,
+      8261,
+      1494,
+      27867,
+      8508,
+      268,
+      74284,
+      2002,
+      9267,
+      304,
+      2004,
+      10670,
+      584,
+      1082,
+      387,
+      70146,
+      268,
+      48108,
+      45490,
+      293,
+      416,
+      441,
+      9314,
+      8564,
+      5817,
+      84190,
+      7367,
+      3453,
+      22229,
+      496,
+      29424,
+      268,
+      7731,
+      89,
+      37208,
+      88633,
+      14230,
+      8822,
+      10457,
+      87053,
+      1048,
+      8696,
+      761,
+      220,
+      330,
+      291,
+      1220,
+      794,
+      10450,
+      220,
+      330,
+      83029,
+      794,
+      220,
+      16,
+      13,
+      15,
+      198,
+      92,
+      128012
+    ],
+    "gates": {
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": true,
+      "accepted": true,
+      "policy_mode": "bounded-lexical",
+      "quality_accepted": false
+    },
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "reported_edits": [],
+    "audit": {
+      "lexical_edits_fully_reported": true,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 0
+    },
+    "lexical_diff": {
+      "input_word_count": 39,
+      "output_word_count": 39,
+      "edit_distance": 0,
+      "operations": []
+    },
+    "development_quality": {
+      "input_wer": 0.02564102564102564,
+      "output_wer": 0.02564102564102564,
+      "scored": true,
+      "claim_limit": "The dataset transcript is unverified and the fixture is development-exposed; these values are diagnostic only."
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-lm": "0.31.3",
+      "tokenizers": "0.22.2",
+      "transformers": "5.12.1"
+    }
+  },
+  "conclusion": {
+    "reference_runtime_executed": true,
+    "surface_candidate_accepted": null,
+    "development_output_contract_accepted": true,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "reason": "The runtime path is independent of the output gate. A development fixture can establish execution, mechanical policy behavior, streaming, cancellation, determinism, and cost; it cannot select a correction model or promote the Python reference into the product."
+  }
+}
