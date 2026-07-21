@@ -22,3 +22,21 @@ export declare class TranscriptionStream
 }
 
 export declare function createContractStream(caseName: string): TranscriptionStream;
+
+export interface ProcessPcmOptions {
+  signal?: AbortSignal;
+  onProgress?: (percent: number) => void;
+  /** Test-only switch proving Rust errors reject the JavaScript promise. */
+  fail?: boolean;
+}
+
+export interface PcmWorkResult {
+  byteLength: number;
+  checksum: number;
+  progressSteps: number;
+}
+
+export declare function processPcm(
+  pcm: Uint8Array,
+  options?: ProcessPcmOptions,
+): Promise<PcmWorkResult>;

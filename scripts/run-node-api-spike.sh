@@ -33,14 +33,14 @@ archive_entries="$(tar -tzf "$tarball_path")"
 grep -q 'package/cuttledoc-node-spike.darwin-arm64.node' <<<"$archive_entries"
 grep -q 'package/index.cjs' <<<"$archive_entries"
 grep -q 'package/index.js' <<<"$archive_entries"
-if grep -Eq 'Cargo|src/' <<<"$archive_entries"; then
-  echo "npm artifact unexpectedly contains Rust build inputs" >&2
+if grep -Eq 'Cargo|src/|binding\.gyp|CMakeLists|install\.js' <<<"$archive_entries"; then
+  echo "npm artifact unexpectedly contains native build inputs" >&2
   exit 1
 fi
 
 compiler_guard_dir="$work_dir/compiler-guard"
 mkdir -p "$compiler_guard_dir"
-for tool in cargo cc c++ clang cmake node-gyp; do
+for tool in cargo cc c++ clang gcc g++ cmake node-gyp; do
   ln -s "$tests_source/compiler-guard.sh" "$compiler_guard_dir/$tool"
 done
 
@@ -57,6 +57,11 @@ for mode in esm commonjs; do
     npm install --prefix "$app_dir" --ignore-scripts --no-audit --no-fund "$tarball_path"
     cp "$tests_source/commonjs.cjs" "$app_dir/contract-test.cjs"
     node "$app_dir/contract-test.cjs"
+
+    native_artifact="$app_dir/node_modules/cuttledoc-node-spike/cuttledoc-node-spike.darwin-arm64.node"
+    mv "$native_artifact" "$native_artifact.missing"
+    cp "$tests_source/missing-artifact.cjs" "$app_dir/missing-artifact.cjs"
+    node "$app_dir/missing-artifact.cjs"
   fi
 done
 
