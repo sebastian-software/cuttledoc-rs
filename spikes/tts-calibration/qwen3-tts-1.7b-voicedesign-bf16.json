@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "german-and-english-warm-profiles-passed-lexical-gate",
+    "status": "content-type-expansion-pending-native-and-dialogue",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [
@@ -143,6 +143,24 @@
         "locale": "de-DE",
         "language": "German",
         "passage_id": "synthetic-de-origin",
+        "voice": null,
+        "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-de-warm-native",
+        "locale": "de-DE",
+        "language": "German",
+        "passage_id": "synthetic-de-native",
+        "voice": null,
+        "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+        "seed": 0
+      },
+      {
+        "id": "qwen-de-warm-dialogue",
+        "locale": "de-DE",
+        "language": "German",
+        "passage_id": "synthetic-de-dialogue",
         "voice": null,
         "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
         "seed": 0

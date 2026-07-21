@@ -85,8 +85,8 @@
         "primary_locale": {
           "const": "de-DE"
         },
-        "topic": {
-          "const": "artificial-intelligence"
+       "topic": {
+          "const": "clean-produced-speech"
         },
         "minimum_passages_per_locale": {
           "type": "object",
@@ -125,9 +125,10 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": [
-          "id",
-          "locale",
+       "required": [
+         "id",
+          "kind",
+         "locale",
           "title",
           "revision",
           "revision_url",
@@ -138,8 +139,14 @@
           "materialization_policy"
         ],
         "properties": {
-          "id": {
-            "$ref": "#/$defs/nonEmptyString"
+         "id": {
+           "$ref": "#/$defs/nonEmptyString"
+         },
+          "kind": {
+            "enum": [
+              "mediawiki",
+              "repository-authored"
+            ]
           },
           "locale": {
             "$ref": "#/$defs/nonEmptyString"

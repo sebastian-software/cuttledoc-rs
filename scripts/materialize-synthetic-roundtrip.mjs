@@ -9,7 +9,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -69,7 +69,8 @@ function validateSelection(selection) {
       selection.text_encoding !== 'utf-8' ||
       selection.paragraph_joiner !== '\n\n' ||
       selection.spoken_transform !== 'none' ||
-      selection.generated_assets !== 'local-required') {
+      selection.generated_assets !==
+        'lossless-local-opus-repository-after-rights-review') {
     errors.push('selection policy fields do not match the accepted diagnostic contract');
   }
   const sourceIds = new Set();
@@ -78,24 +79,33 @@ function validateSelection(selection) {
   for (const source of selection.sources ?? []) {
     if (sourceIds.has(source.id)) errors.push(`duplicate source id: ${source.id}`);
     sourceIds.add(source.id);
-    if (!Number.isInteger(source.page_id) || source.page_id < 1 ||
-        !Number.isInteger(source.revision_id) || source.revision_id < 1 ||
-        !Number.isInteger(source.parent_revision_id) ||
-          source.parent_revision_id < 1) {
+    if (!['mediawiki', 'repository-authored'].includes(source.kind)) {
+      errors.push(`${source.id}: unsupported source kind`);
+    }
+    if (source.kind === 'mediawiki' &&
+        (!Number.isInteger(source.page_id) || source.page_id < 1 ||
+         !Number.isInteger(source.revision_id) || source.revision_id < 1 ||
+         !Number.isInteger(source.parent_revision_id) ||
+           source.parent_revision_id < 1)) {
       errors.push(`${source.id}: page and revision ids must be positive integers`);
+    }
+    if (source.kind === 'repository-authored' &&
+        (!(source.path?.length > 0) ||
+         !/^[0-9a-f]{64}$/.test(source.revision ?? ''))) {
+      errors.push(`${source.id}: repository path and SHA-256 revision are required`);
     }
     if (source.license !== 'CC-BY-SA-4.0' ||
         source.license_url !==
           'https://creativecommons.org/licenses/by-sa/4.0/') {
       errors.push(`${source.id}: license metadata must remain CC BY-SA 4.0`);
     }
-    for (const field of [
-      'api_url',
+    const requiredFields = [
       'revision_url',
       'history_url',
       'attribution',
-      'revision_timestamp',
-    ]) {
+      ...(source.kind === 'mediawiki' ? ['api_url', 'revision_timestamp'] : []),
+    ];
+    for (const field of requiredFields) {
       if (!(source[field]?.length > 0)) {
         errors.push(`${source.id}.${field} must be a non-empty string`);
       }
@@ -142,9 +152,9 @@ function validateSelection(selection) {
       }
     }
   }
-  if ((localeCounts.get('de-DE') ?? 0) < 6 ||
+  if ((localeCounts.get('de-DE') ?? 0) < 8 ||
       (localeCounts.get('en-US') ?? 0) < 3) {
-    errors.push('selection requires at least six German and three English passages');
+    errors.push('selection requires at least eight German and three English passages');
   }
   return errors;
 }
@@ -169,6 +179,17 @@ function findParagraph(paragraphs, segment, passageId) {
 }
 
 async function fetchSource(source) {
+  if (source.kind === 'repository-authored') {
+    const sourcePath = resolve(repoRoot, source.path);
+    if (sourcePath !== repoRoot && !sourcePath.startsWith(`${repoRoot}${sep}`)) {
+      throw new Error(`${source.id}: repository source escapes the repository root`);
+    }
+    const text = await readFile(sourcePath, 'utf8');
+    if (sha256(text) !== source.revision) {
+      throw new Error(`${source.id}: repository source differs from pinned SHA-256`);
+    }
+    return parsePlainExtract(text);
+  }
   const url = new URL(source.api_url);
   url.search = new URLSearchParams({
     action: 'query',
@@ -208,10 +229,10 @@ function attributionMarkdown(selection) {
   const lines = [
     '# Attribution for synthetic roundtrip text',
     '',
-    'The materialized passage files are derived from the pinned Wikipedia',
-    'revisions below and are licensed under CC BY-SA 4.0. The extraction',
-    'removes page markup and references; no additional spoken-text transform',
-    'is applied in this selection.',
+    'The materialized passage files are derived from the pinned Wikimedia and',
+    'repository sources below and are licensed under CC BY-SA 4.0. Wikimedia',
+    'extraction removes page markup and references; no additional spoken-text',
+    'transform is applied in this selection.',
     '',
   ];
   for (const source of selection.sources) {
@@ -250,9 +271,12 @@ async function materialize(selection, outputDirectory) {
       const paragraphs = await fetchSource(source);
       outputManifest.sources.push({
         id: source.id,
+        kind: source.kind,
         locale: source.locale,
         title: source.title,
-        revision_id: source.revision_id,
+        ...(source.kind === 'mediawiki'
+          ? { revision_id: source.revision_id }
+          : { path: source.path, revision: source.revision }),
         revision_url: source.revision_url,
         history_url: source.history_url,
         license: source.license,
@@ -283,6 +307,9 @@ async function materialize(selection, outputDirectory) {
           verbatim_sha256: digest,
           spoken_sha256: digest,
           phenomena: passage.phenomena,
+          ...(passage.content_type
+            ? { content_type: passage.content_type }
+            : {}),
         });
       }
     }
@@ -328,7 +355,7 @@ function selfTest() {
     text_encoding: 'utf-8',
     paragraph_joiner: '\n\n',
     spoken_transform: 'none',
-    generated_assets: 'local-required',
+    generated_assets: 'invalid',
     sources: [],
   };
   if (validateSelection(invalid).length === 0) {
@@ -360,7 +387,7 @@ async function main() {
   const result = await materialize(selection, outputDirectory);
   process.stdout.write(
     `synthetic roundtrip: materialized ${result.passages.length} passage(s) ` +
-    `from ${result.sources.length} pinned Wikipedia revision(s) at ` +
+    `from ${result.sources.length} pinned source(s) at ` +
     `${outputDirectory}\n`,
   );
 }

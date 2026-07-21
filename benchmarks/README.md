@@ -111,7 +111,7 @@ node scripts/materialize-target-domain-corpus.mjs \
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 under issue #13. It starts with
-German and reports English separately, pins exact Wikipedia revisions, and
+German and reports English separately, pins exact source revisions or digests, and
 requires at least three pinned voices per locale across all three required TTS
 engines before producing a recommendation. A bounded German/English
 calibration runs before the full matrix. Every generated artifact crosses the
@@ -133,7 +133,7 @@ generic verified fetch command live in
 [`spikes/tts-calibration`](../spikes/tts-calibration/README.md). KugelAudio is
 currently limited to an implicit default voice and does not satisfy
 multi-voice coverage.
-Materialize the nine digest-pinned passage files and their CC BY-SA
+Materialize the eleven digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:
 
 ```sh
@@ -141,9 +141,10 @@ node scripts/materialize-synthetic-roundtrip.mjs \
   --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip
 ```
 
-The command retrieves the two exact MediaWiki revisions, verifies page and
-parent revision metadata, resolves fixed section/paragraph selectors, and
-rejects any character-count or SHA-256 drift. The checked-in
+The command retrieves three exact MediaWiki revisions, verifies page and parent
+revision metadata, reads one repository-authored source at its pinned SHA-256,
+resolves fixed section/paragraph selectors, and rejects any character-count or
+digest drift. The checked-in
 [`synthetic-roundtrip-selection.json`](fixtures/synthetic-roundtrip-selection.json)
 contains selectors and digests. Lossless generated audio remains local. The
 separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
@@ -176,7 +177,9 @@ receivers on one normalized PCM digest per run. All five receivers fail at
 critical failure is voice/profile-specific. The subsequent
 [`qwen-en-warm-podcast`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1/result.json)
 run passes the English lexical gate with exact normalized character content
-from all five receivers. Only the Qwen listening gate remains before promotion.
+from all five receivers. The next Qwen cells hold the accepted warm description
+constant while comparing German code-switch, native-factual, and dialogue
+content before Voxtral calibration.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

@@ -37,7 +37,7 @@ bash scripts/run-qwen3-tts-voicedesign-calibration.sh
 ```
 
 The runner verifies every model file by byte count and SHA-256 before loading
-it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the four fixed Qwen profiles;
+it. Set `CUTTLEDOC_TTS_PROFILE` to select one of the six fixed Qwen profiles;
 the default is `qwen-de-clear-documentary`.
 
 Cross one completed local TTS result through the five required ASR backends:
@@ -69,7 +69,10 @@ The `qwen-en-warm-podcast` profile also passes the lexical gate. All five ASR
 backends reproduce the exact normalized character sequence; its uniform 2.56%
 WER is only the spoken expansion of the hyphenated `chains-of-thought` token.
 The bounded German/English lexical calibration therefore accepts the warm
-profiles. Listening remains the final Qwen gate before full-matrix promotion.
+profiles. Two additional German profiles keep the same warm description while
+changing the passage to native-factual prose and dialogue. Run those content
+cells before Voxtral so embedded English terms cannot dominate the German
+comparison. Listening remains the final Qwen gate before full-matrix promotion.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-passages-1",
-  "plan_revision": "synthetic-roundtrip-pilot-3",
+  "revision": "synthetic-roundtrip-passages-2",
+  "plan_revision": "synthetic-roundtrip-pilot-4",
   "purpose": "diagnostic-materialization",
   "text_encoding": "utf-8",
   "paragraph_joiner": "\n\n",
@@ -10,6 +10,7 @@
   "sources": [
     {
       "id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "kind": "mediawiki",
       "locale": "de-DE",
       "api_url": "https://de.wikipedia.org/w/api.php",
       "page_id": 2653,
@@ -45,6 +46,7 @@
         },
         {
           "id": "synthetic-de-origin",
+          "content_type": "de-codeswitch",
           "segments": [
             {
               "section_path": [
@@ -146,9 +148,9 @@
               "paragraph_index": 0
             }
           ],
-          "character_count": 937,
-          "verbatim_sha256": "42fd1588c01755206aeee81fbe5997ef05ea079ce9cb6832e1fe1ee01af54295",
-          "spoken_sha256": "42fd1588c01755206aeee81fbe5997ef05ea079ce9cb6832e1fe1ee01af54295",
+          "character_count": 607,
+          "verbatim_sha256": "0dec699c599cdf7b01bf3edab3d659eda5f86253023cafc109cf317c45be5a44",
+          "spoken_sha256": "0dec699c599cdf7b01bf3edab3d659eda5f86253023cafc109cf317c45be5a44",
           "phenomena": [
             "German compounds",
             "proper names",
@@ -159,7 +161,85 @@
       ]
     },
     {
+      "id": "de-wikipedia-buchdruck-268791130",
+      "kind": "mediawiki",
+      "locale": "de-DE",
+      "api_url": "https://de.wikipedia.org/w/api.php",
+      "page_id": 1039141,
+      "title": "Buchdruck",
+      "revision_id": 268791130,
+      "parent_revision_id": 266825862,
+      "revision_timestamp": "2026-07-14T22:42:06Z",
+      "revision_url": "https://de.wikipedia.org/w/index.php?oldid=268791130&title=Buchdruck",
+      "history_url": "https://de.wikipedia.org/w/index.php?title=Buchdruck&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Buchdruck, revision 268791130",
+      "passages": [
+        {
+          "id": "synthetic-de-native",
+          "content_type": "de-native",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 785,
+          "verbatim_sha256": "5ce740e5f44129734276d188e3fad7b37ef0d5f7fb605f99d9d1b4d8e666cf19",
+          "spoken_sha256": "5ce740e5f44129734276d188e3fad7b37ef0d5f7fb605f99d9d1b4d8e666cf19",
+          "phenomena": [
+            "native German factual prose",
+            "German compounds",
+            "proper names",
+            "numbers and dates",
+            "parenthetical punctuation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-de-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "de-DE",
+      "path": "benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "title": "A quiet recording",
+      "revision": "51bb13dc91460c0d653d792042f8aa5b5b148fc9894e43a6c6d0e6cf23088203",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, A quiet recording, revision 51bb13dc9146",
+      "passages": [
+        {
+          "id": "synthetic-de-dialogue",
+          "content_type": "de-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 824,
+          "verbatim_sha256": "78075a708973498dc751c981eac57cf962396a5e38151eb709954023b49307a2",
+          "spoken_sha256": "78075a708973498dc751c981eac57cf962396a5e38151eb709954023b49307a2",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "German compounds",
+            "spoken numbers"
+          ]
+        }
+      ]
+    },
+    {
       "id": "en-wikipedia-artificial-intelligence-1365114492",
+      "kind": "mediawiki",
       "locale": "en-US",
       "api_url": "https://en.wikipedia.org/w/api.php",
       "page_id": 1164,
@@ -175,6 +255,7 @@
       "passages": [
         {
           "id": "synthetic-en-reasoning",
+          "content_type": "en-factual",
           "segments": [
             {
               "section_path": [

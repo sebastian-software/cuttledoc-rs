@@ -230,15 +230,17 @@ function validate(items, acceptedPlan) {
       snapshotBytes: 4520194992,
       artifactCount: 14,
       role: 'required-generator',
-      status: 'german-and-english-warm-profiles-passed-lexical-gate',
+      status: 'content-type-expansion-pending-native-and-dialogue',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
         'qwen-de-warm-podcast',
+        'qwen-de-warm-native',
+        'qwen-de-warm-dialogue',
         'qwen-en-clear-documentary',
         'qwen-en-warm-podcast',
       ],
-      planStatus: 'calibration-passed-lexical-listening-pending',
+      planStatus: 'calibration-expanding-German-content-types',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',
@@ -338,8 +340,13 @@ function validate(items, acceptedPlan) {
       errors.push(`${prefix}calibration role, voice mode, or profiles differ`);
     }
     for (const profile of data.calibration?.profiles ?? []) {
-      if (profile.locale === 'de-DE' && profile.passage_id !== 'synthetic-de-origin') {
-        errors.push(`${prefix}${profile.id}: German profile must use synthetic-de-origin`);
+      if (profile.locale === 'de-DE' &&
+          ![
+            'synthetic-de-origin',
+            'synthetic-de-native',
+            'synthetic-de-dialogue',
+          ].includes(profile.passage_id)) {
+        errors.push(`${prefix}${profile.id}: German profile uses an unknown calibration cell`);
       }
       if (profile.locale === 'en-US' && profile.passage_id !== 'synthetic-en-reasoning') {
         errors.push(`${prefix}${profile.id}: English profile must use synthetic-en-reasoning`);
@@ -373,6 +380,11 @@ function validate(items, acceptedPlan) {
   return errors;
 }
 
+function acceptedSelectionRevision(revision, selection) {
+  return revision === selection.revision ||
+    revision === 'synthetic-roundtrip-passages-1';
+}
+
 function validateQwenCalibrationRun(run, manifest, acceptedSelection) {
   const errors = [];
   const prefix = 'Qwen VoiceDesign clear-profile result: ';
@@ -386,7 +398,7 @@ function validateQwenCalibrationRun(run, manifest, acceptedSelection) {
       run.run_id !==
         'phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1' ||
       run.source_revision !== '6cbd92dd0464182e9458ffe7301be8a57b4bfdbe' ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}identity or revisions differ`);
   }
@@ -617,7 +629,7 @@ function validateQwenWarmCalibrationRun(run, manifest, acceptedSelection) {
       run.run_id !==
         'phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-podcast.1' ||
       run.source_revision !== '82c044b2d04e3daf97a65530fa9b9b3dc90ee71f' ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}identity or revisions differ`);
   }
@@ -849,7 +861,7 @@ function validateQwenEnglishCalibrationRun(run, manifest, acceptedSelection) {
       run.run_id !==
         'phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1' ||
       run.source_revision !== '6143f888fd4629e7f5bac6630646806d93c5ce9a' ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}identity or revisions differ`);
   }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-pilot-3",
+  "revision": "synthetic-roundtrip-pilot-4",
   "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
   "purpose": "decision-support",
@@ -16,9 +16,9 @@
       "en-US"
     ],
     "primary_locale": "de-DE",
-    "topic": "artificial-intelligence",
+    "topic": "clean-produced-speech",
     "minimum_passages_per_locale": {
-      "de-DE": 6,
+      "de-DE": 8,
       "en-US": 3
     },
     "minimum_passage_duration_ms": 45000,
@@ -30,19 +30,22 @@
       "abbreviations",
       "numbers and dates",
       "parenthetical punctuation",
-      "long sentences"
+      "long sentences",
+      "native German factual prose",
+      "conversational dialogue"
     ]
   },
   "text_sources": [
     {
       "id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "kind": "mediawiki",
       "locale": "de-DE",
       "title": "Künstliche Intelligenz",
       "revision": "268935951",
       "revision_url": "https://de.wikipedia.org/w/index.php?oldid=268935951&title=K%C3%BCnstliche_Intelligenz",
       "history_url": "https://de.wikipedia.org/w/index.php?title=K%C3%BCnstliche_Intelligenz&action=history",
       "license": "CC-BY-SA-4.0",
-      "selection_status": "selected-pending-materialization",
+      "selection_status": "materialized",
       "required_sections": [
         "lead",
         "Beschreibung",
@@ -62,14 +65,61 @@
       }
     },
     {
+      "id": "de-wikipedia-buchdruck-268791130",
+      "kind": "mediawiki",
+      "locale": "de-DE",
+      "title": "Buchdruck",
+      "revision": "268791130",
+      "revision_url": "https://de.wikipedia.org/w/index.php?oldid=268791130&title=Buchdruck",
+      "history_url": "https://de.wikipedia.org/w/index.php?title=Buchdruck&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-de-dialogue-1",
+      "kind": "repository-authored",
+      "locale": "de-DE",
+      "title": "A quiet recording",
+      "revision": "51bb13dc91460c0d653d792042f8aa5b5b148fc9894e43a6c6d0e6cf23088203",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
       "id": "en-wikipedia-artificial-intelligence-1365114492",
+      "kind": "mediawiki",
       "locale": "en-US",
       "title": "Artificial intelligence",
       "revision": "1365114492",
       "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1365114492&title=Artificial_intelligence",
       "history_url": "https://en.wikipedia.org/w/index.php?title=Artificial_intelligence&action=history",
       "license": "CC-BY-SA-4.0",
-      "selection_status": "selected-pending-materialization",
+      "selection_status": "materialized",
       "required_sections": [
         "lead",
         "Goals",
@@ -129,7 +179,7 @@
       "source_url": "https://github.com/QwenLM/Qwen3-TTS",
       "source_revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
       "license": "Apache-2.0 converted model and MIT reference runtime; all 14 snapshot files are byte-counted and SHA-256 pinned in spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json",
-      "status": "calibration-passed-lexical-listening-pending",
+      "status": "calibration-expanding-German-content-types",
       "locales": [
         "de-DE",
         "en-US"
@@ -272,6 +322,8 @@
     ],
     "calibration_passage_ids": [
       "synthetic-de-origin",
+      "synthetic-de-native",
+      "synthetic-de-dialogue",
       "synthetic-en-reasoning"
     ],
     "promotion_rule": "Pin every artifact first, run the bounded German/English calibration, reject unstable or unjustifiably expensive candidates, then freeze the surviving full matrix before materializing all passages."

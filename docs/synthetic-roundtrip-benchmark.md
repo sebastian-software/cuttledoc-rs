@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** decision-support text and first single-voice diagnostics verified;
-multi-voice German and English matrix remains to be run
+**Status:** three German content cells are pinned; native-factual and dialogue
+Qwen calibrations plus the multi-voice matrix remain to be run
 
 ## Purpose
 
@@ -32,20 +32,21 @@ a strong or weak voice cannot disappear inside one aggregate.
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
 
-The exact nine-passage selection is
+The exact eleven-passage selection is
 [`synthetic-roundtrip-selection.json`](../benchmarks/fixtures/synthetic-roundtrip-selection.json).
-On 2026-07-20, the repository materializer retrieved both pinned revisions
-and reproduced all nine expected text digests. It writes the full CC BY-SA
-passage and attribution package to the caller-selected local output directory.
-Reviewed fixtures may additionally enter `benchmarks/assets` with an explicit
-per-asset license and attribution package.
+The repository materializer retrieves three pinned MediaWiki revisions, reads
+one digest-pinned repository-authored source, and reproduces all eleven
+expected text digests. It writes the full CC BY-SA passage and attribution
+package to the caller-selected local output directory. Reviewed fixtures may
+additionally enter `benchmarks/assets` with an explicit per-asset license and
+attribution package.
 
 ```sh
 node scripts/materialize-synthetic-roundtrip.mjs \
   --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip
 ```
 
-## Initial text source
+## Initial text sources
 
 The primary German pilot selects six 45–90 second passages from the exact revision
 `268935951` of the German Wikipedia article
@@ -59,11 +60,24 @@ An English control selects three passages from exact revision `1365114492` of
 German and English are separate result cells; aggregate WER must not obscure
 language-specific behavior.
 
-Wikipedia text is available under CC BY-SA 4.0. Materialization must preserve
-the article title, exact revision link, history/authorship link, license,
-verbatim-text digest, spoken-text digest, and a notice for every change made
-for speech. Lossless generated audio remains local and digest-pinned. A compact
-Opus copy may be committed only after its attribution, redistribution, and
+Before comparing additional engines, the German calibration deliberately
+separates three content types:
+
+| Cell | Passage | Purpose |
+| --- | --- | --- |
+| `de-codeswitch` | `synthetic-de-origin` | Technical German with embedded English terms and proper names |
+| `de-native` | `synthetic-de-native` | Largely native German factual prose from the pinned “Buchdruck” lead |
+| `de-dialogue` | `synthetic-de-dialogue` | Repository-authored conversational prose with quoted turns |
+
+The dialogue is currently synthesized by one described voice. It isolates the
+effect of conversational text and punctuation; it is not a two-speaker or
+speaker-diarization test.
+
+All selected text is available under CC BY-SA 4.0. Materialization preserves
+the source identity, exact revision or repository digest, history/authorship
+link, license, verbatim-text digest, spoken-text digest, and any change notice.
+Lossless generated audio remains local and digest-pinned. A compact Opus copy
+may be committed only after its attribution, redistribution, and
 lossless-versus-codec control have passed review. The dedicated asset tree and
 SPDX sidecars prevent CC BY-SA media from being mistaken for code covered by
 the repository MIT license.
@@ -298,6 +312,12 @@ zero normalized character edits. Each reports the same 3/117 word edits
 `chains-of-thought` is spoken as three words. The separately licensed
 [`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
 preserves this positive control.
+
+The next bounded Qwen step keeps that accepted warm voice description fixed
+and changes only the German content cell: first `synthetic-de-native`, then
+`synthetic-de-dialogue`. This directly tests whether the earlier German spread
+comes from English code-switching or from the synthesis/recognition path more
+generally before the larger Voxtral calibration begins.
 
 The bounded German/English lexical calibration therefore accepts the warm
 Qwen profiles and rejects the clear German profile. Listening is the remaining

@@ -44,16 +44,12 @@
       "minItems": 2,
       "items": {
         "type": "object",
-        "required": [
-          "id",
-          "locale",
-          "api_url",
-          "page_id",
-          "title",
-          "revision_id",
-          "parent_revision_id",
-          "revision_timestamp",
-          "revision_url",
+       "required": [
+         "id",
+          "kind",
+         "locale",
+         "title",
+         "revision_url",
           "history_url",
           "license",
           "license_url",
@@ -61,8 +57,14 @@
           "passages"
         ],
         "properties": {
-          "id": {
-            "$ref": "#/$defs/nonEmptyString"
+         "id": {
+           "$ref": "#/$defs/nonEmptyString"
+         },
+          "kind": {
+            "enum": [
+              "mediawiki",
+              "repository-authored"
+            ]
           },
           "locale": {
             "$ref": "#/$defs/nonEmptyString"
@@ -104,8 +106,15 @@
           "license_url": {
             "const": "https://creativecommons.org/licenses/by-sa/4.0/"
           },
-          "attribution": {
+         "attribution": {
+           "$ref": "#/$defs/nonEmptyString"
+         },
+          "path": {
             "$ref": "#/$defs/nonEmptyString"
+          },
+          "revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
           },
           "passages": {
             "type": "array",
@@ -115,6 +124,37 @@
             }
           }
         },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": { "const": "mediawiki" }
+              }
+            },
+            "then": {
+              "required": [
+                "api_url",
+                "page_id",
+                "revision_id",
+                "parent_revision_id",
+                "revision_timestamp"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": { "const": "repository-authored" }
+              }
+            },
+            "then": {
+              "required": [
+                "path",
+                "revision"
+              ]
+            }
+          }
+        ],
         "additionalProperties": false
       }
     }
@@ -136,10 +176,13 @@
         "phenomena"
       ],
       "properties": {
-        "id": {
+       "id": {
+         "$ref": "#/$defs/nonEmptyString"
+       },
+        "content_type": {
           "$ref": "#/$defs/nonEmptyString"
         },
-        "segments": {
+       "segments": {
           "type": "array",
           "minItems": 1,
           "items": {

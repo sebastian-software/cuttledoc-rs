@@ -208,7 +208,7 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
       decisionScope?.backend_selection_blocking !== false ||
       decisionScope?.current_required_cell !== 'de-DE/podcast' ||
       decisionScope?.primary_comparison_plan_revision !==
-        'synthetic-roundtrip-pilot-3' ||
+        'synthetic-roundtrip-pilot-4' ||
       decisionScope?.numeric_quality_claims_require_human_gold !== true ||
       !(decisionScope?.reason?.length > 0)) {
     errors.push('decision_scope must keep the corpus an optional German podcast control');
@@ -584,6 +584,8 @@ function validateSyntheticRoundtripPlan(plan) {
   ];
   const requiredSourceIds = [
     'de-wikipedia-kuenstliche-intelligenz-268935951',
+    'de-wikipedia-buchdruck-268791130',
+    'cuttledoc-authored-de-dialogue-1',
     'en-wikipedia-artificial-intelligence-1365114492',
   ];
 
@@ -617,12 +619,12 @@ function validateSyntheticRoundtripPlan(plan) {
       plan.initial_scope?.primary_locale !== 'de-DE') {
     errors.push('initial scope must preserve German-first de-DE and en-US cells');
   }
-  if (plan.initial_scope?.topic !== 'artificial-intelligence') {
-    errors.push('initial scope topic must remain artificial-intelligence');
+  if (plan.initial_scope?.topic !== 'clean-produced-speech') {
+    errors.push('initial scope topic must remain clean-produced-speech');
   }
-  if (plan.initial_scope?.minimum_passages_per_locale?.['de-DE'] < 6 ||
+  if (plan.initial_scope?.minimum_passages_per_locale?.['de-DE'] < 8 ||
       plan.initial_scope?.minimum_passages_per_locale?.['en-US'] < 3) {
-    errors.push('initial scope requires at least six German and three English passages');
+    errors.push('initial scope requires at least eight German and three English passages');
   }
   if (plan.initial_scope?.minimum_passage_duration_ms !== 45_000 ||
       plan.initial_scope?.maximum_passage_duration_ms !== 90_000) {
@@ -634,9 +636,12 @@ function validateSyntheticRoundtripPlan(plan) {
 
   const sources = plan.text_sources ?? [];
   if (!arrayEquals(sources.map((source) => source.id), requiredSourceIds)) {
-    errors.push('text_sources must preserve the pinned German and English Wikipedia revisions');
+    errors.push('text_sources must preserve the pinned German and English sources');
   }
   for (const source of sources) {
+    if (!['mediawiki', 'repository-authored'].includes(source.kind)) {
+      errors.push(`${source.id ?? '<source>'}.kind is invalid`);
+    }
     for (const field of [
       'id',
       'locale',
@@ -661,7 +666,7 @@ function validateSyntheticRoundtripPlan(plan) {
       }
     }
     if (source.license !== 'CC-BY-SA-4.0') {
-      errors.push(`${source.id}: Wikipedia source license must be CC-BY-SA-4.0`);
+      errors.push(`${source.id}: text source license must be CC-BY-SA-4.0`);
     }
     if (!uniqueStrings(source.required_sections)) {
       errors.push(`${source.id}: required_sections must be a non-empty unique string array`);
@@ -764,6 +769,8 @@ function validateSyntheticRoundtripPlan(plan) {
     ],
     calibration_passage_ids: [
       'synthetic-de-origin',
+      'synthetic-de-native',
+      'synthetic-de-dialogue',
       'synthetic-en-reasoning',
     ],
   };
@@ -894,28 +901,46 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   const passageIds = new Set();
   const localeCounts = new Map();
   const coveredGermanPhenomena = new Set();
+  const expectedContentTypes = new Map([
+    ['synthetic-de-origin', 'de-codeswitch'],
+    ['synthetic-de-native', 'de-native'],
+    ['synthetic-de-dialogue', 'de-dialogue'],
+    ['synthetic-en-reasoning', 'en-factual'],
+  ]);
   for (const source of selection.sources ?? []) {
     if (sourceIds.has(source.id)) errors.push(`duplicate source id: ${source.id}`);
     sourceIds.add(source.id);
     const expected = expectedSources.get(source.id);
     if (!expected) {
       errors.push(`unknown source id: ${source.id}`);
-    } else if (source.locale !== expected.locale ||
+    } else if (source.kind !== expected.kind ||
+        source.locale !== expected.locale ||
         source.title !== expected.title ||
-        String(source.revision_id) !== expected.revision ||
+        (source.kind === 'mediawiki'
+          ? String(source.revision_id)
+          : source.revision) !== expected.revision ||
         source.revision_url !== expected.revision_url ||
         source.history_url !== expected.history_url ||
         source.license !== expected.license) {
       errors.push(`${source.id}: source metadata differs from the accepted plan`);
     }
-    if (!(Number.isInteger(source.page_id) && source.page_id > 0) ||
-        !(Number.isInteger(source.revision_id) && source.revision_id > 0) ||
-        !(Number.isInteger(source.parent_revision_id) &&
-          source.parent_revision_id > 0) ||
-        !/^\d{4}-\d{2}-\d{2}T/.test(source.revision_timestamp ?? '')) {
+    if (source.kind === 'mediawiki' &&
+        (!(Number.isInteger(source.page_id) && source.page_id > 0) ||
+         !(Number.isInteger(source.revision_id) && source.revision_id > 0) ||
+         !(Number.isInteger(source.parent_revision_id) &&
+           source.parent_revision_id > 0) ||
+         !/^\d{4}-\d{2}-\d{2}T/.test(source.revision_timestamp ?? ''))) {
       errors.push(`${source.id}: invalid pinned MediaWiki metadata`);
     }
-    for (const field of ['api_url', 'license_url']) {
+    if (source.kind === 'repository-authored' &&
+        (!(source.path?.length > 0) ||
+         !/^[0-9a-f]{64}$/.test(source.revision ?? ''))) {
+      errors.push(`${source.id}: invalid pinned repository metadata`);
+    }
+    for (const field of [
+      'license_url',
+      ...(source.kind === 'mediawiki' ? ['api_url'] : []),
+    ]) {
       try {
         if (new URL(source[field]).protocol !== 'https:') {
           errors.push(`${source.id}.${field} must use HTTPS`);
@@ -963,6 +988,13 @@ function validateSyntheticRoundtripSelection(selection, plan) {
           new Set(passage.phenomena).size !== passage.phenomena.length) {
         errors.push(`${passage.id}: phenomena must be a non-empty unique array`);
       }
+      if (expectedContentTypes.has(passage.id)) {
+        if (passage.content_type !== expectedContentTypes.get(passage.id)) {
+          errors.push(`${passage.id}: content_type differs from the accepted cell`);
+        }
+      } else if (passage.content_type !== undefined) {
+        errors.push(`${passage.id}: unexpected content_type`);
+      }
       if (source.locale === 'de-DE') {
         for (const phenomenon of passage.phenomena ?? []) {
           coveredGermanPhenomena.add(phenomenon);
@@ -989,6 +1021,11 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   return errors;
 }
 
+function acceptedSelectionRevision(revision, selection) {
+  return revision === selection.revision ||
+    revision === 'synthetic-roundtrip-passages-1';
+}
+
 function validateAppleTtsRun(run, selection) {
   const errors = [];
   if (run.schema_version !== schemaVersion) {
@@ -999,7 +1036,7 @@ function validateAppleTtsRun(run, selection) {
       !/^[0-9a-f]{40}$/.test(run.source_revision ?? '')) {
     errors.push('run_id, captured_at, and source_revision must be pinned');
   }
-  if (run.selection_revision !== selection.revision ||
+  if (!acceptedSelectionRevision(run.selection_revision, selection) ||
       run.purpose !== 'development-diagnostic') {
     errors.push('run must reference the diagnostic passage selection');
   }
@@ -2642,7 +2679,7 @@ function validateQwen3TtsRun(run, selection, modelManifest) {
   if (run.schema_version !== schemaVersion ||
       !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
       !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
-      run.selection_revision !== selection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, selection) ||
       run.purpose !== 'development-diagnostic') {
     errors.push('run identity must pin the source and diagnostic selection');
   }
@@ -2854,7 +2891,7 @@ function validateVoxtralTtsRun(run, selection, modelManifest) {
   if (run.schema_version !== schemaVersion ||
       !/^\d{4}-\d{2}-\d{2}T/.test(run.captured_at ?? '') ||
       !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
-      run.selection_revision !== selection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, selection) ||
       run.purpose !== 'development-diagnostic') {
     errors.push('run identity must pin the source and diagnostic selection');
   }
