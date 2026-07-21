@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3-0.6b-4bit-mlx",
+  "task": "text-generation",
+  "source": {
+    "repository": "Qwen/Qwen3-0.6B",
+    "observed_revision": "b8f042e18b7a05a3b5ba187f22246b91166bf6ae",
+    "license": "Apache-2.0",
+    "parameter_count": 600000000,
+    "non_embedding_parameter_count": 440000000,
+    "advertised_languages": "100+",
+    "context_tokens": 32768
+  },
+  "conversion": {
+    "repository": "mlx-community/Qwen3-0.6B-4bit",
+    "revision": "73e3e38d981303bc594367cd910ea6eb48349da8",
+    "license": "Apache-2.0",
+    "format": "MLX 4-bit safetensors",
+    "quantization_bits": 4,
+    "quantization_group_size": 64,
+    "weight_bytes": 335450584,
+    "snapshot_bytes": 351383618
+  },
+  "reference_runtime": {
+    "repository": "ml-explore/mlx-lm",
+    "revision": "cf10f962b7a20e63a6df43dbf0faf06070153d40",
+    "version": "0.31.3",
+    "license": "MIT",
+    "mlx_repository": "ml-explore/mlx",
+    "mlx_revision": "30a19f7234abfb4d136af58623eaac289e63f5d2",
+    "mlx_version": "0.32.0",
+    "boundary": "Pinned Python reference over official Apple MLX; not an accepted product dependency or stable API"
+  },
+  "generation_contract": {
+    "prompt_id": "surface-only-v1",
+    "prompt_sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
+    "chat_template": "model tokenizer template with enable_thinking=false",
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 256,
+    "stream": true,
+    "cancellation_probe_after_tokens": 4,
+    "rationale": "Greedy non-thinking decoding makes the runtime probe repeatable. Quality claims require a multilingual held-out corpus and are outside this single development fixture."
+  },
+  "artifacts": [
+    {
+      "path": "added_tokens.json",
+      "bytes": 707,
+      "sha256": "c0284b582e14987fbd3d5a2cb2bd139084371ed9acbae488829a1c900833c680"
+    },
+    {
+      "path": "config.json",
+      "bytes": 937,
+      "sha256": "15d3ac26c043ae477273ed5802ee0f0b33bb14f18c9d3dd70910c02d906e3f1f"
+    },
+    {
+      "path": "merges.txt",
+      "bytes": 1671853,
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 335450584,
+      "sha256": "392e8d466d56100ada00eb82031fb854297fc9e389b7d303eba3af114e87bce2"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "bytes": 49731,
+      "sha256": "7b294141456f6904936db03c00bca50fb5f6198f652fe8483f9cd2a1018accfb"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 613,
+      "sha256": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 9706,
+      "sha256": "253153d0738ceb4c668d2eff957714dd2bea0b56de772a9fdccd96cbf517e6a0"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 11422654,
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    },
+    {
+      "path": "vocab.json",
+      "bytes": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  ]
+}

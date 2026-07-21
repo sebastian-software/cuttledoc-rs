@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "id": "issue7-de-audiobook-whisper",
+  "purpose": "development-runtime-probe",
+  "language": "German",
+  "locale": "de-DE",
+  "domain": "professionally narrated audiobook",
+  "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+  "source_fixture_id": "audiobook-de-10870_10823_000000",
+  "source_dataset": "facebook/multilingual_librispeech",
+  "source_dataset_revision": "2e83e61823b4c47dcbcb1980bb88601274127609",
+  "source_split": "dev",
+  "gold_status": "dataset-transcript-unverified",
+  "development_only": true,
+  "transcript": "wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+  "evaluation_reference": "wie aber kam sie hier auf meinen tisch und warum schauderte ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+  "inference_policy": {
+    "prompt_id": "surface-only-v1",
+    "reference_visible_to_model": false,
+    "lexical_changes_allowed": false,
+    "reason": "The single known substitution is intentionally left outside the prompt. This probe measures a mechanically gated formatting path and runtime behavior, not lexical correction quality."
+  },
+  "provenance": {
+    "fixture_manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "analysis": "benchmarks/analysis/phase0.audiobook-pilot-1.errors.json",
+    "analysis_sha256": "1035fb6f0adfd94761fb7d95bef05fe43ef50cbf51bf8b2a03cc1097f4450c4f",
+    "license": "CC-BY-4.0"
+  }
+}
