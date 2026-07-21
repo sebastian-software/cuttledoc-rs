@@ -15,6 +15,7 @@ ADRs capture decisions that materially constrain the implementation. Proposed AD
 | [0009](0009-voice-pipeline-direction-and-staged-speech-synthesis.md)   | Voice-pipeline direction and staged speech synthesis | Accepted |
 | [0010](0010-capability-oriented-engine-ownership.md)                   | Capability-oriented engine ownership and backend identity | Accepted |
 | [0011](0011-us-english-project-language.md)                            | US English as the project language                   | Accepted |
+| [0012](0012-official-mlx-boundary-for-voxtral.md)                      | Official MLX boundary for Voxtral                    | Accepted |
 
 Status values: proposed, accepted, superseded, rejected.
 

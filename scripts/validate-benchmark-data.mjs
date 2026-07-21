@@ -1258,6 +1258,149 @@ function validateVoxtralRealtimeDirectBoundary(
   return errors;
 }
 
+function validateVoxtralCMpsControlManifest(manifest) {
+  const errors = [];
+  if (manifest.schema_version !== schemaVersion ||
+      manifest.source?.repository !== 'https://github.com/antirez/voxtral.c' ||
+      manifest.source?.revision !==
+        '134d366c24d20c64b614a3dcc8bda2a6922d077d' ||
+      manifest.source?.license !== 'MIT' ||
+      manifest.source?.commit_count !== 45 ||
+      manifest.source?.release_tags?.length !== 0) {
+    errors.push('pure-C control source and history must remain pinned');
+  }
+  if (manifest.model?.repository !==
+        'mistralai/Voxtral-Mini-4B-Realtime-2602' ||
+      manifest.model?.revision !==
+        '2769294da9567371363522aac9bbcfdd19447add' ||
+      manifest.model?.license !== 'Apache-2.0' ||
+      manifest.model?.format !== 'BF16 Safetensors') {
+    errors.push('pure-C control must preserve the official BF16 model pin');
+  }
+  const expectedArtifacts = new Map([
+    [
+      'consolidated.safetensors',
+      [
+        8859462744,
+        '263f178fe752c90a2ae58f037a95ed092db8b14768b0978b8c48f66979c8345d',
+      ],
+    ],
+    [
+      'params.json',
+      [
+        1343,
+        '2ace010ebf7f0b62c60747d91c6d140e3c7238632d3e9c63d60a2bd2065ea301',
+      ],
+    ],
+    [
+      'tekken.json',
+      [
+        14910348,
+        '8434af1d39eba99f0ef46cf1450bf1a63fa941a26933a1ef5dbbf4adf0d00e44',
+      ],
+    ],
+  ]);
+  const artifacts = manifest.model?.artifacts ?? [];
+  if (artifacts.length !== expectedArtifacts.size) {
+    errors.push('pure-C control must contain exactly three model artifacts');
+  }
+  for (const artifact of artifacts) {
+    const expected = expectedArtifacts.get(artifact.path);
+    if (!expected || artifact.bytes !== expected[0] ||
+        artifact.sha256 !== expected[1]) {
+      errors.push(`invalid pure-C model artifact: ${artifact.path}`);
+    }
+  }
+  if (manifest.build?.backend !== 'Metal/MPS' ||
+      manifest.build?.external_dependencies?.length !== 0 ||
+      manifest.disposition?.status !== 'reference-only' ||
+      !(manifest.disposition?.reasons?.length >= 4)) {
+    errors.push('pure-C build and reference-only disposition must be explicit');
+  }
+  return errors;
+}
+
+function validateVoxtralCMpsControlRun(
+  run,
+  controlManifest,
+  directManifest,
+  audiobookManifest,
+) {
+  const errors = [];
+  const fixture = audiobookManifest.fixtures.find(
+    (candidate) => candidate.id === 'audiobook-de-135_82_000105',
+  );
+  const artifactBytes = controlManifest.model.artifacts.reduce(
+    (total, artifact) => total + artifact.bytes,
+    0,
+  );
+  if (run.schema_version !== schemaVersion ||
+      run.experiment_id !== 'phase0.voxtral-realtime-c-mps-control-1' ||
+      run.source_revision !== controlManifest.source.revision ||
+      run.source?.license !== controlManifest.source.license ||
+      run.model?.source !==
+        `${controlManifest.model.repository}@${controlManifest.model.revision}` ||
+      run.model?.artifact_bytes !== artifactBytes ||
+      run.model?.weights_sha256 !==
+        controlManifest.model.artifacts[0].sha256) {
+    errors.push('pure-C control run must preserve source and model pins');
+  }
+  if (!fixture || run.fixture?.id !== fixture.id ||
+      run.fixture?.pcm_sha256 !== fixture.normalized.sha256 ||
+      run.fixture?.pcm_samples !== fixture.normalized.sample_count ||
+      run.fixture?.duration_ms !== fixture.normalized.duration_ms ||
+      run.fixture?.gold_status !== fixture.gold_status) {
+    errors.push('pure-C control fixture must match the audiobook pilot');
+  }
+  const transcription = run.transcription;
+  if (transcription?.status !== 'ok' ||
+      transcription?.reference_word_count !== 34 ||
+      transcription?.word_substitutions !== 1 ||
+      transcription?.word_insertions !== 0 ||
+      transcription?.word_deletions !== 0 ||
+      Math.abs(transcription?.wer - 1 / 34) > 1e-12 ||
+      Math.abs(transcription?.cer - 1 / 166) > 1e-12 ||
+      transcription?.first_use_overhead_ms !==
+        transcription?.process_wall_ms - transcription?.encoder_ms -
+          transcription?.decoder_ms ||
+      !(transcription?.maximum_resident_set_bytes >
+        transcription?.peak_memory_footprint_bytes) ||
+      !(transcription?.reported_metal_weight_cache_bytes > 8_000_000_000)) {
+    errors.push('pure-C functional and resource evidence must remain measured');
+  }
+  const contract = run.contract;
+  if (contract?.incremental_audio_api !== true ||
+      contract?.feed_executes_model_synchronously !== true ||
+      contract?.explicit_queue_capacity !== false ||
+      contract?.backpressure_status !== false ||
+      contract?.cancellation_operation !== false ||
+      contract?.busy_or_reentrancy_status !== false ||
+      contract?.internal_synchronization !== false ||
+      contract?.cuttledoc_stream_contract_satisfied !== false) {
+    errors.push('pure-C lifecycle gaps must not be promoted into capabilities');
+  }
+  const comparison = run.comparison;
+  const expectedMlxBytes = 18999872 + 625912 + 130164152;
+  if (comparison?.official_mlx?.runtime_and_adapter_bytes !== expectedMlxBytes ||
+      comparison?.official_mlx?.model_bytes !==
+        directManifest.conversion.weight_bytes ||
+      comparison?.pure_c_mps?.runtime_binary_bytes !== run.build?.binary_bytes ||
+      comparison?.pure_c_mps?.model_bytes !== artifactBytes ||
+      comparison?.pure_c_mps?.dependency_disposition !== 'reference-only' ||
+      Math.abs(
+        comparison?.ratios?.mlx_runtime_stack_over_c_binary -
+          expectedMlxBytes / run.build.binary_bytes,
+      ) > 1e-12 ||
+      Math.abs(
+        comparison?.ratios?.c_model_over_mlx_model -
+          artifactBytes / directManifest.conversion.weight_bytes,
+      ) > 1e-12 ||
+      !comparison?.recommendation?.includes('official MLX')) {
+    errors.push('pure-C versus official-MLX recommendation must reconcile');
+  }
+  return errors;
+}
+
 function validateVoxtralRealtimeDirectFrontend(
   run,
   oracle,
@@ -3530,6 +3673,14 @@ const voxtralRealtimeDirectLanguageControlPath = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-direct.streaming-language-control-1/result.json',
 );
+const voxtralCMpsControlManifestPath = join(
+  repoRoot,
+  'spikes/voxtral-realtime-c-mps-control/control-manifest.json',
+);
+const voxtralCMpsControlRunPath = join(
+  repoRoot,
+  'benchmarks/raw/phase0.voxtral-realtime-c-mps-control-1/result.json',
+);
 const voxtralRealtime480Path = join(
   repoRoot,
   'benchmarks/raw/phase0.voxtral-realtime-mlx-reference-480ms.audiobook-pilot-1/result.json',
@@ -3587,6 +3738,10 @@ const schemaPaths = [
   join(
     repoRoot,
     'spikes/voxtral-realtime-mlx-direct/model-manifest.schema.json',
+  ),
+  join(
+    repoRoot,
+    'spikes/voxtral-realtime-c-mps-control/control-manifest.schema.json',
   ),
   join(repoRoot, 'benchmarks/schema/source-rights-review.schema.json'),
   join(repoRoot, 'benchmarks/schema/audiobook-pilot.schema.json'),
@@ -3653,6 +3808,10 @@ const voxtralRealtimeDirectStreaming80 = await readJson(
 const voxtralRealtimeDirectLanguageControl = await readJson(
   voxtralRealtimeDirectLanguageControlPath,
 );
+const voxtralCMpsControlManifest = await readJson(
+  voxtralCMpsControlManifestPath,
+);
+const voxtralCMpsControlRun = await readJson(voxtralCMpsControlRunPath);
 const sourceRightsPaths = (await readdir(sourceRightsDirectory))
   .filter((name) => name.endsWith('.json'))
   .sort()
@@ -3740,6 +3899,11 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     voxtralRealtimeModelManifest,
   ).map((error) => `${voxtralRealtimeDirectModelManifestPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralCMpsControlManifest(voxtralCMpsControlManifest).map(
+    (error) => `${voxtralCMpsControlManifestPath}: ${error}`,
+  ),
 );
 failures.push(
   ...validateQwen3TtsRun(
@@ -3896,6 +4060,14 @@ failures.push(
     voxtralRealtimeDirectModelManifest,
     audiobookPilot,
   ).map((error) => `${voxtralRealtimeDirectLanguageControlPath}: ${error}`),
+);
+failures.push(
+  ...validateVoxtralCMpsControlRun(
+    voxtralCMpsControlRun,
+    voxtralCMpsControlManifest,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).map((error) => `${voxtralCMpsControlRunPath}: ${error}`),
 );
 const maximumRunningStep = (run) => Math.max(
   ...run.runs.map(
@@ -4214,6 +4386,18 @@ if (process.argv.includes('--self-test')) {
       'validator self-test failed to reject divergent direct Voxtral language metrics',
     );
   }
+  const invalidVoxtralCMpsControl = structuredClone(voxtralCMpsControlRun);
+  invalidVoxtralCMpsControl.comparison.ratios.c_model_over_mlx_model += 1;
+  if (validateVoxtralCMpsControlRun(
+    invalidVoxtralCMpsControl,
+    voxtralCMpsControlManifest,
+    voxtralRealtimeDirectModelManifest,
+    audiobookPilot,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject divergent C/MPS comparison evidence',
+    );
+  }
   const invalidVoxtralRealtimeAggregate = structuredClone(
     voxtralRealtime480,
   );
@@ -4299,6 +4483,7 @@ console.log(
   `1 direct Voxtral encoder parity record, 1 direct Voxtral transcription parity record, ` +
   `3 direct Voxtral streaming parity records, ` +
   `1 direct Voxtral multilingual live control, ` +
+  `1 Voxtral C/MPS boundary control, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,

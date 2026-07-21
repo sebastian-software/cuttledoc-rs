@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/voxtral-c-mps-control-manifest-1.0.0.json",
+  "title": "Voxtral pure-C/MPS comparison control manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "model",
+    "build",
+    "disposition"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "license",
+        "commit_count",
+        "first_commit_at",
+        "last_commit_at",
+        "commit_authors",
+        "release_tags"
+      ],
+      "properties": {
+        "repository": { "type": "string", "format": "uri" },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "license": { "type": "string", "minLength": 1 },
+        "commit_count": { "type": "integer", "minimum": 1 },
+        "first_commit_at": { "type": "string", "format": "date-time" },
+        "last_commit_at": { "type": "string", "format": "date-time" },
+        "commit_authors": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "release_tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision", "license", "format", "artifacts"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "license": { "type": "string", "minLength": 1 },
+        "format": { "type": "string", "minLength": 1 },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "bytes", "sha256"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "bytes": { "type": "integer", "minimum": 1 },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend", "external_dependencies", "system_frameworks"],
+      "properties": {
+        "backend": { "const": "Metal/MPS" },
+        "external_dependencies": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "system_frameworks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reasons"],
+      "properties": {
+        "status": { "const": "reference-only" },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase0.voxtral-realtime-c-mps-control-1",
+  "captured_at": "2026-07-21T04:58:22Z",
+  "source_revision": "134d366c24d20c64b614a3dcc8bda2a6922d077d",
+  "fixture_id": null,
+  "candidate": {
+    "task": "asr",
+    "model": {
+      "id": "mistralai/Voxtral-Mini-4B-Realtime-2602",
+      "revision": "2769294da9567371363522aac9bbcfdd19447add",
+      "quantization": "BF16 Safetensors",
+      "license": "Apache-2.0"
+    },
+    "runtime": {
+      "id": "antirez/voxtral.c",
+      "version": "134d366c24d20c64b614a3dcc8bda2a6922d077d",
+      "boundary": "external pure-C implementation using Apple Metal/MPS; comparison control only"
+    },
+    "options": {
+      "backend": "mps",
+      "delay_ms": 480,
+      "model_artifact_bytes": 8874374435,
+      "lazy_load_ms": 37.221,
+      "first_process_wall_ms": 18160,
+      "first_use_overhead_ms": 9295,
+      "reported_metal_weight_cache_bytes": 8429200000,
+      "functional_fixture": "audiobook-de-135_82_000105",
+      "functional_output_wer": 0.029411764705882353,
+      "dependency_disposition": "reference-only"
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "power_state": "unknown"
+  },
+  "measurements": {
+    "quality": {
+      "wer": null,
+      "cer": null
+    },
+    "timing": {
+      "audio_duration_ms": 13340,
+      "cold_load_ms": 37.221,
+      "warm_inference_ms": 8865,
+      "real_time_factor": 0.6645427286356822
+    },
+    "resources": {
+      "peak_memory_bytes": 25495650304,
+      "model_size_bytes": 8874374435,
+      "binary_size_bytes": 246024
+    },
+    "streaming": {
+      "supported": false,
+      "first_result_ms": null,
+      "update_count": null,
+      "volatile_update_count": null,
+      "final_update_count": null,
+      "revoke_count": null,
+      "timestamps": "none"
+    },
+    "energy": {
+      "method": "not-measured",
+      "sample_rate_ms": null,
+      "sample_count": null,
+      "energy_joules": null,
+      "raw_artifact": null,
+      "notes": "The bounded comparison did not add an energy run because the runtime already fails the lifecycle and dependency gates."
+    }
+  },
+  "engineering_cost": {
+    "conversion_effort": "The control builds into a 246,024-byte executable with no non-system dynamic dependency, but requires the publisher's 8,874,374,435-byte BF16 model package.",
+    "update_cost": "The pinned project has 45 commits across eleven days, no release tags, and 43 commits from its primary author. Cuttledoc would have to own cancellation, reentrancy, backpressure, error taxonomy, and future model updates in a fork or adapter.",
+    "packaging_cost": "The executable is 609 times smaller than the current MLX runtime/adapter stack, while the required BF16 model is 2.83 times larger than the pinned 4-bit MLX model and reported an 8.43 GB Metal weight cache."
+  },
+  "reproduction": {
+    "command": "CUTTLEDOC_VOXTRAL_C_SOURCE_DIR=/absolute/path/to/voxtral.c@134d366 CUTTLEDOC_VOXTRAL_C_MODEL_DIR=/absolute/path/to/pinned-bf16-model bash scripts/run-voxtral-c-mps-control.sh",
+    "raw_artifacts": [
+      "benchmarks/raw/phase0.voxtral-realtime-c-mps-control-1/result.json"
+    ]
+  },
+  "result": {
+    "status": "partial",
+    "blocker": "The synchronous external stream API lacks Cuttledoc cancellation, busy/reentrancy, bounded-queue, and backpressure semantics, and the young single-maintainer-dominant project fails ADR-0005 as a production dependency.",
+    "observations": [
+      "The pinned MPS target compiled without warnings and links only Apple system frameworks.",
+      "vox_load completed in 37.221 ms because it mmaps weights lazily; the first full process still took 18.16 seconds for 13.34 seconds of audio.",
+      "The functional output differed from the development reference by Halte versus Haltet, so the BF16 control is not exact transcript parity with the 4-bit MLX path.",
+      "The measured process reached 25.50 GB maximum RSS and a 16.66 GB macOS peak memory footprint; the runtime reported an 8.43 GB Metal weight cache.",
+      "The pure-C implementation remains a useful readable control, while official MLX remains the accepted first-class Voxtral foundation."
+    ]
+  }
+}

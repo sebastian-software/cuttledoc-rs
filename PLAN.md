@@ -81,7 +81,7 @@ Evidence snapshot: 2026-07-20.
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements and a bounded repository-owned live session; held-out, long-audio, and product-integration gates remain. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
 | Held-out target-domain corpus (#18) | In progress | The German-first podcast/audiobook contract, source isolation, rights gate, and initial source dispositions are machine-readable. Accepted rights reviews, acquisition, independent gold review, and identical Apple/Whisper/Qwen/Parakeet/Voxtral runs remain. |
-| Voxtral Realtime live streaming (#19) | In progress | The repository-owned official-MLX session now retains incremental mel, causal-convolution, 32-layer encoder, downsampler, 26-layer decoder, token, and text state behind the bounded Rust/C ABI. Real-time 480/2,400 ms runs reproduce the pinned 177-token streaming text exactly with append-only deltas; a ten-run DE/EN/ES/FR/PT control preserves language/delay cells and confirms 320 ms input as the stable path. The checked 80 ms stress run applies backpressure but still exposes multi-second MLX steps. Held-out data, full-pilot breadth, common-engine integration, long audio, clean-host delivery, and the focused C/MPS lifecycle/packaging comparison remain. |
+| Voxtral Realtime live streaming (#19) | Complete | The repository-owned official-MLX session retains incremental mel, causal-convolution, 32-layer encoder, downsampler, 26-layer decoder, token, and text state behind the bounded Rust/C ABI. Real-time 480/2,400 ms runs reproduce the pinned 177-token streaming text exactly with append-only deltas; a ten-run DE/EN/ES/FR/PT control preserves language/delay cells and confirms 320 ms input as the stable path. The pure-C/MPS control proves a tiny binary but a larger BF16 model/working set, missing lifecycle semantics, and an ADR-0005 failure; ADR-0012 selects the owned official-MLX boundary. Held-out data moves to #18; common-engine, long-audio, and clean-host delivery are focused productization follow-ups. |
 | Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Partial | Add Node 22 and CI artifact gates; Node 24 ESM/CommonJS packed loading is proven. |
 | Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
@@ -302,9 +302,9 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    error profiles.
 3. Carry the now streaming-parity-proven official-MLX Voxtral adapter into the
    held-out and common-engine gates. Keep 320 ms as the measured default,
-   retain the 80 ms backpressure stress gate, add long-audio cache/memory
-   coverage, and compare only lifecycle, packaging, and maintenance with pure
-   C/MPS. Do not adopt the reference runtime's unbounded live queue.
+   retain the 80 ms backpressure stress gate, and add long-audio cache/memory
+   coverage. ADR-0012 completed the C/MPS comparison and rejects both the
+   reference runtime's unbounded queue and the pure-C path as product boundaries.
 4. Use those real raw outputs to execute the frozen surface-only and bounded
    lexical postprocessing candidates under #7. Keep corrected text separate
    from raw ASR ranking and reject critical semantic regressions.

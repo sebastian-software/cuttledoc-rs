@@ -189,8 +189,9 @@ finalization rather than cancellation. Its model docstring also names a
 This rejects `mlx-audio` as Cuttledoc's product boundary, not official MLX or
 Voxtral. The candidate advances to a bounded repository-owned ingestion loop
 over official MLX, with cooperative cancellation designed into the Rust-owned
-lifecycle. The pure-C/MPS implementation remains a comparison boundary, not a
-reason to abandon the first-class MLX platform.
+lifecycle. The pure-C/MPS implementation was retained as a comparison boundary
+and is resolved below; it was never a reason to abandon the first-class MLX
+platform.
 
 ### Repository-owned official-MLX boundary
 
@@ -289,6 +290,39 @@ The machine-readable
 keeps every raw text and timing cell. One development-exposed clip per language
 is an operational/routing diagnostic, not statistical quality evidence.
 
+### Pure-C/Metal-MPS boundary control
+
+The publisher-linked `antirez/voxtral.c` control was pinned at
+`134d366c24d20c64b614a3dcc8bda2a6922d077d`, built without warnings, and run
+against the same German development fixture. Its strongest result is
+packaging: the MPS executable is only 246,024 bytes and links no non-system
+dynamic library. The complete official BF16 model package is 8.87 GB,
+however, versus 3.13 GB for the pinned 4-bit MLX model.
+
+`vox_load()` completed in 37 ms because it mmaps model data lazily. The first
+complete process still took 18.16 seconds for 13.34 seconds of audio. Explicit
+encoder plus decoder work was 8.87 seconds; the remaining 9.30 seconds includes
+first-use weight materialization and Metal setup. The run reached 25.50 GB
+maximum RSS, a 16.66 GB macOS peak memory footprint, and an upstream-reported
+8.43 GB Metal weight cache. Its text differed from the development reference
+by one word (`Halte` instead of `Haltet`, 2.94% single-clip WER).
+
+The public C API is incremental but synchronous: `feed()` performs all
+available model work inline. It exposes no cancellation operation, hard queue,
+backpressure status, busy/reentrancy result, or synchronization around a model
+context or stream. Adding those semantics would create a Cuttledoc-maintained
+fork or a second substantial adapter. The pinned project also has only 45
+commits across eleven days, no release tags, and explicitly asks for more
+production testing.
+
+The compact implementation remains useful reference and packaging evidence,
+but fails ADR-0005 as a production dependency. ADR-0012 therefore retains the
+repository-owned adapter over official MLX. The machine-readable
+[`control`](../benchmarks/raw/phase0.voxtral-realtime-c-mps-control-1/result.json)
+and [reproduction spike](../spikes/voxtral-realtime-c-mps-control/README.md)
+keep the comparison auditable without duplicating the multilingual quality
+evaluation.
+
 ## Artifact and license pins
 
 | Artifact | Exact revision | Representation | License |
@@ -302,6 +336,7 @@ is an operational/routing diagnostic, not statistical quality evidence.
 | Whisper Tiny MLX conversion | `mlx-community/whisper-tiny@78c52ab98ca87f570bc57ad852e15ef7060f9f76` | Float16 NPZ | MIT source model/converter; converted model card has no structured license field |
 | Qwen3-ASR 0.6B official / MLX reference | `Qwen/Qwen3-ASR-0.6B@5eb144179a02acc5e5ba31e748d22b0cf3e303b0` / `mlx-community/Qwen3-ASR-0.6B-8bit@89e96d92ba34aca20b3e29fb10cc284097d1219f` | BF16 official / 8-bit MLX conversion | Apache-2.0 |
 | Voxtral Realtime 4B official / MLX reference | `mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add` / `mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit@fdebf7b2af834a1db4b8a3c99ab7480b333adf9e` | BF16 official / 4-bit MLX conversion | Apache-2.0 |
+| Voxtral pure-C/MPS control | `antirez/voxtral.c@134d366c24d20c64b614a3dcc8bda2a6922d077d` | source-built MPS executable; official BF16 model | MIT code / Apache-2.0 model |
 | Official MLX | `ml-explore/mlx@7a1d4f5c12ac82f4b4d0a6e71538d89ca0605247` | v0.32.0 source build | MIT |
 
 The Parakeet model repository's structured metadata declares CC-BY-4.0 while
@@ -351,8 +386,8 @@ timestamp detail, and streaming behavior.
    cancellation, persistent incremental model state, append-only updates, and
    exact streaming-oracle text at both configured delays. Carry the 320 ms
    path into held-out, long-audio, and common-engine gates; retain 80 ms as a
-   stress test and compare lifecycle/packaging with pure C/MPS. Do not adopt
-   `mlx-audio` as the product boundary.
+   stress test. ADR-0012 selects official MLX after the C/MPS comparison. Do
+   not adopt `mlx-audio` or `voxtral.c` as the product boundary.
 3. Acquire held-out German-first professional-podcast material and independent
    audiobook works, then rerun Apple, Whisper, direct Qwen, Parakeet, and
    Voxtral on the identical language/domain cells.

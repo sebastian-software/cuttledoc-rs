@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "phase0.voxtral-realtime-c-mps-control-1",
+  "captured_at": "2026-07-21T04:58:22Z",
+  "source_revision": "134d366c24d20c64b614a3dcc8bda2a6922d077d",
+  "issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/19",
+  "measurement_scope": "Focused ownership, lifecycle, packaging, and one-fixture functional control for the publisher-linked pure-C/Metal-MPS implementation. This does not repeat the multilingual quality evaluation and is not held-out model-selection evidence.",
+  "host": {
+    "architecture": "arm64",
+    "processor": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)"
+  },
+  "source": {
+    "repository": "antirez/voxtral.c",
+    "revision": "134d366c24d20c64b614a3dcc8bda2a6922d077d",
+    "license": "MIT",
+    "commit_count": 45,
+    "history_span_days": 11,
+    "release_tag_count": 0,
+    "primary_author_commit_count": 43,
+    "source_lines_excluding_generated_shader_header": 11798,
+    "upstream_production_readiness": "README says more testing is needed before production quality"
+  },
+  "model": {
+    "source": "mistralai/Voxtral-Mini-4B-Realtime-2602@2769294da9567371363522aac9bbcfdd19447add",
+    "format": "BF16 Safetensors",
+    "license": "Apache-2.0",
+    "artifact_bytes": 8874374435,
+    "weights_sha256": "263f178fe752c90a2ae58f037a95ed092db8b14768b0978b8c48f66979c8345d"
+  },
+  "fixture": {
+    "id": "audiobook-de-135_82_000105",
+    "manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "pcm_sha256": "72b384abfc6030528d5e60f8b84464c5951341152691537c55a623ae1fba4f4a",
+    "pcm_samples": 213440,
+    "sample_rate_hz": 16000,
+    "duration_ms": 13340,
+    "gold_status": "dataset-transcript-unverified"
+  },
+  "build": {
+    "status": "ok",
+    "target": "mps",
+    "compiler": "Apple clang 21.0.0",
+    "binary_bytes": 246024,
+    "external_dynamic_dependencies": [],
+    "system_frameworks": [
+      "Accelerate",
+      "Metal",
+      "MetalPerformanceShaders",
+      "MetalPerformanceShadersGraph",
+      "Foundation",
+      "AudioToolbox",
+      "CoreFoundation"
+    ]
+  },
+  "lifecycle": {
+    "load_ms": 37.221,
+    "destroy_ms": 2.623,
+    "peak_rss_bytes": 77185024,
+    "load_semantics": "Lazy mmap and metadata setup; weights and shaders are materialized during first inference"
+  },
+  "transcription": {
+    "status": "ok",
+    "text": "Halte den Schnabel, Sir. Ich habe euch doch nur deshalb hinausgeschickt, damit mein altes Gun wieder einmal mitreden kann. Kehrt ihr zurück, so sucht mich auf, und erzählt, was ihr erlebt und erfahren habt.",
+    "reference_word_count": 34,
+    "word_substitutions": 1,
+    "word_insertions": 0,
+    "word_deletions": 0,
+    "wer": 0.029411764705882353,
+    "cer": 0.006024096385542169,
+    "process_wall_ms": 18160,
+    "process_real_time_factor": 1.3613193403298351,
+    "encoder_ms": 1021,
+    "decoder_ms": 7844,
+    "prefill_ms": 193,
+    "decoder_ms_per_step": 43.2,
+    "decoder_steps": 178,
+    "text_tokens": 52,
+    "first_use_overhead_ms": 9295,
+    "maximum_resident_set_bytes": 25495650304,
+    "peak_memory_footprint_bytes": 16662383024,
+    "reported_metal_weight_cache_bytes": 8429200000
+  },
+  "contract": {
+    "incremental_audio_api": true,
+    "feed_executes_model_synchronously": true,
+    "explicit_queue_capacity": false,
+    "backpressure_status": false,
+    "cancellation_operation": false,
+    "busy_or_reentrancy_status": false,
+    "thread_safety_documented": false,
+    "internal_synchronization": false,
+    "cuttledoc_stream_contract_satisfied": false
+  },
+  "comparison": {
+    "official_mlx": {
+      "runtime_and_adapter_bytes": 149789936,
+      "model_bytes": 3133798126,
+      "measured_mlx_peak_bytes": 5477155585,
+      "cancellation": true,
+      "busy_status": true,
+      "bounded_queue_and_backpressure": true,
+      "dependency_disposition": "official foundation with repository-owned model adapter"
+    },
+    "pure_c_mps": {
+      "runtime_binary_bytes": 246024,
+      "model_bytes": 8874374435,
+      "reported_metal_weight_cache_bytes": 8429200000,
+      "cancellation": false,
+      "busy_status": false,
+      "bounded_queue_and_backpressure": false,
+      "dependency_disposition": "reference-only"
+    },
+    "ratios": {
+      "mlx_runtime_stack_over_c_binary": 608.8427795662212,
+      "c_model_over_mlx_model": 2.831827092298159,
+      "c_reported_metal_cache_over_mlx_peak": 1.5389739928302584
+    },
+    "recommendation": "Retain the repository-owned adapter over official MLX. Keep voxtral.c as a readable implementation and packaging control, not a production dependency or fork."
+  }
+}

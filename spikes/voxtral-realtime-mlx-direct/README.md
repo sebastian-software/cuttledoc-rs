@@ -178,8 +178,8 @@ The complete ten-cell record is
 1. Expand the five-cell language control to the full multilingual audiobook
    pilot and genuinely held-out German-first podcast/audiobook gates through
    this repository-owned streaming boundary.
-2. Compare clean-load, packaging, cancellation granularity, and maintenance
-   cost with the pure-C/MPS control; do not duplicate quality evaluation.
-3. If Voxtral remains selected, place this adapter behind the common engine
+2. Treat the completed pure-C/MPS comparison and ADR-0012 as the fixed native
+   boundary decision; keep that implementation reference-only.
+3. If Voxtral remains selected after the held-out gate, place this adapter behind the common engine
    contract, add long-audio cache/memory tests, and make the 320 ms default an
    explicit product setting rather than a spike constant.

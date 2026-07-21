@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "source": {
+    "repository": "https://github.com/antirez/voxtral.c",
+    "revision": "134d366c24d20c64b614a3dcc8bda2a6922d077d",
+    "license": "MIT",
+    "commit_count": 45,
+    "first_commit_at": "2026-02-04T18:04:44Z",
+    "last_commit_at": "2026-02-15T18:58:50Z",
+    "commit_authors": [
+      "Salvatore Sanfilippo",
+      "Riccardo Tripodi"
+    ],
+    "release_tags": []
+  },
+  "model": {
+    "repository": "mistralai/Voxtral-Mini-4B-Realtime-2602",
+    "revision": "2769294da9567371363522aac9bbcfdd19447add",
+    "license": "Apache-2.0",
+    "format": "BF16 Safetensors",
+    "artifacts": [
+      {
+        "path": "consolidated.safetensors",
+        "bytes": 8859462744,
+        "sha256": "263f178fe752c90a2ae58f037a95ed092db8b14768b0978b8c48f66979c8345d"
+      },
+      {
+        "path": "params.json",
+        "bytes": 1343,
+        "sha256": "2ace010ebf7f0b62c60747d91c6d140e3c7238632d3e9c63d60a2bd2065ea301"
+      },
+      {
+        "path": "tekken.json",
+        "bytes": 14910348,
+        "sha256": "8434af1d39eba99f0ef46cf1450bf1a63fa941a26933a1ef5dbbf4adf0d00e44"
+      }
+    ]
+  },
+  "build": {
+    "backend": "Metal/MPS",
+    "external_dependencies": [],
+    "system_frameworks": [
+      "Accelerate",
+      "Metal",
+      "MetalPerformanceShaders",
+      "MetalPerformanceShadersGraph",
+      "Foundation",
+      "AudioToolbox",
+      "CoreFoundation"
+    ]
+  },
+  "disposition": {
+    "status": "reference-only",
+    "reasons": [
+      "The project describes itself as requiring more testing before production use.",
+      "The pinned history spans eleven days, has no release tags, and is overwhelmingly maintained by one author.",
+      "The synchronous stream API exposes no cancellation, busy, queue-capacity, or backpressure contract.",
+      "Its small executable is outweighed by the BF16 model and Metal working-set cost for Cuttledoc's target configuration."
+    ]
+  }
+}
