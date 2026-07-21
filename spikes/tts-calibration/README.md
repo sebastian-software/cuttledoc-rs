@@ -57,6 +57,13 @@ unnecessary quantization before the five receivers see the shared 16 kHz PCM.
 Whisper, Qwen, and Apple receive the language or locale recorded by the TTS
 run; the model-managed Parakeet and Voxtral paths are not forced to German.
 
+After encoding the reviewed PCM16 WAV with
+`scripts/encode-benchmark-opus.mjs`, archive a completed five-receiver result
+with `scripts/archive-qwen-tts-calibration.mjs`. The archiver verifies the
+selection, model/profile revisions, reference digest, and ASR completeness,
+then writes the result record, asset manifest, exact reference, attribution,
+and SPDX sidecars without overwriting an existing archive.
+
 Both German Qwen profiles are checked in under `benchmarks/raw`. The
 `qwen-de-clear-documentary` profile completed the passage but all five ASR
 receivers failed at the spoken year `1962`. In contrast, all five receivers
@@ -91,6 +98,12 @@ decades. The English dialogue does not pass. It repeats one earlier question
 until the fixed 1,200-token limit and omits the final 32 reference words. Both
 the positive and failed outputs are retained as digest-pinned Opus controls;
 the remaining multilingual run must not average this generation failure away.
+
+All three Spanish outputs finish normally. Whisper and Voxtral recover the two
+factual passages nearly completely; the larger Parakeet, Qwen-ASR, and Apple
+spreads are receiver-specific. Four receivers make one edit on the dialogue.
+The native-factual phrase “a elegir” remains open for listening because two
+otherwise strong receivers render it similarly as another word.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration

@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-es-warm-technical.1",
+  "captured_at": "2026-07-21T14:05:19.067740Z",
+  "source_revision": "c0e326dd7317c123f27ccfc073a1d4812dcacd13",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-es-warm-technical",
+      "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "Spanish",
+      "locale": "es-419",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-es-technical",
+    "source_id": "es-wikipedia-inteligencia-artificial-174423117",
+    "locale": "es-419",
+    "character_count": 1100,
+    "text_sha256": "b848e8732d5504bd3abab34419a3eefe89289ffb53b948a7376becc93e3eef4c",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-es-warm-technical",
+      "passage_id": "synthetic-es-technical",
+      "locale": "es-419",
+      "language": "Spanish",
+      "voice": null,
+      "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2136960,
+      "byte_count": 8547840,
+      "duration_ms": 89040,
+      "sha256": "e64df8227663dd8490c7b4d21ee069cbd6e734fd2d49f803d8845f6dad43ebb0",
+      "minimum_sample": -0.8112707138061523,
+      "maximum_sample": 0.5640457272529602,
+      "rms": 0.08681671714772174,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1763.576833,
+      "first_audio_ms": 41738.549083,
+      "complete_synthesis_ms": 42509.214667,
+      "real_time_factor": 0.4774170560085355,
+      "output_count": 1,
+      "token_count": 1113
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4723261440,
+      "mlx_peak_memory_bytes": 17510786833,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 2136960,
+        "sample_rate_hz": 24000,
+        "token_count": 1113,
+        "processing_time_seconds": 41.73853397369385,
+        "mlx_audio_reported_duration_over_processing": 2.133280485033768,
+        "peak_memory_gb_decimal": 17.510786833,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1424640,
+        "byte_count": 5698560,
+        "duration_ms": 89040,
+        "sha256": "94b7166eda37edb66c440dd7a3683f599e4a6b668afdc0986542b18c9d16a5c9"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:06:01.332Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "es",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Aprendizaje automático y profundo. Se espera que estas técnicas permitan a las máquinas aprender de manera más eficiente y precisa de grandes volúmenes de datos, mejorando capacidades en procesamiento del lenguaje natural, visión por computadora y toma de decisiones automatizada. Procesamiento del lenguaje natural, PLN. Los avances en PLN permitirán a las máquinas comprender y responder al lenguaje humano de manera más natural y precisa, abriendo nuevas posibilidades en atención al cliente automatizada y generación de contenido. Analítica predictiva y prescriptiva. Estas técnicas utilizarán datos y modelos matemáticos para prever futuro y recomendar acciones, permitiendo a las organizaciones anticipar y abordar problemas de manera proactiva. Integración del Internet de las Cosas, IoT y la IA permitirá a las máquinas recopilar y analizar datos en tiempo real para tomar decisiones autónomas y mejorar la eficiencia. IA generativa. Estará más al alcance de las personas sin conocimientos técnicos, permitiendo la creación de chatbots personalizados y otros modelos generativos. Gracias.",
+            "sha256": "77b1dcebf356e0ca1c53e800f7d1068f7d1a930264fcd1e332d44cc1f145de8c",
+            "segment_count": 6,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 157,
+            "hypothesis_word_count": 157,
+            "word_edits": 2,
+            "wer": 0.012738853503184714,
+            "reference_character_count": 918,
+            "hypothesis_character_count": 923,
+            "character_edits": 9,
+            "cer": 0.00980392156862745
+          },
+          "timing": {
+            "cold_load_ms": 1106.2315409999999,
+            "complete_inference_ms": 3881.109624999999,
+            "real_time_factor": 0.04358838303009882
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1959804928
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:06:04.697Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Aprendizaje automático e profundo. Se espera que estas técnicas permitan a las máquinas aprender de manera más eficiente y precisa de grandes volúmenes de datos, mejorando capacidades en procesamiento del lenguaje natural. Visión por computadora y toma de decisiones automatizada. Processamiento de lenguaje natural, PLN. Los avances in pay aliene permitirán alle macinas comprender y responder o linguaggio mano de maneira más naturale precisa. abriendo nuevas posibilidades en atención al cliente automatizada y generación de contenido. Analytica predictiva y prescriptiva Estas técnicas utilizarán datos y modelos matemáticos para prever futuro y recomendar acciones. permitiendo a las organizaciones anticipar y abordar problemas de manera proactiva. Integración del Internet de las Cosas, IoT, y la IA, permitir las máquinas recopilar y analizar datos en tiempo real para tomar decisiones autónomas y mejorar la eficiencia. Ihr Hiner Tiva. Está más al alcance de las personas sin conocimientos técnicos. Permitiendo la creación de chatbots personalizados y otros modelos generativos.",
+            "sha256": "182ff07f112e2ac7aead8944188631bebe91f05fa4728c63be6da074c1628ea5",
+            "segment_count": 13,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 157,
+            "hypothesis_word_count": 155,
+            "word_edits": 23,
+            "wer": 0.1464968152866242,
+            "reference_character_count": 918,
+            "hypothesis_character_count": 917,
+            "character_edits": 36,
+            "cer": 0.0392156862745098
+          },
+          "timing": {
+            "cold_load_ms": 277.89416700000004,
+            "complete_inference_ms": 1373.7600839999998,
+            "real_time_factor": 0.015428572371967653
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 167870464
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:06:07.033Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "es",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Aprendizaje automático y profundo: se espera que estas técnicas permitan a las máquinas aprender de manera más eficiente y precisa de grandes volumen de datos, mejorando capacidades en procesamiento del lenguaje natural, visión por computadora y toma de decisiones automatizada. Procesamiento del lenguaje natural, PELIEN: los avances en PELIEN permitirán a las máquinas comprender y responder lenguaje humano de manera más natural y precisa, abriendo nuevas posibilidades en atención al cliente automatizada y generación de contenido. Análítica predictiva y prescriptiva: estas técnicas utilizan datos y modelos matemáticos para prever futuro y recomendar acciones, permitiendo a las organizaciones anticipar y abordar problemas de manera proactiva. Integración del Internet de las cosas (IoT): la IA permitirá a las máquinas recopilar y analizar datos en tiempo real, para tomar decisiones autónomas y mejorar la eficiencia. IA genérica: esta arma se alcanza de las personas sin conocimientos técnicos, permitiendo la creación de chatbots personalizados y otros modelos gen",
+            "sha256": "36617eb2c18e4b69924c544582949db6f1c1bad9be3e3381c65a2d4f33af568f",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 157,
+            "hypothesis_word_count": 154,
+            "word_edits": 14,
+            "wer": 0.08917197452229299,
+            "reference_character_count": 918,
+            "hypothesis_character_count": 904,
+            "character_edits": 36,
+            "cer": 0.0392156862745098
+          },
+          "timing": {
+            "complete_inference_ms": 2141.385709,
+            "real_time_factor": 0.02404970472821204
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 3424045480
+          },
+          "generation": {
+            "token_count": 256,
+            "finish_reason": "length",
+            "stop_token": null
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:06:38.398Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Aprenissage automático y profundo. Se espera que estas técnicas permitan a las máquinas aprender de manera más eficiente y precisa de grandes volúmenes de datos, mejorando capacidades en procesamiento de lenguaje natural, visión por computadora y toma de decisiones automatizada. Procesamiento del lenguaje natural, PLN. Los avances en PLN permitirán a las máquinas comprender y responder al lenguaje humano de manera más natural y precisa, abriendo nuevas posibilidades en atención al cliente automatizada y generación de contenido. Analítica predictiva y prescriptiva. Estas técnicas utilizarán datos y modelos matemáticos para prever futuro y recomendar acciones, permitiendo a las organizaciones anticipar y abordar problemas de manera proactiva. Integración del Internet de las Cosas, IoT, y la IA permitirá a las máquinas recopilar y analizar datos en tiempo real para tomar decisiones autónomas y mejorar la eficiencia. IA generativa. Estará más al alcance de las personas sin conocimientos técnicos, permitiendo la creación de chatbots personalizados y otros modelos generativos.",
+            "sha256": "c6948344dd76fa021ba3b9f95bd03b50c4ce97ead9dbc86798632b27afc0722a",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 157,
+            "hypothesis_word_count": 156,
+            "word_edits": 3,
+            "wer": 0.01910828025477707,
+            "reference_character_count": 918,
+            "hypothesis_character_count": 915,
+            "character_edits": 7,
+            "cer": 0.007625272331154684
+          },
+          "timing": {
+            "complete_inference_ms": 28706.055708,
+            "real_time_factor": 0.3223950551212938
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5515685532
+          },
+          "generation": {
+            "token_count": 1124,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:06:41.623Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "es-419",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Aprendizaje automático y profundo. Se espera que estas técnicas permitan a las máquinas aprender de manera más eficiente y precisa de grandes volúmenes de datos, mejorando capacidades en procesamiento del lenguaje natural, visión por computadora y toma de decisiones automatizada. Procesamiento de lenguaje natural, Payien. Los avances en Payana permitirán a las máquinas comprender y responder al lenguaje humano de manera más natural y precisa, abriendo nuevas posibilidades en atención al cliente y automatizada y generación de contenido. Analítica, productiva y prescriptiva. Estas técnicas utilizaban datos y modelos matemáticos para prever futuro y recomendar acciones, permitiendo a las organizaciones anticipar y abordar problemas de manera protiva. Integración del internet de las cosas, EOT y la IA permitía a las máquinas recopilar y analizar datos en tiempo real para tomar decisiones autónomas y mejorar la eficiencia. IA generativa. Está más al alcance de las personas sin conocimientos técnicos, permitiendo la creación de chatbots personalizados y otros modelos generativos.",
+            "sha256": "b6e6c6d6fd8229c332d7ad41502072790b519234a26807412a764ba13cad84bf",
+            "segment_count": 158,
+            "update_count": 278,
+            "final_update_count": 5,
+            "volatile_update_count": 273,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 157,
+            "hypothesis_word_count": 157,
+            "word_edits": 11,
+            "wer": 0.07006369426751592,
+            "reference_character_count": 918,
+            "hypothesis_character_count": 917,
+            "character_edits": 24,
+            "cer": 0.026143790849673203
+          },
+          "timing": {
+            "first_result_ms": 79.242458,
+            "complete_inference_ms": 879.878041,
+            "real_time_factor": 0.009881828852201258
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Complete listening review before promoting this voice and content cell.",
+    "calibration_disposition": "passed-technical-content-gate-receiver-spread-listening-pending"
+  }
+}

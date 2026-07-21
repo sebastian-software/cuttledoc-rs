@@ -1,9 +1,8 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** all three German Qwen content cells and the English technical and
-native-factual cells pass the lexical gate; the English dialogue exposes a
-repeat-and-truncate failure, while Spanish, French, Portuguese, and listening
-review remain pending
+**Status:** German and Spanish pass all three Qwen content cells; English
+technical and native-factual pass while English dialogue exposes a repeat-and-
+truncate failure; French, Portuguese, and listening review remain pending
 
 ## Purpose
 
@@ -354,9 +353,17 @@ dialogue fail for different reasons. The English dialogue reads 102 reference
 words correctly, then repeats “What happens if someone turns away while
 speaking?” until the 1,200-token limit and omits the final 32 reference words.
 This is a shared synthesis failure: four receivers report roughly 24–25% WER,
-while Whisper transcribes the audible repetitions and exceeds 200% WER. The
-three Spanish, French, and Portuguese cells are the next bounded Qwen step.
-Listening remains a separate gate before full-matrix promotion.
+while Whisper transcribes the audible repetitions and exceeds 200% WER.
+
+All three Spanish generations finish normally. The technical cell ranges from
+1.27% WER (Whisper) to 14.65% (Parakeet), the native-factual cell from 1.58%
+to 20.53% (Qwen-ASR), and the dialogue from 0.68% for four receivers to 10.27%
+for Parakeet. The high values are not shared omissions: Whisper and Voxtral
+recover both factual passages almost completely, and four receivers recover
+the dialogue with one edit. The similar Whisper/Voxtral rendering of “a
+elegir” in the native-factual audio remains explicitly open for pronunciation
+review. French and Portuguese are the next bounded Qwen step. Listening
+remains a separate gate before full-matrix promotion.
 
 ## Voxtral TTS MLX reference result
 
@@ -431,8 +438,8 @@ artifact also remains reference-only under CC BY-NC 4.0.
    **In progress:** all three model/runtime snapshots are pinned. German's
    three Qwen cells pass the lexical gate, the English technical and
    native-factual cells pass, the English dialogue has a pinned repeat-and-
-   truncate failure, and the remaining nine multilingual Qwen cells are
-   frozen for execution.
+   truncate failure, all three Spanish cells complete, and the remaining six
+   French and Portuguese Qwen cells are frozen for execution.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

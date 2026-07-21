@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-es-technical.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 1137,
+    "characters": 1100,
+    "sha256": "b848e8732d5504bd3abab34419a3eefe89289ffb53b948a7376becc93e3eef4c",
+    "spoken_text_sha256": "b848e8732d5504bd3abab34419a3eefe89289ffb53b948a7376becc93e3eef4c",
+    "source_id": "es-wikipedia-inteligencia-artificial-174423117",
+    "passage_id": "synthetic-es-technical",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-es-warm-technical.1",
+    "record_sha256": "cf39478f604e6afbe282508f26232b5a7e688cc94c540dd931e60a3ddb6f6a3e",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-es-warm-technical",
+    "voice_instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "es-419",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2136960,
+      "bytes": 8547840,
+      "sha256": "e64df8227663dd8490c7b4d21ee069cbd6e734fd2d49f803d8845f6dad43ebb0"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "61ca5dddb5987a61d58bbdaed50f188efd4c2dae2010bb0113cf8baff2910d9e"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 785311,
+    "sha256": "2672d4333b8ece565e2fae266e817aad7eb7ee127b84d9e9f912bfa66e89b6bf",
+    "duration_ms": 89046.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 70552,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-technical-content-gate-receiver-spread",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.012738853503184714,
+      0.1464968152866242
+    ],
+    "summary": "All five receivers cover the complete technical passage. Whisper and Voxtral make two and three word edits respectively; the larger Parakeet, Qwen-ASR, and Apple spreads are receiver-specific."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

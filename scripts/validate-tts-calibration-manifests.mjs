@@ -178,6 +178,54 @@ const additionalQwenCalibrationSpecs = [
     reachedMaxTokens: true,
     attributionNeedle: 'reproducible failed generation control',
   },
+  {
+    profileId: 'qwen-es-warm-technical',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-es-warm-technical.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/es-419/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-es-technical',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-technical-content-gate-receiver-spread',
+    resultDisposition:
+      'passed-technical-content-gate-receiver-spread-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'Whisper and Voxtral make two and three word edits',
+  },
+  {
+    profileId: 'qwen-es-warm-native',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-es-warm-native.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/es-419/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-es-native',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-native-content-gate-pronunciation-review-required',
+    resultDisposition:
+      'passed-native-content-gate-pronunciation-review-required-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'keeps that phrase open for pronunciation review',
+  },
+  {
+    profileId: 'qwen-es-warm-dialogue',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-es-warm-dialogue.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/es-419/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-es-dialogue',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-dialogue-content-gate-receiver-spread',
+    resultDisposition:
+      'passed-dialogue-content-gate-receiver-spread-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'Parakeet alone makes fifteen edits',
+  },
 ];
 const additionalQwenCalibrationEvidence = await Promise.all(
   additionalQwenCalibrationSpecs.map(async (spec) => {
@@ -596,7 +644,9 @@ function validate(items, acceptedPlan) {
       snapshotBytes: 4520194992,
       artifactCount: 14,
       role: 'required-generator',
-      status: 'multilingual-content-type-expansion-in-progress-English-dialogue-failed',
+      status:
+        'multilingual-content-type-expansion-in-progress-' +
+        'English-dialogue-failed-Spanish-passed',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -617,7 +667,9 @@ function validate(items, acceptedPlan) {
         'qwen-pt-warm-native',
         'qwen-pt-warm-dialogue',
       ],
-      planStatus: 'multilingual-content-type-expansion-in-progress-English-dialogue-failed',
+      planStatus:
+        'multilingual-content-type-expansion-in-progress-' +
+        'English-dialogue-failed-Spanish-passed',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',

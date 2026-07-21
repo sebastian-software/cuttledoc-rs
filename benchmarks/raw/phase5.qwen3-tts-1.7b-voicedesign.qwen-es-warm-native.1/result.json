@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-es-warm-native.1",
+  "captured_at": "2026-07-21T14:07:37.940826Z",
+  "source_revision": "c0e326dd7317c123f27ccfc073a1d4812dcacd13",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-es-warm-native",
+      "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "Spanish",
+      "locale": "es-419",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-es-native",
+    "source_id": "es-wikipedia-audiolibro-174385246",
+    "locale": "es-419",
+    "character_count": 1206,
+    "text_sha256": "fdb0965a2006c4181b55329565437d81341bf6b180ae9317355bcc20f0e2e418",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-es-warm-native",
+      "passage_id": "synthetic-es-native",
+      "locale": "es-419",
+      "language": "Spanish",
+      "voice": null,
+      "instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1981440,
+      "byte_count": 7925760,
+      "duration_ms": 82560,
+      "sha256": "89cb03f681fc2659b7270773ac80540f4ea234a0eeb9f6e73cac3e246b15daa2",
+      "minimum_sample": -0.3470041751861572,
+      "maximum_sample": 0.6118022799491882,
+      "rms": 0.05727046218478382,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1563.839209,
+      "first_audio_ms": 39195.101916,
+      "complete_synthesis_ms": 39387.929666,
+      "real_time_factor": 0.4770824814195737,
+      "output_count": 1,
+      "token_count": 1032
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4774494208,
+      "mlx_peak_memory_bytes": 16635089617,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1981440,
+        "sample_rate_hz": 24000,
+        "token_count": 1032,
+        "processing_time_seconds": 39.195103883743286,
+        "mlx_audio_reported_duration_over_processing": 2.1063855384815784,
+        "peak_memory_gb_decimal": 16.635089617,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1320960,
+        "byte_count": 5283840,
+        "duration_ms": 82560,
+        "sha256": "ff2698b43d14af27f59c5f395422d1c7f4505f1ca01642814f9ee45eb7fb9082"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:07:59.189Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "es",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "El audiolibro es un medio de comunicación útil cuando la lectura directa no es posible. Permite conservar materiales que de otra manera podrían deteriorarse y perderse. Permite llevar a cabo otras actividades mientras se las ejecuta. Conducir, caminar, tomar sol, cocinar, etc. Es fácil de descargar, de ejecutar y económico. Fomenta la lectura y promociona el contenido más que el formato escrito. Un audiolibro puede ofrecer los contenidos más variados. Puede ser un cuento, una conferencia, un curso, un artículo, un ensayo, un diálogo, una entrevista, un programa de radio, un relato más o menos largo realizado por una emisora de radio. Debido a una lógica limitación de tiempo, los audiolibros cuyo texto proviene de una obra previa de gran extensión suelen ser versiones reducidas. La voz puede ser generada por computadoras o puede ser una lectura humana, muchas veces llevada a cabo por actores. Un audiolibro comercial contará habitualmente con narradores profesionales que interpretan y dramatizan los textos. Algunas empresas editoras de audiolibros dan alergia entre voz femenina o masculina, qué variedad de español o inglés se prefiere, el tono, el timbre y la cadencia de los locutores.",
+            "sha256": "1b1e41d5f2906a8fc380c03dc322d9ce7bc6c6e19f59dcb03453ffca6e0049b9",
+            "segment_count": 13,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 190,
+            "hypothesis_word_count": 189,
+            "word_edits": 3,
+            "wer": 0.015789473684210527,
+            "reference_character_count": 984,
+            "hypothesis_character_count": 984,
+            "character_edits": 4,
+            "cer": 0.0040650406504065045
+          },
+          "timing": {
+            "cold_load_ms": 1099.9212499999999,
+            "complete_inference_ms": 3096.3279170000005,
+            "real_time_factor": 0.037503971862887606
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1956691968
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:08:02.827Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "El audiolibro es un medio de comunicación útil cuando la lectura directa no es posible. Permite conservar materiales que de otra manera podrían deteriorarse y perderse. Permite llevar a cabo otras actividades mientras se los ejecuta, conducir, caminar, tomar sol, cocinar, etc. Es fácil de descargar de ejecutar y con el Nomiko? Fomenta la lectura y promociona il contenido más que il formato escrito. Un audiolibro puede ofrecer los contenidos más variados. Puede ser un cuento, una conferencia, un curso, un artículo, un ensayo, un diálogo, una entrevista, un programa de radio, un relato más o menos largo realizado por el video una emisora de radio. De vida buena lógica limitación de tiempo, los audiolibros cuyo texto proviene de una obra previa de gran extensión, suelen ser versiones reducidas. La voz puede ser generada por computadoras o puede ser una lectura humana, muchas veces llevada a cabo por actores. Un audiolibro comercial contará habitualmente con narradores profesionales que interpretan y dramatizan los textos. Algunas empresas editoras de audio libros dan alegía, entre voz femenina o masculina, que variedad de español o inglés se prefiere, el tono, el timbre y la cadencia de los locutores.",
+            "sha256": "fc14a97494cea864c08cabbee4726c091f272301913450651528ec24695110f4",
+            "segment_count": 10,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 190,
+            "hypothesis_word_count": 194,
+            "word_edits": 15,
+            "wer": 0.07894736842105263,
+            "reference_character_count": 984,
+            "hypothesis_character_count": 993,
+            "character_edits": 23,
+            "cer": 0.023373983739837397
+          },
+          "timing": {
+            "cold_load_ms": 286.577459,
+            "complete_inference_ms": 1452.51575,
+            "real_time_factor": 0.017593456274224806
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 172326912
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:08:05.071Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "es",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "El audio libro es un medio de comunicación útil cuando la lectura directa no es posible. Permite conservar materiales que de otra manera podrían deteriorarse y perderse. Permite llevar a cabo otras actividades mientras se los ejecuta, conducir, caminar, tomar sol, cocinar, etc. Es fácil de descargar de ejecutar y económico. Fomenta la lectura y promociona el contenido más que el formato escrito. Un audio libro puede ofrecer los contenidos más bajados. Puede ser un cuento, una conferencia, un curso, un artículo, un ensayo, un diálogo, un entrevista, un programa de radio, un relato más o menos largo realizado por una emisora de radio. Debido a una lógica limitación de tiempo, los audio libros cuyo texto proviene de una obra previa de gran extensión suelen ser versiones reducidas. La voz puede ser generada por computadoras o puede ser una lectura humana, muchas veces llevada a cabo por actores. Un audio libro comercial contará habitualmente con narradoras profesionales que interpretan y dramatizan los textos. Algunas impresiones de tomas de",
+            "sha256": "746b82d62814797849beb0540977d9400775b7901ff79a5a968e31bca26d896c",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 190,
+            "hypothesis_word_count": 168,
+            "word_edits": 39,
+            "wer": 0.20526315789473684,
+            "reference_character_count": 984,
+            "hypothesis_character_count": 861,
+            "character_edits": 128,
+            "cer": 0.13008130081300814
+          },
+          "timing": {
+            "complete_inference_ms": 2077.575542,
+            "real_time_factor": 0.025164432437015504
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2863590228
+          },
+          "generation": {
+            "token_count": 256,
+            "finish_reason": "length",
+            "stop_token": null
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:08:33.250Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "El audio libro es un medio de comunicación útil cuando la lectura directa no es posible. Permite conservar materiales que de otra manera podrían deteriorarse y perderse. Permite llevar a cabo otras actividades mientras se los ejecuta. Conducir, caminar, tomar sol, cocinar, etc. Es fácil de descargar, de ejecutar y económico. Fomenta la lectura y promociona el contenido más que el formato escrito. Un audiolibro puede ofrecer los contenidos más variados. Puede ser un cuento, una conferencia, un curso, un artículo, un ensayo, un diálogo, una entrevista, un programa de radio, un relato más o menos largo realizado por una emisora de radio. Debido a una lógica limitación de tiempo, los audiolibros cuyo texto proviene de una obra previa de gran extensión suelen ser versiones reducidas. La voz puede ser generada por computadoras o puede ser una lectura humana, muchas veces llevada a cabo por actores. Un audiolibro comercial contará habitualmente con narradores profesionales que interpretan y dramatizan los textos. Algunas empresas editoras de audiolibros dan a elegía entre voz femenina o masculina, que variedad de español o inglés se prefiere, el tono, el timbre y la cadencia de los locutores.",
+            "sha256": "ef585fcd63799b6e979d29ce0a044a242eca2f745920b0a3346bd36e49ad94bf",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 190,
+            "hypothesis_word_count": 191,
+            "word_edits": 4,
+            "wer": 0.021052631578947368,
+            "reference_character_count": 984,
+            "hypothesis_character_count": 984,
+            "character_edits": 3,
+            "cer": 0.003048780487804878
+          },
+          "timing": {
+            "complete_inference_ms": 24881.21125,
+            "real_time_factor": 0.3013712602955426
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5727530552
+          },
+          "generation": {
+            "token_count": 1043,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:08:36.809Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "es-419",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "El audiolibro es un medio de comunicación útil cuando la lectura directa no es posible. Permite conservar materiales que de otra manera podrían deteriorarse y perderse. permite llevar a cabo otras actividades mientras se los ejecuta. Con decir, caminar, tomar sol, cocinar, etc. Es fácil de descargar, de ejecutar y económico. fomentar la lectura y promoción el contenido más que el formato escrito. Un audiolibro puede ofrecer los contenidos más variados. Puede ser un cuento, una conferencia, un curso, una artículo, un ensayo, un diálogo, una entrevista, un programa de radio, un relato más o menos logo realizado por una emisora de radio. To be the ana a lógica limitacióntación de tiempo, los audiolibros, cuyo texto proviene de una obra previa de gran extensión, suelen ser versiones redecidas. La voz puede ser generada por computadoras o puede ser una lectura humana, muchas veces llevada a cabo por actores. Un audiolibro comercial contará habitualmente con narradores profesionales que interpretan y dramatizan los textos. Algunas empresas etoras de audioolibros dan a elegía entre voz femenina o masculina, que hay variedad de español o inglés, se prefiere el tono, el timbre y la la cadencia de los locutores",
+            "sha256": "00a58aa78ae101fd0c103cf0636fd045a0bc4788df91083c73a3f7510e0725f5",
+            "segment_count": 196,
+            "update_count": 342,
+            "final_update_count": 4,
+            "volatile_update_count": 338,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 190,
+            "hypothesis_word_count": 195,
+            "word_edits": 19,
+            "wer": 0.1,
+            "reference_character_count": 984,
+            "hypothesis_character_count": 995,
+            "character_edits": 33,
+            "cer": 0.03353658536585366
+          },
+          "timing": {
+            "first_result_ms": 79.639875,
+            "complete_inference_ms": 989.452583,
+            "real_time_factor": 0.011984648534399225
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Complete listening review before promoting this voice and content cell.",
+    "calibration_disposition": "passed-native-content-gate-pronunciation-review-required-listening-pending"
+  }
+}

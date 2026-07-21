@@ -9,6 +9,7 @@ on:
       - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
+      - "scripts/archive-qwen-tts-calibration.mjs"
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
@@ -29,6 +30,7 @@ on:
       - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
+      - "scripts/archive-qwen-tts-calibration.mjs"
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
@@ -55,6 +57,7 @@ jobs:
         run: node scripts/validate-tts-calibration-manifests.mjs --self-test
       - name: Check TTS calibration runners
         run: |
+          node --check scripts/archive-qwen-tts-calibration.mjs
           node --check scripts/run-tts-calibration-asr.mjs
           python -m py_compile spikes/tts-calibration/run_qwen_voicedesign.py
           bash -n scripts/run-qwen3-tts-voicedesign-calibration.sh

@@ -191,8 +191,9 @@ makes seven. The three German content cells are therefore lexically complete;
 the English native-factual cell also passes with one to four word edits and
 complete decade recovery. The English dialogue is a pinned failed control:
 Qwen repeats one question until the 1,200-token limit and omits the last 32
-reference words. Spanish, French, and Portuguese remain next; listening review
-precedes full-matrix promotion.
+reference words. All three Spanish cells complete without a shared content
+omission, although “a elegir” remains open for pronunciation review. French
+and Portuguese remain next; listening review precedes full-matrix promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

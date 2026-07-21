@@ -38,7 +38,7 @@ const referencePath = requiredPath(values.reference, '--reference');
 const outputPath = requiredPath(values.output, '--output');
 const ttsRun = JSON.parse(await readFile(resultPath, 'utf8'));
 const locale = ttsRun.input?.locale;
-if (!/^[a-z]{2}-[A-Z]{2}$/.test(locale ?? '')) {
+if (!/^[a-z]{2}-(?:[A-Z]{2}|\d{3})$/.test(locale ?? '')) {
   throw new Error(`TTS run has no supported BCP 47 locale: ${locale}`);
 }
 const language = locale.slice(0, 2);

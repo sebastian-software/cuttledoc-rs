@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-es-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 929,
+    "characters": 888,
+    "sha256": "3d5455265d7b370e041b81bf5d234204eb2eb2c18d538c696ed2e9bb51d7525b",
+    "spoken_text_sha256": "3d5455265d7b370e041b81bf5d234204eb2eb2c18d538c696ed2e9bb51d7525b",
+    "source_id": "cuttledoc-authored-es-dialogue-1",
+    "passage_id": "synthetic-es-dialogue",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-es-warm-dialogue.1",
+    "record_sha256": "8a26d33b5115a94963dae422dd9f87070523fab1f8f26c199d930cddde1f3f48",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-es-warm-dialogue",
+    "voice_instruction": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "es-419",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1908480,
+      "bytes": 7633920,
+      "sha256": "8fd1f148610d7cebb7aece31f71ae866d93445b0d1d0b63c62dd14f5afac4995"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "c0c87d6e2d4db3005687a0197d780a0d8503e2156279c2c59eb271cff0a9f88d"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 582019,
+    "sha256": "a1c4698a955c8296a592f311a709f7a7ba3b2df207fa10d265c6e822dd3be508",
+    "duration_ms": 79526.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 58548,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-dialogue-content-gate-receiver-spread",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.00684931506849315,
+      0.10273972602739725
+    ],
+    "summary": "Whisper, Qwen-ASR, Voxtral, and Apple each make one word edit and recover the complete dialogue. Parakeet alone makes fifteen edits with cross-language substitutions."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

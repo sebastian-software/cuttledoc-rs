@@ -39,6 +39,9 @@ fixture is a second positive content control. The English
 [`synthetic-en-dialogue`](synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-dialogue/manifest.json)
 fixture is intentionally retained as a failed control: Qwen repeats one
 question until the token limit and omits the final 32 reference words.
+The three `es-419` Qwen fixtures add technical, native-factual, and dialogue
+controls. All finish normally; their per-receiver WER spread is retained
+without collapsing it into one language-wide score.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis
