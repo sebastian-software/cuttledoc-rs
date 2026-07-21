@@ -1,8 +1,9 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** all three German Qwen content cells pass the lexical gate; the same
-three-cell slice is materialized for English, Spanish, French, and Portuguese,
-with multilingual Qwen execution and listening review still pending
+**Status:** all three German Qwen content cells and the English technical and
+native-factual cells pass the lexical gate; the English dialogue exposes a
+repeat-and-truncate failure, while Spanish, French, Portuguese, and listening
+review remain pending
 
 ## Purpose
 
@@ -347,11 +348,15 @@ evidence identifies a receiver-specific Parakeet weakness rather than a shared
 Qwen content error. The dialogue cell passes the lexical content gate; one
 voice reads the full exchange, and listening review remains open.
 
-The completed German/English lexical calibrations accept the warm Qwen
-profiles and reject the clear German profile. English native-factual and
-dialogue runs plus all three Spanish, French, and Portuguese cells are the
-next bounded Qwen step. Listening remains a separate gate before full-matrix
-promotion.
+The completed German cells and the English technical/native-factual cells
+accept the warm Qwen profiles, while the clear German profile and English
+dialogue fail for different reasons. The English dialogue reads 102 reference
+words correctly, then repeats “What happens if someone turns away while
+speaking?” until the 1,200-token limit and omits the final 32 reference words.
+This is a shared synthesis failure: four receivers report roughly 24–25% WER,
+while Whisper transcribes the audible repetitions and exceeds 200% WER. The
+three Spanish, French, and Portuguese cells are the next bounded Qwen step.
+Listening remains a separate gate before full-matrix promotion.
 
 ## Voxtral TTS MLX reference result
 
@@ -424,8 +429,10 @@ artifact also remains reference-only under CC BY-NC 4.0.
    candidates that pass fidelity, stability, listening, and operational-cost
    gates.
    **In progress:** all three model/runtime snapshots are pinned. German's
-   three Qwen cells pass the lexical gate, the English technical cell passes,
-   and the remaining eleven multilingual Qwen cells are frozen for execution.
+   three Qwen cells pass the lexical gate, the English technical and
+   native-factual cells pass, the English dialogue has a pinned repeat-and-
+   truncate failure, and the remaining nine multilingual Qwen cells are
+   frozen for execution.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

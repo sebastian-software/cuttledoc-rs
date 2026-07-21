@@ -188,7 +188,11 @@ passes with complete critical-fact recovery and 1.92–2.88% WER across the five
 receivers. The dialogue cell holds the accepted warm description
 constant: four receivers stay at or below two word edits, while Parakeet alone
 makes seven. The three German content cells are therefore lexically complete;
-listening review precedes Voxtral calibration.
+the English native-factual cell also passes with one to four word edits and
+complete decade recovery. The English dialogue is a pinned failed control:
+Qwen repeats one question until the 1,200-token limit and omits the last 32
+reference words. Spanish, French, and Portuguese remain next; listening review
+precedes full-matrix promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

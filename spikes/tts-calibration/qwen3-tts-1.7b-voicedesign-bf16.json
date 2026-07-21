@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "multilingual-content-type-expansion-pending",
+    "status": "multilingual-content-type-expansion-in-progress-English-dialogue-failed",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

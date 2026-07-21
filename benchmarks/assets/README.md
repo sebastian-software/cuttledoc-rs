@@ -33,6 +33,12 @@ the full factual passage and its critical facts. The repository-authored
 [`synthetic-de-dialogue`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-dialogue/manifest.json)
 fixture completes the three-cell content control; four receivers make no more
 than two word edits, while Parakeet records seven receiver-specific edits.
+The English
+[`synthetic-en-native`](synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-native/manifest.json)
+fixture is a second positive content control. The English
+[`synthetic-en-dialogue`](synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-dialogue/manifest.json)
+fixture is intentionally retained as a failed control: Qwen repeats one
+question until the token limit and omits the final 32 reference words.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis

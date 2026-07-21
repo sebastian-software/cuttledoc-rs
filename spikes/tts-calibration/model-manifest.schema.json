@@ -224,7 +224,8 @@
             "content-type-expansion-pending-native-and-dialogue",
             "content-type-expansion-pending-dialogue",
             "three-German-content-types-passed-listening-pending",
-            "multilingual-content-type-expansion-pending"
+            "multilingual-content-type-expansion-pending",
+            "multilingual-content-type-expansion-in-progress-English-dialogue-failed"
           ]
         },
         "voice_mode": {

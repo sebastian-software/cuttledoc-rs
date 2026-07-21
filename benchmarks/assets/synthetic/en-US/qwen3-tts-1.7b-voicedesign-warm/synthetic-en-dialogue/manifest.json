@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-en-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-failed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 879,
+    "characters": 843,
+    "sha256": "40161c3a50b3b878aecd39e1465eeaf8871cf5fd72ea0996a1d2e8a03d8dfb0f",
+    "spoken_text_sha256": "40161c3a50b3b878aecd39e1465eeaf8871cf5fd72ea0996a1d2e8a03d8dfb0f",
+    "source_id": "cuttledoc-authored-en-dialogue-1",
+    "passage_id": "synthetic-en-dialogue",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-dialogue.1",
+    "record_sha256": "e4fcaa97bac391399fe17f001dfdbfc0f7fe99b1e2af8b4e1ffe93b695f338e1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-en-warm-dialogue",
+    "voice_instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "en-US",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2304000,
+      "bytes": 9216000,
+      "sha256": "16861551367714425a050ccef68328e040104196f1935248429823bc2d1cec8a"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "dd1ab38c86dc4fece4830d0196f24f1dd3378b6f038f81dd5816f93570634e58"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 860136,
+    "sha256": "698408f58a4c4389ee4b44d54507db31d206f3582d8ab9d7a813d8f6eb4c0037",
+    "duration_ms": 96006.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 71673,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "FFmpeg 8.1.2 libopus 1.6.1",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "failed-shared-repetition-and-truncation",
+    "receiver_count": 5,
+    "reached_max_tokens": true,
+    "configured_max_tokens": 1200,
+    "shared_repeated_phrase": "What happens if someone turns away while speaking?",
+    "reference_words_missing_after_last_correct_sentence": 32,
+    "observed_wer_range": [
+      0.23880597014925373,
+      2.2238805970149254
+    ]
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

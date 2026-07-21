@@ -1,0 +1,371 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-dialogue.1",
+  "captured_at": "2026-07-21T13:53:40.950262Z",
+  "source_revision": "247fbadff67118dacc83648d84745f6a55065385",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-en-warm-dialogue",
+      "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "English",
+      "locale": "en-US",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-en-dialogue",
+    "source_id": "cuttledoc-authored-en-dialogue-1",
+    "locale": "en-US",
+    "character_count": 843,
+    "text_sha256": "40161c3a50b3b878aecd39e1465eeaf8871cf5fd72ea0996a1d2e8a03d8dfb0f",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-en-warm-dialogue",
+      "passage_id": "synthetic-en-dialogue",
+      "locale": "en-US",
+      "language": "English",
+      "voice": null,
+      "instruction": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "partial",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2304000,
+      "byte_count": 9216000,
+      "duration_ms": 96000,
+      "sha256": "16861551367714425a050ccef68328e040104196f1935248429823bc2d1cec8a",
+      "minimum_sample": -0.9043527841567993,
+      "maximum_sample": 0.795743465423584,
+      "rms": 0.06638789712896705,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1422.732625,
+      "first_audio_ms": 47076.786333,
+      "complete_synthesis_ms": 49333.093958,
+      "real_time_factor": 0.5138863953958334,
+      "output_count": 1,
+      "token_count": 1200
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4725391360,
+      "mlx_peak_memory_bytes": 18211567313,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 2304000,
+        "sample_rate_hz": 24000,
+        "token_count": 1200,
+        "processing_time_seconds": 47.07627201080322,
+        "mlx_audio_reported_duration_over_processing": 2.039243888682808,
+        "peak_memory_gb_decimal": 18.211567313,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": true,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1536000,
+        "byte_count": 6144000,
+        "duration_ms": 96000,
+        "sha256": "47eef73d36504b03457655ebbe03006e75fc45eb96a528339610d725003af62b"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T13:54:01.134Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "en",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "What makes a recording easy to understand? Mara asks. A quiet room helps, but consistency matters just as much. Jonas replies. Keep the microphone at a steady distance and speak as naturally as you can. Mara moves her chair a little closer. Does expensive equipment solve most problems? Not by itself. Good placement, a comfortable posture, and a careful sound check usually matter more than an impressive price tag. What happens if someone turns away while speaking? Jonas smiles. The voice becomes softer and the tone changes. That is why a host should sit comfortably, breathe freely, and avoid chasing every sentence. What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away? What happens if someone turns away while speaking? What happens if someone turns away? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away while speaking? What happens if someone turns away? What happens if someone turns away while speaking?",
+            "sha256": "db04d0ec7eb94b95e0d60ffd0a4c00467e3c21fb1f7285405f25e571ddfebc24",
+            "segment_count": 50,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 134,
+            "hypothesis_word_count": 400,
+            "word_edits": 298,
+            "wer": 2.2238805970149254,
+            "reference_character_count": 667,
+            "hypothesis_character_count": 2059,
+            "character_edits": 1413,
+            "cer": 2.1184407796101947
+          },
+          "timing": {
+            "cold_load_ms": 1093.951833,
+            "complete_inference_ms": 4248.660749999999,
+            "real_time_factor": 0.04425688281249999
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1960624128
+          }
+        },
+        {
+          "captured_at": "2026-07-21T13:54:04.152Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "What makes a recording easy to understand? Mara asks. Quiet room helps but consistency matters just as much. Jonas replies. Keep the microphone at a steady distance and speak as naturally as you can. Mara moves her chair a little closer. Does expensive equipment solve most problems? Not by itself. Placement A comfortable posture, and a careful sound check usually matter more than an impressive price tag. What happens if someone turns away while speaking? Jonas smiles. The voice becomes softer and the tone changes. That is why a host should sit comfortably, breathe freely, and avoid chasing every sentence.",
+            "sha256": "2249914a9a79277394a3983bb9d1366f105bcdefc4c612346aa220a5b1e7a5c6",
+            "segment_count": 14,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 134,
+            "hypothesis_word_count": 100,
+            "word_edits": 34,
+            "wer": 0.2537313432835821,
+            "reference_character_count": 667,
+            "hypothesis_character_count": 497,
+            "character_edits": 170,
+            "cer": 0.25487256371814093
+          },
+          "timing": {
+            "cold_load_ms": 250.20495799999998,
+            "complete_inference_ms": 1225.6980000000003,
+            "real_time_factor": 0.012767687500000003
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 163676160
+          }
+        },
+        {
+          "captured_at": "2026-07-21T13:54:05.712Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "en",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "What makes a recording easy to understand? Mara asks. A quiet room helps, but consistency matters just as much. Jonas replies. Keep the microphone at a steady distance and speak as naturally as you can. Mara moves her chair a little closer. Does expensive equipment solve most problems? Not by itself. Good placement, a comfortable posture, and a careful sound check usually matter more than an impressive price tag. What happens if someone turns away while speaking? Jonas smiles. The voice becomes softer and the tone changes. That is why a host should sit comfortably, breathe freely, and avoid chasing every sentence.",
+            "sha256": "7a095c98b3bc77e9368492f9abe929838a35ac4791e82bb2b033d381889bcf8c",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 134,
+            "hypothesis_word_count": 102,
+            "word_edits": 32,
+            "wer": 0.23880597014925373,
+            "reference_character_count": 667,
+            "hypothesis_character_count": 502,
+            "character_edits": 165,
+            "cer": 0.24737631184407796
+          },
+          "timing": {
+            "complete_inference_ms": 1423.264875,
+            "real_time_factor": 0.01482567578125
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2702028060
+          },
+          "generation": {
+            "token_count": 120,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T13:54:39.590Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "What makes a recording easy to understand? Mara asks. A quiet room helps, but consistency matters just as much. Jonas replies. Keep the microphone at a steady distance and speak as naturally as you can. Mara moves her chair a little closer. Does expensive equipment solve most problems? Not by itself. Good placement, a comfortable posture, and a careful sound check usually matter more than an impressive price tag. What happens if someone turns away while speaking? Jonas smiles. The voice becomes softer and the tone changes. That is why a host should sit comfortably, breathe freely, and avoid chasing every sentence.",
+            "sha256": "7a095c98b3bc77e9368492f9abe929838a35ac4791e82bb2b033d381889bcf8c",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 134,
+            "hypothesis_word_count": 102,
+            "word_edits": 32,
+            "wer": 0.23880597014925373,
+            "reference_character_count": 667,
+            "hypothesis_character_count": 502,
+            "character_edits": 165,
+            "cer": 0.24737631184407796
+          },
+          "timing": {
+            "complete_inference_ms": 30464.403166,
+            "real_time_factor": 0.31733753297916667
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5726957124
+          },
+          "generation": {
+            "token_count": 1211,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T13:54:40.887Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "en-US",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "What makes a recording easy to understand? Mara asks. A quiet room helps, but consistency matters just as much, Jonas replies. Keep the microphone at a steady distance and speak as naturally as you can. Mara moves her chair a little closer. Does expensive equipment solve most problems? Not by itself. Good placement, a comfortable posture, and a careful sound check usually matter more than an impressive price tag. What happens if someone turns away while speaking? Jonas smiles. The voice becomes softer and the tone changes. That is why a host should sit comfortably, breathe freely, and avoid chasing every sentence.",
+            "sha256": "b964099633b6004a47193521cc118092dbabe42360c352f9308817a507e16b4d",
+            "segment_count": 102,
+            "update_count": 170,
+            "final_update_count": 12,
+            "volatile_update_count": 158,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 134,
+            "hypothesis_word_count": 102,
+            "word_edits": 32,
+            "wer": 0.23880597014925373,
+            "reference_character_count": 667,
+            "hypothesis_character_count": 502,
+            "character_edits": 165,
+            "cer": 0.24737631184407796
+          },
+          "timing": {
+            "first_result_ms": 37.019083,
+            "complete_inference_ms": 951.342666,
+            "real_time_factor": 0.0099098194375
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "qwen3-asr-0.6b-mlx-direct",
+          "voxtral-realtime-4b-mlx-direct-2400ms",
+          "apple-speechtranscriber"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": false,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "calibration_disposition": "failed-shared-repetition-and-truncation",
+    "shared_repeated_phrase": "What happens if someone turns away while speaking?",
+    "reference_words_missing_after_last_correct_sentence": 32,
+    "next": "Keep this deterministic failure as evidence, inspect whether the dialogue punctuation triggers repetition, and do not pass the English dialogue cell without a predeclared control."
+  }
+}

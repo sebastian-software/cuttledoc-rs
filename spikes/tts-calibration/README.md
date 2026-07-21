@@ -85,6 +85,13 @@ Spanish and Portuguese are regional calibration proxies; their labels do not
 turn a single synthesized voice or source edition into universal dialect
 coverage.
 
+The English native-factual cell passes: four receivers make one word edit,
+Apple makes four, and every receiver recovers the complete passage and both
+decades. The English dialogue does not pass. It repeats one earlier question
+until the fixed 1,200-token limit and omits the final 32 reference words. Both
+the positive and failed outputs are retained as digest-pinned Opus controls;
+the remaining multilingual run must not average this generation failure away.
+
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
 cell.
