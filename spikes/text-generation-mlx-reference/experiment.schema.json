@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/text-generation-experiment.schema.json",
+  "title": "Pinned text-generation reference experiment",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "model_manifest_path",
+    "generation_contract",
+    "result_contract"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_manifest_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generation_contract": {
+      "type": "object"
+    },
+    "result_contract": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

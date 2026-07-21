@@ -38,6 +38,8 @@
   },
   "generation_contract": {
     "prompt_id": "surface-only-v1",
+    "policy_mode": "surface-only",
+    "render_mode": "template",
     "prompt_path": "benchmarks/postprocessing/prompts/surface-only-v1.txt",
     "prompt_sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
     "chat_template": "pinned model tokenizer template with enable_thinking=false",

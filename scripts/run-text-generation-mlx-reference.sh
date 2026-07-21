@@ -5,16 +5,24 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 project="$repo_root/spikes/text-generation-mlx-reference"
 manifest=${CUTTLEDOC_TEXT_GENERATION_MANIFEST:-$project/model-manifest.json}
+experiment=${CUTTLEDOC_TEXT_GENERATION_EXPERIMENT:-}
+
+if [[ -n "$experiment" ]]; then
+  contract_source=$experiment
+else
+  contract_source=$manifest
+fi
 
 IFS=$'\t' read -r manifest_id fixture_relative prompt_relative < <(
   node -e '
     const manifest = require(process.argv[1]);
+    const contract = require(process.argv[2]);
     process.stdout.write([
       manifest.id,
-      manifest.result_contract.fixture_path,
-      manifest.generation_contract.prompt_path,
+      contract.result_contract.fixture_path,
+      contract.generation_contract.prompt_path,
     ].join("\t") + "\n");
-  ' "$manifest"
+  ' "$manifest" "$contract_source"
 )
 if [[ -z "$manifest_id" ]] || [[ -z "$fixture_relative" ]] || [[ -z "$prompt_relative" ]]; then
   echo "Manifest did not provide model id, fixture, and prompt paths: $manifest" >&2
@@ -33,14 +41,21 @@ if [[ ! -d "$model_dir" ]]; then
   exit 1
 fi
 
+runner_arguments=(
+  --manifest "$manifest"
+  --model-dir "$model_dir"
+  --fixture "$fixture"
+  --prompt "$prompt"
+  --output "$output"
+  --source-revision "$source_revision"
+)
+if [[ -n "$experiment" ]]; then
+  runner_arguments+=(--experiment "$experiment")
+fi
+
 uv run \
   --project "$project" \
   --frozen \
   --python /opt/homebrew/bin/python3.12 \
   python "$project/run_reference.py" \
-  --manifest "$manifest" \
-  --model-dir "$model_dir" \
-  --fixture "$fixture" \
-  --prompt "$prompt" \
-  --output "$output" \
-  --source-revision "$source_revision"
+  "${runner_arguments[@]}"

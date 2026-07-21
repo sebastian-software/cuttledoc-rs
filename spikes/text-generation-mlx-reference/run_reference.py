@@ -23,6 +23,7 @@ def parse_args() -> argparse.Namespace:
         description="Run the pinned MLX text-generation reference probe."
     )
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--experiment", type=Path)
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--fixture", type=Path, required=True)
     parser.add_argument("--prompt", type=Path, required=True)
@@ -72,7 +73,7 @@ def word_error_rate(reference: str, hypothesis: str) -> float:
     return previous[-1] / len(reference_words) if reference_words else 0.0
 
 
-def render_prompt(template: str, fixture: dict) -> str:
+def render_prompt(template: str, fixture: dict, contract: dict) -> str:
     replacements = {
         "{{language}}": fixture["language"],
         "{{domain}}": fixture["domain"],
@@ -81,12 +82,18 @@ def render_prompt(template: str, fixture: dict) -> str:
     rendered = template
     for marker, value in replacements.items():
         rendered = rendered.replace(marker, value)
+    if contract["render_mode"] == "append-transcript":
+        if "{{transcript}}" in template:
+            raise ValueError("Append-transcript prompt must not contain a transcript marker")
+        rendered = f"{rendered.rstrip()}\n{fixture['transcript']}"
+    elif contract["render_mode"] != "template":
+        raise ValueError(f"Unsupported prompt render mode: {contract['render_mode']}")
     if "{{" in rendered or "}}" in rendered:
         raise ValueError("Prompt contains an unresolved template marker")
     return rendered
 
 
-def verify_inputs(manifest: dict, model_dir: Path, prompt: Path) -> None:
+def verify_inputs(manifest: dict, contract: dict, model_dir: Path, prompt: Path) -> None:
     snapshot_bytes = 0
     for artifact in manifest["artifacts"]:
         path = model_dir / artifact["path"]
@@ -102,8 +109,92 @@ def verify_inputs(manifest: dict, model_dir: Path, prompt: Path) -> None:
         raise ValueError("Model snapshot byte-count drift")
 
     prompt_digest = sha256_bytes(prompt.read_bytes())
-    if prompt_digest != manifest["generation_contract"]["prompt_sha256"]:
+    if prompt_digest != contract["prompt_sha256"]:
         raise ValueError(f"Prompt SHA-256 drift: {prompt_digest}")
+
+
+def word_diff(source: str, target: str) -> dict:
+    source_words = normalized_words(source)
+    target_words = normalized_words(target)
+    rows = len(source_words) + 1
+    columns = len(target_words) + 1
+    distances = [[0] * columns for _ in range(rows)]
+    for source_index in range(rows):
+        distances[source_index][0] = source_index
+    for target_index in range(columns):
+        distances[0][target_index] = target_index
+    for source_index in range(1, rows):
+        for target_index in range(1, columns):
+            distances[source_index][target_index] = min(
+                distances[source_index - 1][target_index] + 1,
+                distances[source_index][target_index - 1] + 1,
+                distances[source_index - 1][target_index - 1]
+                + (source_words[source_index - 1] != target_words[target_index - 1]),
+            )
+
+    operations = []
+    source_index = len(source_words)
+    target_index = len(target_words)
+    while source_index > 0 or target_index > 0:
+        if (
+            source_index > 0
+            and target_index > 0
+            and source_words[source_index - 1] == target_words[target_index - 1]
+            and distances[source_index][target_index]
+            == distances[source_index - 1][target_index - 1]
+        ):
+            source_index -= 1
+            target_index -= 1
+        elif (
+            source_index > 0
+            and target_index > 0
+            and distances[source_index][target_index]
+            == distances[source_index - 1][target_index - 1] + 1
+        ):
+            operations.append(
+                {
+                    "type": "replace",
+                    "input_index": source_index - 1,
+                    "output_index": target_index - 1,
+                    "input": source_words[source_index - 1],
+                    "output": target_words[target_index - 1],
+                }
+            )
+            source_index -= 1
+            target_index -= 1
+        elif (
+            source_index > 0
+            and distances[source_index][target_index]
+            == distances[source_index - 1][target_index] + 1
+        ):
+            operations.append(
+                {
+                    "type": "delete",
+                    "input_index": source_index - 1,
+                    "output_index": target_index,
+                    "input": source_words[source_index - 1],
+                    "output": None,
+                }
+            )
+            source_index -= 1
+        else:
+            operations.append(
+                {
+                    "type": "insert",
+                    "input_index": source_index,
+                    "output_index": target_index - 1,
+                    "input": None,
+                    "output": target_words[target_index - 1],
+                }
+            )
+            target_index -= 1
+    operations.reverse()
+    return {
+        "input_word_count": len(source_words),
+        "output_word_count": len(target_words),
+        "edit_distance": distances[-1][-1],
+        "operations": operations,
+    }
 
 
 def run_generation(model, tokenizer, prompt: str, contract: dict) -> dict:
@@ -194,12 +285,30 @@ def main() -> None:
         raise ValueError("--source-revision must be a lowercase 40-character Git SHA")
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    experiment = (
+        json.loads(args.experiment.read_text(encoding="utf-8"))
+        if args.experiment is not None
+        else None
+    )
     fixture = json.loads(args.fixture.read_text(encoding="utf-8"))
-    verify_inputs(manifest, args.model_dir, args.prompt)
+    contract = (
+        experiment["generation_contract"]
+        if experiment is not None
+        else manifest["generation_contract"]
+    )
+    result_contract = (
+        experiment["result_contract"]
+        if experiment is not None
+        else manifest["result_contract"]
+    )
+    if (
+        experiment is not None
+        and not args.manifest.as_posix().endswith(experiment["model_manifest_path"])
+    ):
+        raise ValueError("Experiment model path does not match --manifest")
+    verify_inputs(manifest, contract, args.model_dir, args.prompt)
     prompt_template = args.prompt.read_text(encoding="utf-8")
-    rendered_prompt = render_prompt(prompt_template, fixture)
-    contract = manifest["generation_contract"]
-    result_contract = manifest["result_contract"]
+    rendered_prompt = render_prompt(prompt_template, fixture, contract)
 
     if args.fixture.as_posix().endswith(result_contract["fixture_path"]) is False:
         raise ValueError("Fixture path does not match the manifest result contract")
@@ -218,6 +327,10 @@ def main() -> None:
         fixture["transcript"]
     )
     output_nonempty = len(generation["text"]) > 0
+    policy_mode = contract["policy_mode"]
+    mechanical_output_accepted = output_nonempty and (
+        lexical_invariant if policy_mode == "surface-only" else True
+    )
 
     result = {
         "schema_version": "1.0.0",
@@ -257,6 +370,7 @@ def main() -> None:
             "execution_context": "normal host process outside the restricted diagnostic sandbox",
         },
         "procedure": {
+            "experiment_id": experiment["id"] if experiment is not None else None,
             "model_load": "Fresh Python process; OS file and Metal caches were not cleared.",
             "generation": contract,
             "complete_generation_repetitions": 2,
@@ -303,8 +417,11 @@ def main() -> None:
             "gates": {
                 "nonempty": output_nonempty,
                 "case_and_punctuation_insensitive_lexical_invariant": lexical_invariant,
-                "accepted": output_nonempty and lexical_invariant,
+                "accepted": mechanical_output_accepted,
+                "policy_mode": policy_mode,
+                "quality_accepted": False,
             },
+            "lexical_diff": word_diff(fixture["transcript"], generation["text"]),
             "development_quality": {
                 "input_wer": word_error_rate(
                     fixture["evaluation_reference"], fixture["transcript"]
@@ -326,7 +443,10 @@ def main() -> None:
         },
         "conclusion": {
             "reference_runtime_executed": True,
-            "surface_candidate_accepted": output_nonempty and lexical_invariant,
+            "surface_candidate_accepted": (
+                mechanical_output_accepted if policy_mode == "surface-only" else None
+            ),
+            "development_output_contract_accepted": mechanical_output_accepted,
             "model_quality_selected": False,
             "product_runtime_accepted": False,
             "reason": "The runtime path is independent of the output gate. A development fixture can establish execution, mechanical policy behavior, streaming, cancellation, determinism, and cost; it cannot select a correction model or promote the Python reference into the product.",

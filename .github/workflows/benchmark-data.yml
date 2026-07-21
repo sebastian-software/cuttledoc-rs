@@ -20,6 +20,7 @@ on:
       - "scripts/validate-tts-calibration-manifests.mjs"
       - "scripts/validate-text-generation-mlx-reference.mjs"
       - "scripts/validate-text-generation-model-manifests.mjs"
+      - "scripts/validate-text-generation-experiments.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
@@ -44,6 +45,7 @@ on:
       - "scripts/validate-tts-calibration-manifests.mjs"
       - "scripts/validate-text-generation-mlx-reference.mjs"
       - "scripts/validate-text-generation-model-manifests.mjs"
+      - "scripts/validate-text-generation-experiments.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
@@ -65,6 +67,7 @@ jobs:
         run: |
           node scripts/validate-text-generation-mlx-reference.mjs --self-test
           node scripts/validate-text-generation-model-manifests.mjs --self-test
+          node scripts/validate-text-generation-experiments.mjs --self-test
           python -m py_compile spikes/text-generation-mlx-reference/run_reference.py
           bash -n scripts/fetch-text-generation-mlx-model.sh
           bash -n scripts/run-text-generation-mlx-reference.sh

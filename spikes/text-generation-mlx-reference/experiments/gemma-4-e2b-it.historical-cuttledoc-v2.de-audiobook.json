@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "id": "gemma-4-e2b-it.historical-cuttledoc-v2.de-audiobook",
+  "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/gemma-4-e2b-it-4bit-mlx.json",
+  "generation_contract": {
+    "prompt_id": "historical-cuttledoc-v2",
+    "policy_mode": "historical-control",
+    "render_mode": "append-transcript",
+    "prompt_path": "benchmarks/postprocessing/prompts/historical-cuttledoc-v2.txt",
+    "prompt_sha256": "583a49811268e4f770a484a535b39dd9be6b75563153b1b58d7204e9cd8d55a4",
+    "chat_template": "pinned model tokenizer template with enable_thinking=false",
+    "chat_template_options": {
+      "enable_thinking": false
+    },
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 256,
+    "stream": true,
+    "cancellation_probe_after_tokens": 4,
+    "rationale": "The exact Cuttledoc 2 prompt is a broad proofreading control. Its transcript is appended after the frozen template, matching the historical caller contract."
+  },
+  "result_contract": {
+    "run_id": "phase5.gemma-4-e2b-it-4bit-mlx-reference.historical-cuttledoc-v2.issue20-de-audiobook-whisper-1",
+    "purpose": "development-runtime-probe",
+    "fixture_path": "benchmarks/postprocessing/fixtures/issue7-de-audiobook-whisper.json",
+    "result_path": "benchmarks/postprocessing/runs/phase5.gemma-4-e2b-it-4bit-mlx-reference.historical-cuttledoc-v2.issue20-de-audiobook-whisper-1.json",
+    "result_required": false
+  }
+}
