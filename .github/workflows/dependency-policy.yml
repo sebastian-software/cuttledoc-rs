@@ -17,11 +17,11 @@ jobs:
         run: bash scripts/check-dependency-policy.sh
 
       - name: Install cargo-deny
-        if: hashFiles('**/Cargo.lock') != ''
+        if: hashFiles('Cargo.lock') != ''
         run: cargo install cargo-deny --version 0.18.5 --locked
 
       - name: Check advisories, licenses, sources, and duplicate versions
-        if: hashFiles('**/Cargo.lock') != ''
+        if: hashFiles('Cargo.lock') != ''
         run: |
           cargo deny check advisories licenses bans sources
           cargo tree --locked --duplicates
