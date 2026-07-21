@@ -38,3 +38,9 @@ The run records cold model load, first-token latency, throughput, peak process
 and MLX memory, exact output/token identifiers, mechanical gates, and a
 cooperative cancellation probe. It is not a quality benchmark: one
 development-exposed, unverified fixture cannot select a model or prompt.
+
+Validate the pinned manifest, fixture, prompt, and checked-in measurement:
+
+```sh
+node scripts/validate-text-generation-mlx-reference.mjs --self-test
+```

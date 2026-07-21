@@ -18,6 +18,8 @@ on:
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
+      - "scripts/validate-text-generation-mlx-reference.mjs"
+      - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
@@ -39,6 +41,8 @@ on:
       - "scripts/validate-benchmark-data.mjs"
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
+      - "scripts/validate-text-generation-mlx-reference.mjs"
+      - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
@@ -55,6 +59,8 @@ jobs:
         run: node scripts/validate-benchmark-data.mjs --self-test
       - name: Validate pinned TTS calibration models
         run: node scripts/validate-tts-calibration-manifests.mjs --self-test
+      - name: Validate pinned MLX text-generation reference
+        run: node scripts/validate-text-generation-mlx-reference.mjs --self-test
       - name: Check TTS calibration runners
         run: |
           node --check scripts/archive-qwen-tts-calibration.mjs
