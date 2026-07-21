@@ -180,8 +180,10 @@ critical failure is voice/profile-specific. The subsequent
 run passes the English lexical gate with exact normalized character content
 from all five receivers. The native-German `Buchdruck` cell subsequently
 passes with complete critical-fact recovery and 1.92–2.88% WER across the five
-receivers. The remaining dialogue cell holds the accepted warm description
-constant before Voxtral calibration.
+receivers. The dialogue cell holds the accepted warm description
+constant: four receivers stay at or below two word edits, while Parakeet alone
+makes seven. The three German content cells are therefore lexically complete;
+listening review precedes Voxtral calibration.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

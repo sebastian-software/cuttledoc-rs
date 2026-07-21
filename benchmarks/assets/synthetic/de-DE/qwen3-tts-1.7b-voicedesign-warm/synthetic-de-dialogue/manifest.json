@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-de-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 878,
+    "characters": 824,
+    "sha256": "78075a708973498dc751c981eac57cf962396a5e38151eb709954023b49307a2",
+    "spoken_text_sha256": "78075a708973498dc751c981eac57cf962396a5e38151eb709954023b49307a2",
+    "source_id": "cuttledoc-authored-de-dialogue-1",
+    "passage_id": "synthetic-de-dialogue",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-dialogue.1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-de-warm-dialogue",
+    "voice_instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "de-DE",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1365120,
+      "bytes": 5460480,
+      "sha256": "6519ca5543caf434b48e90970eed0c3e97aa32a14efae76c069b124a3bf5608e"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "b88cbfc3869538d36fdae62b4e507d0aa1365f60459658490cf4a1ad348946b1"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 486076,
+    "sha256": "6faa7a999f9ef4dcd35da826377e711378d5bedf3eee28bc46b43d5da793b0b3",
+    "duration_ms": 56886.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 68357,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "FFmpeg 8.1.2 libopus 1.6.1",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-dialogue-content-gate",
+    "receiver_count": 5,
+    "receiver_count_at_or_below_two_word_edits": 4,
+    "parakeet_receiver_specific_errors": true,
+    "observed_wer_range": [
+      0.008130081300813009,
+      0.056910569105691054
+    ]
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

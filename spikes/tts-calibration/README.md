@@ -72,9 +72,11 @@ The bounded German/English lexical calibration therefore accepts the warm
 profiles. Two additional German profiles keep the same warm description while
 changing the passage to native-factual prose and dialogue. The native-factual
 cell passes all five receivers with complete critical-fact recovery and
-1.92–2.88% WER; dialogue remains next. These cells run before Voxtral so
-embedded English terms cannot dominate the German comparison. Listening
-remains the final Qwen gate before full-matrix promotion.
+1.92–2.88% WER. In the dialogue cell, four receivers make at most two edits;
+Parakeet alone makes seven. The three content cells therefore pass the Qwen
+lexical gate without letting embedded English terms dominate the comparison.
+Listening remains the final Qwen gate before Voxtral and full-matrix
+promotion.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration

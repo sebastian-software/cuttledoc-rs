@@ -29,7 +29,10 @@ fixture provides the cross-language positive control with exact normalized
 character content from all five receivers. The native-German
 [`synthetic-de-native`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-native/manifest.json)
 fixture provides the first content-type control: all five receivers recover
-the full factual passage and its critical facts.
+the full factual passage and its critical facts. The repository-authored
+[`synthetic-de-dialogue`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-dialogue/manifest.json)
+fixture completes the three-cell content control; four receivers make no more
+than two word edits, while Parakeet records seven receiver-specific edits.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis

@@ -1,0 +1,379 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-dialogue.1",
+  "captured_at": "2026-07-21T12:56:07.162176Z",
+  "source_revision": "8a1561681999eda4d51b9de126b2ec41393a7dac",
+  "selection_revision": "synthetic-roundtrip-passages-2",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-de-warm-dialogue",
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "German",
+      "locale": "de-DE",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-dialogue",
+    "source_id": "cuttledoc-authored-de-dialogue-1",
+    "locale": "de-DE",
+    "character_count": 824,
+    "text_sha256": "78075a708973498dc751c981eac57cf962396a5e38151eb709954023b49307a2",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-de-warm-dialogue",
+      "passage_id": "synthetic-de-dialogue",
+      "locale": "de-DE",
+      "language": "German",
+      "voice": null,
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1365120,
+      "byte_count": 5460480,
+      "duration_ms": 56880,
+      "sha256": "6519ca5543caf434b48e90970eed0c3e97aa32a14efae76c069b124a3bf5608e",
+      "minimum_sample": -0.46574369072914124,
+      "maximum_sample": 0.7561948895454407,
+      "rms": 0.09095978461687115,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1671.001166,
+      "first_audio_ms": 25483.2715,
+      "complete_synthesis_ms": 26001.622792,
+      "real_time_factor": 0.4571312023909986,
+      "output_count": 1,
+      "token_count": 711
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4713971712,
+      "mlx_peak_memory_bytes": 13281936425,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1365120,
+        "sample_rate_hz": 24000,
+        "token_count": 711,
+        "processing_time_seconds": 25.482683897018433,
+        "mlx_audio_reported_duration_over_processing": 2.232103974207174,
+        "peak_memory_gb_decimal": 13.281936425,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 910080,
+        "byte_count": 3640320,
+        "duration_ms": 56880,
+        "sha256": "122eba76f3c700796cda06810d14e0921a93abeb6b6844e8c2b9c19c5cd33c82"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T12:56:41.082Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "de",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Was macht eine Aufnahme eigentlich leicht verständlich? fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Nein, der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders. Und wenn jemand beim Sprechen den Kopf bewegt? Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen. Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.",
+            "sha256": "12235e1edd638456ee057835bb3bc214d02c271a504441f6989598b2f67db8c7",
+            "segment_count": 20,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 123,
+            "hypothesis_word_count": 123,
+            "word_edits": 1,
+            "wer": 0.008130081300813009,
+            "reference_character_count": 655,
+            "hypothesis_character_count": 649,
+            "character_edits": 8,
+            "cer": 0.012213740458015267
+          },
+          "timing": {
+            "cold_load_ms": 1098.420333,
+            "complete_inference_ms": 1845.1360420000005,
+            "real_time_factor": 0.03243910059774966
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1953136640
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:56:44.932Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Was macht eine Aufnahme eigentlich leicht verständlich? Bagmara Vor allem Ruhe. Antwortet Jonas. Nicht völlige Stille. sondern eine ruhige Umgebung. in der die Stimme klar im Mittelpunkt steht. Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Nine. Der Abstand ist genauso wichtig. Etwa 15 cm sind ein brauchbarer Anfang. Aber jede Stimme klingt anders. Und wenn jemand beim Sprechen den Kopf bewegt? Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen. Frei atmen und nicht jedes Wort erzwingen. Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Gute Technik fällt kaum auf.  Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.",
+            "sha256": "39db0f8da7fd960831952f98a800d80b023eed8abde85c872efb1006d3447f45",
+            "segment_count": 24,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 123,
+            "hypothesis_word_count": 120,
+            "word_edits": 7,
+            "wer": 0.056910569105691054,
+            "reference_character_count": 655,
+            "hypothesis_character_count": 630,
+            "character_edits": 31,
+            "cer": 0.04732824427480916
+          },
+          "timing": {
+            "cold_load_ms": 255.56462499999998,
+            "complete_inference_ms": 1649.8312499999997,
+            "real_time_factor": 0.0290054720464135
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 160382976
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:56:46.997Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "de",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Was macht eine Aufnahme eigentlich leicht verständlich? fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Nein, der Abstand ist genauso wichtig. Etwa fünfzehn Zentimeter sind ein brauchbares Anfang, aber jede Stimme klingt anders. Und wenn jemand beim Sprechen den Kopf bewegt? Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen. Mara macht eine kurze Pause. Das klingt weniger technisch als ich erwartet hatte. Gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.",
+            "sha256": "2f3a515c67d405218e7088853495542911f1e8abfea1ee65b1c172b5f8e2cd5b",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 123,
+            "hypothesis_word_count": 123,
+            "word_edits": 1,
+            "wer": 0.008130081300813009,
+            "reference_character_count": 655,
+            "hypothesis_character_count": 655,
+            "character_edits": 1,
+            "cer": 0.0015267175572519084
+          },
+          "timing": {
+            "complete_inference_ms": 1918.138958,
+            "real_time_factor": 0.03372255552039381
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2712360220
+          },
+          "generation": {
+            "token_count": 228,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:57:03.144Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Was macht eine Aufnahme eigentlich leicht verständlich? Fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Nein, der Abstand ist genauso wichtig. Etwa 15 cm sind ein brauchbarer Anfang, aber jede Stimme klingt anders. Und wenn jemand beim Sprechen den Kopf bewegt? Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen. Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.",
+            "sha256": "bf2e4df8074c40fffc99c845fea624b9348bdc9dad64f393ea2a876c2f048132",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 123,
+            "hypothesis_word_count": 123,
+            "word_edits": 2,
+            "wer": 0.016260162601626018,
+            "reference_character_count": 655,
+            "hypothesis_character_count": 641,
+            "character_edits": 17,
+            "cer": 0.025954198473282442
+          },
+          "timing": {
+            "complete_inference_ms": 14409.945666,
+            "real_time_factor": 0.253339410443038
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5323166900
+          },
+          "generation": {
+            "token_count": 722,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:57:05.139Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "de-DE",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Was macht eine Aufnahme eigentlich leicht verständlich? fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Nein, der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders. Und wenn jemand beim Sprechen den Kopf bewegt? Jonas lacht Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen. Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.",
+            "sha256": "71ea803e7c86aed9bf87cc2874231b1773a659a60fe7d3757130644480414b78",
+            "segment_count": 123,
+            "update_count": 199,
+            "final_update_count": 4,
+            "volatile_update_count": 195,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 123,
+            "hypothesis_word_count": 123,
+            "word_edits": 1,
+            "wer": 0.008130081300813009,
+            "reference_character_count": 655,
+            "hypothesis_character_count": 649,
+            "character_edits": 8,
+            "cer": 0.012213740458015267
+          },
+          "timing": {
+            "first_result_ms": 78.015583,
+            "complete_inference_ms": 575.852375,
+            "real_time_factor": 0.010123986902250352
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp",
+          "qwen3-asr-0.6b-mlx-direct",
+          "apple-speechtranscriber"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ],
+        "critical_findings": {
+          "shared_content_omission": false,
+          "shared_truncation": false,
+          "dialogue_content_recovered_by_four_backends": true,
+          "parakeet_receiver_specific_errors": true,
+          "probable_tts_content_error": false
+        }
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "calibration_disposition": "passed-dialogue-content-gate",
+    "content_type": "de-dialogue",
+    "three_content_cells_complete": true,
+    "listening_required": true,
+    "next": "Perform listening review for the three accepted warm Qwen content cells, then begin the pinned Voxtral calibration."
+  }
+}

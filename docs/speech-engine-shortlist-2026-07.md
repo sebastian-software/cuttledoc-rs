@@ -76,12 +76,13 @@ NVIDIA offline family at lower model size.
    measured. Retain the warm profiles: every receiver recovers German `1962`,
    and all five reproduce the exact normalized English character content.
    Reject the clear German profile.
-3. **In progress:** the German text selection now separates code-switch,
-   native-factual, and dialogue cells. The native-factual Qwen cell passes with
-   complete critical-fact recovery from all five receivers and 1.92–2.88% WER.
-   Run the dialogue with the same warm voice description before starting
-   Voxtral. Qwen listening, Qwen3-ASR 1.7B, and Nemotron remain open for the
-   bounded calibration set.
+3. **Complete for Qwen lexical content:** the German selection separates
+   code-switch, native-factual, and dialogue cells. Native factual prose passes
+   with complete critical-fact recovery and 1.92–2.88% WER. Four dialogue
+   receivers stay at or below two edits; Parakeet alone rises to seven edits,
+   so the shared evidence does not indicate a Qwen content failure. Perform
+   Qwen listening review, then start Voxtral. Qwen3-ASR 1.7B and Nemotron
+   remain open for the bounded qualification set.
 4. Reject a generator with repeated omissions, insertions, truncation,
    non-finite audio, unstable completion, or unjustified operational cost.
 5. Freeze the surviving three-engine, six-voice-per-locale matrix and expand it

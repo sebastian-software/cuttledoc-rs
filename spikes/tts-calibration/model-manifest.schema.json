@@ -222,7 +222,8 @@
             "two-german-profiles-measured-warm-passed-clear-failed",
             "german-and-english-warm-profiles-passed-lexical-gate",
             "content-type-expansion-pending-native-and-dialogue",
-            "content-type-expansion-pending-dialogue"
+            "content-type-expansion-pending-dialogue",
+            "three-German-content-types-passed-listening-pending"
           ]
         },
         "voice_mode": {

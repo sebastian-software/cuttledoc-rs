@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** three German content cells are pinned; native-factual Qwen passes,
-while dialogue and the multi-voice matrix remain to be run
+**Status:** all three German Qwen content cells pass the lexical gate;
+listening review and the multi-voice matrix remain to be run
 
 ## Purpose
 
@@ -313,7 +313,7 @@ zero normalized character edits. Each reports the same 3/117 word edits
 [`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
 preserves this positive control.
 
-The next bounded Qwen step keeps that accepted warm voice description fixed
+The bounded Qwen content step keeps that accepted warm voice description fixed
 and changes only the German content cell: first `synthetic-de-native`, then
 `synthetic-de-dialogue`. This directly tests whether the earlier German spread
 comes from English code-switching or from the synthesis/recognition path more
@@ -327,6 +327,15 @@ character edits. The remaining differences are orthography, compound
 boundaries, and one receiver-specific dropped preposition rather than a shared
 content failure. This cell passes the lexical content gate; listening review
 remains open.
+
+The `synthetic-de-dialogue` run generated 56.88 seconds of finite audio and
+stopped normally at 711 tokens. Whisper, direct Qwen3-ASR, and Apple each make
+one word edit (0.81% WER); direct Voxtral makes two (1.63%). Parakeet is the
+outlier at seven edits (5.69%), including “Bagmara”, “Nine”, and an omitted
+speaker attribution. The other four receivers recover those locations, so the
+evidence identifies a receiver-specific Parakeet weakness rather than a shared
+Qwen content error. The dialogue cell passes the lexical content gate; one
+voice reads the full exchange, and listening review remains open.
 
 The bounded German/English lexical calibration therefore accepts the warm
 Qwen profiles and rejects the clear German profile. Listening is the remaining

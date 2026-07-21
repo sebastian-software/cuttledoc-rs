@@ -64,6 +64,14 @@ const qwenNativeCalibrationRun = JSON.parse(await readFile(
   ),
   'utf8',
 ));
+const qwenDialogueCalibrationRun = JSON.parse(await readFile(
+  join(
+    repoRoot,
+    'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-de-warm-dialogue.1/result.json',
+  ),
+  'utf8',
+));
 const calibrationAssetDirectory = join(
   repoRoot,
   'benchmarks/assets/synthetic/de-DE/qwen3-tts-1.7b-voicedesign-clear/' +
@@ -124,6 +132,21 @@ const [qwenNativeCalibrationAudio, qwenNativeCalibrationReference,
   readFile(join(nativeCalibrationAssetDirectory, 'reference.txt')),
   readFile(join(nativeCalibrationAssetDirectory, 'ATTRIBUTION.md'), 'utf8'),
 ]);
+const dialogueCalibrationAssetDirectory = join(
+  repoRoot,
+  'benchmarks/assets/synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/' +
+    'synthetic-de-dialogue',
+);
+const qwenDialogueCalibrationAsset = JSON.parse(await readFile(
+  join(dialogueCalibrationAssetDirectory, 'manifest.json'),
+  'utf8',
+));
+const [qwenDialogueCalibrationAudio, qwenDialogueCalibrationReference,
+  qwenDialogueCalibrationAttribution] = await Promise.all([
+  readFile(join(dialogueCalibrationAssetDirectory, 'audio.opus')),
+  readFile(join(dialogueCalibrationAssetDirectory, 'reference.txt')),
+  readFile(join(dialogueCalibrationAssetDirectory, 'ATTRIBUTION.md'), 'utf8'),
+]);
 
 const failures = validate(manifests, plan);
 failures.push(...validateQwenCalibrationRun(
@@ -173,6 +196,18 @@ failures.push(...validateQwenNativeCalibrationAsset(
   qwenNativeCalibrationReference,
   qwenNativeCalibrationAttribution,
   qwenNativeCalibrationRun,
+));
+failures.push(...validateQwenDialogueCalibrationRun(
+  qwenDialogueCalibrationRun,
+  manifests[0].data,
+  selection,
+));
+failures.push(...validateQwenDialogueCalibrationAsset(
+  qwenDialogueCalibrationAsset,
+  qwenDialogueCalibrationAudio,
+  qwenDialogueCalibrationReference,
+  qwenDialogueCalibrationAttribution,
+  qwenDialogueCalibrationRun,
 ));
 if (values['self-test']) {
   const changed = structuredClone(manifests);
@@ -260,6 +295,26 @@ if (values['self-test']) {
   ).length === 0) {
     failures.push('self-test failed to reject changed native-German asset bytes');
   }
+  const changedDialogueRun = structuredClone(qwenDialogueCalibrationRun);
+  changedDialogueRun.result.asr_content_checks.backends[0].quality.word_edits += 1;
+  if (validateQwenDialogueCalibrationRun(
+    changedDialogueRun,
+    manifests[0].data,
+    selection,
+  ).length === 0) {
+    failures.push('self-test failed to reject changed German-dialogue evidence');
+  }
+  const changedDialogueAsset = structuredClone(qwenDialogueCalibrationAsset);
+  changedDialogueAsset.archive.bytes += 1;
+  if (validateQwenDialogueCalibrationAsset(
+    changedDialogueAsset,
+    qwenDialogueCalibrationAudio,
+    qwenDialogueCalibrationReference,
+    qwenDialogueCalibrationAttribution,
+    qwenDialogueCalibrationRun,
+  ).length === 0) {
+    failures.push('self-test failed to reject changed German-dialogue asset bytes');
+  }
 }
 if (failures.length > 0) {
   for (const failure of failures) process.stderr.write(`- ${failure}\n`);
@@ -268,7 +323,7 @@ if (failures.length > 0) {
 process.stdout.write(
   `Validated ${manifests.length} TTS calibration manifests: ` +
     `${manifests.reduce((sum, item) => sum + item.data.artifact.snapshot_bytes, 0)} ` +
-    'total snapshot bytes, 4 measured calibration profiles, and 4 Opus assets\n',
+    'total snapshot bytes, 5 measured calibration profiles, and 5 Opus assets\n',
 );
 
 function validate(items, acceptedPlan) {
@@ -285,7 +340,7 @@ function validate(items, acceptedPlan) {
       snapshotBytes: 4520194992,
       artifactCount: 14,
       role: 'required-generator',
-      status: 'content-type-expansion-pending-dialogue',
+      status: 'three-German-content-types-passed-listening-pending',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -295,7 +350,7 @@ function validate(items, acceptedPlan) {
         'qwen-en-clear-documentary',
         'qwen-en-warm-podcast',
       ],
-      planStatus: 'calibration-native-passed-dialogue-pending',
+      planStatus: 'calibration-three-German-content-types-passed-listening-pending',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',
@@ -1326,6 +1381,219 @@ function validateQwenNativeCalibrationAsset(
       asset.calibration_finding?.critical_facts_recovered_by_all_backends !== true ||
       !attribution.includes('CC BY-SA 4.0') ||
       !attribution.includes('native-German factual')) {
+    errors.push(`${prefix}archive, finding, or attribution caveat differs`);
+  }
+  return errors;
+}
+
+function validateQwenDialogueCalibrationRun(run, manifest, acceptedSelection) {
+  const errors = [];
+  const prefix = 'Qwen VoiceDesign German-dialogue result: ';
+  const profile = manifest.calibration.profiles.find(
+    (item) => item.id === 'qwen-de-warm-dialogue',
+  );
+  const passage = acceptedSelection.sources
+    .flatMap((source) => source.passages.map((item) => ({ source, item })))
+    .find(({ item }) => item.id === profile.passage_id);
+  if (run.schema_version !== '1.0.0' ||
+      run.run_id !==
+        'phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-dialogue.1' ||
+      run.source_revision !== '8a1561681999eda4d51b9de126b2ec41393a7dac' ||
+      run.selection_revision !== acceptedSelection.revision ||
+      run.purpose !== 'calibration') {
+    errors.push(`${prefix}identity or revisions differ`);
+  }
+  if (run.candidate?.id !== 'qwen3-tts-1.7b-voicedesign-mlx-audio' ||
+      run.candidate?.model?.revision !== manifest.artifact.revision ||
+      run.candidate?.model?.snapshot_bytes !== manifest.artifact.snapshot_bytes ||
+      run.candidate?.runtime?.revision !== manifest.reference_runtime.revision ||
+      run.candidate?.runtime?.version !== manifest.reference_runtime.version ||
+      run.candidate?.voice?.profile_id !== profile.id ||
+      run.candidate?.voice?.instruction !== profile.instruction ||
+      run.candidate?.voice?.locale !== profile.locale ||
+      run.candidate?.voice?.seed !== profile.seed) {
+    errors.push(`${prefix}candidate, runtime, or voice profile differs`);
+  }
+  if (!passage ||
+      run.input?.passage_id !== passage.item.id ||
+      run.input?.source_id !== passage.source.id ||
+      run.input?.locale !== passage.source.locale ||
+      run.input?.character_count !== passage.item.character_count ||
+      run.input?.text_sha256 !== passage.item.spoken_sha256 ||
+      run.input?.license !== passage.source.license) {
+    errors.push(`${prefix}input differs from the pinned passage`);
+  }
+  const expectedGeneration = {
+    profile_id: profile.id,
+    passage_id: profile.passage_id,
+    locale: profile.locale,
+    language: profile.language,
+    voice: profile.voice,
+    instruction: profile.instruction,
+    seed: profile.seed,
+    ...manifest.calibration.generation,
+    sample_rate_hz: manifest.calibration.sample_rate_hz,
+  };
+  if (JSON.stringify(run.procedure?.generation) !==
+        JSON.stringify(expectedGeneration) ||
+      run.procedure?.stream !== false ||
+      !run.procedure?.model_verification?.includes('SHA-256')) {
+    errors.push(`${prefix}execution contract differs`);
+  }
+
+  const audio = run.result?.audio;
+  if (run.result?.status !== 'measured' ||
+      audio?.sample_format !== 'f32le' ||
+      audio?.sample_rate_hz !== 24_000 ||
+      audio?.channel_count !== 1 ||
+      audio?.sample_count !== 1_365_120 ||
+      audio?.byte_count !== 5_460_480 ||
+      audio?.duration_ms !== 56_880 ||
+      audio?.sha256 !==
+        '6519ca5543caf434b48e90970eed0c3e97aa32a14efae76c069b124a3bf5608e' ||
+      audio?.non_finite_sample_count !== 0 ||
+      !(audio?.rms > 0 && audio.rms < 1) ||
+      run.result?.timing?.token_count !== 711 ||
+      !(run.result?.timing?.complete_synthesis_ms > 0) ||
+      run.result?.termination?.reached_max_tokens !== false ||
+      run.result?.termination?.configured_max_tokens !== 1_200 ||
+      run.result?.resources?.model_snapshot_bytes !==
+        manifest.artifact.snapshot_bytes) {
+    errors.push(`${prefix}audio, timing, resources, or termination differ`);
+  }
+
+  const checks = run.result?.asr_content_checks;
+  if (checks?.status !== 'complete' ||
+      checks?.normalized_audio?.sample_format !== 'f32le' ||
+      checks?.normalized_audio?.sample_rate_hz !== 16_000 ||
+      checks?.normalized_audio?.sample_count !== 910_080 ||
+      checks?.normalized_audio?.byte_count !== 3_640_320 ||
+      checks?.normalized_audio?.duration_ms !== audio?.duration_ms ||
+      checks?.normalized_audio?.sha256 !==
+        '122eba76f3c700796cda06810d14e0921a93abeb6b6844e8c2b9c19c5cd33c82') {
+    errors.push(`${prefix}normalized PCM evidence differs`);
+  }
+  const expectedBackends = new Map([
+    ['whisper-large-v3-turbo-coreml-whispercpp', [
+      '12235e1edd638456ee057835bb3bc214d02c271a504441f6989598b2f67db8c7',
+      1, 123, 8, 649,
+    ]],
+    ['parakeet-tdt-0.6b-v3-coreml', [
+      '39db0f8da7fd960831952f98a800d80b023eed8abde85c872efb1006d3447f45',
+      7, 120, 31, 630,
+    ]],
+    ['qwen3-asr-0.6b-mlx-direct', [
+      '2f3a515c67d405218e7088853495542911f1e8abfea1ee65b1c172b5f8e2cd5b',
+      1, 123, 1, 655,
+    ]],
+    ['voxtral-realtime-4b-mlx-direct-2400ms', [
+      'bf2e4df8074c40fffc99c845fea624b9348bdc9dad64f393ea2a876c2f048132',
+      2, 123, 17, 641,
+    ]],
+    ['apple-speechtranscriber', [
+      '71ea803e7c86aed9bf87cc2874231b1773a659a60fe7d3757130644480414b78',
+      1, 123, 8, 649,
+    ]],
+  ]);
+  const measuredBackends = checks?.backends ?? [];
+  if (measuredBackends.length !== expectedBackends.size ||
+      new Set(measuredBackends.map((item) => item.backend?.id)).size !==
+        measuredBackends.length) {
+    errors.push(`${prefix}must contain five unique ASR backends`);
+  }
+  for (const check of measuredBackends) {
+    const expected = expectedBackends.get(check.backend?.id);
+    const quality = check.quality;
+    const digest = createHash('sha256')
+      .update(check.transcript?.text ?? '')
+      .digest('hex');
+    if (!expected ||
+        check.transcript?.sha256 !== digest ||
+        check.transcript?.sha256 !== expected[0] ||
+        quality?.reference_word_count !== 123 ||
+        quality?.word_edits !== expected[1] ||
+        quality?.hypothesis_word_count !== expected[2] ||
+        Math.abs(quality?.wer - quality?.word_edits / 123) > 1e-15 ||
+        quality?.reference_character_count !== 655 ||
+        quality?.character_edits !== expected[3] ||
+        quality?.hypothesis_character_count !== expected[4] ||
+        Math.abs(quality?.cer - quality?.character_edits / 655) > 1e-15 ||
+        !(check.timing?.complete_inference_ms > 0) ||
+        Math.abs(check.timing.real_time_factor -
+          check.timing.complete_inference_ms / audio.duration_ms) > 1e-12) {
+      errors.push(`${prefix}${check.backend?.id}: transcript or metrics differ`);
+    }
+  }
+  if (checks?.comparison?.completed_backend_count !== 5 ||
+      checks?.comparison?.expected_backend_count !== 5 ||
+      checks?.comparison?.critical_findings?.shared_content_omission !== false ||
+      checks?.comparison?.critical_findings?.shared_truncation !== false ||
+      checks?.comparison?.critical_findings
+        ?.dialogue_content_recovered_by_four_backends !== true ||
+      checks?.comparison?.critical_findings
+        ?.parakeet_receiver_specific_errors !== true ||
+      checks?.comparison?.critical_findings?.probable_tts_content_error !== false ||
+      run.conclusion?.calibration_disposition !==
+        'passed-dialogue-content-gate' ||
+      run.conclusion?.content_type !== 'de-dialogue' ||
+      run.conclusion?.three_content_cells_complete !== true ||
+      run.conclusion?.listening_required !== true) {
+    errors.push(`${prefix}critical finding or disposition differs`);
+  }
+  return errors;
+}
+
+function validateQwenDialogueCalibrationAsset(
+  asset,
+  audio,
+  reference,
+  attribution,
+  run,
+) {
+  const errors = [];
+  const prefix = 'Qwen VoiceDesign German-dialogue asset: ';
+  const audioDigest = createHash('sha256').update(audio).digest('hex');
+  const referenceDigest = createHash('sha256').update(reference).digest('hex');
+  if (asset.schema_version !== '1.0.0' ||
+      asset.asset_id !==
+        'synthetic-de-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1' ||
+      asset.purpose !== 'reproducible-passed-content-type-calibration' ||
+      asset.license !== 'CC-BY-SA-4.0' ||
+      asset.reference?.bytes !== reference.length ||
+      asset.reference?.characters !== run.input.character_count ||
+      asset.reference?.sha256 !== referenceDigest ||
+      asset.reference?.spoken_text_sha256 !== run.input.text_sha256 ||
+      asset.reference?.source_id !== run.input.source_id ||
+      asset.reference?.passage_id !== run.input.passage_id) {
+    errors.push(`${prefix}identity, license, or reference differs`);
+  }
+  if (asset.generation?.run_id !== run.run_id ||
+      asset.generation?.model_revision !== run.candidate.model.revision ||
+      asset.generation?.voice_profile !== run.candidate.voice.profile_id ||
+      asset.generation?.voice_instruction !== run.candidate.voice.instruction ||
+      asset.generation?.seed !== run.candidate.voice.seed ||
+      asset.generation?.lossless_f32le?.sample_count !==
+        run.result.audio.sample_count ||
+      asset.generation?.lossless_f32le?.bytes !== run.result.audio.byte_count ||
+      asset.generation?.lossless_f32le?.sha256 !== run.result.audio.sha256) {
+    errors.push(`${prefix}generation provenance differs from the run`);
+  }
+  if (asset.archive?.path !== 'audio.opus' ||
+      asset.archive?.codec !== 'Opus' ||
+      asset.archive?.bytes !== audio.length ||
+      asset.archive?.sha256 !== audioDigest ||
+      asset.archive?.target_bit_rate_bps !== 64_000 ||
+      asset.archive?.variable_bit_rate !== true ||
+      asset.archive?.application !== 'audio' ||
+      asset.archive?.frame_duration_ms !== 20 ||
+      asset.archive?.deterministic_repeat_sha256_match !== true ||
+      asset.calibration_finding?.disposition !==
+        run.conclusion.calibration_disposition ||
+      asset.calibration_finding?.receiver_count !== 5 ||
+      asset.calibration_finding?.receiver_count_at_or_below_two_word_edits !== 4 ||
+      asset.calibration_finding?.parakeet_receiver_specific_errors !== true ||
+      !attribution.includes('CC BY-SA 4.0') ||
+      !attribution.includes('dialogue lexical gate')) {
     errors.push(`${prefix}archive, finding, or attribution caveat differs`);
   }
   return errors;
