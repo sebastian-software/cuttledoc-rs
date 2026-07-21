@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-de-origin.qwen3-tts-1.7b-voicedesign-clear.opus-64k-1",
+  "purpose": "reproducible-critical-token-calibration-failure",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 829,
+    "characters": 811,
+    "sha256": "6a4dadcdf7ba6d98ec697006166c89d0f903e04341fd39aaa762072af452e344",
+    "spoken_text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "passage_id": "synthetic-de-origin",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-de-clear-documentary",
+    "voice_instruction": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady documentary narration.",
+    "seed": 0,
+    "locale": "de-DE",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1253760,
+      "bytes": 5015040,
+      "sha256": "af4e290315377c15f0235f75e07276fa9019f74ebb66b2d08e691944d7a1b19b"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "8e289ef36193a2cd1861b2ee5ceef02bac637e72a87f0c7c0316cc523c13166d"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 492294,
+    "sha256": "0d1d25d7550e61d7a71f572a6b2ee706500e08111c5d5a16c81529957743c20e",
+    "duration_ms": 52246.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 75380,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "FFmpeg 8.1.2 libopus 1.6.1",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "failed-critical-token-pronunciation",
+    "token": "1962",
+    "receiver_count": 5,
+    "receiver_recovery_count": 0
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

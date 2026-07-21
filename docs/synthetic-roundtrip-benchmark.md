@@ -238,6 +238,38 @@ quality score. All five ASR cells are complete on identical PCM. A blinded
 listening review remains necessary to evaluate pronunciation and prosody and
 to assign any audible residual errors.
 
+## Qwen3-TTS 1.7B VoiceDesign calibration
+
+The first current-model calibration is
+[`qwen-de-clear-documentary`](../benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1/result.json).
+Its separately licensed
+[`64 kbit/s Opus fixture`](../benchmarks/assets/synthetic/de-DE/qwen3-tts-1.7b-voicedesign-clear/synthetic-de-origin/manifest.json)
+is retained so the critical-token failure can be replayed without regenerating
+the 4.52 GB model; lossless f32 remains local and digest-pinned.
+The pinned 1.7B BF16 snapshot generated 52.24 seconds of mono 24 kHz f32 PCM.
+Loading took 1.785 seconds and synthesis took 22.844 seconds (RTF 0.437), with
+12.63 GB MLX peak allocation. Generation stopped normally at 653 of 1,200
+tokens; the output is finite and contains the complete passage.
+
+All five receivers transcribed the identical normalized f32 master:
+
+| Backend | German WER | German CER | Diagnostic observation |
+| --- | ---: | ---: | --- |
+| Parakeet TDT 0.6B v3 | 3.88% | 1.30% | best aggregate score, but renders `1962` as `106 und 66` |
+| Whisper large-v3-turbo | 4.85% | 4.48% | renders the year as nonsensical words around `1966` |
+| Direct Voxtral Realtime 4B/MLX | 4.85% | 1.16% | renders the year as `101,600` |
+| Direct Qwen3-ASR 0.6B/MLX | 6.80% | 3.90% | renders the year as `1966` plus nonsensical material |
+| Apple Speech | 6.80% | 2.31% | omits the year and adds several proper-name errors |
+
+The receivers otherwise recover the full text and broadly agree on names and
+technical content. Their independent, incompatible failures at the same
+`1962` position localize a probable synthesis pronunciation error. The clear
+profile therefore fails the critical-token gate provisionally. The shorter
+duration is faster delivery, not truncation. Run the warm German profile next
+to determine whether this is profile-specific before accepting or rejecting
+Qwen VoiceDesign for the full matrix. Listening remains required for the exact
+audible realization and prosody.
+
 ## Voxtral TTS MLX reference result
 
 The native-German Voxtral result is
@@ -307,6 +339,10 @@ artifact also remains reference-only under CC BY-NC 4.0.
    required ASR receivers and the two bounded ASR qualifiers. Freeze only the
    candidates that pass fidelity, stability, listening, and operational-cost
    gates.
+   **In progress:** all three model/runtime snapshots are pinned. The first
+   Qwen clear-documentary German profile completed all five required ASR
+   receivers but provisionally failed the `1962` critical-token gate. The
+   second German Qwen profile is the next bounded discriminator.
 6. Compare quality, latency, memory, model delivery, and maintenance cost;
    prototype the narrow direct official-MLX boundary for the leading open
    model.

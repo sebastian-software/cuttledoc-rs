@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "pinned-pending-execution",
+    "status": "first-profile-measured-critical-token-failure",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

@@ -217,7 +217,8 @@
         "status": {
           "enum": [
             "pinned-pending-execution",
-            "pinned-capability-limited-pending-execution"
+            "pinned-capability-limited-pending-execution",
+            "first-profile-measured-critical-token-failure"
           ]
         },
         "voice_mode": {

@@ -165,6 +165,13 @@ process-context control. The raw CC BY-SA-derived audio remains local.
 The reviewed compact Qwen codec-control copy is committed separately under
 `benchmarks/assets`; it is not a replacement for the lossless TTS artifact.
 
+The first current Qwen VoiceDesign calibration is
+[`qwen-de-clear-documentary`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-de-clear-documentary.1/result.json).
+It records the pinned model/profile, f32 synthesis metrics, and five ASR
+receivers on one normalized PCM digest. The complete passage is present, but
+all five receivers fail independently at the spoken year `1962`; the warm
+German profile is required before a model-family decision.
+
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
 download or import. The exact deny-by-default workflow and the requirements for
