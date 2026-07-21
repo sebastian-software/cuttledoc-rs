@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "id": "issue20-de-audiobook-whisper-conservative",
+  "purpose": "development-prompt-probe",
+  "language": "German",
+  "locale": "de-DE",
+  "domain": "professionally narrated audiobook",
+  "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+  "source_fixture_id": "audiobook-de-10870_10823_000000",
+  "source_dataset": "facebook/multilingual_librispeech",
+  "source_dataset_revision": "2e83e61823b4c47dcbcb1980bb88601274127609",
+  "source_split": "dev",
+  "gold_status": "dataset-transcript-unverified",
+  "development_only": true,
+  "transcript": "wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+  "evaluation_reference": "wie aber kam sie hier auf meinen tisch und warum schauderte ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+  "error_profile": "Two independent German audiobook development clips for the same Whisper backend each contain one unreviewed single-word substitution: one modernizes an apparently historical inflection and one drops a final consonant. Preserve archaic or unusual grammar and spelling unless the immediate context overwhelmingly proves a recognition error. Do not infer a target word from this profile.",
+  "error_profile_sources": [
+    "audiobook-de-4001_2999_000089",
+    "audiobook-de-135_82_000105"
+  ],
+  "glossary": [],
+  "protected_spans": [
+    "in keiner weise"
+  ],
+  "inference_policy": {
+    "prompt_id": "conservative-error-profile-v1",
+    "reference_visible_to_model": false,
+    "lexical_changes_allowed": true,
+    "allowed_edit_classes": [
+      "surface",
+      "word-boundary",
+      "contextual-misrecognition",
+      "asr-inflection"
+    ],
+    "reason": "The error profile comes only from two other development clips and does not expose this fixture's target substitution. The dataset reference remains evaluation-only."
+  },
+  "provenance": {
+    "fixture_manifest": "benchmarks/fixtures/audiobook-pilot.json",
+    "analysis": "benchmarks/analysis/phase0.audiobook-pilot-1.errors.json",
+    "analysis_sha256": "1035fb6f0adfd94761fb7d95bef05fe43ef50cbf51bf8b2a03cc1097f4450c4f",
+    "license": "CC-BY-4.0",
+    "claim_limit": "All three German dataset transcripts are unverified and development-exposed. The profile is useful for prompt mechanics only, not for product-quality selection."
+  }
+}

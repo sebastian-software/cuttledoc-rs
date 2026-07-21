@@ -74,9 +74,18 @@ function validateShape(experiment) {
       errors.push(error.message);
     }
   }
-  if (contract?.prompt_id !== 'historical-cuttledoc-v2' ||
-      contract?.policy_mode !== 'historical-control' ||
-      contract?.render_mode !== 'append-transcript' ||
+  const promptShapeValid =
+    (contract?.prompt_id === 'historical-cuttledoc-v2' &&
+     contract?.policy_mode === 'historical-control' &&
+     contract?.render_mode === 'append-transcript' &&
+     contract?.output_mode === 'plain-text') ||
+    (contract?.prompt_id === 'conservative-error-profile-v1' &&
+     contract?.policy_mode === 'bounded-lexical' &&
+     contract?.render_mode === 'template' &&
+     contract?.output_mode === 'json-edits');
+  if (!promptShapeValid ||
+      !Array.isArray(contract?.context_fields) ||
+      contract.context_fields.length === 0 ||
       !digest.test(contract?.prompt_sha256 ?? '') ||
       contract?.chat_template_options?.enable_thinking !== false ||
       contract?.seed !== 0 || contract?.temperature !== 0 ||
@@ -85,7 +94,7 @@ function validateShape(experiment) {
       !Number.isInteger(contract?.cancellation_probe_after_tokens) ||
       contract.cancellation_probe_after_tokens <= 0 ||
       contract.cancellation_probe_after_tokens >= contract.max_tokens) {
-    errors.push('historical deterministic generation contract is invalid');
+    errors.push('deterministic generation contract is invalid');
   }
   if (!(result?.run_id?.length > 0) ||
       result?.purpose !== 'development-runtime-probe' ||
@@ -142,20 +151,38 @@ async function validateExperiment(experiment, path) {
         run.procedure?.evaluation_reference_visible_to_model !== false) {
       errors.push('result identity or hidden-reference boundary does not match');
     }
-    if (!(run.output?.text?.length > 0) ||
+    const outputNonempty = run.output?.text?.length > 0;
+    const invariant = inputWords.join('\n') === outputWords.join('\n');
+    const expectedAccepted = experiment.generation_contract.policy_mode ===
+      'historical-control'
+      ? outputNonempty
+      : outputNonempty && run.output?.parser?.valid === true &&
+        run.output?.audit?.lexical_edits_fully_reported === true &&
+        run.output?.audit?.protected_spans_unchanged === true;
+    if ((experiment.generation_contract.policy_mode === 'historical-control' &&
+         !outputNonempty) ||
         sha256(run.output.text) !== run.output.text_sha256 ||
-        run.output?.gates?.policy_mode !== 'historical-control' ||
-        run.output?.gates?.accepted !== true ||
+        run.output?.gates?.policy_mode !==
+          experiment.generation_contract.policy_mode ||
+        run.output?.gates?.accepted !== expectedAccepted ||
         run.output?.gates?.quality_accepted !== false ||
         run.output?.gates?.case_and_punctuation_insensitive_lexical_invariant !==
-          (inputWords.join('\n') === outputWords.join('\n')) ||
+          invariant ||
         run.output?.lexical_diff?.input_word_count !== inputWords.length ||
         run.output?.lexical_diff?.output_word_count !== outputWords.length ||
         run.output?.lexical_diff?.edit_distance !==
           wordDistance(fixture.transcript, run.output.text) ||
         run.output?.lexical_diff?.operations?.length !==
           run.output?.lexical_diff?.edit_distance) {
-      errors.push('historical output contract or lexical diff is invalid');
+      errors.push('output contract or lexical diff is invalid');
+    }
+    if (experiment.generation_contract.output_mode === 'json-edits' &&
+        (!(run.output?.raw_text?.length > 0) ||
+         sha256(run.output.raw_text) !== run.output.raw_text_sha256 ||
+         typeof run.output?.parser?.valid !== 'boolean' ||
+         typeof run.output?.audit?.lexical_edits_fully_reported !== 'boolean' ||
+         typeof run.output?.audit?.protected_spans_unchanged !== 'boolean')) {
+      errors.push('structured output parser and audit evidence is incomplete');
     }
     if (run.measurements?.deterministic_repeat?.text_identical !== true ||
         run.measurements?.deterministic_repeat?.token_ids_identical !== true ||
@@ -164,7 +191,7 @@ async function validateExperiment(experiment, path) {
         run.streaming?.cancellation?.process_remained_usable !== true ||
         run.conclusion?.reference_runtime_executed !== true ||
         run.conclusion?.surface_candidate_accepted !== null ||
-        run.conclusion?.development_output_contract_accepted !== true ||
+        run.conclusion?.development_output_contract_accepted !== expectedAccepted ||
         run.conclusion?.model_quality_selected !== false ||
         run.conclusion?.product_runtime_accepted !== false) {
       errors.push('runtime evidence must remain deterministic and non-promoting');

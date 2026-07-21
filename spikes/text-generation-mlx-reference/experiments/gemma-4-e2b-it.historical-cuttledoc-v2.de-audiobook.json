@@ -6,6 +6,10 @@
     "prompt_id": "historical-cuttledoc-v2",
     "policy_mode": "historical-control",
     "render_mode": "append-transcript",
+    "output_mode": "plain-text",
+    "context_fields": [
+      "transcript"
+    ],
     "prompt_path": "benchmarks/postprocessing/prompts/historical-cuttledoc-v2.txt",
     "prompt_sha256": "583a49811268e4f770a484a535b39dd9be6b75563153b1b58d7204e9cd8d55a4",
     "chat_template": "pinned model tokenizer template with enable_thinking=false",

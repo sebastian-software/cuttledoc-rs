@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import unicodedata
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -74,14 +75,25 @@ def word_error_rate(reference: str, hypothesis: str) -> float:
 
 
 def render_prompt(template: str, fixture: dict, contract: dict) -> str:
+    def render_value(value) -> str:
+        return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+
     replacements = {
         "{{language}}": fixture["language"],
+        "{{locale}}": fixture.get("locale", "unspecified"),
         "{{domain}}": fixture["domain"],
+        "{{backend}}": fixture.get("asr_backend", "unspecified"),
+        "{{error_profile}}": fixture.get(
+            "error_profile", "No independent error profile supplied"
+        ),
+        "{{glossary}}": fixture.get("glossary", []),
+        "{{protected_spans}}": fixture.get("protected_spans", []),
+        "{{suspect_spans}}": fixture.get("suspect_spans", []),
         "{{transcript}}": fixture["transcript"],
     }
     rendered = template
     for marker, value in replacements.items():
-        rendered = rendered.replace(marker, value)
+        rendered = rendered.replace(marker, render_value(value))
     if contract["render_mode"] == "append-transcript":
         if "{{transcript}}" in template:
             raise ValueError("Append-transcript prompt must not contain a transcript marker")
@@ -194,6 +206,127 @@ def word_diff(source: str, target: str) -> dict:
         "output_word_count": len(target_words),
         "edit_distance": distances[-1][-1],
         "operations": operations,
+    }
+
+
+def count_word_sequence(words: list[str], sequence: list[str]) -> int:
+    if not sequence:
+        return 0
+    width = len(sequence)
+    return sum(
+        words[index : index + width] == sequence
+        for index in range(len(words) - width + 1)
+    )
+
+
+def parse_output(raw_text: str, contract: dict, fixture: dict) -> dict:
+    output_mode = contract["output_mode"]
+    if output_mode == "plain-text":
+        return {
+            "text": raw_text,
+            "reported_edits": None,
+            "parser": {"valid": True, "error": None},
+            "audit": {
+                "lexical_edits_fully_reported": None,
+                "protected_spans_unchanged": None,
+                "reported_lexical_edit_count": None,
+            },
+        }
+    if output_mode != "json-edits":
+        raise ValueError(f"Unsupported output mode: {output_mode}")
+
+    try:
+        parsed = json.loads(raw_text)
+    except json.JSONDecodeError as error:
+        return {
+            "text": "",
+            "reported_edits": None,
+            "parser": {"valid": False, "error": str(error)},
+            "audit": {
+                "lexical_edits_fully_reported": False,
+                "protected_spans_unchanged": False,
+                "reported_lexical_edit_count": None,
+            },
+        }
+
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("text"), str):
+        return {
+            "text": "",
+            "reported_edits": None,
+            "parser": {
+                "valid": False,
+                "error": "Output must be an object with a string text field",
+            },
+            "audit": {
+                "lexical_edits_fully_reported": False,
+                "protected_spans_unchanged": False,
+                "reported_lexical_edit_count": None,
+            },
+        }
+    edits = parsed.get("edits")
+    if not isinstance(edits, list) or any(
+        not isinstance(edit, dict)
+        or not isinstance(edit.get("original"), str)
+        or not isinstance(edit.get("replacement"), str)
+        or edit.get("class")
+        not in {
+            "surface",
+            "word-boundary",
+            "contextual-misrecognition",
+            "asr-inflection",
+        }
+        or not isinstance(edit.get("reason"), str)
+        or not isinstance(edit.get("confidence"), (int, float))
+        or not 0 <= edit["confidence"] <= 1
+        for edit in edits
+    ):
+        return {
+            "text": parsed["text"],
+            "reported_edits": edits,
+            "parser": {
+                "valid": False,
+                "error": "edits must match the bounded lexical audit schema",
+            },
+            "audit": {
+                "lexical_edits_fully_reported": False,
+                "protected_spans_unchanged": False,
+                "reported_lexical_edit_count": None,
+            },
+        }
+
+    diff = word_diff(fixture["transcript"], parsed["text"])
+    operation_pairs = Counter(
+        (
+            tuple(normalized_words(operation["input"] or "")),
+            tuple(normalized_words(operation["output"] or "")),
+        )
+        for operation in diff["operations"]
+    )
+    reported_pairs = Counter()
+    for edit in edits:
+        pair = (
+            tuple(normalized_words(edit["original"])),
+            tuple(normalized_words(edit["replacement"])),
+        )
+        if pair[0] != pair[1]:
+            reported_pairs[pair] += 1
+
+    input_words = normalized_words(fixture["transcript"])
+    output_words = normalized_words(parsed["text"])
+    protected_unchanged = all(
+        count_word_sequence(input_words, normalized_words(span))
+        == count_word_sequence(output_words, normalized_words(span))
+        for span in fixture.get("protected_spans", [])
+    )
+    return {
+        "text": parsed["text"],
+        "reported_edits": edits,
+        "parser": {"valid": True, "error": None},
+        "audit": {
+            "lexical_edits_fully_reported": reported_pairs == operation_pairs,
+            "protected_spans_unchanged": protected_unchanged,
+            "reported_lexical_edit_count": sum(reported_pairs.values()),
+        },
     }
 
 
@@ -323,14 +456,26 @@ def main() -> None:
     generation = run_generation(model, tokenizer, rendered_prompt, contract)
     deterministic_repeat = run_generation(model, tokenizer, rendered_prompt, contract)
     cancellation = run_cancellation_probe(model, tokenizer, rendered_prompt, contract)
-    lexical_invariant = normalized_words(generation["text"]) == normalized_words(
+    parsed_output = parse_output(generation["text"], contract, fixture)
+    corrected_text = parsed_output["text"].strip()
+    lexical_invariant = normalized_words(corrected_text) == normalized_words(
         fixture["transcript"]
     )
-    output_nonempty = len(generation["text"]) > 0
+    output_nonempty = len(corrected_text) > 0
     policy_mode = contract["policy_mode"]
-    mechanical_output_accepted = output_nonempty and (
-        lexical_invariant if policy_mode == "surface-only" else True
-    )
+    if policy_mode == "surface-only":
+        mechanical_output_accepted = output_nonempty and lexical_invariant
+    elif policy_mode == "historical-control":
+        mechanical_output_accepted = output_nonempty
+    elif policy_mode == "bounded-lexical":
+        mechanical_output_accepted = (
+            output_nonempty
+            and parsed_output["parser"]["valid"]
+            and parsed_output["audit"]["lexical_edits_fully_reported"]
+            and parsed_output["audit"]["protected_spans_unchanged"]
+        )
+    else:
+        raise ValueError(f"Unsupported policy mode: {policy_mode}")
 
     result = {
         "schema_version": "1.0.0",
@@ -374,7 +519,7 @@ def main() -> None:
             "model_load": "Fresh Python process; OS file and Metal caches were not cleared.",
             "generation": contract,
             "complete_generation_repetitions": 2,
-            "prompt_visible_fields": ["language", "domain", "transcript"],
+            "prompt_visible_fields": contract["context_fields"],
             "evaluation_reference_visible_to_model": False,
             "command": "CUTTLEDOC_TEXT_GENERATION_MANIFEST=/repo/candidate.json CUTTLEDOC_TEXT_GENERATION_MODEL_DIR=/local/model CUTTLEDOC_TEXT_GENERATION_OUTPUT=/tmp/result.json bash scripts/run-text-generation-mlx-reference.sh",
         },
@@ -411,8 +556,10 @@ def main() -> None:
             "cancellation": cancellation,
         },
         "output": {
-            "text": generation["text"],
-            "text_sha256": sha256_bytes(generation["text"].encode("utf-8")),
+            "raw_text": generation["text"],
+            "raw_text_sha256": sha256_bytes(generation["text"].encode("utf-8")),
+            "text": corrected_text,
+            "text_sha256": sha256_bytes(corrected_text.encode("utf-8")),
             "token_ids": generation["token_ids"],
             "gates": {
                 "nonempty": output_nonempty,
@@ -421,13 +568,16 @@ def main() -> None:
                 "policy_mode": policy_mode,
                 "quality_accepted": False,
             },
-            "lexical_diff": word_diff(fixture["transcript"], generation["text"]),
+            "parser": parsed_output["parser"],
+            "reported_edits": parsed_output["reported_edits"],
+            "audit": parsed_output["audit"],
+            "lexical_diff": word_diff(fixture["transcript"], corrected_text),
             "development_quality": {
                 "input_wer": word_error_rate(
                     fixture["evaluation_reference"], fixture["transcript"]
                 ),
                 "output_wer": word_error_rate(
-                    fixture["evaluation_reference"], generation["text"]
+                    fixture["evaluation_reference"], corrected_text
                 ),
                 "claim_limit": "The dataset transcript is unverified and the fixture is development-exposed; these values are diagnostic only.",
             },

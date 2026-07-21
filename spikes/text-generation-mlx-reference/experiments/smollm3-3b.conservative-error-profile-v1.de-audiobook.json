@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "id": "smollm3-3b.conservative-error-profile-v1.de-audiobook",
+  "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/smollm3-3b-4bit-mlx.json",
+  "generation_contract": {
+    "prompt_id": "conservative-error-profile-v1",
+    "policy_mode": "bounded-lexical",
+    "render_mode": "template",
+    "output_mode": "json-edits",
+    "context_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+    "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+    "chat_template": "pinned model tokenizer template with enable_thinking=false",
+    "chat_template_options": {
+      "enable_thinking": false
+    },
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 384,
+    "stream": true,
+    "cancellation_probe_after_tokens": 4,
+    "rationale": "The bounded prompt receives an error-class profile from two independent development clips, no target reference, no suspect span, and one protected phrase."
+  },
+  "result_contract": {
+    "run_id": "phase5.smollm3-3b-4bit-mlx-reference.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+    "purpose": "development-runtime-probe",
+    "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json",
+    "result_path": "benchmarks/postprocessing/runs/phase5.smollm3-3b-4bit-mlx-reference.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
+    "result_required": false
+  }
+}

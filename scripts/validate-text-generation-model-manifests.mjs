@@ -77,6 +77,9 @@ function validateManifestShape(manifest) {
       !artifactDigest.test(contract?.prompt_sha256 ?? '') ||
       contract?.policy_mode !== 'surface-only' ||
       contract?.render_mode !== 'template' ||
+      contract?.output_mode !== 'plain-text' ||
+      !Array.isArray(contract?.context_fields) ||
+      contract.context_fields.length === 0 ||
       contract?.temperature !== 0 || contract?.seed !== 0 ||
       contract?.stream !== true || !Number.isInteger(contract?.max_tokens) ||
       contract.max_tokens <= 0 ||
