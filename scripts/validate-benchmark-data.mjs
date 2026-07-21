@@ -596,12 +596,12 @@ function validateSyntheticRoundtripPlan(plan) {
       'https://github.com/sebastian-software/cuttledoc-rs/issues/13') {
     errors.push('tracking_issue must remain Phase 5 issue #13');
   }
-  if (plan.purpose !== 'diagnostic') {
-    errors.push('purpose must remain diagnostic');
+  if (plan.purpose !== 'decision-support') {
+    errors.push('purpose must remain decision-support');
   }
-  if (plan.relationship_to_target_domain?.eligible_for_model_selection !== false ||
+  if (plan.relationship_to_target_domain?.eligible_for_model_selection !== true ||
       plan.relationship_to_target_domain?.eligible_for_release_acceptance !== false) {
-    errors.push('synthetic evidence must not select ASR models or satisfy release acceptance');
+    errors.push('synthetic evidence may inform model selection but cannot satisfy release acceptance');
   }
   for (const field of ['required_comparison', 'reason']) {
     if (!(plan.relationship_to_target_domain?.[field]?.length > 0)) {
@@ -767,7 +767,9 @@ function validateSyntheticRoundtripPlan(plan) {
   for (const field of [
     'retain_raw_tts_audio',
     'retain_raw_asr_output',
-    'fixed_voice_per_candidate_and_locale',
+    'pin_every_voice_configuration',
+    'same_passages_across_voices',
+    'report_per_voice',
     'fixed_generation_parameters',
     'require_fresh_process_cold_load',
     'forbid_asr_specific_text_changes',
@@ -777,8 +779,11 @@ function validateSyntheticRoundtripPlan(plan) {
     }
   }
   if (!(execution?.matrix?.length > 0) ||
+      !(execution?.voice_selection?.length > 0) ||
+      execution?.minimum_distinct_voices_per_locale < 3 ||
+      execution?.minimum_tts_engines_per_locale < 2 ||
       execution?.minimum_repetitions < 2) {
-    errors.push('execution policy requires a matrix description and at least two repetitions');
+    errors.push('execution policy requires multi-voice, multi-engine coverage and at least two repetitions');
   }
   for (const field of ['text_fidelity', 'synthesis']) {
     if (!uniqueStrings(plan.metrics?.[field])) {
@@ -4451,9 +4456,17 @@ if (process.argv.includes('--self-test')) {
     syntheticRoundtripPlan,
   );
   invalidSyntheticRoundtripPlan.relationship_to_target_domain
-    .eligible_for_model_selection = true;
+    .eligible_for_model_selection = false;
   if (validateSyntheticRoundtripPlan(invalidSyntheticRoundtripPlan).length === 0) {
-    failures.push('validator self-test failed to reject synthetic model-selection evidence');
+    failures.push('validator self-test failed to preserve synthetic decision-support evidence');
+  }
+  const invalidSyntheticVoiceCoverage = structuredClone(
+    syntheticRoundtripPlan,
+  );
+  invalidSyntheticVoiceCoverage.execution_policy
+    .minimum_distinct_voices_per_locale = 1;
+  if (validateSyntheticRoundtripPlan(invalidSyntheticVoiceCoverage).length === 0) {
+    failures.push('validator self-test failed to reject single-voice synthetic evidence');
   }
   const invalidSyntheticRoundtripSelection = structuredClone(
     syntheticRoundtripSelection,

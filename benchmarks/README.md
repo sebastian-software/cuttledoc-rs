@@ -108,17 +108,20 @@ node scripts/materialize-target-domain-corpus.mjs \
   --output-dir /absolute/path/to/cuttledoc-target-domain/normalized
 ```
 
-The separate
+The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
-defines the Phase 5 TTS → STT diagnostic under issue #13. It starts with
+under issue #13. It starts with
 German and reports English separately, pins exact Wikipedia revisions, and
-crosses each supported TTS/locale cell with the same four ASR backends. Apple
+requires at least three pinned voices per locale across at least two TTS
+engines before producing a recommendation. Every generated artifact crosses
+the same four ASR backends. Apple
 `AVSpeechSynthesizer` is the system baseline; Qwen3-TTS and Chatterbox use a
 pinned MLX-Audio reference before a direct-official-MLX dependency decision;
 Qwen-Audio-3.0-TTS-Plus is an English remote quality ceiling. Synthetic
-results validate lifecycle and expose pronunciation/recognition failures, but
-the plan explicitly forbids using them as held-out target-domain or
-release-acceptance evidence. See
+results may inform the default model recommendation for clean produced speech,
+but do not establish universal superiority or release-quality real-world WER.
+The professional German podcast corpus remains a separate optional long-form
+control. See
 [`docs/synthetic-roundtrip-benchmark.md`](../docs/synthetic-roundtrip-benchmark.md).
 Materialize the nine digest-pinned passage files and their CC BY-SA
 attribution package outside Git with:

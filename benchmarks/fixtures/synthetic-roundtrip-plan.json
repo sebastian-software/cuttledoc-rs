@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-pilot-1",
-  "evidence_date": "2026-07-20",
+  "revision": "synthetic-roundtrip-pilot-2",
+  "evidence_date": "2026-07-21",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
-  "purpose": "diagnostic",
+  "purpose": "decision-support",
   "relationship_to_target_domain": {
-    "eligible_for_model_selection": false,
+    "eligible_for_model_selection": true,
     "eligible_for_release_acceptance": false,
-    "required_comparison": "Report synthetic results separately from real podcast and audiobook cells.",
-    "reason": "Synthetic speech is controlled and reproducible, but it does not represent speaker, room, mastering, overlap, or spontaneous-speech variation in the target domain."
+    "required_comparison": "Report every synthetic result by locale, TTS engine, and voice, and keep the professional-podcast control separate.",
+    "reason": "Multi-voice synthetic speech is controlled, reproducible evidence for a pragmatic recommendation on clean produced speech. It can inform model selection without claiming universal real-world superiority or release-quality WER."
   },
   "initial_scope": {
     "locales": [
@@ -199,10 +199,15 @@
     "parakeet-tdt-0.6b-v3-coreml"
   ],
   "execution_policy": {
-    "matrix": "Every materialized TTS candidate is run for each declared locale and transcribed by every ASR backend using identical digest-checked normalized PCM.",
+    "matrix": "Each locale covers at least three pinned voices across at least two TTS engines. Every generated artifact is transcribed by every ASR backend using identical digest-checked normalized PCM.",
     "retain_raw_tts_audio": true,
     "retain_raw_asr_output": true,
-    "fixed_voice_per_candidate_and_locale": true,
+    "pin_every_voice_configuration": true,
+    "minimum_distinct_voices_per_locale": 3,
+    "minimum_tts_engines_per_locale": 2,
+    "same_passages_across_voices": true,
+    "report_per_voice": true,
+    "voice_selection": "Prefer distinct native-locale voices and different presentation profiles when metadata permits; record stable provider or model voice IDs and do not infer demographic traits from voice names.",
     "fixed_generation_parameters": true,
     "minimum_repetitions": 2,
     "require_fresh_process_cold_load": true,
@@ -238,6 +243,7 @@
     "All source text and model artifacts are revision- and digest-pinned before measured execution.",
     "The Apple system baseline completes a Rust-owned synthesis lifecycle including cancellation and generated-audio ownership.",
     "Qwen3-TTS completes the same German passage set through the pinned mlx-audio reference runner.",
+    "Each measured locale covers at least three pinned voices across at least two TTS engines, with results reported per voice.",
     "All generated PCM is passed unchanged to all four ASR backends.",
     "Results separate lexical content errors from punctuation and capitalization differences.",
     "At least one blinded pronunciation and prosody review is recorded per candidate.",

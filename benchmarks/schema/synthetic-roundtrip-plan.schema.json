@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cuttledoc.dev/schemas/synthetic-roundtrip-plan.schema.json",
-  "title": "Cuttledoc synthetic TTS to STT diagnostic plan",
+  "title": "Cuttledoc synthetic TTS to STT decision-support plan",
   "type": "object",
   "required": [
     "schema_version",
@@ -36,7 +36,7 @@
       "format": "uri"
     },
     "purpose": {
-      "const": "diagnostic"
+      "const": "decision-support"
     },
     "relationship_to_target_domain": {
       "type": "object",
@@ -48,7 +48,7 @@
       ],
       "properties": {
         "eligible_for_model_selection": {
-          "const": false
+          "const": true
         },
         "eligible_for_release_acceptance": {
           "const": false
@@ -333,7 +333,12 @@
         "matrix",
         "retain_raw_tts_audio",
         "retain_raw_asr_output",
-        "fixed_voice_per_candidate_and_locale",
+        "pin_every_voice_configuration",
+        "minimum_distinct_voices_per_locale",
+        "minimum_tts_engines_per_locale",
+        "same_passages_across_voices",
+        "report_per_voice",
+        "voice_selection",
         "fixed_generation_parameters",
         "minimum_repetitions",
         "require_fresh_process_cold_load",
@@ -349,8 +354,25 @@
         "retain_raw_asr_output": {
           "const": true
         },
-        "fixed_voice_per_candidate_and_locale": {
+        "pin_every_voice_configuration": {
           "const": true
+        },
+        "minimum_distinct_voices_per_locale": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "minimum_tts_engines_per_locale": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "same_passages_across_voices": {
+          "const": true
+        },
+        "report_per_voice": {
+          "const": true
+        },
+        "voice_selection": {
+          "$ref": "#/$defs/nonEmptyString"
         },
         "fixed_generation_parameters": {
           "const": true

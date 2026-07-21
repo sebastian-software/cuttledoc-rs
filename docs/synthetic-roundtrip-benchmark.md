@@ -1,13 +1,13 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** diagnostic text, Apple TTS lifecycle, and local Qwen3-TTS MLX
-reference verified; first four-backend Qwen → ASR content matrix complete
+**Status:** decision-support text and first single-voice diagnostics verified;
+multi-voice German and English matrix remains to be run
 
 ## Purpose
 
-The first speech-synthesis spike uses controlled text-to-speech (TTS) output
-as input to the existing speech-to-text (STT) candidates. This creates a
-reproducible TTS → STT loop that is useful for:
+The benchmark uses controlled text-to-speech (TTS) output as input to the
+speech-to-text (STT) candidates. This creates a reproducible TTS → STT loop
+that is useful for:
 
 - validating audio formats, chunk ownership, streaming, cancellation, and
   lifecycle across the Rust boundary;
@@ -17,11 +17,17 @@ reproducible TTS → STT loop that is useful for:
 - separating lexical recognition errors from capitalization and punctuation
   reconstruction.
 
-It is not target-domain evidence. Clean generated speech does not represent
-speaker diversity, rooms, microphones, mastering, overlap, disfluency, or
-spontaneous language in professional podcasts and audiobooks. Synthetic
-scores therefore stay separate from issue #18 and cannot select a production
-ASR model or satisfy a release-quality gate.
+The primary product workload is clean, professionally produced speech. A
+multi-voice synthetic matrix is therefore useful decision support for the
+default recommendation: it can compare engines under exact, repeatable input
+and known reference text. It does not establish universal superiority or
+release-quality real-world WER. The professional German podcast corpus remains
+a separate long-form control, and users can select any supported ASR engine.
+
+Single-voice diagnostics already checked in do not satisfy the revised matrix.
+Each measured locale must cover at least three pinned voices across at least
+two TTS engines. Results remain split by locale, TTS engine, and voice so a
+strong or weak voice cannot disappear inside one aggregate.
 
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
@@ -105,10 +111,11 @@ has the same quality.
 
 ## Measurement and diagnosis
 
-Every TTS candidate uses a fixed German voice and fixed generation parameters.
-Its digest-checked normalized PCM is passed unchanged to Apple Speech,
-Whisper, direct Qwen3-ASR over MLX, and Parakeet. Raw generated audio and raw
-ASR text are retained locally.
+Each voice has a stable provider/model voice ID and fixed generation
+parameters. The same passages are used across voices. Every artifact's
+digest-checked normalized PCM is passed unchanged to Apple Speech, Whisper,
+direct Qwen3-ASR over MLX, and Parakeet. Raw generated audio and raw ASR text
+are retained locally.
 
 The report keeps two text views:
 
