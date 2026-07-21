@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "content-type-expansion-pending-native-and-dialogue",
+    "status": "content-type-expansion-pending-dialogue",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

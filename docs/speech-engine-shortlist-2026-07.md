@@ -77,10 +77,11 @@ NVIDIA offline family at lower model size.
    and all five reproduce the exact normalized English character content.
    Reject the clear German profile.
 3. **In progress:** the German text selection now separates code-switch,
-   native-factual, and dialogue cells. Materialize the latter two with the same
-   warm Qwen voice description and cross each result through the five required
-   ASR backends before starting Voxtral. Qwen listening, Qwen3-ASR 1.7B, and
-   Nemotron remain open for the bounded calibration set.
+   native-factual, and dialogue cells. The native-factual Qwen cell passes with
+   complete critical-fact recovery from all five receivers and 1.92–2.88% WER.
+   Run the dialogue with the same warm voice description before starting
+   Voxtral. Qwen listening, Qwen3-ASR 1.7B, and Nemotron remain open for the
+   bounded calibration set.
 4. Reject a generator with repeated omissions, insertions, truncation,
    non-finite audio, unstable completion, or unjustified operational cost.
 5. Freeze the surviving three-engine, six-voice-per-locale matrix and expand it

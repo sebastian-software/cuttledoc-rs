@@ -150,7 +150,8 @@ contains selectors and digests. Lossless generated audio remains local. The
 separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
 Opus copies with complete attribution and a passed codec control; it currently
 contains the codec-control Qwen fixture, paired clear and warm German Qwen
-VoiceDesign fixtures, and the warm English Qwen VoiceDesign fixture.
+VoiceDesign fixtures, the warm English fixture, and the native-German content
+control.
 
 Validate its five-engine lossless/48/64/96 kbit/s evidence and the committed
 asset hashes with:
@@ -177,9 +178,10 @@ receivers on one normalized PCM digest per run. All five receivers fail at
 critical failure is voice/profile-specific. The subsequent
 [`qwen-en-warm-podcast`](raw/phase5.qwen3-tts-1.7b-voicedesign.qwen-en-warm-podcast.1/result.json)
 run passes the English lexical gate with exact normalized character content
-from all five receivers. The next Qwen cells hold the accepted warm description
-constant while comparing German code-switch, native-factual, and dialogue
-content before Voxtral calibration.
+from all five receivers. The native-German `Buchdruck` cell subsequently
+passes with complete critical-fact recovery and 1.92–2.88% WER across the five
+receivers. The remaining dialogue cell holds the accepted warm description
+constant before Voxtral calibration.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a

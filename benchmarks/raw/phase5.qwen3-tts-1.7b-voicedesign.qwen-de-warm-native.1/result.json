@@ -1,0 +1,376 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-de-warm-native.1",
+  "captured_at": "2026-07-21T12:47:55.681522Z",
+  "source_revision": "ebaee27d51511b858e9a008b8d2bf939183d56f1",
+  "selection_revision": "synthetic-roundtrip-passages-2",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-de-warm-native",
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "German",
+      "locale": "de-DE",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-de-native",
+    "source_id": "de-wikipedia-buchdruck-268791130",
+    "locale": "de-DE",
+    "character_count": 785,
+    "text_sha256": "5ce740e5f44129734276d188e3fad7b37ef0d5f7fb605f99d9d1b4d8e666cf19",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-de-warm-native",
+      "passage_id": "synthetic-de-native",
+      "locale": "de-DE",
+      "language": "German",
+      "voice": null,
+      "instruction": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1317120,
+      "byte_count": 5268480,
+      "duration_ms": 54880,
+      "sha256": "87d10c77bb42da5a20d39b3075045c41b3f24fad076cfef7b9cee07d36cecc47",
+      "minimum_sample": -0.5548226833343506,
+      "maximum_sample": 0.5124393105506897,
+      "rms": 0.0880045487013956,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1824.158625,
+      "first_audio_ms": 26164.966084,
+      "complete_synthesis_ms": 27268.266042,
+      "real_time_factor": 0.4968707369169096,
+      "output_count": 1,
+      "token_count": 686
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4717674496,
+      "mlx_peak_memory_bytes": 12999227881,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1317120,
+        "sample_rate_hz": 24000,
+        "token_count": 686,
+        "processing_time_seconds": 26.164857864379883,
+        "mlx_audio_reported_duration_over_processing": 2.09746983088764,
+        "peak_memory_gb_decimal": 12.999227881,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 878080,
+        "byte_count": 3512320,
+        "duration_ms": 54880,
+        "sha256": "cef63fd06cb53c7e5b229cfba5533259597266a8dfa50a185361d1bb608a3948"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T12:48:14.079Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "de",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+            "sha256": "6c1567f93b2f33b9bcbe31933c8ac8e7b2fab200ee8dea64724532279e76a1c3",
+            "segment_count": 9,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 104,
+            "hypothesis_word_count": 103,
+            "word_edits": 2,
+            "wer": 0.019230769230769232,
+            "reference_character_count": 665,
+            "hypothesis_character_count": 665,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "cold_load_ms": 1118.8871669999999,
+            "complete_inference_ms": 1933.8848750000006,
+            "real_time_factor": 0.03523842702259476
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1954955264
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:48:16.996Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier, oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften. Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse Typendruck Der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, Wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+            "sha256": "7afee190f296501b51b2067cf5fabc9c991fcba448fd65160f96fa93927094bf",
+            "segment_count": 13,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 104,
+            "hypothesis_word_count": 102,
+            "word_edits": 3,
+            "wer": 0.028846153846153848,
+            "reference_character_count": 665,
+            "hypothesis_character_count": 663,
+            "character_edits": 2,
+            "cer": 0.0030075187969924814
+          },
+          "timing": {
+            "cold_load_ms": 265.987375,
+            "complete_inference_ms": 1134.0807499999999,
+            "real_time_factor": 0.020664736698250728
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 157483008
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:48:19.008Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "de",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Scriptorien der Klöster. In Ostasien gab es bereits im achten Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzchrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+            "sha256": "8651fd4b155379aa28dc5c4310b84d3dff08d2cefe098b51981f6151112f7e3d",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 104,
+            "hypothesis_word_count": 104,
+            "word_edits": 3,
+            "wer": 0.028846153846153848,
+            "reference_character_count": 665,
+            "hypothesis_character_count": 669,
+            "character_edits": 8,
+            "cer": 0.012030075187969926
+          },
+          "timing": {
+            "complete_inference_ms": 1854.122959,
+            "real_time_factor": 0.03378503934037901
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2659259572
+          },
+          "generation": {
+            "token_count": 212,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:48:34.748Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+            "sha256": "6c1567f93b2f33b9bcbe31933c8ac8e7b2fab200ee8dea64724532279e76a1c3",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 104,
+            "hypothesis_word_count": 103,
+            "word_edits": 2,
+            "wer": 0.019230769230769232,
+            "reference_character_count": 665,
+            "hypothesis_character_count": 665,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "complete_inference_ms": 14216.641875,
+            "real_time_factor": 0.25904959684766765
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5312357556
+          },
+          "generation": {
+            "token_count": 697,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T12:48:36.834Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "de-DE",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Der Buchdruck historisch auch Buchdruckerkunstst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den Auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+            "sha256": "0bd72edd8c606364543affc3f5470454714d2dc08efde51836f67e1860180a51",
+            "segment_count": 104,
+            "update_count": 209,
+            "final_update_count": 4,
+            "volatile_update_count": 205,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 104,
+            "hypothesis_word_count": 103,
+            "word_edits": 3,
+            "wer": 0.028846153846153848,
+            "reference_character_count": 665,
+            "hypothesis_character_count": 667,
+            "character_edits": 2,
+            "cer": 0.0030075187969924814
+          },
+          "timing": {
+            "first_result_ms": 78.454209,
+            "complete_inference_ms": 635.78,
+            "real_time_factor": 0.011584912536443148
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp",
+          "voxtral-realtime-4b-mlx-direct-2400ms"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ],
+        "critical_findings": {
+          "shared_content_omission": false,
+          "shared_truncation": false,
+          "critical_facts_recovered_by_all_backends": true,
+          "probable_tts_content_error": false
+        }
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "calibration_disposition": "passed-native-German-content-gate",
+    "content_type": "de-native",
+    "listening_required": true,
+    "next": "Run the fixed warm profile on the German dialogue cell, then perform listening review."
+  }
+}

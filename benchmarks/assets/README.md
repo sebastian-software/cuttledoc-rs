@@ -26,7 +26,10 @@ fixture is the paired positive control: all five receivers recover `1962`,
 although listening review remains open. The English
 [`qwen-en-warm-podcast`](synthetic/en-US/qwen3-tts-1.7b-voicedesign-warm/synthetic-en-reasoning/manifest.json)
 fixture provides the cross-language positive control with exact normalized
-character content from all five receivers.
+character content from all five receivers. The native-German
+[`synthetic-de-native`](synthetic/de-DE/qwen3-tts-1.7b-voicedesign-warm/synthetic-de-native/manifest.json)
+fixture provides the first content-type control: all five receivers recover
+the full factual passage and its critical facts.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis
@@ -46,7 +49,7 @@ node scripts/encode-benchmark-opus.mjs \
 ```
 
 Use the same command with the paths recorded in the VoiceDesign asset manifests
-to reproduce or check the two current-model fixtures.
+to reproduce or check the current-model fixtures.
 
 See [LICENSE.md](LICENSE.md) for the directory-level licensing rule. The
 adjacent `.license` sidecars are the machine-readable SPDX declarations for

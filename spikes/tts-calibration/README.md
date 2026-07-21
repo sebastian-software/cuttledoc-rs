@@ -70,9 +70,11 @@ backends reproduce the exact normalized character sequence; its uniform 2.56%
 WER is only the spoken expansion of the hyphenated `chains-of-thought` token.
 The bounded German/English lexical calibration therefore accepts the warm
 profiles. Two additional German profiles keep the same warm description while
-changing the passage to native-factual prose and dialogue. Run those content
-cells before Voxtral so embedded English terms cannot dominate the German
-comparison. Listening remains the final Qwen gate before full-matrix promotion.
+changing the passage to native-factual prose and dialogue. The native-factual
+cell passes all five receivers with complete critical-fact recovery and
+1.92–2.88% WER; dialogue remains next. These cells run before Voxtral so
+embedded English terms cannot dominate the German comparison. Listening
+remains the final Qwen gate before full-matrix promotion.
 
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration

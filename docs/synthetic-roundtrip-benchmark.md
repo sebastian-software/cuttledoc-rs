@@ -1,7 +1,7 @@
 # Synthetic speech roundtrip benchmark
 
-**Status:** three German content cells are pinned; native-factual and dialogue
-Qwen calibrations plus the multi-voice matrix remain to be run
+**Status:** three German content cells are pinned; native-factual Qwen passes,
+while dialogue and the multi-voice matrix remain to be run
 
 ## Purpose
 
@@ -318,6 +318,15 @@ and changes only the German content cell: first `synthetic-de-native`, then
 `synthetic-de-dialogue`. This directly tests whether the earlier German spread
 comes from English code-switching or from the synthesis/recognition path more
 generally before the larger Voxtral calibration begins.
+
+The `synthetic-de-native` run is now complete. Qwen generated 54.88 seconds of
+finite audio and stopped normally at 686 of 1,200 tokens. All five receivers
+recover the complete passage, including the 8th century, 1440, and Johannes
+Gutenberg. WER spans only 1.92–2.88%; Whisper and Voxtral have zero normalized
+character edits. The remaining differences are orthography, compound
+boundaries, and one receiver-specific dropped preposition rather than a shared
+content failure. This cell passes the lexical content gate; listening review
+remains open.
 
 The bounded German/English lexical calibration therefore accepts the warm
 Qwen profiles and rejects the clear German profile. Listening is the remaining
