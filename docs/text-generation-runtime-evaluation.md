@@ -1,20 +1,18 @@
 # Apple-local text-generation runtime evaluation
 
-**Status:** issue #7 complete; embedded transcript enhancement deferred from
-the initial v3 scope.
+**Status:** issue #7 runtime probe complete; model-first quality and runtime
+bakeoff continues in issue #20.
 
 **Evidence date:** 2026-07-21.
 
 ## Outcome
 
-Official MLX is the preferred foundation for a future embedded Apple-local
-text-generation backend, but Cuttledoc should not ship an embedded enhancement
-model in the initial v3 release merely because the runtime works. The pinned
-Qwen3 0.6B experiment proves model load, deterministic autoregressive
-generation, token streaming, cooperative cancellation, and modest delivery
-cost. The same run also proves why runtime viability and correction quality are
-separate gates: the model violated a lexical invariant and doubled the
-development fixture's content error count.
+The pinned Qwen3 0.6B experiment proves model load, deterministic
+autoregressive generation, token streaming, cooperative cancellation, and
+modest delivery cost through official MLX. The same run also proves why runtime
+viability and correction quality are separate gates: the deliberately small
+model violated a lexical invariant and doubled the development fixture's
+content error count. It cannot select the production model or runtime.
 
 The practical decision is therefore:
 
@@ -22,12 +20,18 @@ The practical decision is therefore:
 2. keep `TextGenerationEngine` independent of STT, TTS, and inference runtime;
 3. allow OpenAI and Ollama adapters to be implemented independently behind
    that contract;
-4. defer an embedded backend until a model and prompt pass multilingual,
-   held-out transcript-enhancement gates; and
-5. start that future embedded bakeoff with a narrow repository-owned adapter
-   over official MLX, with llama.cpp/GGUF retained as the credible fallback.
+4. compare Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B through one pinned
+   reference layer before product-runtime work;
+5. carry only the quality survivor or survivors through both a narrow
+   repository-owned adapter over official MLX and a pinned Core ML conversion;
+   and
+6. ship no embedded backend until a frozen model/prompt/runtime tuple passes
+   multilingual held-out transcript-enhancement gates.
 
-This is an explicit scope deferral, not a rejection of MLX.
+MLX-LM over official MLX is the common reference layer for the initial model
+comparison because it supports the three candidates on the target hardware.
+That is an experimental convenience, not a product-runtime decision. See the
+[`transcript-enhancement model bakeoff`](transcript-enhancement-model-bakeoff.md).
 
 ## Candidate review
 
@@ -37,17 +41,18 @@ delivery cost, and replaceability all contribute to the disposition.
 
 | Candidate | 2026-07-21 evidence | Model and delivery implications | Disposition |
 | --- | --- | --- | --- |
-| [Official MLX](https://github.com/ml-explore/mlx) plus an owned model adapter | Apple-maintained MIT project; about 27.6k stars; v0.32.0 released 2026-07-07; current macOS/Metal work. [MLX-LM](https://github.com/ml-explore/mlx-lm) is the official reference implementation, with about 6.4k stars and v0.31.3. | MLX safetensors fit the existing verified model-cache design and reuse the already accepted MLX runtime foundation. Cuttledoc still owns the model graph, KV cache, task ABI, lifecycle, and upgrade tests. | Preferred future embedded foundation. `mlx-lm` and Python remain reference-only; product code talks to official MLX through a narrow owned C++/C ABI. |
+| [Official MLX](https://github.com/ml-explore/mlx) plus an owned model adapter | Apple-maintained MIT project; about 27.6k stars; v0.32.0 released 2026-07-07; current macOS/Metal work. [MLX-LM](https://github.com/ml-explore/mlx-lm) is the official reference implementation, with about 6.4k stars and v0.31.3. | MLX safetensors fit the existing verified model-cache design and reuse the already accepted MLX runtime foundation. Cuttledoc still owns the model graph, architecture-specific cache, task ABI, lifecycle, and upgrade tests. | Serious embedded finalist after model-quality selection. `mlx-lm` and Python remain reference-only; a product path uses a narrow owned C++/C ABI over official MLX. |
 | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Mature MIT project; about 121k stars; frequent numbered builds; Apple Silicon/Metal, GGUF, a C API, CLI, and local server are first-class paths. | Strong model availability and portable delivery, but GGUF creates a second model format and cache alongside the MLX safetensors already needed by Cuttledoc. It also adds another native runtime to build, sign, test, and update. | Credible fallback. Promote if cross-platform embedded inference or GGUF distribution becomes more valuable than one Apple-local runtime foundation. |
 | [mistral.rs](https://github.com/EricLBuehler/mistral.rs) | Active MIT Rust project; about 7.5k stars; v0.9.0 released 2026-07-07; Metal, safetensors, GGUF/UQFF, Rust SDK, servers, multimodal and agent features. | Capable, but its broad runtime and feature surface are disproportionate to Cuttledoc's narrow correction task. Adoption would add a large second ownership and dependency surface instead of reusing official MLX. | Reference only. Re-evaluate only if its Rust-native lifecycle or supported model produces a measured advantage large enough to pay for the surface. |
 | [Candle](https://github.com/huggingface/candle) | Established Apache-2.0/MIT Rust framework; about 20.7k stars; active Metal kernels and safetensors/GGUF support; no GitHub release stream at the snapshot. | Cuttledoc would own or closely track model-specific implementations as well as the runtime integration. Current model coverage is not a stable task-level compatibility promise. | Reference only. Useful implementation prior art, not an initial embedded dependency. |
-| [Core ML](https://apple.github.io/coremltools/docs-guides/source/stateful-models.html) | Apple supports stateful models and KV-cache-style state on current platforms; the framework itself is mature and system-delivered. | Requires a maintained converted model, conversion validation, compiled artifacts, and model-specific state mapping. No selected instruction model currently gains a measured deployment advantage over MLX. | Deferred. Reconsider only for a concrete converted model that proves a size, energy, Neural Engine, or deployment benefit. |
+| [Core ML](https://apple.github.io/coremltools/docs-guides/source/stateful-models.html) | Apple supports stateful models, KV-cache-style state, and compressed weights on current platforms; the framework itself is mature and system-delivered. | Requires a maintained converted model, conversion validation, compiled artifacts, and model-specific state mapping. Compute placement is graph- and device-dependent; Core ML does not imply Neural Engine execution. | Serious embedded finalist after model-quality selection. Port the same survivor as MLX and measure conversion parity, actual compute placement, delivery, energy procedure, and lifecycle. |
 | Ollama HTTP adapter | Existing Cuttledoc 2 behavior and a pragmatic local-process provider boundary. | Ollama owns process lifecycle and its model cache. Cuttledoc owns provider configuration, request cancellation, errors, and capability mapping, but does not embed the runtime. | Independently implementable local provider; not the embedded runtime decision. |
 | OpenAI HTTP adapter | Remote model access without local native runtime or model delivery. | No local model cache. Credentials, privacy, cost, network errors, rate limits, cancellation, and opaque model revisions remain provider concerns. | Independently implementable remote provider; not coupled to Ollama or an embedded backend. |
 
 No weak project enters a Cargo, npm, native build, or release manifest as a
-result of this evaluation. The official MLX foundation was already accepted;
-the experiment adds only a locked, disposable Python reference environment.
+result of this evaluation. The initial quality comparison adds only a locked,
+disposable Python reference environment; it does not preselect the embedded
+runtime.
 
 ## Pinned experiment
 
@@ -110,20 +115,25 @@ The cache key remains `provider + model identity + immutable revision + artifact
 digest + format`. A friendly model name is never enough to reuse an artifact
 across runtimes.
 
-## Quality gate before resuming embedded work
+## Quality gate before selecting embedded work
 
-A later embedded proposal must freeze a complete
+The model-quality proposal must freeze a complete
 `model + revision + quantization + prompt + decoding` tuple and test it per
 language and domain. German remains first, followed by English, Spanish,
 French, and Portuguese. Professional podcast and audiobook recordings are the
 target domain; synthetic round trips remain diagnostic only.
 
-At minimum, the proposal must report content WER/CER, surface improvements,
+At minimum, the quality stage reports content WER/CER, surface improvements,
 edit precision, transcript-level regression rate, protected-content and
-contract violations, first-token latency, throughput, load, memory, model
-size, cancellation, and repeated determinism. Raw text is always retained.
-No aggregate gain may hide a regression in a product-priority language cell or
-a critical change to a name, number, date, unit, technical term, or negation.
+contract violations, plus enough latency, memory, and size data to identify
+impractical candidates. Raw text is always retained. No aggregate gain may hide
+a regression in a product-priority language cell or a critical change to a
+name, number, date, unit, technical term, or negation.
+
+Only the quality survivor proceeds to the MLX/Core ML comparison. That stage
+adds conversion parity, actual compute placement, first-token latency,
+throughput, load, memory, model and artifact size, energy procedure,
+cancellation, lifecycle, and repeated determinism.
 
 ## Replacement boundary
 
@@ -133,6 +143,6 @@ mechanical guards, and raw/corrected result retention live in the enhancement
 orchestrator above the engine. The engine only owns model/provider execution,
 ordered text deltas, supported generation options, cancellation, and lifecycle.
 
-That separation lets a future official-MLX adapter, llama.cpp adapter, Ollama
-provider, and OpenAI provider coexist or replace one another without changing
-STT or TTS contracts.
+That separation lets future official-MLX, Core ML, and llama.cpp adapters plus
+Ollama and OpenAI providers coexist or replace one another without changing STT
+or TTS contracts.

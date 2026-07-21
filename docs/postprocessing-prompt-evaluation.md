@@ -1,8 +1,7 @@
 # Prompt-controlled transcript correction
 
 **Status:** prompt candidates and evaluation contract defined; first embedded
-runtime probe complete; model selection still awaits representative audiobook
-and podcast gold data.
+runtime probe complete; model-first bakeoff in progress under issue #20.
 
 **Evidence date:** 2026-07-20.
 
@@ -138,14 +137,19 @@ changed `fielen` to `fiel` under `surface-only-v1`; the lexical gate rejected
 the output. That exact tuple is not a correction candidate. See
 [`text-generation-runtime-evaluation.md`](text-generation-runtime-evaluation.md).
 
-1. Use Gemma 3n E4B only to reproduce the historical Ollama candidate, and use
-   deterministic decoding where that provider/model supports it. Do not infer
-   an embedded-runtime choice from the historical result.
+1. Compare Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B through one pinned
+   reference layer, using deterministic non-thinking decoding where supported.
+   Use Gemma 3n E4B only to reproduce the historical Ollama control. Do not
+   infer an embedded-runtime choice from the reference results.
 2. Compare raw/no-op, historical, surface-only, and conservative prompts on
-   development data from real Apple, Whisper, and Qwen outputs.
+   development data from real Apple, Whisper, Qwen, Parakeet, and Voxtral
+   outputs.
 3. Build suspect spans only from product-available signals; never use gold
    alignment at inference.
 4. Freeze at most one surface and one lexical prompt tuple per model for
    validation.
 5. Run the surviving tuple on unseen audiobook and professional-podcast
    sources, German first.
+6. Port only the quality survivor or survivors through repository-owned
+   official-MLX and Core ML paths, then select the embedded runtime from
+   conversion parity and measured product cost.

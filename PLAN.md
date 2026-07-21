@@ -84,7 +84,8 @@ Evidence snapshot: 2026-07-20.
 | Voxtral Realtime live streaming (#19) | Complete | The repository-owned official-MLX session retains incremental mel, causal-convolution, 32-layer encoder, downsampler, 26-layer decoder, token, and text state behind the bounded Rust/C ABI. Real-time 480/2,400 ms runs reproduce the pinned 177-token streaming text exactly with append-only deltas; a ten-run DE/EN/ES/FR/PT control preserves language/delay cells and confirms 320 ms input as the stable path. The pure-C/MPS control proves a tiny binary but a larger BF16 model/working set, missing lifecycle semantics, and an ADR-0005 failure; ADR-0012 selects the owned official-MLX boundary. Held-out data moves to #18; common-engine, long-audio, and clean-host delivery are focused productization follow-ups. |
 | Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Complete | Node 22/24 CI builds, packs, compiler-free installs, and tests the same macOS arm64 tarball through ESM and CommonJS, including streaming fields, background work, progress, errors, cancellation, and missing-artifact diagnostics. |
-| Local text-generation runtime (#7) | Partial | Historical real/TTS evidence, four versioned prompt candidates, edit-policy gates, and source-grouped split discipline are recorded. The Gemma 3n E4B run waits for real audiobook and podcast gold data. |
+| Local text-generation runtime (#7) | Complete | The pinned Qwen3 0.6B MLX reference proves load, deterministic streaming, cancellation, and external lexical rejection. It is explicitly a runtime/negative control, not quality selection. |
+| Transcript-enhancement model/runtime bakeoff (#20) | In progress | Compare Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B through one pinned reference layer; after held-out model selection, compare the survivor through repository-owned official MLX and Core ML paths. |
 
 The open issue list is a work queue, not a second architecture plan. Completed
 foundation issues should close with links to their evidence. Productization
@@ -194,11 +195,12 @@ Evaluate independently:
 
 Gate:
 
-- Issue #7 defers an embedded enhancement backend from the initial v3 scope.
-  Keep OpenAI and Ollama independently implementable behind the runtime-neutral
-  text-generation contract; when embedded work resumes, evaluate a narrow
-  owned adapter over official MLX first and retain llama.cpp/GGUF as the
-  cross-platform fallback.
+- Issue #7 proves the runtime and safety-gate foundation. Issue #20 selects the
+  model before the embedded runtime: compare Gemma 4 E2B, Qwen 3.5 0.8B, and
+  SmolLM3 3B through one reference layer, then port only the quality survivor
+  through both official MLX and Core ML. Keep OpenAI and Ollama independently
+  implementable behind the runtime-neutral text-generation contract and retain
+  llama.cpp/GGUF as the cross-platform fallback.
 - Keep enhancement only where measured transcript quality, install size, and operational complexity justify it.
 - Do not select an immature runtime merely because its model experiment succeeds.
 - Preserve raw transcription as a complete product regardless of this decision.
@@ -310,9 +312,10 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    retain the 80 ms backpressure stress gate, and add long-audio cache/memory
    coverage. ADR-0012 completed the C/MPS comparison and rejects both the
    reference runtime's unbounded queue and the pure-C path as product boundaries.
-4. Use those real raw outputs to execute the frozen surface-only and bounded
-   lexical postprocessing candidates under #7. Keep corrected text separate
-   from raw ASR ranking and reject critical semantic regressions.
+4. Execute #20 in two stages: run the pinned Gemma 4 E2B, Qwen 3.5 0.8B, and
+   SmolLM3 3B development matrix first, then use the real raw outputs for the
+   frozen held-out surface and bounded lexical comparison. Keep corrected text
+   separate from raw ASR ranking and reject critical semantic regressions.
 5. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 6. Finish #9 with Node 22 plus packed-artifact CI gates.

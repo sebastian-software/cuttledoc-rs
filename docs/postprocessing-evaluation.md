@@ -1,7 +1,7 @@
 # Transcript postprocessing evaluation
 
-**Status:** historical evidence imported; Cuttledoc 3 acceptance benchmark
-pending.
+**Status:** historical evidence imported; model-first Cuttledoc 3 bakeoff in
+progress under issue #20.
 
 **Evidence date:** 2026-07-20.
 
@@ -67,8 +67,11 @@ Unicode letters and must recompute every score from the retained raw text.
 ## Cuttledoc 3 decision
 
 Postprocessing remains a first-class experiment under the local
-text-generation runtime work, with Gemma 3n E4B as the initial historical
-candidate. It is a separate, optional stage:
+text-generation runtime work. Gemma 4 E2B is the primary quality candidate,
+Qwen 3.5 0.8B is the small efficiency challenger, and SmolLM3 3B is the
+multilingual product-size compromise. Gemma 3n E4B remains a historical Ollama
+control rather than defining the new embedded runtime. It is a separate,
+optional stage:
 
 1. preserve the raw ASR transcript;
 2. correct a copy with the exact model, quantization, prompt, and decoding
@@ -81,9 +84,13 @@ candidate. It is a separate, optional stage:
 6. reject a candidate that introduces any critical semantic regression, even
    when aggregate WER improves.
 
-The first meaningful rerun should use raw outputs from Apple, Whisper, and
-Qwen on the audiobook and professional-podcast gold sets. Synthetic TTS remains
-a smoke/control condition, not the acceptance population.
+Issue #20 first executes all three candidates through one pinned reference
+layer on development data, then uses raw outputs from Apple, Whisper, Qwen,
+Parakeet, and Voxtral on the audiobook and professional-podcast gold sets for
+selection. Only the quality survivor proceeds to an official-MLX versus Core ML
+product-runtime comparison. Synthetic TTS remains a smoke/control condition,
+not the acceptance population. See
+[`transcript-enhancement-model-bakeoff.md`](transcript-enhancement-model-bakeoff.md).
 
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus
