@@ -576,9 +576,12 @@ def main() -> None:
                 "input_wer": word_error_rate(
                     fixture["evaluation_reference"], fixture["transcript"]
                 ),
-                "output_wer": word_error_rate(
-                    fixture["evaluation_reference"], corrected_text
+                "output_wer": (
+                    word_error_rate(fixture["evaluation_reference"], corrected_text)
+                    if parsed_output["parser"]["valid"] and output_nonempty
+                    else None
                 ),
+                "scored": parsed_output["parser"]["valid"] and output_nonempty,
                 "claim_limit": "The dataset transcript is unverified and the fixture is development-exposed; these values are diagnostic only.",
             },
         },
