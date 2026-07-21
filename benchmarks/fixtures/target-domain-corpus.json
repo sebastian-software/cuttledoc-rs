@@ -1,0 +1,264 @@
+{
+  "schema_version": "1.0.0",
+  "revision": "target-domain-corpus-de-podcast-1",
+  "evidence_date": "2026-07-21",
+  "plan_revision": "target-domain-held-out-1",
+  "purpose": "held-out",
+  "normalization": {
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "sample_format": "float32le",
+    "container": "raw",
+    "decoder": "ffmpeg accurate output seek after input decode"
+  },
+  "cells": [
+    {
+      "id": "de-DE/podcast",
+      "locale": "de-DE",
+      "domain": "podcast",
+      "status": "gold-review",
+      "summary": {
+        "selected_duration_ms": 1800000,
+        "human_verified_duration_ms": 0,
+        "source_group_count": 3,
+        "speaker_count": 5
+      },
+      "source_groups": [
+        {
+          "id": "die-wissensarchitektinnen-s01e01",
+          "source_candidate_id": "die-wissensarchitektinnen",
+          "rights_review_id": "die-wissensarchitektinnen-s01e01-rights-1",
+          "rights_review_path": "benchmarks/rights/die-wissensarchitektinnen-s01e01.json",
+          "work_kind": "episode",
+          "title": "Was ihr schon immer über Datentracking in der Wissenschaft wissen wolltet",
+          "published_at": "2026-02-01",
+          "locale": "de-DE",
+          "domain": "podcast",
+          "split": "validation",
+          "speakers": [
+            {
+              "id": "ulrike-wuttke",
+              "display_name": "Ulrike Wuttke",
+              "role": "host"
+            },
+            {
+              "id": "yuliya-fadeeva",
+              "display_name": "Yuliya Fadeeva",
+              "role": "guest"
+            },
+            {
+              "id": "renke-siems",
+              "display_name": "Renke Siems",
+              "role": "guest"
+            }
+          ],
+          "source_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e01.mp3",
+            "source_url": "https://podcasts.homes/audio/@Die_Wissensarchitekt_innen/was-ihr-schon-immer-uber-datentracking-in-der-wissenschaft-wissen-wolltet.mp3",
+            "sha256": "8013e0561a0dfcd464f55b97e4e327ae60a01d4a87fb6de2a8c228281f99f7ac",
+            "bytes": 114785154,
+            "duration_ms": 6988255
+          },
+          "selection": {
+            "start_ms": 170000,
+            "end_ms": 770000,
+            "duration_ms": 600000,
+            "track_roles": [
+              "long-form",
+              "aligned-clip-parent"
+            ]
+          },
+          "normalized_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e01-170000-770000.f32le",
+            "sha256": "2cd723b35b764f151717e409ba80b45b215c71e94edd51da43f1d2e4be77cb23",
+            "bytes": 38400000,
+            "sample_count": 9600000,
+            "duration_ms": 600000
+          },
+          "published_transcript": {
+            "artifact_name": "wissensarchitektinnen-s01e01-transcript.pdf",
+            "source_url": "https://ulrikewuttke.wordpress.com/wp-content/uploads/2026/02/1-1-yulia-renke-transkription_v3.pdf",
+            "sha256": "ed1beea6ddeaa60f5d43a032260275dddff955f11dd130b3fd9978e1f34bb137",
+            "bytes": 407705,
+            "status": "publisher-draft-not-gold",
+            "use": "alignment-and-transcription-aid-only"
+          },
+          "gold_transcript": {
+            "status": "pending-independent-human-review",
+            "artifact_name": "die-wissensarchitektinnen-s01e01-170000-770000.gold.json",
+            "sha256": null,
+            "bytes": null,
+            "reviewer_id": null,
+            "reviewed_at": null,
+            "review_record_sha256": null
+          },
+          "attribution": {
+            "creators": [
+              "Ulrike Wuttke",
+              "Yuliya Fadeeva",
+              "Renke Siems"
+            ],
+            "license": "CC-BY-4.0",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "changes": [
+              "Extracted the 00:02:50–00:12:50 range.",
+              "Decoded to mono 16 kHz float32 PCM without content editing."
+            ]
+          }
+        },
+        {
+          "id": "die-wissensarchitektinnen-s01e02",
+          "source_candidate_id": "die-wissensarchitektinnen",
+          "rights_review_id": "die-wissensarchitektinnen-s01e02-rights-1",
+          "rights_review_path": "benchmarks/rights/die-wissensarchitektinnen-s01e02.json",
+          "work_kind": "episode",
+          "title": "Business as usual? Philosophische Reflexionen zum Datentracking",
+          "published_at": "2026-03-01",
+          "locale": "de-DE",
+          "domain": "podcast",
+          "split": "test",
+          "speakers": [
+            {
+              "id": "ulrike-wuttke",
+              "display_name": "Ulrike Wuttke",
+              "role": "host"
+            },
+            {
+              "id": "nicola-moessner",
+              "display_name": "Nicola Mößner",
+              "role": "guest"
+            }
+          ],
+          "source_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e02.mp3",
+            "source_url": "https://podcasts.homes/audio/@Die_Wissensarchitekt_innen/business-as-usual-philosophische-reflexionen-zum-datentracking.mp3",
+            "sha256": "3ace500fb31b069c1866d36118c0582b78d78a52922b28c0e6192f08b5db370d",
+            "bytes": 52145098,
+            "duration_ms": 3512353
+          },
+          "selection": {
+            "start_ms": 124000,
+            "end_ms": 724000,
+            "duration_ms": 600000,
+            "track_roles": [
+              "long-form",
+              "aligned-clip-parent"
+            ]
+          },
+          "normalized_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e02-124000-724000.f32le",
+            "sha256": "4d8c2bd6132c6d45cfd00717f0f3d04f06e9305d0cb69b90f2dcc28c590498f9",
+            "bytes": 38400000,
+            "sample_count": 9600000,
+            "duration_ms": 600000
+          },
+          "published_transcript": {
+            "artifact_name": "wissensarchitektinnen-s01e02-transcript.pdf",
+            "source_url": "https://ulrikewuttke.wordpress.com/wp-content/uploads/2026/03/1-2-nicola-transkription_v3.pdf",
+            "sha256": "454b9ab7cdc139b4a226b663711d9f256ccd45071b9b5003b1178c7a9b82dc0f",
+            "bytes": 243357,
+            "status": "publisher-draft-not-gold",
+            "use": "alignment-and-transcription-aid-only"
+          },
+          "gold_transcript": {
+            "status": "pending-independent-human-review",
+            "artifact_name": "die-wissensarchitektinnen-s01e02-124000-724000.gold.json",
+            "sha256": null,
+            "bytes": null,
+            "reviewer_id": null,
+            "reviewed_at": null,
+            "review_record_sha256": null
+          },
+          "attribution": {
+            "creators": [
+              "Ulrike Wuttke",
+              "Nicola Mößner"
+            ],
+            "license": "CC-BY-4.0",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "changes": [
+              "Extracted the 00:02:04–00:12:04 range.",
+              "Decoded to mono 16 kHz float32 PCM without content editing."
+            ]
+          }
+        },
+        {
+          "id": "die-wissensarchitektinnen-s01e04",
+          "source_candidate_id": "die-wissensarchitektinnen",
+          "rights_review_id": "die-wissensarchitektinnen-s01e04-rights-1",
+          "rights_review_path": "benchmarks/rights/die-wissensarchitektinnen-s01e04.json",
+          "work_kind": "episode",
+          "title": "Von Stop Tracking Science zu Open Research Europe – Wie kann die Wende des wissenschaftlichen Publikationssystems gelingen?",
+          "published_at": "2026-05-03",
+          "locale": "de-DE",
+          "domain": "podcast",
+          "split": "test",
+          "speakers": [
+            {
+              "id": "ulrike-wuttke",
+              "display_name": "Ulrike Wuttke",
+              "role": "host"
+            },
+            {
+              "id": "bjoern-brembs",
+              "display_name": "Björn Brembs",
+              "role": "guest"
+            }
+          ],
+          "source_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e04.mp3",
+            "source_url": "https://podcasts.homes/audio/@Die_Wissensarchitekt_innen/von-stop-tracking-science-zu-open-research-europe-wie-kann-die-wende-des-wissenschaftlichen-publikationssystems-gelingen.mp3",
+            "sha256": "b5dfcf937f7fdfdd8e7df70cd1bb1b66c32ff44f2491094bc48c5879ae7239e5",
+            "bytes": 77212716,
+            "duration_ms": 5302898
+          },
+          "selection": {
+            "start_ms": 583000,
+            "end_ms": 1183000,
+            "duration_ms": 600000,
+            "track_roles": [
+              "long-form",
+              "aligned-clip-parent"
+            ]
+          },
+          "normalized_audio": {
+            "artifact_name": "die-wissensarchitektinnen-s01e04-583000-1183000.f32le",
+            "sha256": "20e76cc8bfc080e9681d5de61b3ea5c41be4608ab4c9893fac8dd85110e92d85",
+            "bytes": 38400000,
+            "sample_count": 9600000,
+            "duration_ms": 600000
+          },
+          "published_transcript": {
+            "artifact_name": "wissensarchitektinnen-s01e04-transcript.pdf",
+            "source_url": "https://ulrikewuttke.wordpress.com/wp-content/uploads/2026/05/1-4-transkription-brembs-v2.pdf",
+            "sha256": "4dbd2401a62b35fc754d514ec2a29aabf896d7fea7de1c5ae1a720aee684e2a1",
+            "bytes": 323544,
+            "status": "publisher-draft-not-gold",
+            "use": "alignment-and-transcription-aid-only"
+          },
+          "gold_transcript": {
+            "status": "pending-independent-human-review",
+            "artifact_name": "die-wissensarchitektinnen-s01e04-583000-1183000.gold.json",
+            "sha256": null,
+            "bytes": null,
+            "reviewer_id": null,
+            "reviewed_at": null,
+            "review_record_sha256": null
+          },
+          "attribution": {
+            "creators": [
+              "Ulrike Wuttke",
+              "Björn Brembs"
+            ],
+            "license": "CC-BY-4.0",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "changes": [
+              "Extracted the 00:09:43–00:19:43 range.",
+              "Decoded to mono 16 kHz float32 PCM without content editing."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

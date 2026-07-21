@@ -94,6 +94,20 @@ remains a short-read integration gate; audiobook and professional-podcast
 cells are reported separately, with independent-source grouping and
 human-verified gold transcripts.
 
+The first concrete selection is
+[`target-domain-corpus.json`](fixtures/target-domain-corpus.json). It pins three
+CC-BY-4.0 German podcast episodes, three exact ten-minute ranges, five speakers,
+validation/test isolation, publisher-draft transcript digests, and deterministic
+mono 16 kHz float PCM. Its gold status deliberately remains
+`pending-independent-human-review`. Materialize or re-verify the normalized
+audio outside Git with:
+
+```sh
+node scripts/materialize-target-domain-corpus.mjs \
+  --input-dir /absolute/path/to/cuttledoc-target-domain \
+  --output-dir /absolute/path/to/cuttledoc-target-domain/normalized
+```
+
 The separate
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 defines the Phase 5 TTS → STT diagnostic under issue #13. It starts with

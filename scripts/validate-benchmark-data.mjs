@@ -2,7 +2,7 @@
 
 import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -344,6 +344,198 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
         errors.push(`${cell.id}: ${sourceId} does not cover ${cell.locale}`);
       }
     }
+  }
+  return errors;
+}
+
+function validateTargetDomainCorpus(corpus, plan, rightsReviews) {
+  const errors = [];
+  if (corpus.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!(corpus.revision?.length > 0) ||
+      corpus.plan_revision !== plan.revision ||
+      corpus.purpose !== 'held-out') {
+    errors.push('corpus revision, plan revision, and purpose are inconsistent');
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(corpus.evidence_date ?? '')) {
+    errors.push('evidence_date must be an ISO date');
+  }
+  if (corpus.normalization?.sample_rate_hz !== 16_000 ||
+      corpus.normalization?.channels !== 1 ||
+      corpus.normalization?.sample_format !== 'float32le' ||
+      corpus.normalization?.container !== 'raw' ||
+      !(corpus.normalization?.decoder?.length > 0)) {
+    errors.push('normalization must pin mono 16 kHz raw float32le decoding');
+  }
+
+  const planCells = new Map(plan.cells.map((cell) => [cell.id, cell]));
+  const reviews = new Map(
+    rightsReviews.map((review) => [review.review_id, review]),
+  );
+  const seenCells = new Set();
+  const seenSourceGroups = new Map();
+  for (const cell of corpus.cells ?? []) {
+    if (seenCells.has(cell.id)) errors.push(`duplicate corpus cell: ${cell.id}`);
+    seenCells.add(cell.id);
+    const planCell = planCells.get(cell.id);
+    if (!planCell || cell.id !== `${cell.locale}/${cell.domain}`) {
+      errors.push(`${cell.id}: corpus cell is absent from the target plan`);
+    }
+    if (planCell?.status !== cell.status) {
+      errors.push(`${cell.id}: corpus and plan status differ`);
+    }
+    const speakers = new Set();
+    let selectedDurationMs = 0;
+    let humanVerifiedDurationMs = 0;
+    const splits = new Set();
+    for (const sourceGroup of cell.source_groups ?? []) {
+      const previousSplit = seenSourceGroups.get(sourceGroup.id);
+      if (previousSplit) {
+        errors.push(
+          `${sourceGroup.id}: source group crosses ${previousSplit} and ${sourceGroup.split}`,
+        );
+      }
+      seenSourceGroups.set(sourceGroup.id, sourceGroup.split);
+      splits.add(sourceGroup.split);
+      if (!['validation', 'test'].includes(sourceGroup.split)) {
+        errors.push(`${sourceGroup.id}: held-out split must be validation or test`);
+      }
+      if (sourceGroup.locale !== cell.locale ||
+          sourceGroup.domain !== cell.domain ||
+          !['episode', 'work'].includes(sourceGroup.work_kind)) {
+        errors.push(`${sourceGroup.id}: source-group cell identity is inconsistent`);
+      }
+      if (!planCell?.source_candidate_ids.includes(
+        sourceGroup.source_candidate_id,
+      )) {
+        errors.push(`${sourceGroup.id}: source candidate is absent from the plan cell`);
+      }
+      const review = reviews.get(sourceGroup.rights_review_id);
+      if (!review || review.disposition !== 'accepted' ||
+          review.scope !== 'source-group' ||
+          review.source_group_id !== sourceGroup.id ||
+          review.source_candidate_id !== sourceGroup.source_candidate_id) {
+        errors.push(`${sourceGroup.id}: exact accepted rights review is missing`);
+      }
+      if (sourceGroup.rights_review_path !==
+          `benchmarks/rights/${sourceGroup.id}.json`) {
+        errors.push(`${sourceGroup.id}: rights_review_path is not canonical`);
+      }
+      const source = sourceGroup.source_audio;
+      if (review && (source?.artifact_name !== review.acquisition?.artifact_name ||
+          source?.source_url !== review.acquisition?.source_url ||
+          source?.sha256 !== review.acquisition?.expected_source_sha256)) {
+        errors.push(`${sourceGroup.id}: source audio differs from rights review`);
+      }
+      if (!/^[0-9a-f]{64}$/.test(source?.sha256 ?? '') ||
+          !Number.isInteger(source?.bytes) || source.bytes <= 0 ||
+          !Number.isInteger(source?.duration_ms) || source.duration_ms <= 0) {
+        errors.push(`${sourceGroup.id}: source audio metadata is incomplete`);
+      }
+
+      const selection = sourceGroup.selection;
+      const durationMs = selection?.end_ms - selection?.start_ms;
+      if (!Number.isInteger(selection?.start_ms) ||
+          selection.start_ms < 0 ||
+          durationMs !== selection?.duration_ms ||
+          selection.end_ms > source?.duration_ms ||
+          durationMs < plan.tracks.long_form.minimum_passage_duration_ms ||
+          durationMs > plan.tracks.long_form.maximum_passage_duration_ms ||
+          !arrayEquals(selection?.track_roles ?? [], [
+            'long-form',
+            'aligned-clip-parent',
+          ])) {
+        errors.push(`${sourceGroup.id}: exact range or track roles are invalid`);
+      }
+      selectedDurationMs += selection?.duration_ms ?? 0;
+
+      const normalized = sourceGroup.normalized_audio;
+      if (!/^[0-9a-f]{64}$/.test(normalized?.sha256 ?? '') ||
+          normalized?.duration_ms !== selection?.duration_ms ||
+          normalized?.sample_count !== normalized?.duration_ms * 16 ||
+          normalized?.bytes !== normalized?.sample_count * 4) {
+        errors.push(`${sourceGroup.id}: normalized PCM metadata is inconsistent`);
+      }
+      const publishedTranscript = sourceGroup.published_transcript;
+      if (!/^[0-9a-f]{64}$/.test(publishedTranscript?.sha256 ?? '') ||
+          !Number.isInteger(publishedTranscript?.bytes) ||
+          publishedTranscript.bytes <= 0 ||
+          publishedTranscript?.status !== 'publisher-draft-not-gold' ||
+          publishedTranscript?.use !== 'alignment-and-transcription-aid-only') {
+        errors.push(`${sourceGroup.id}: publisher transcript must stay digest-pinned draft material`);
+      }
+      for (const speaker of sourceGroup.speakers ?? []) {
+        if (!(speaker.id?.length > 0) || !(speaker.display_name?.length > 0)) {
+          errors.push(`${sourceGroup.id}: speaker identity is incomplete`);
+        }
+        speakers.add(speaker.id);
+      }
+
+      const gold = sourceGroup.gold_transcript;
+      if (gold?.status === 'pending-independent-human-review') {
+        for (const field of [
+          'sha256',
+          'bytes',
+          'reviewer_id',
+          'reviewed_at',
+          'review_record_sha256',
+        ]) {
+          if (gold[field] !== null) {
+            errors.push(`${sourceGroup.id}: pending gold ${field} must be null`);
+          }
+        }
+      } else if (gold?.status === 'human-verified') {
+        if (!/^[0-9a-f]{64}$/.test(gold.sha256 ?? '') ||
+            !Number.isInteger(gold.bytes) || gold.bytes <= 0 ||
+            !(gold.reviewer_id?.length > 0) ||
+            Number.isNaN(Date.parse(gold.reviewed_at ?? '')) ||
+            !/^[0-9a-f]{64}$/.test(gold.review_record_sha256 ?? '')) {
+          errors.push(`${sourceGroup.id}: human-verified gold evidence is incomplete`);
+        } else {
+          humanVerifiedDurationMs += selection.duration_ms;
+        }
+      } else {
+        errors.push(`${sourceGroup.id}: gold transcript status is invalid`);
+      }
+      if (!(gold?.artifact_name?.length > 0) ||
+          basename(gold.artifact_name) !== gold.artifact_name) {
+        errors.push(`${sourceGroup.id}: gold transcript artifact name is unsafe`);
+      }
+      if (sourceGroup.attribution?.license !== 'CC-BY-4.0' ||
+          sourceGroup.attribution?.license_url !==
+            'https://creativecommons.org/licenses/by/4.0/' ||
+          !(sourceGroup.attribution?.creators?.length > 0) ||
+          !(sourceGroup.attribution?.changes?.length > 0)) {
+        errors.push(`${sourceGroup.id}: CC BY attribution is incomplete`);
+      }
+    }
+    const sourceGroupCount = cell.source_groups?.length ?? 0;
+    if (selectedDurationMs !== cell.summary?.selected_duration_ms ||
+        humanVerifiedDurationMs !== cell.summary?.human_verified_duration_ms ||
+        sourceGroupCount !== cell.summary?.source_group_count ||
+        speakers.size !== cell.summary?.speaker_count) {
+      errors.push(`${cell.id}: summary differs from source-group evidence`);
+    }
+    if (selectedDurationMs < plan.tracks.aligned_clip.minimum_total_duration_ms ||
+        sourceGroupCount < plan.tracks.aligned_clip.minimum_source_groups ||
+        speakers.size < plan.tracks.aligned_clip.minimum_speakers) {
+      errors.push(`${cell.id}: selected corpus does not meet the 30m/3/3 contract`);
+    }
+    if (!splits.has('validation') || !splits.has('test')) {
+      errors.push(`${cell.id}: validation and test assignments must both be frozen`);
+    }
+    const allHumanVerified = humanVerifiedDurationMs === selectedDurationMs;
+    if ((cell.status === 'ready' || cell.status === 'complete') &&
+        !allHumanVerified) {
+      errors.push(`${cell.id}: ready corpus requires complete human gold review`);
+    }
+    if (cell.status === 'gold-review' && allHumanVerified) {
+      errors.push(`${cell.id}: fully reviewed corpus must advance beyond gold-review`);
+    }
+  }
+  if ((corpus.cells ?? []).length === 0) {
+    errors.push('corpus must contain at least one selected cell');
   }
   return errors;
 }
@@ -3594,6 +3786,10 @@ const targetDomainPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/target-domain-plan.json',
 );
+const targetDomainCorpusPath = join(
+  repoRoot,
+  'benchmarks/fixtures/target-domain-corpus.json',
+);
 const syntheticRoundtripPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/synthetic-roundtrip-plan.json',
@@ -3725,6 +3921,8 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/matrix.schema.json'),
   join(repoRoot, 'benchmarks/schema/source-candidates.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
+  join(repoRoot, 'benchmarks/schema/target-domain-corpus.schema.json'),
+  join(repoRoot, 'benchmarks/schema/target-domain-transcript.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-selection.schema.json'),
   join(repoRoot, 'benchmarks/schema/tts-run.schema.json'),
@@ -3761,6 +3959,7 @@ const manifest = await readJson(manifestPath);
 const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const targetDomainPlan = await readJson(targetDomainPlanPath);
+const targetDomainCorpus = await readJson(targetDomainCorpusPath);
 const syntheticRoundtripPlan = await readJson(syntheticRoundtripPlanPath);
 const syntheticRoundtripSelection = await readJson(
   syntheticRoundtripSelectionPath,
@@ -3859,6 +4058,13 @@ failures.push(
   ...validateTargetDomainPlan(targetDomainPlan, sourceCandidates).map(
     (error) => `${targetDomainPlanPath}: ${error}`,
   ),
+);
+failures.push(
+  ...validateTargetDomainCorpus(
+    targetDomainCorpus,
+    targetDomainPlan,
+    sourceRightsReviews,
+  ).map((error) => `${targetDomainCorpusPath}: ${error}`),
 );
 failures.push(
   ...validateSyntheticRoundtripPlan(syntheticRoundtripPlan).map(
@@ -4214,6 +4420,16 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push('validator self-test failed to reject a development source in a held-out cell');
   }
+  const invalidTargetDomainCorpus = structuredClone(targetDomainCorpus);
+  invalidTargetDomainCorpus.cells[0].source_groups[0]
+    .normalized_audio.bytes += 4;
+  if (validateTargetDomainCorpus(
+    invalidTargetDomainCorpus,
+    targetDomainPlan,
+    sourceRightsReviews,
+  ).length === 0) {
+    failures.push('validator self-test failed to reject target-domain PCM drift');
+  }
   const invalidSyntheticRoundtripPlan = structuredClone(
     syntheticRoundtripPlan,
   );
@@ -4478,6 +4694,7 @@ console.log(
   `${aggregates.length} aggregate(s), ${matrices.length} matrix record(s), ` +
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
+  `${targetDomainCorpus.cells.length} selected target-domain corpus cell(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
   `3 measured TTS diagnostics, ` +

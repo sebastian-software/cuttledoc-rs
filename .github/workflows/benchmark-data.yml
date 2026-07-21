@@ -6,6 +6,7 @@ on:
       - "benchmarks/**"
       - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/import-target-domain-source.mjs"
+      - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/validate-benchmark-data.mjs"
@@ -16,6 +17,7 @@ on:
       - "benchmarks/**"
       - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/import-target-domain-source.mjs"
+      - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/validate-benchmark-data.mjs"
@@ -33,6 +35,8 @@ jobs:
         run: node scripts/validate-benchmark-data.mjs --self-test
       - name: Verify rights-gated local source import
         run: node scripts/import-target-domain-source.mjs --self-test
+      - name: Verify target-domain corpus materializer
+        run: node scripts/materialize-target-domain-corpus.mjs --self-test
       - name: Verify deterministic ASR error analysis
         run: >-
           node scripts/analyze-asr-errors.mjs

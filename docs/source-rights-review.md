@@ -1,9 +1,9 @@
 # Benchmark source rights review
 
-**Status:** accepted acquisition gate; no target-domain source group is
-accepted yet.
+**Status:** accepted acquisition gate; three German podcast source groups are
+accepted and materialized locally. German audiobook acquisition remains blocked.
 
-**Evidence date:** 2026-07-20.
+**Evidence date:** 2026-07-21.
 
 Issue [#18](https://github.com/sebastian-software/cuttledoc-rs/issues/18)
 requires professionally recorded, held-out podcast and audiobook audio. Public
@@ -18,7 +18,12 @@ source terms, or an appropriate reviewer resolves it.
 ## Review levels
 
 A candidate-level review records whether a corpus is worth pursuing and which
-questions remain. It can never authorize acquisition. Current reviews are:
+questions remain. It can never authorize acquisition. Current reviews include:
+
+- `die-wissensarchitektinnen-s01e01`, `s01e02`, and `s01e04`: accepted
+  source-group reviews for professionally produced German podcast episodes.
+  The official feed licenses each episode under CC BY 4.0; exact originals are
+  digest-pinned, and selected ranges remain pending independent gold review;
 
 - [`merkel-podcast-corpus.json`](../benchmarks/rights/merkel-podcast-corpus.json):
   strong German podcast fit, blocked because no explicit audio/transcript grant
@@ -71,6 +76,19 @@ deterministic `.provenance.json` sidecar. Re-running the command verifies the
 existing files rather than silently replacing them.
 
 Original import is intentionally separate from audio normalization and gold
-transcript work. Once three German podcast and three German audiobook source
-groups are accepted, the next manifest revision will pin exact clip ranges,
-normalized PCM digests, split assignments, and independent gold-review state.
+transcript work. The first selection is pinned in
+[`target-domain-corpus.json`](../benchmarks/fixtures/target-domain-corpus.json):
+three ten-minute German podcast passages, five speakers, frozen validation/test
+assignments, exact original/publisher-transcript/normalized-PCM digests, and an
+explicit pending independent-review state. Reproduce the local PCM with:
+
+```sh
+node scripts/materialize-target-domain-corpus.mjs \
+  --input-dir /absolute/path/to/cuttledoc-target-domain \
+  --output-dir /absolute/path/to/cuttledoc-target-domain/normalized
+```
+
+The materializer rechecks each accepted rights review and original digest before
+invoking FFmpeg, then rejects any normalized-byte or digest drift. The publisher
+transcripts are alignment aids, never unquestioned gold. See
+[`target-domain-gold-review.md`](target-domain-gold-review.md) for the human gate.

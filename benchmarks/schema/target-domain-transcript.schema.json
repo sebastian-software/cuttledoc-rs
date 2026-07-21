@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/target-domain-transcript.schema.json",
+  "title": "Cuttledoc exact-audio target-domain transcript",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "transcript_id",
+    "revision",
+    "source_group_id",
+    "locale",
+    "domain",
+    "audio",
+    "turns",
+    "review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "transcript_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_group_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "enum": [
+        "podcast",
+        "audiobook"
+      ]
+    },
+    "audio": {
+      "type": "object",
+      "required": [
+        "normalized_sha256",
+        "duration_ms",
+        "source_start_ms",
+        "source_end_ms"
+      ],
+      "properties": {
+        "normalized_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_start_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_end_ms": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "turns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/turn"
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "status",
+        "prepared_by",
+        "reviewer_id",
+        "reviewed_at",
+        "compared_against_exact_audio",
+        "preserved_fields",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "draft",
+            "human-verified"
+          ]
+        },
+        "prepared_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "compared_against_exact_audio": {
+          "type": "boolean"
+        },
+        "preserved_fields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "verbatim-text",
+              "speaker-turns",
+              "punctuation",
+              "capitalization",
+              "numbers",
+              "disfluencies",
+              "uncertainty"
+            ]
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "span": {
+      "type": "object",
+      "required": [
+        "start_char",
+        "end_char",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "start_char": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_char": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "enum": [
+            "name-or-term",
+            "number-date-or-unit",
+            "negation",
+            "uncertain"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "turn": {
+      "type": "object",
+      "required": [
+        "speaker_id",
+        "start_ms",
+        "end_ms",
+        "text",
+        "spans"
+      ],
+      "properties": {
+        "speaker_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/span"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
