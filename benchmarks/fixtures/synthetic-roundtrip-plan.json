@@ -57,8 +57,8 @@
         "record_spoken_text_sha256": true,
         "record_change_notice": true,
         "preserve_attribution": true,
-        "generated_audio_location": "local-required",
-        "redistribution": "blocked-until-CC-BY-SA-attribution-package-review"
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
       }
     },
     {
@@ -82,8 +82,8 @@
         "record_spoken_text_sha256": true,
         "record_change_notice": true,
         "preserve_attribution": true,
-        "generated_audio_location": "local-required",
-        "redistribution": "blocked-until-CC-BY-SA-attribution-package-review"
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
       }
     }
   ],
@@ -296,7 +296,20 @@
     "fixed_generation_parameters": true,
     "minimum_repetitions": 2,
     "require_fresh_process_cold_load": true,
-    "forbid_asr_specific_text_changes": true
+    "forbid_asr_specific_text_changes": true,
+    "repository_audio": {
+      "scope": "Redistributable clean-speech fixtures with an accepted rights review, complete attribution, and a passed lossless-versus-codec ASR control.",
+      "container": "Ogg",
+      "codec": "Opus",
+      "target_bit_rate_bps": 64000,
+      "variable_bit_rate": true,
+      "application": "audio",
+      "frame_duration_ms": 20,
+      "expected_packet_loss_percent": 0,
+      "lossless_generation_source": "local-required-and-sha256-pinned",
+      "license_boundary": "per-asset-sidecar-and-attribution",
+      "product_packages": "excluded"
+    }
   },
   "metrics": {
     "text_fidelity": [

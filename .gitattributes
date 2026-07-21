@@ -1,0 +1,2 @@
+*.opus binary
+benchmarks/assets/** export-ignore

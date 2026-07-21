@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-de-origin.qwen3-tts-0.6b-ryan.opus-64k-1",
+  "purpose": "reproducible-clean-speech-benchmark-and-codec-control",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 829,
+    "characters": 811,
+    "sha256": "6a4dadcdf7ba6d98ec697006166c89d0f903e04341fd39aaa762072af452e344",
+    "spoken_text_sha256": "e21020c7d9aa51a52a023b9e9c3f153c21404ace1d8e9b67d69c0ff1fc0d553e",
+    "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+    "passage_id": "synthetic-de-origin",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-0.6b-mlx-reference.synthetic-de-origin-1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16",
+    "model_revision": "6415d95f88be018ff9e46813119dc3bc12261328",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice": "Ryan",
+    "locale": "de-DE",
+    "cross_lingual": true,
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1860480,
+      "bytes": 7441920,
+      "sha256": "ec7c19aaa1f7c9aeb1362f2a0259af81ea3599f6aa5876bb07bd833db7bad7b5"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "773f28cb8970ed1425b7e20151d192008116093b80790d9f62021800b795d372"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 763465,
+    "sha256": "ee07a8ac87054a9c02680fb85cd645dedcd11043a169e757c282c035640999db",
+    "duration_ms": 77526.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 78782,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "FFmpeg 8.1.2_1 libopus 1.6.1",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

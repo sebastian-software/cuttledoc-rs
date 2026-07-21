@@ -6,7 +6,7 @@
   "text_encoding": "utf-8",
   "paragraph_joiner": "\n\n",
   "spoken_transform": "none",
-  "generated_assets": "local-required",
+  "generated_assets": "lossless-local-opus-repository-after-rights-review",
   "sources": [
     {
       "id": "de-wikipedia-kuenstliche-intelligenz-268935951",

@@ -678,10 +678,11 @@ function validateSyntheticRoundtripPlan(plan) {
         errors.push(`${source.id}: materialization_policy.${field} must be true`);
       }
     }
-    if (policy?.generated_audio_location !== 'local-required' ||
+    if (policy?.generated_audio_location !==
+          'lossless-local-opus-repository-after-rights-review' ||
         policy?.redistribution !==
-          'blocked-until-CC-BY-SA-attribution-package-review') {
-      errors.push(`${source.id}: generated assets must remain local and redistribution-blocked`);
+          'CC-BY-SA-4.0-with-attribution-after-codec-control') {
+      errors.push(`${source.id}: generated assets must preserve the reviewed lossless/local and Opus/repository split`);
     }
   }
 
@@ -840,6 +841,22 @@ function validateSyntheticRoundtripPlan(plan) {
       execution?.minimum_repetitions < 2) {
     errors.push('execution policy requires multi-voice, multi-engine coverage and at least two repetitions');
   }
+  const repositoryAudio = execution?.repository_audio;
+  if (!(repositoryAudio?.scope?.length > 0) ||
+      repositoryAudio?.container !== 'Ogg' ||
+      repositoryAudio?.codec !== 'Opus' ||
+      repositoryAudio?.target_bit_rate_bps !== 64_000 ||
+      repositoryAudio?.variable_bit_rate !== true ||
+      repositoryAudio?.application !== 'audio' ||
+      repositoryAudio?.frame_duration_ms !== 20 ||
+      repositoryAudio?.expected_packet_loss_percent !== 0 ||
+      repositoryAudio?.lossless_generation_source !==
+        'local-required-and-sha256-pinned' ||
+      repositoryAudio?.license_boundary !==
+        'per-asset-sidecar-and-attribution' ||
+      repositoryAudio?.product_packages !== 'excluded') {
+    errors.push('execution_policy.repository_audio must preserve the accepted Opus and licensing boundary');
+  }
   for (const field of ['text_fidelity', 'synthesis']) {
     if (!uniqueStrings(plan.metrics?.[field])) {
       errors.push(`metrics.${field} must be a non-empty unique string array`);
@@ -866,8 +883,9 @@ function validateSyntheticRoundtripSelection(selection, plan) {
       selection.text_encoding !== 'utf-8' ||
       selection.paragraph_joiner !== '\n\n' ||
       selection.spoken_transform !== 'none' ||
-      selection.generated_assets !== 'local-required') {
-    errors.push('selection policy must preserve local diagnostic materialization');
+      selection.generated_assets !==
+        'lossless-local-opus-repository-after-rights-review') {
+    errors.push('selection policy must preserve local lossless sources and reviewed repository Opus assets');
   }
   const expectedSources = new Map(
     plan.text_sources.map((source) => [source.id, source]),

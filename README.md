@@ -95,4 +95,7 @@ This repository is intentionally not a GitHub fork. It combines three codebases 
 
 ## License
 
-[MIT](LICENSE)
+The source code is [MIT-licensed](LICENSE) unless a file says otherwise.
+Redistributable benchmark media under
+[`benchmarks/assets`](benchmarks/assets/README.md) carries separate per-asset
+licensing and is excluded from product archives and packages.

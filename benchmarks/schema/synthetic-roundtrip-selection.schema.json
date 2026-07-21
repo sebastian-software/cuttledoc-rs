@@ -37,7 +37,7 @@
       "const": "none"
     },
     "generated_assets": {
-      "const": "local-required"
+      "const": "lossless-local-opus-repository-after-rights-review"
     },
     "sources": {
       "type": "array",

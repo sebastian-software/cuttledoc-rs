@@ -35,8 +35,10 @@ The machine-readable contract is
 The exact nine-passage selection is
 [`synthetic-roundtrip-selection.json`](../benchmarks/fixtures/synthetic-roundtrip-selection.json).
 On 2026-07-20, the repository materializer retrieved both pinned revisions
-and reproduced all nine expected text digests. The CC BY-SA passage text and
-attribution package remain in the caller-selected local output directory.
+and reproduced all nine expected text digests. It writes the full CC BY-SA
+passage and attribution package to the caller-selected local output directory.
+Reviewed fixtures may additionally enter `benchmarks/assets` with an explicit
+per-asset license and attribution package.
 
 ```sh
 node scripts/materialize-synthetic-roundtrip.mjs \
@@ -60,10 +62,11 @@ language-specific behavior.
 Wikipedia text is available under CC BY-SA 4.0. Materialization must preserve
 the article title, exact revision link, history/authorship link, license,
 verbatim-text digest, spoken-text digest, and a notice for every change made
-for speech. Generated audio remains local until its attribution and
-redistribution package has been reviewed. This isolation also prevents
-CC BY-SA benchmark assets from being mistaken for code covered by the
-repository license.
+for speech. Lossless generated audio remains local and digest-pinned. A compact
+Opus copy may be committed only after its attribution, redistribution, and
+lossless-versus-codec control have passed review. The dedicated asset tree and
+SPDX sidecars prevent CC BY-SA media from being mistaken for code covered by
+the repository MIT license.
 
 ## Calibration shortlist
 
@@ -124,7 +127,8 @@ parameters. The same passages are used across voices. Every artifact's
 digest-checked normalized PCM is passed unchanged to Apple Speech, Whisper,
 direct Qwen3-ASR over MLX, Parakeet, and direct Voxtral Realtime over MLX at
 the 2,400 ms quality configuration. Raw generated audio and raw ASR text are
-retained locally.
+retained locally. A reviewed Ogg Opus copy may additionally be retained in Git
+for exact cross-engine reproduction.
 
 The report keeps two text views:
 
@@ -143,6 +147,39 @@ A roundtrip mismatch is not automatically an ASR error. It is attributed to
 TTS only when the generated audio contains the wrong or missing spoken
 content, to ASR when intelligible content is transcribed incorrectly across
 the shared audio, or left unresolved when the evidence is ambiguous.
+
+## Repository audio format and codec control
+
+The canonical Git format for reviewed clean-speech fixtures is mono Ogg Opus
+with a 64 kbit/s VBR target, the `audio` application, 20 ms frames, and 0%
+expected packet loss. The original lossless generation output remains local
+for listening and acoustic-quality review. Benchmark media is excluded from
+product packages and carries its own attribution and license.
+
+The first checked fixture is
+[`synthetic-de-origin`](../benchmarks/assets/synthetic/de-DE/qwen3-tts-0.6b-ryan/synthetic-de-origin/manifest.json).
+Its 7.44 MB lossless float PCM source becomes a 763,465-byte Opus artifact.
+FFmpeg 8.1.2 with libopus 1.6.1 produced byte-identical repeated encodes. The
+machine-readable
+[`codec control`](../benchmarks/controls/opus-codec-qwen3-tts-de-1.json)
+compares normalized lossless audio with 48, 64, and 96 kbit/s targets across
+all five required ASR engines:
+
+| Backend | Lossless WER | 48 kbit/s | 64 kbit/s | 96 kbit/s |
+| --- | ---: | ---: | ---: | ---: |
+| Whisper large-v3-turbo | 1.94% | 1.94% | 1.94% | 1.94% |
+| Parakeet TDT 0.6B v3 | 8.74% | 9.71% | 6.80% | 8.74% |
+| Direct Qwen3-ASR 0.6B/MLX | 1.94% | 2.91% | 1.94% | 1.94% |
+| Direct Voxtral Realtime 4B/MLX | 3.88% | 3.88% | 3.88% | 3.88% |
+| Apple Speech | 4.85% | 4.85% | 4.85% | 4.85% |
+
+At 64 kbit/s, no backend regressed in lexical WER relative to lossless. The
+remaining transcript differences are punctuation or compound-hyphen choices;
+Parakeet happened to improve by two word edits. That non-monotonic improvement
+is model sensitivity, not evidence that lossy audio is better. This bounded
+control accepts 64 kbit/s for clean synthetic ASR fixtures; it does not claim
+codec transparency for music, TTS listening tests, or every future voice and
+language.
 
 ## Apple system baseline result
 
@@ -176,19 +213,20 @@ The first diagnostic therefore fixes the English-native `Ryan` preset speaking
 German. This is a real cross-lingual limitation to review, not a reason to
 discard the platform or model family.
 
-Four ASR backends have now transcribed the exact same digest-pinned 16 kHz
+Five ASR backends have now transcribed the exact same digest-pinned 16 kHz
 audio:
 
 | Backend | German WER | German CER | Diagnostic observation |
 | --- | ---: | ---: | --- |
 | Whisper large-v3-turbo | 1.94% | 0.00% | exact lexical character sequence; WER comes from splitting `Rockefeller-Stiftung` |
 | Direct Qwen3-ASR 0.6B/MLX | 1.94% | 0.58% | semantically equivalent `ca.`/`circa` and `im Lauf`/`im Laufe`; names and technical terms preserved |
+| Direct Voxtral Realtime 4B/MLX | 3.88% | 0.00% | lexical differences are source/reference hyphens and `ca.`/`circa`; names and technical terms preserved |
 | Apple Speech | 4.85% | 0.58% | substitutions include `Dartmouth`/`Dartmoalth` and `Augmentation`/`Augumentation` |
 | Parakeet TDT 0.6B v3 | 8.74% | 3.03% | language-switch errors concentrate around embedded English terms |
 
 The spread strengthens the evidence that Qwen generated the intended German
 content and demonstrates why one roundtrip score must not be treated as a TTS
-quality score. All four ASR cells are complete on identical PCM. A blinded
+quality score. All five ASR cells are complete on identical PCM. A blinded
 listening review remains necessary to evaluate pronunciation and prosody and
 to assign any audible residual errors.
 
@@ -251,6 +289,10 @@ artifact also remains reference-only under CC BY-NC 4.0.
    Voxtral BF16 as required generators, KugelAudio as a bounded German
    challenger, and five required ASR receivers including direct Voxtral
    Realtime.
+   **Archive control complete:** a five-engine lossless/48/64/96 kbit/s check
+   accepts 64 kbit/s Ogg Opus for reviewed clean-speech Git fixtures. The first
+   CC BY-SA asset, attribution, reproduction script, and validation record are
+   checked in; lossless generation PCM remains local.
 5. Pin the new model/runtime artifacts and run one German and one English
    calibration passage before the full matrix. Generate two voices each for
    Apple, Qwen, and Voxtral, plus one German KugelAudio voice; run the five

@@ -140,14 +140,25 @@ The command retrieves the two exact MediaWiki revisions, verifies page and
 parent revision metadata, resolves fixed section/paragraph selectors, and
 rejects any character-count or SHA-256 drift. The checked-in
 [`synthetic-roundtrip-selection.json`](fixtures/synthetic-roundtrip-selection.json)
-contains selectors and digests, not the licensed passage text or generated
-audio.
+contains selectors and digests. Lossless generated audio remains local. The
+separately licensed [`assets`](assets/README.md) tree may contain reviewed Ogg
+Opus copies with complete attribution and a passed codec control; it currently
+contains the first `synthetic-de-origin` Qwen fixture.
+
+Validate its five-engine lossless/48/64/96 kbit/s evidence and the committed
+asset hashes with:
+
+```sh
+node scripts/validate-opus-codec-control.mjs --self-test
+```
 
 The first measured TTS lifecycle record is
 [`phase5.apple-tts.synthetic-de-origin-1`](raw/phase5.apple-tts.synthetic-de-origin-1/result.json).
 It records the native Apple voice PCM metadata and digest, Rust/Swift
 ownership, timing/resources, stable busy/cancel statuses, and the restricted
 process-context control. The raw CC BY-SA-derived audio remains local.
+The reviewed compact Qwen codec-control copy is committed separately under
+`benchmarks/assets`; it is not a replacement for the lossless TTS artifact.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
@@ -271,9 +282,12 @@ product dependency.
 ## Fixture rules
 
 - Record exact provenance, artifact license, language, normalization, and hash.
-- Synthetic speech is useful for pipeline smoke tests but is not quality data.
+- Synthetic speech is controlled decision-support for clean-speech model
+  selection, but is not standalone release-quality or real-world evidence.
 - A local-required fixture may stay out of Git only after its expected digest
   and acquisition procedure are fixed in the manifest.
+- A repository media fixture requires separate licensing, attribution,
+  provenance, a lossless-versus-codec control, and product-package exclusion.
 - Use the same normalized audio bytes for every candidate in a comparison.
 
 WER and CER are lowercase, punctuation-insensitive Levenshtein distance divided

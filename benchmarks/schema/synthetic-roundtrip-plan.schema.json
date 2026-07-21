@@ -199,10 +199,10 @@
                 "const": true
               },
               "generated_audio_location": {
-                "const": "local-required"
+                "const": "lossless-local-opus-repository-after-rights-review"
               },
               "redistribution": {
-                "const": "blocked-until-CC-BY-SA-attribution-package-review"
+                "const": "CC-BY-SA-4.0-with-attribution-after-codec-control"
               }
             },
             "additionalProperties": false
@@ -395,7 +395,8 @@
         "fixed_generation_parameters",
         "minimum_repetitions",
         "require_fresh_process_cold_load",
-        "forbid_asr_specific_text_changes"
+        "forbid_asr_specific_text_changes",
+        "repository_audio"
       ],
       "properties": {
         "matrix": {
@@ -439,6 +440,58 @@
         },
         "forbid_asr_specific_text_changes": {
           "const": true
+        },
+        "repository_audio": {
+          "type": "object",
+          "required": [
+            "scope",
+            "container",
+            "codec",
+            "target_bit_rate_bps",
+            "variable_bit_rate",
+            "application",
+            "frame_duration_ms",
+            "expected_packet_loss_percent",
+            "lossless_generation_source",
+            "license_boundary",
+            "product_packages"
+          ],
+          "properties": {
+            "scope": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "container": {
+              "const": "Ogg"
+            },
+            "codec": {
+              "const": "Opus"
+            },
+            "target_bit_rate_bps": {
+              "const": 64000
+            },
+            "variable_bit_rate": {
+              "const": true
+            },
+            "application": {
+              "const": "audio"
+            },
+            "frame_duration_ms": {
+              "const": 20
+            },
+            "expected_packet_loss_percent": {
+              "const": 0
+            },
+            "lossless_generation_source": {
+              "const": "local-required-and-sha256-pinned"
+            },
+            "license_boundary": {
+              "const": "per-asset-sidecar-and-attribution"
+            },
+            "product_packages": {
+              "const": "excluded"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
