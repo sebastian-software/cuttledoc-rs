@@ -1,7 +1,7 @@
 # Node-API packaging spike (#9)
 
-Status: implementation complete; locally verified on Node 24 / macOS arm64;
-Node 22 and 24 packed-artifact CI added.
+Status: complete; locally verified on Node 24 / macOS arm64 and verified from
+the packed artifact on Node 22 and 24 in CI.
 
 ## What was exercised
 
@@ -35,9 +35,12 @@ reports progress at 25/50/75/100%, retains the checksum of PCM mutated by the
 caller after submission, leaves the JavaScript event loop responsive, maps a
 Rust failure to a rejected Promise, and rejects cancelled work.
 
-Node 22 is part of the intended support floor but was not installed on this
-machine. The repository workflow runs the exact same build-pack-install-test
-script on Node 22 and 24; its first green run is required before closing #9.
+Node 22 is part of the intended support floor but was not installed on the
+development machine. The repository workflow ran the exact same build-pack-
+install-test script successfully on Node 22 and 24 in
+[CI run 29841265536](https://github.com/sebastian-software/cuttledoc-rs/actions/runs/29841265536).
+The workflow uses current Node-24-based GitHub Actions so the artifact test does
+not depend on GitHub's deprecated Node 20 action runtime.
 
 ## Decision
 
