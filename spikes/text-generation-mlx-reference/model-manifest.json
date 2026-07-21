@@ -2,6 +2,7 @@
   "schema_version": "1.0.0",
   "id": "qwen3-0.6b-4bit-mlx",
   "task": "text-generation",
+  "candidate_role": "runtime-and-negative-gate-control",
   "source": {
     "repository": "Qwen/Qwen3-0.6B",
     "observed_revision": "b8f042e18b7a05a3b5ba187f22246b91166bf6ae",
@@ -34,14 +35,25 @@
   },
   "generation_contract": {
     "prompt_id": "surface-only-v1",
+    "prompt_path": "benchmarks/postprocessing/prompts/surface-only-v1.txt",
     "prompt_sha256": "c8e31bcc1ed1169fa02e04f5504c7fc1e3599cf61b8272d6ee32cff0dbc889a7",
     "chat_template": "model tokenizer template with enable_thinking=false",
+    "chat_template_options": {
+      "enable_thinking": false
+    },
     "seed": 0,
     "temperature": 0.0,
     "max_tokens": 256,
     "stream": true,
     "cancellation_probe_after_tokens": 4,
     "rationale": "Greedy non-thinking decoding makes the runtime probe repeatable. Quality claims require a multilingual held-out corpus and are outside this single development fixture."
+  },
+  "result_contract": {
+    "run_id": "phase5.qwen3-0.6b-4bit-mlx-reference.issue7-de-audiobook-whisper-1",
+    "purpose": "development-runtime-probe",
+    "fixture_path": "benchmarks/postprocessing/fixtures/issue7-de-audiobook-whisper.json",
+    "result_path": "benchmarks/postprocessing/runs/phase5.qwen3-0.6b-4bit-mlx-reference.issue7-de-audiobook-whisper-1.json",
+    "result_required": true
   },
   "artifacts": [
     {

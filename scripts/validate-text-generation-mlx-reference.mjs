@@ -32,9 +32,19 @@ function validate(manifest, fixture, result, promptBytes) {
   const contract = manifest.generation_contract;
   const model = result.candidate?.model;
   const runtime = result.candidate?.runtime;
+  const resultContract = manifest.result_contract;
 
   if (manifest.schema_version !== '1.0.0' || manifest.task !== 'text-generation') {
     errors.push('manifest must identify the text-generation task');
+  }
+  if (!(manifest.candidate_role?.length > 0) ||
+      resultContract?.run_id !== result.run_id ||
+      resultContract?.purpose !== result.purpose ||
+      resultContract?.fixture_path !==
+        'benchmarks/postprocessing/fixtures/issue7-de-audiobook-whisper.json' ||
+      resultContract?.result_path !==
+        'benchmarks/postprocessing/runs/phase5.qwen3-0.6b-4bit-mlx-reference.issue7-de-audiobook-whisper-1.json') {
+    errors.push('manifest result identity must remain pinned');
   }
   for (const revision of [
     manifest.source?.observed_revision,
@@ -68,6 +78,9 @@ function validate(manifest, fixture, result, promptBytes) {
   }
   if (sha256(promptBytes) !== contract?.prompt_sha256 ||
       contract?.prompt_id !== 'surface-only-v1' ||
+      contract?.prompt_path !==
+        'benchmarks/postprocessing/prompts/surface-only-v1.txt' ||
+      contract?.chat_template_options?.enable_thinking !== false ||
       contract?.temperature !== 0 ||
       contract?.seed !== 0 ||
       contract?.stream !== true) {
@@ -97,6 +110,11 @@ function validate(manifest, fixture, result, promptBytes) {
       runtime?.revision !== manifest.reference_runtime.revision ||
       runtime?.mlx_revision !== manifest.reference_runtime.mlx_revision) {
     errors.push('result model/runtime identity must match the manifest');
+  }
+  if (result.candidate?.manifest_id !== undefined &&
+      (result.candidate.manifest_id !== manifest.id ||
+       result.candidate.role !== manifest.candidate_role)) {
+    errors.push('result manifest identity must match the manifest');
   }
   if (result.fixture?.id !== fixture.id ||
       result.fixture?.transcript_sha256 !== sha256(fixture.transcript) ||

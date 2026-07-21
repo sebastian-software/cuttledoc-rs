@@ -19,6 +19,7 @@ on:
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
       - "scripts/validate-text-generation-mlx-reference.mjs"
+      - "scripts/validate-text-generation-model-manifests.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
@@ -42,6 +43,7 @@ on:
       - "scripts/validate-opus-codec-control.mjs"
       - "scripts/validate-tts-calibration-manifests.mjs"
       - "scripts/validate-text-generation-mlx-reference.mjs"
+      - "scripts/validate-text-generation-model-manifests.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
@@ -60,7 +62,12 @@ jobs:
       - name: Validate pinned TTS calibration models
         run: node scripts/validate-tts-calibration-manifests.mjs --self-test
       - name: Validate pinned MLX text-generation reference
-        run: node scripts/validate-text-generation-mlx-reference.mjs --self-test
+        run: |
+          node scripts/validate-text-generation-mlx-reference.mjs --self-test
+          node scripts/validate-text-generation-model-manifests.mjs --self-test
+          python -m py_compile spikes/text-generation-mlx-reference/run_reference.py
+          bash -n scripts/fetch-text-generation-mlx-model.sh
+          bash -n scripts/run-text-generation-mlx-reference.sh
       - name: Check TTS calibration runners
         run: |
           node --check scripts/archive-qwen-tts-calibration.mjs

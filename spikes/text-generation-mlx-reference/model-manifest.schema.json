@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/text-generation-model-manifest.schema.json",
+  "title": "Pinned MLX text-generation reference model",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "task",
+    "candidate_role",
+    "source",
+    "conversion",
+    "reference_runtime",
+    "generation_contract",
+    "result_contract",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]+$"
+    },
+    "task": {
+      "const": "text-generation"
+    },
+    "candidate_role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object"
+    },
+    "conversion": {
+      "type": "object"
+    },
+    "reference_runtime": {
+      "type": "object"
+    },
+    "generation_contract": {
+      "type": "object"
+    },
+    "result_contract": {
+      "type": "object",
+      "required": [
+        "run_id",
+        "purpose",
+        "fixture_path",
+        "result_path",
+        "result_required"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}

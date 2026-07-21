@@ -4,16 +4,29 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 project="$repo_root/spikes/text-generation-mlx-reference"
-manifest="$project/model-manifest.json"
-fixture="$repo_root/benchmarks/postprocessing/fixtures/issue7-de-audiobook-whisper.json"
-prompt="$repo_root/benchmarks/postprocessing/prompts/surface-only-v1.txt"
-model_dir=${CUTTLEDOC_TEXT_GENERATION_MODEL_DIR:-/tmp/cuttledoc-qwen3-0.6b-4bit}
+manifest=${CUTTLEDOC_TEXT_GENERATION_MANIFEST:-$project/model-manifest.json}
+
+while IFS=$'\t' read -r manifest_id fixture_relative prompt_relative; do
+  fixture=${CUTTLEDOC_TEXT_GENERATION_FIXTURE:-$repo_root/$fixture_relative}
+  prompt=${CUTTLEDOC_TEXT_GENERATION_PROMPT:-$repo_root/$prompt_relative}
+  model_dir=${CUTTLEDOC_TEXT_GENERATION_MODEL_DIR:-/tmp/cuttledoc-$manifest_id}
+done < <(
+  node -e '
+    const manifest = require(process.argv[1]);
+    process.stdout.write([
+      manifest.id,
+      manifest.result_contract.fixture_path,
+      manifest.generation_contract.prompt_path,
+    ].join("\t") + "\n");
+  ' "$manifest"
+)
+
 output=${CUTTLEDOC_TEXT_GENERATION_OUTPUT:-/tmp/cuttledoc-text-generation-mlx-reference.json}
 source_revision=$(git -C "$repo_root" rev-parse HEAD)
 
 if [[ ! -d "$model_dir" ]]; then
   echo "Model directory not found: $model_dir" >&2
-  echo "Run scripts/fetch-text-generation-mlx-model.sh first." >&2
+  echo "Run scripts/fetch-text-generation-mlx-model.sh first with the same manifest." >&2
   exit 1
 fi
 

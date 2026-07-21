@@ -112,7 +112,7 @@ def run_generation(model, tokenizer, prompt: str, contract: dict) -> dict:
         messages,
         tokenize=False,
         add_generation_prompt=True,
-        enable_thinking=False,
+        **contract.get("chat_template_options", {}),
     )
     mx.random.seed(contract["seed"])
     sampler = make_sampler(temp=contract["temperature"])
@@ -158,7 +158,7 @@ def run_cancellation_probe(model, tokenizer, prompt: str, contract: dict) -> dic
         [{"role": "user", "content": prompt}],
         tokenize=False,
         add_generation_prompt=True,
-        enable_thinking=False,
+        **contract.get("chat_template_options", {}),
     )
     cancel_after = contract["cancellation_probe_after_tokens"]
     generator = stream_generate(
@@ -199,6 +199,12 @@ def main() -> None:
     prompt_template = args.prompt.read_text(encoding="utf-8")
     rendered_prompt = render_prompt(prompt_template, fixture)
     contract = manifest["generation_contract"]
+    result_contract = manifest["result_contract"]
+
+    if args.fixture.as_posix().endswith(result_contract["fixture_path"]) is False:
+        raise ValueError("Fixture path does not match the manifest result contract")
+    if args.prompt.as_posix().endswith(contract["prompt_path"]) is False:
+        raise ValueError("Prompt path does not match the manifest generation contract")
 
     mx.reset_peak_memory()
     load_started = time.perf_counter_ns()
@@ -215,12 +221,14 @@ def main() -> None:
 
     result = {
         "schema_version": "1.0.0",
-        "run_id": "phase5.qwen3-0.6b-4bit-mlx-reference.issue7-de-audiobook-whisper-1",
+        "run_id": result_contract["run_id"],
         "captured_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_revision": args.source_revision,
-        "purpose": "development-runtime-probe",
+        "purpose": result_contract["purpose"],
         "candidate": {
             "task": "text-generation",
+            "manifest_id": manifest["id"],
+            "role": manifest["candidate_role"],
             "model": manifest["conversion"],
             "source_model": manifest["source"],
             "runtime": manifest["reference_runtime"],
@@ -254,7 +262,7 @@ def main() -> None:
             "complete_generation_repetitions": 2,
             "prompt_visible_fields": ["language", "domain", "transcript"],
             "evaluation_reference_visible_to_model": False,
-            "command": "CUTTLEDOC_TEXT_GENERATION_MODEL_DIR=/local/model CUTTLEDOC_TEXT_GENERATION_OUTPUT=/tmp/result.json bash scripts/run-text-generation-mlx-reference.sh",
+            "command": "CUTTLEDOC_TEXT_GENERATION_MANIFEST=/repo/candidate.json CUTTLEDOC_TEXT_GENERATION_MODEL_DIR=/local/model CUTTLEDOC_TEXT_GENERATION_OUTPUT=/tmp/result.json bash scripts/run-text-generation-mlx-reference.sh",
         },
         "measurements": {
             "model_load_ms": (load_completed - load_started) / 1_000_000,
@@ -319,8 +327,9 @@ def main() -> None:
         "conclusion": {
             "reference_runtime_executed": True,
             "surface_candidate_accepted": output_nonempty and lexical_invariant,
+            "model_quality_selected": False,
             "product_runtime_accepted": False,
-            "reason": "The runtime path is independent of the output gate. One development fixture can establish runtime behavior, mechanical rejection, streaming, cancellation, determinism, and cost; it cannot select a correction model or promote the Python reference into the product.",
+            "reason": "The runtime path is independent of the output gate. A development fixture can establish execution, mechanical policy behavior, streaming, cancellation, determinism, and cost; it cannot select a correction model or promote the Python reference into the product.",
         },
     }
 

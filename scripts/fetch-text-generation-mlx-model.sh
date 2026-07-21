@@ -3,10 +3,20 @@
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-manifest="$repo_root/spikes/text-generation-mlx-reference/model-manifest.json"
-model_dir=${1:-/tmp/cuttledoc-qwen3-0.6b-4bit}
-repository=mlx-community/Qwen3-0.6B-4bit
-revision=73e3e38d981303bc594367cd910ea6eb48349da8
+manifest=${CUTTLEDOC_TEXT_GENERATION_MANIFEST:-$repo_root/spikes/text-generation-mlx-reference/model-manifest.json}
+
+while IFS=$'\t' read -r manifest_id repository revision; do
+  model_dir=${1:-/tmp/cuttledoc-$manifest_id}
+done < <(
+  node -e '
+    const manifest = require(process.argv[1]);
+    process.stdout.write([
+      manifest.id,
+      manifest.conversion.repository,
+      manifest.conversion.revision,
+    ].join("\t") + "\n");
+  ' "$manifest"
+)
 
 mkdir -p "$model_dir"
 
@@ -57,4 +67,5 @@ done < <(
 )
 
 echo "model_revision=$revision"
+echo "model_manifest=$manifest"
 echo "model_directory=$model_dir"
