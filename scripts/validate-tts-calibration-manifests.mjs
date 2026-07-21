@@ -226,6 +226,51 @@ const additionalQwenCalibrationSpecs = [
     reachedMaxTokens: false,
     attributionNeedle: 'Parakeet alone makes fifteen edits',
   },
+  {
+    profileId: 'qwen-fr-warm-technical',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-fr-warm-technical.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/fr-FR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-fr-technical',
+    purpose: 'reproducible-failed-content-type-calibration',
+    disposition: 'failed-shared-mid-passage-truncation',
+    resultDisposition: 'failed-shared-mid-passage-truncation',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'stops after the third of five technical list items',
+  },
+  {
+    profileId: 'qwen-fr-warm-native',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-fr-warm-native.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/fr-FR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-fr-native',
+    purpose: 'reproducible-passed-content-type-calibration',
+    disposition: 'passed-native-content-gate',
+    resultDisposition: 'passed-native-content-gate-listening-pending',
+    referencePathProven: true,
+    reachedMaxTokens: false,
+    attributionNeedle: 'Voxtral is lexically exact',
+  },
+  {
+    profileId: 'qwen-fr-warm-dialogue',
+    resultDirectory:
+      'benchmarks/raw/phase5.qwen3-tts-1.7b-voicedesign.' +
+      'qwen-fr-warm-dialogue.1',
+    assetDirectory:
+      'benchmarks/assets/synthetic/fr-FR/' +
+      'qwen3-tts-1.7b-voicedesign-warm/synthetic-fr-dialogue',
+    purpose: 'reproducible-failed-content-type-calibration',
+    disposition: 'failed-shared-repetition-and-truncation',
+    resultDisposition: 'failed-shared-repetition-and-truncation',
+    referencePathProven: false,
+    reachedMaxTokens: true,
+    attributionNeedle: 'dialogue stops after “Jonas sourit”',
+  },
 ];
 const additionalQwenCalibrationEvidence = await Promise.all(
   additionalQwenCalibrationSpecs.map(async (spec) => {
@@ -646,7 +691,7 @@ function validate(items, acceptedPlan) {
       role: 'required-generator',
       status:
         'multilingual-content-type-expansion-in-progress-' +
-        'English-dialogue-failed-Spanish-passed',
+        'French-failures-recorded',
       voiceMode: 'description',
       profiles: [
         'qwen-de-clear-documentary',
@@ -669,7 +714,7 @@ function validate(items, acceptedPlan) {
       ],
       planStatus:
         'multilingual-content-type-expansion-in-progress-' +
-        'English-dialogue-failed-Spanish-passed',
+        'French-failures-recorded',
     }],
     ['voxtral-4b-tts-2603-mlx-bf16', {
       candidate: 'voxtral-tts-4b-bf16-mlx-audio',

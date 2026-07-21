@@ -42,6 +42,9 @@ question until the token limit and omits the final 32 reference words.
 The three `es-419` Qwen fixtures add technical, native-factual, and dialogue
 controls. All finish normally; their per-receiver WER spread is retained
 without collapsing it into one language-wide score.
+The three `fr-FR` fixtures retain one native-factual pass and two failed
+controls: a technical mid-list truncation below the token limit and a dialogue
+repeat/truncation at the limit.
 
 This encoding is for clean, professionally produced speech. It is not a claim
 that 64 kbit/s is transparent for music, acoustic analysis, or speech synthesis

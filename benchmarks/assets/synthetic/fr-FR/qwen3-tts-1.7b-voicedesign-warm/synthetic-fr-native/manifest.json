@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-fr-native.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-passed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 858,
+    "characters": 814,
+    "sha256": "6161a49a2c27652e8d1100d93c572f11244271da80ba4a28b12f3229b39b3fd1",
+    "spoken_text_sha256": "6161a49a2c27652e8d1100d93c572f11244271da80ba4a28b12f3229b39b3fd1",
+    "source_id": "fr-wikipedia-livre-audio-235403403",
+    "passage_id": "synthetic-fr-native",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-native.1",
+    "record_sha256": "6e21f1215b6c32444d5fdff9e577228e4b92190577eca5d05fc4ef2ed3a2fc00",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-fr-warm-native",
+    "voice_instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "fr-FR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1192320,
+      "bytes": 4769280,
+      "sha256": "ded4483c9ab55661e5ac26f839ec244c3672ddac630fb10890ebfd9ca78dad7f"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "9afa2b26bb5f322b62128a055a45a47896e08a50179098c228c7bf94279f7896"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 429895,
+    "sha256": "42c9b90bd4616449fef74215080decf1f943e145e95547f060f2d96f9224651e",
+    "duration_ms": 49686.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 69217,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "passed-native-content-gate",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0,
+      0.047244094488188976
+    ],
+    "summary": "All five receivers recover the complete native-factual passage. Voxtral is lexically exact; the other receivers make between two and six word edits."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

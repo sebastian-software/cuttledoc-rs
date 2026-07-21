@@ -105,6 +105,12 @@ spreads are receiver-specific. Four receivers make one edit on the dialogue.
 The native-factual phrase “a elegir” remains open for listening because two
 otherwise strong receivers render it similarly as another word.
 
+French yields one strong pass and two hard generation failures. The native-
+factual cell is complete and reaches 0–4.72% WER. The technical cell silently
+stops after three of five list items below the token limit; the dialogue stops
+after “Jonas sourit” and repeats until the limit. These are retained as failed
+controls rather than averaged into the successful French result.
+
 The snapshots are large: Qwen is 4.52 GB, Voxtral is 8.04 GB, and KugelAudio
 is 18.69 GB. Download only the candidate required by the current calibration
 cell.

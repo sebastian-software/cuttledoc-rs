@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-fr-technical.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-failed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 992,
+    "characters": 959,
+    "sha256": "68e1e728182d3082922cb646cc4c2a6c84d346734cee014a9e27f42fc9390c78",
+    "spoken_text_sha256": "68e1e728182d3082922cb646cc4c2a6c84d346734cee014a9e27f42fc9390c78",
+    "source_id": "fr-wikipedia-intelligence-artificielle-237681031",
+    "passage_id": "synthetic-fr-technical",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-technical.1",
+    "record_sha256": "c24ae4de68150e7f128e1239c2bd09c8185524a1fc7e2f22a3ab5d68dd1f013f",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-fr-warm-technical",
+    "voice_instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "fr-FR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1729920,
+      "bytes": 6919680,
+      "sha256": "1581535efc07539be822e637a4cf836191034549cb6508c4856003a76999f070"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "a10c5f395d91f77007007e0fda97030588133c3b3fa9d3f0feaf4a287e4c66f3"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 442271,
+    "sha256": "612db6fb912527153febf02a7aa90f4e8639e2b3adbeb76914b03f367946a4db",
+    "duration_ms": 72086.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 49082,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "failed-shared-mid-passage-truncation",
+    "receiver_count": 5,
+    "reached_max_tokens": false,
+    "observed_wer_range": [
+      0.43478260869565216,
+      0.572463768115942
+    ],
+    "summary": "All five receivers agree that Qwen stops after the third of five technical list items even though generation reports normal termination below the token limit. Whisper additionally repeats filler after the shared endpoint."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

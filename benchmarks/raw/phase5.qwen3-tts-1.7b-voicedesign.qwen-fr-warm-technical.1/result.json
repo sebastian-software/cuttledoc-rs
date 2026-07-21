@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-technical.1",
+  "captured_at": "2026-07-21T14:17:34.169993Z",
+  "source_revision": "8d01ee60de6c5f57d1817f4cbedd5a9c5200b205",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-fr-warm-technical",
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "French",
+      "locale": "fr-FR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-fr-technical",
+    "source_id": "fr-wikipedia-intelligence-artificielle-237681031",
+    "locale": "fr-FR",
+    "character_count": 959,
+    "text_sha256": "68e1e728182d3082922cb646cc4c2a6c84d346734cee014a9e27f42fc9390c78",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-fr-warm-technical",
+      "passage_id": "synthetic-fr-technical",
+      "locale": "fr-FR",
+      "language": "French",
+      "voice": null,
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1729920,
+      "byte_count": 6919680,
+      "duration_ms": 72080,
+      "sha256": "1581535efc07539be822e637a4cf836191034549cb6508c4856003a76999f070",
+      "minimum_sample": -0.5867764949798584,
+      "maximum_sample": 0.7338051199913025,
+      "rms": 0.07082003475302145,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1673.640208,
+      "first_audio_ms": 33622.456791,
+      "complete_synthesis_ms": 33844.614541,
+      "real_time_factor": 0.4695423770948946,
+      "output_count": 1,
+      "token_count": 901
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4756897792,
+      "mlx_peak_memory_bytes": 15348609553,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1729920,
+        "sample_rate_hz": 24000,
+        "token_count": 901,
+        "processing_time_seconds": 33.62243294715881,
+        "mlx_audio_reported_duration_over_processing": 2.1438067885593317,
+        "peak_memory_gb_decimal": 15.348609553,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1153280,
+        "byte_count": 4613120,
+        "duration_ms": 72080,
+        "sha256": "c5b641ec83d93b1a75f4c6d76e653f5c5d42d21ccbf55ac7d21c4153318218b5"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:17:51.047Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "fr",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "L'apprentissage généraliste. L'IA apprend à partir de données diverses pour identifier des modèles et appliquer ses connaissances à de nouvelles situations, comme détecter des fraudes en ligne. Le raisonnement. Cette capacité permet à l'IA de faire des prédictions et tirer des conclusions à partir des données, aidant dans des décisions comme la prédiction de comportement d'achat. La résolution de problème. L'IA trouve des solutions optimales pour des problèmes spécifiques utilisés dans des contextes comme l'optimisation industrielle ou les stratégies de jeu. L'IA est en train de se dérouler. L'IA est en train de se dérouler. L'IA est en train de se dérouler. L'IA est en train de se dérouler. L'IA est en train de se dérouler. L'IA est en train de se dérouler.",
+            "sha256": "133c0ae0cc48e8099ab2c52bf4a8d365748c9b7f58372b21a0065a9a6335da06",
+            "segment_count": 12,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 123,
+            "word_edits": 60,
+            "wer": 0.43478260869565216,
+            "reference_character_count": 789,
+            "hypothesis_character_count": 620,
+            "character_edits": 238,
+            "cer": 0.30164765525982257
+          },
+          "timing": {
+            "cold_load_ms": 1100.7397919999999,
+            "complete_inference_ms": 2606.4676669999994,
+            "real_time_factor": 0.03616076119589345
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1955381248
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:17:53.422Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Laprontissage generalis. L'IA apprend à partir de données diverses pour identifier des modèles et appliquer ses connaissances à de nouvelles situations, comme détecter des fraudes en ligne. L'ERIZANMANG Capacité permet à l'IA de faire des prédictions et tirer des conclusions à partir des données. Et dans des décisions comme la prédiction de comportement d'achat. La résolution de problème. L'IA trouve des solutions optimales pour des problèmes spécifiques. Utilisez dans des contextes comme l'optimisation industrielle ou les stratégies de jeu.",
+            "sha256": "a0fb735f98b39efc9eefe138092e5290287307b2f9ce6b43cc614d3a8eb11427",
+            "segment_count": 8,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 79,
+            "word_edits": 67,
+            "wer": 0.4855072463768116,
+            "reference_character_count": 789,
+            "hypothesis_character_count": 455,
+            "character_edits": 345,
+            "cer": 0.4372623574144487
+          },
+          "timing": {
+            "cold_load_ms": 253.505834,
+            "complete_inference_ms": 904.372292,
+            "real_time_factor": 0.012546785405105438
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 162791424
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:17:54.953Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "fr",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "La prontesage généralise, l'ia appartiendra de donner des verspoints identifiés des modèles et applique ses connaissances à de nouvelles situations, comme détecter des fraudes en ligne, la résolution. Cette capacité permet à l'ia de faire des prédictions et tirer des conclusions à partir des données et d'en donner des décisions comme la prédiction de comportement d'achat, la résolution de problème, l'ia trouve des solutions optimales pour des problèmes spécifiques, utilisez dans des contextes comme la optimisation industrielle ou les stratégies de jeu.",
+            "sha256": "68c76887709cc6affe88b7230c343d532f811f84a710254336b087e78a692ca1",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 82,
+            "word_edits": 79,
+            "wer": 0.572463768115942,
+            "reference_character_count": 789,
+            "hypothesis_character_count": 464,
+            "character_edits": 368,
+            "cer": 0.4664131812420786
+          },
+          "timing": {
+            "complete_inference_ms": 1382.779083,
+            "real_time_factor": 0.01918394954217536
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2908582452
+          },
+          "generation": {
+            "token_count": 132,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:18:20.426Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "La Prontissage Generalis, l'IA apprend à partir de données diverses pour identifier des modèles et appliquer ses connaissances à de nouvelles situations, comme détecter des fraudes en ligne. Le raisonnement, cette capacité permet à l'IA de faire des prédictions et tirer des conclusions à partir des données, aidant dans des décisions comme la prédiction du comportement d'achat. La résolution des problèmes. L'IA trouve des solutions optimales pour des problèmes spécifiques utilisés dans des contextes comme l'optimisation industrielle ou les stratégies de jeu.",
+            "sha256": "6ca56cbded1bfe7151a56184c49ddc495ec284fee09ac03d2024c2cd3e34067e",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 82,
+            "word_edits": 65,
+            "wer": 0.47101449275362317,
+            "reference_character_count": 789,
+            "hypothesis_character_count": 469,
+            "character_edits": 328,
+            "cer": 0.4157160963244613
+          },
+          "timing": {
+            "complete_inference_ms": 22524.69225,
+            "real_time_factor": 0.3124957304384018
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5517274820
+          },
+          "generation": {
+            "token_count": 912,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:18:23.615Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "fr-FR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "L'apprentissage généraliste, l'A apprend à partir de données diverses pour identifier des modèles et appliquer ses connaissances à de nouvelles situations comme détecter des fraudes en ligne, le raisonnement. Cette capacité permet à l'A de faire des prédictions et tirer des conclusions à partir des données etant dans des décisions comme la prédiction du comportement d'achat. La résolution du problème, l'A trouve des solutions optimales pour des problèmes spécifiques utilisés dans des contextes comme l'optimisation industrielle ou les stratégies de Jo.",
+            "sha256": "044ebbb24cc6cd2be80f17a1753e00e528fe85af21dabd08b0426d4b5410a019",
+            "segment_count": 81,
+            "update_count": 149,
+            "final_update_count": 3,
+            "volatile_update_count": 146,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 81,
+            "word_edits": 69,
+            "wer": 0.5,
+            "reference_character_count": 789,
+            "hypothesis_character_count": 465,
+            "character_edits": 333,
+            "cer": 0.4220532319391635
+          },
+          "timing": {
+            "first_result_ms": 78.823125,
+            "complete_inference_ms": 635.8045,
+            "real_time_factor": 0.008820817147613761
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "whisper-large-v3-turbo-coreml-whispercpp"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Keep this failed output as reproducible evidence and require a predeclared control before promotion.",
+    "calibration_disposition": "failed-shared-mid-passage-truncation"
+  }
+}

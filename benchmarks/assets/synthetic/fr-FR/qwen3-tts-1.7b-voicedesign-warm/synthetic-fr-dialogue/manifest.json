@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "asset_id": "synthetic-fr-dialogue.qwen3-tts-1.7b-voicedesign-warm.opus-64k-1",
+  "purpose": "reproducible-failed-content-type-calibration",
+  "license": "CC-BY-SA-4.0",
+  "reference": {
+    "path": "reference.txt",
+    "bytes": 990,
+    "characters": 943,
+    "sha256": "c26bef000e9b23e3a2d44c716e4dde3f405b9d6007fdd85d459e8ff8a3a98ca8",
+    "spoken_text_sha256": "c26bef000e9b23e3a2d44c716e4dde3f405b9d6007fdd85d459e8ff8a3a98ca8",
+    "source_id": "cuttledoc-authored-fr-dialogue-1",
+    "passage_id": "synthetic-fr-dialogue",
+    "attribution": "ATTRIBUTION.md"
+  },
+  "generation": {
+    "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-dialogue.1",
+    "record_sha256": "c5ae2ae9b9270d0fb5017164013f017148daa213cb0115b18880ea4b3f1f8caf",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+    "model_revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+    "runtime": "Blaizzy/mlx-audio@64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+    "voice_profile": "qwen-fr-warm-dialogue",
+    "voice_instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+    "seed": 0,
+    "locale": "fr-FR",
+    "lossless_f32le": {
+      "location": "local-required",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2304000,
+      "bytes": 9216000,
+      "sha256": "d41af4cabc9a13091a2c0e04cf08d502042c667d035feb089f4c3cfec93f953b"
+    },
+    "lossless_pcm16_wav": {
+      "location": "local-required",
+      "sha256": "9eec7dfda0f554606c44a66dcf22e0d01f6a75e287f037d532995d389ae067f1"
+    }
+  },
+  "archive": {
+    "path": "audio.opus",
+    "container": "Ogg",
+    "codec": "Opus",
+    "bytes": 714534,
+    "sha256": "2060c8f5a75aaf0692ca1ee608580cbfea81b805475d9220c5b160283a5cdec7",
+    "duration_ms": 96006.5,
+    "decoded_sample_rate_hz": 48000,
+    "channel_count": 1,
+    "target_bit_rate_bps": 64000,
+    "container_bit_rate_bps": 59540,
+    "variable_bit_rate": true,
+    "application": "audio",
+    "frame_duration_ms": 20,
+    "expected_packet_loss_percent": 0,
+    "encoder": "ffmpeg version 8.1.2 with libopus",
+    "deterministic_repeat_sha256_match": true,
+    "reproduction_script": "scripts/encode-benchmark-opus.mjs"
+  },
+  "codec_control": "benchmarks/controls/opus-codec-qwen3-tts-de-1.json",
+  "calibration_finding": {
+    "disposition": "failed-shared-repetition-and-truncation",
+    "receiver_count": 5,
+    "reached_max_tokens": true,
+    "observed_wer_range": [
+      0.4057971014492754,
+      0.5217391304347826
+    ],
+    "summary": "All five receivers agree that the dialogue stops after “Jonas sourit”. Qwen then repeats unintelligible material until the fixed token limit and omits the remaining dialogue."
+  },
+  "distribution": {
+    "git_repository": true,
+    "git_archive": false,
+    "cargo_package": false,
+    "npm_package": false
+  }
+}

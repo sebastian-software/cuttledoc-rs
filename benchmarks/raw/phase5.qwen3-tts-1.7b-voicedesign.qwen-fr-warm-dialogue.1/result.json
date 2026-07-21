@@ -1,0 +1,368 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-dialogue.1",
+  "captured_at": "2026-07-21T14:20:50.923102Z",
+  "source_revision": "8d01ee60de6c5f57d1817f4cbedd5a9c5200b205",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-fr-warm-dialogue",
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "French",
+      "locale": "fr-FR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-fr-dialogue",
+    "source_id": "cuttledoc-authored-fr-dialogue-1",
+    "locale": "fr-FR",
+    "character_count": 943,
+    "text_sha256": "c26bef000e9b23e3a2d44c716e4dde3f405b9d6007fdd85d459e8ff8a3a98ca8",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-fr-warm-dialogue",
+      "passage_id": "synthetic-fr-dialogue",
+      "locale": "fr-FR",
+      "language": "French",
+      "voice": null,
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "partial",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 2304000,
+      "byte_count": 9216000,
+      "duration_ms": 96000,
+      "sha256": "d41af4cabc9a13091a2c0e04cf08d502042c667d035feb089f4c3cfec93f953b",
+      "minimum_sample": -0.801308274269104,
+      "maximum_sample": 0.8017914295196533,
+      "rms": 0.0694586688562397,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1318.994833,
+      "first_audio_ms": 44707.771542,
+      "complete_synthesis_ms": 45450.729167,
+      "real_time_factor": 0.4734450954895833,
+      "output_count": 1,
+      "token_count": 1200
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4727488512,
+      "mlx_peak_memory_bytes": 18211878097,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 2304000,
+        "sample_rate_hz": 24000,
+        "token_count": 1200,
+        "processing_time_seconds": 44.70778203010559,
+        "mlx_audio_reported_duration_over_processing": 2.1472771772787778,
+        "peak_memory_gb_decimal": 18.211878097,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": true,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 1536000,
+        "byte_count": 6144000,
+        "duration_ms": 96000,
+        "sha256": "e9424d51ca21fb0b470a9e34acf43bc201405123de23bba338464f82f48ab63c"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:21:20.657Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "fr",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "« Qu'est-ce qui rend un enregistrement facile à comprendre ? » demande Marat. « Une pièce calme aide beaucoup, mais la régularité compte tout autant », répond Jonas. Garde le microphone à une distance stable et parle aussi naturellement que possible. Marat rapproche légèrement sa chaise. Un équipement coûteux résout-il la plupart des problèmes ? Pas à lui seul. Un bon placement, une posture confortable et un essai sonore attentif comptent en souvent davantage qu'un prix impressionnant. Que se passe-t-il si quelqu'un tourne la tête en parlant ? Jonas sourit. Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501 Sous-titrage ST' 501",
+            "sha256": "a042fcbc356acfe307b17611f600f4d0f4e2cb92ed9cc4ef44a7f66204d07927",
+            "segment_count": 32,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 152,
+            "word_edits": 72,
+            "wer": 0.5217391304347826,
+            "reference_character_count": 735,
+            "hypothesis_character_count": 818,
+            "character_edits": 300,
+            "cer": 0.40816326530612246
+          },
+          "timing": {
+            "cold_load_ms": 920.5521659999999,
+            "complete_inference_ms": 7023.8155830000005,
+            "real_time_factor": 0.07316474565625
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 2008268800
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:21:23.898Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Qu'est-ce qu'on enregistrement facile à comprendre ? demande Mara. Une pièce calme aide beaucoup. Mais la régularité compte tout autant. Répond Jonas. Garde le microphone à une distance stable et parle aussi naturellement que possible. Mara rapproche légèrement sa chaise. Un équipement coûteux résout-il la plupart des problèmes ? Pas à lui seul bon placement Une posture confortable, et un essai sonore attentif. comptant souvent davantage qu'un prix impressionnant. Que se passe-t-il ? Si quelqu'un tourne la tête en parlant, Jonas souris.",
+            "sha256": "ecbcf8c3ea27cfabc13e994085209f3a1beb8a666a3bd3737f32f0c27f2fc144",
+            "segment_count": 16,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 79,
+            "word_edits": 62,
+            "wer": 0.4492753623188406,
+            "reference_character_count": 735,
+            "hypothesis_character_count": 439,
+            "character_edits": 298,
+            "cer": 0.4054421768707483
+          },
+          "timing": {
+            "cold_load_ms": 209.228875,
+            "complete_inference_ms": 1384.1448329999998,
+            "real_time_factor": 0.014418175343749999
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 165691392
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:21:25.555Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "fr",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Qu'est-ce qui rend un enregistrement facile à comprendre ? Demande Mara. Une pièce calme aide beaucoup, mais la régularité compte tout autant, répond Jonas. Garde le microphone à une distance stable et parle aussi naturellement que possible. Mara rapproche légèrement sa chaise. Un équipement coûteux résout-il la plupart des problèmes ? Pas à lui seul. Un bon placement, une posture confortable et un essai sonore attentif comptent souvent davantage qu'un prix impressionnant. Que se passe-t-il si quelqu'un tourne la tête en parlant ? Jonas sourit.",
+            "sha256": "5622ed3efc3a44ff1700127c390499b176319a4b2e0ed005020c5899a9315fbb",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 82,
+            "word_edits": 56,
+            "wer": 0.4057971014492754,
+            "reference_character_count": 735,
+            "hypothesis_character_count": 446,
+            "character_edits": 289,
+            "cer": 0.39319727891156464
+          },
+          "timing": {
+            "complete_inference_ms": 1486.673458,
+            "real_time_factor": 0.015486181854166666
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 3373131920
+          },
+          "generation": {
+            "token_count": 137,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:21:58.229Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Qu'est-ce qui rend un enregistrement facile à comprendre? Demande Mara. Une pièce calme aide beaucoup, mais la régularité compte tout autant, répond Jonas. Garde le microphone à une distance stable et parle aussi naturellement que possible. Mara rapproche légèrement sa chaise. Un équipement coûteux résout-il la plupart des problèmes? Pas à lui seul. Un bon placement, une posture confortable et un essai sonore attentif comptent souvent davantage qu'un prix impressionnant. Que se passe-t-il si quelqu'un tourne la tête en parlant? Jonas sourit.",
+            "sha256": "8e55dee31c28c1150bafd0b3248c1d50b21097cab5b5c7239ab80afc7b0c7c3f",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 82,
+            "word_edits": 56,
+            "wer": 0.4057971014492754,
+            "reference_character_count": 735,
+            "hypothesis_character_count": 446,
+            "character_edits": 289,
+            "cer": 0.39319727891156464
+          },
+          "timing": {
+            "complete_inference_ms": 30643.979958,
+            "real_time_factor": 0.3192081245625
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5726957124
+          },
+          "generation": {
+            "token_count": 1211,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:22:01.406Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "fr-FR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Qu'est-ce qui rend un enregistrement facile à comprendre demande Mara. Une pièce calme aide beaucoup, mais la régularité compte tout autant, répond Jonas. Garde le microphone à une distance stable et parle aussi naturellement que possible. Mara rapproche légèrement sa chaise. Un équipement coûteux résout-il la plupart des problèmes Pas à lui seul. Un bon placement, une posture confortable et un essai sonore attentif comptant souvent davantage qu'un prix impressionnant. Que se passe-t-il si quelqu'un tourne la tête en parlant Jonas sourit.",
+            "sha256": "5336a9b28e02a8ecd5f9ba9c8da326cb86461b6a7df7e554b5726a88b4150f92",
+            "segment_count": 82,
+            "update_count": 145,
+            "final_update_count": 5,
+            "volatile_update_count": 140,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 138,
+            "hypothesis_word_count": 82,
+            "word_edits": 57,
+            "wer": 0.41304347826086957,
+            "reference_character_count": 735,
+            "hypothesis_character_count": 446,
+            "character_edits": 290,
+            "cer": 0.3945578231292517
+          },
+          "timing": {
+            "first_result_ms": 73.899542,
+            "complete_inference_ms": 689.045334,
+            "real_time_factor": 0.0071775555625
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "qwen3-asr-0.6b-mlx-direct",
+          "voxtral-realtime-4b-mlx-direct-2400ms"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": false,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Keep this failed output as reproducible evidence and require a predeclared control before promotion.",
+    "calibration_disposition": "failed-shared-repetition-and-truncation"
+  }
+}

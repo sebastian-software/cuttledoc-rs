@@ -125,7 +125,7 @@
   },
   "calibration": {
     "role": "required-generator",
-    "status": "multilingual-content-type-expansion-in-progress-English-dialogue-failed-Spanish-passed",
+    "status": "multilingual-content-type-expansion-in-progress-French-failures-recorded",
     "voice_mode": "description",
     "sample_rate_hz": 24000,
     "profiles": [

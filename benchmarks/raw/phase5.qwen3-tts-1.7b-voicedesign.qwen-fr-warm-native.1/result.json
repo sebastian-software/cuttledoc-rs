@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase5.qwen3-tts-1.7b-voicedesign.qwen-fr-warm-native.1",
+  "captured_at": "2026-07-21T14:19:11.801369Z",
+  "source_revision": "8d01ee60de6c5f57d1817f4cbedd5a9c5200b205",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "purpose": "calibration",
+  "candidate": {
+    "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "task": "tts",
+    "model": {
+      "repository": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+      "revision": "7d3824abff87e49756bb0f83fb5411de75d160c4",
+      "license": "Apache-2.0",
+      "snapshot_bytes": 4520194992
+    },
+    "runtime": {
+      "repository": "Blaizzy/mlx-audio",
+      "revision": "64e8416c303fb3b3463dab8eb4ebd78c55a87c1a",
+      "version": "0.4.5",
+      "boundary": "Pinned Python reference runner over official Apple MLX",
+      "license": "MIT"
+    },
+    "voice": {
+      "mode": "description",
+      "profile_id": "qwen-fr-warm-native",
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "language": "French",
+      "locale": "fr-FR",
+      "seed": 0
+    }
+  },
+  "host": {
+    "id": "mac-studio-m1-ultra-local",
+    "chip": "Apple M1 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "execution_context": "normal host process outside the restricted diagnostic sandbox"
+  },
+  "input": {
+    "passage_id": "synthetic-fr-native",
+    "source_id": "fr-wikipedia-livre-audio-235403403",
+    "locale": "fr-FR",
+    "character_count": 814,
+    "text_sha256": "6161a49a2c27652e8d1100d93c572f11244271da80ba4a28b12f3229b39b3fd1",
+    "license": "CC-BY-SA-4.0"
+  },
+  "procedure": {
+    "repetitions": 1,
+    "generation": {
+      "profile_id": "qwen-fr-warm-native",
+      "passage_id": "synthetic-fr-native",
+      "locale": "fr-FR",
+      "language": "French",
+      "voice": null,
+      "instruction": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "seed": 0,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 1200,
+      "stream": false,
+      "sample_rate_hz": 24000
+    },
+    "stream": false,
+    "cold_load": "Fresh Python process; OS file and Metal caches were not cleared.",
+    "command": "bash scripts/run-qwen3-tts-voicedesign-calibration.sh",
+    "model_verification": "Every artifact verified by byte count and SHA-256 before load.",
+    "raw_audio": "local-required; not checked into Git",
+    "raw_artifacts": [
+      "audio.f32le",
+      "audio.pcm16.wav",
+      "result.json"
+    ]
+  },
+  "result": {
+    "status": "measured",
+    "audio": {
+      "sample_format": "f32le",
+      "sample_rate_hz": 24000,
+      "channel_count": 1,
+      "sample_count": 1192320,
+      "byte_count": 4769280,
+      "duration_ms": 49680,
+      "sha256": "ded4483c9ab55661e5ac26f839ec244c3672ddac630fb10890ebfd9ca78dad7f",
+      "minimum_sample": -0.5912284255027771,
+      "maximum_sample": 0.5687153935432434,
+      "rms": 0.07773581027183396,
+      "non_finite_sample_count": 0
+    },
+    "timing": {
+      "model_load_ms": 1625.157458,
+      "first_audio_ms": 22645.752041,
+      "complete_synthesis_ms": 22715.912916,
+      "real_time_factor": 0.4572446239130435,
+      "output_count": 1,
+      "token_count": 621
+    },
+    "resources": {
+      "maximum_resident_set_size_bytes": 4739072000,
+      "mlx_peak_memory_bytes": 12264337837,
+      "model_snapshot_bytes": 4520194992
+    },
+    "runtime_output": [
+      {
+        "sample_count": 1192320,
+        "sample_rate_hz": 24000,
+        "token_count": 621,
+        "processing_time_seconds": 22.64571499824524,
+        "mlx_audio_reported_duration_over_processing": 2.193792512351656,
+        "peak_memory_gb_decimal": 12.264337837,
+        "is_streaming_chunk": false,
+        "is_final_chunk": false
+      }
+    ],
+    "termination": {
+      "reached_max_tokens": false,
+      "configured_max_tokens": 1200
+    },
+    "asr_content_checks": {
+      "status": "complete",
+      "normalized_audio": {
+        "sample_format": "f32le",
+        "sample_rate_hz": 16000,
+        "channel_count": 1,
+        "sample_count": 794880,
+        "byte_count": 3179520,
+        "duration_ms": 49680,
+        "sha256": "3575438f427a72b8d0b94bca289989d0991740fa61e3f0ae43404a35e0d7170d"
+      },
+      "normalization": "Unicode lowercase; punctuation and whitespace removed consistently with the phase-0 matrix.",
+      "backends": [
+        {
+          "captured_at": "2026-07-21T14:19:28.068Z",
+          "backend": {
+            "id": "whisper-large-v3-turbo-coreml-whispercpp",
+            "locale": "fr",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Un livre audio est un enregistrement, un livre ou autre texte écrit, lu à haute voix et fourni sans l'écrit. Il peut aussi avoir recours au podcast et être issu d'un recours à la synthèse vocale, offrant ainsi une accessibilité accrue aux personnes malvoyantes ou dyslexiques. Le rapport à la littérature se trouve modifié par le recours à l'ouïe, plutôt qu'à la vue, traditionnellement attachée à l'imprimé. Les progrès techniques, notamment en matière d'enregistrement et de restitution sonore, l'envie de nouveautés et de nombreuses autres qualités, gains de temps de mobilité et d'encombrement physique de stockage, lecture en communauté, plaisir de l'écoute, rapport décomplexé au texte pour les apprenants, contribue à l'essor considérable du livre audio à la fin du XXe siècle et début du XXIe siècle.",
+            "sha256": "bbac660c8c8588184e80df4d2fc1c8c4ca47de40fc4eb87a11174136f2c174fc",
+            "segment_count": 11,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 127,
+            "hypothesis_word_count": 127,
+            "word_edits": 2,
+            "wer": 0.015748031496062992,
+            "reference_character_count": 657,
+            "hypothesis_character_count": 656,
+            "character_edits": 3,
+            "cer": 0.0045662100456621
+          },
+          "timing": {
+            "cold_load_ms": 908.694625,
+            "complete_inference_ms": 1988.0168749999998,
+            "real_time_factor": 0.04001644273349436
+          },
+          "resources": {
+            "model_bytes": 2899675450,
+            "binary_bytes": 2172752,
+            "maximum_resident_set_size_bytes": 1953071104
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:19:30.853Z",
+          "backend": {
+            "id": "parakeet-tdt-0.6b-v3-coreml",
+            "locale": "model-managed",
+            "execution": "existing legacy CoreML Node adapter in a normal host process"
+          },
+          "transcript": {
+            "text": "Un livre audio est un enregistrement, un livre ou autre texte écrit. Lui à haute voix, et fournissant l'écrit. Il peut aussi avoir recours au podcast et être issu d'un recours à la synthèse vocale, offrant ainsi une accessibilité accrue aux personnes malvoyantes ou dyslexiques. Le rapport à la littérature se trouve modifié par le recours à Louis, plutôt qu'à la vue, traditionnellement attaché à l'imprimé. Les progrès techniques, notamment en matière d'enregistrement et de restitution sonore, L'envie de nouveautés et de nombreuses autres qualités. gain de temps, de mobilité et d'encombrement physique de stockage, Lecture en communauté. Plaisir de l'écoute Rapport décomplexé au texte pour les apprenants. contribue à l'essor considérable du livre audio à la fin du XXe siècle et début du XXIe siècle",
+            "sha256": "cae54c6359d1d69df1db6f863676a0f63464142c7663d4f1769e2db7997077e1",
+            "segment_count": 12,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 127,
+            "hypothesis_word_count": 126,
+            "word_edits": 6,
+            "wer": 0.047244094488188976,
+            "reference_character_count": 657,
+            "hypothesis_character_count": 656,
+            "character_edits": 8,
+            "cer": 0.0121765601217656
+          },
+          "timing": {
+            "cold_load_ms": 230.956416,
+            "complete_inference_ms": 1131.1234169999998,
+            "real_time_factor": 0.022768184722222216
+          },
+          "resources": {
+            "model_bytes": 1899782094,
+            "vad_bytes": 911498,
+            "binary_bytes": 133472,
+            "maximum_resident_set_size_bytes": 156450816
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:19:32.878Z",
+          "backend": {
+            "id": "qwen3-asr-0.6b-mlx-direct",
+            "locale": "fr",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Un livre audio est un enregistrement, un livre ou autre texte écrit, lu à haute voix et fourni sans l'écrit. Il peut aussi avoir recours au podcast et être issu d'un recours à la synthèse vocale, offrant ainsi une accessibilité accrue aux personnes malvoyantes ou dyslexiques. Le rapport à la littérature se trouve modifié par le recours à Louis, plutôt qu'à la vue, traditionnellement attaché à l'imprimé. Les progrès techniques, notamment en matière d'enregistrement et de restitution sonore, l'envie de nouveauté et de nombreuses autres qualités, gain de temps, de mobilité et d'encombrement physique de stockage, lecture en communauté, plaisir de l'écoute, rapport décomplexé au texte pour les apprenants, contribuent à l'essor considérable du livre audio à la fin du XXe siècle et début du XXIe siècle.",
+            "sha256": "bce8e8c7fa46bfe9fcf03b2d7987f6ee59eb2c409bbbacdcd26a180b6f3d539e",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 127,
+            "hypothesis_word_count": 127,
+            "word_edits": 3,
+            "wer": 0.023622047244094488,
+            "reference_character_count": 657,
+            "hypothesis_character_count": 655,
+            "character_edits": 4,
+            "cer": 0.0060882800608828
+          },
+          "timing": {
+            "complete_inference_ms": 1893.878333,
+            "real_time_factor": 0.03812154454508857
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 2689472680
+          },
+          "generation": {
+            "token_count": 209,
+            "finish_reason": "eos",
+            "stop_token": 151645
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:19:44.839Z",
+          "backend": {
+            "id": "voxtral-realtime-4b-mlx-direct-2400ms",
+            "locale": "model-managed",
+            "execution": "repository-owned C++ task ABI over official MLX"
+          },
+          "transcript": {
+            "text": "Un livre audio est un enregistrement, un livre ou autre texte écrit, lu à haute voix et fourni sans l'écrit. Il peut aussi avoir recours au podcast et être issu d'un recours à la synthèse vocale, offrant ainsi une accessibilité accrue aux personnes malvoyantes ou dyslexiques. Le rapport à la littérature se trouve modifié par le recours à l'ouïe, plutôt qu'à la vue, traditionnellement attachée à l'imprimé. Les progrès techniques, notamment en matière d'enregistrement et de restitution sonore, l'envie de nouveautés et de nombreuses autres qualités. Gain de temps, de mobilité et d'encombrement physique de stockage, lecture en communauté, plaisir de l'écoute, rapport décomplexé au texte pour les apprenants, contribuent à l'essor considérable du livre audio à la fin du XXe siècle et début du XXIe siècle.",
+            "sha256": "b6874f345e2667e3224e45dbc21faba134e056c84c0f85e7c4a8b0bc779e94e1",
+            "segment_count": 1,
+            "update_count": 1,
+            "final_update_count": 1,
+            "volatile_update_count": 0,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 127,
+            "hypothesis_word_count": 127,
+            "word_edits": 0,
+            "wer": 0,
+            "reference_character_count": 657,
+            "hypothesis_character_count": 657,
+            "character_edits": 0,
+            "cer": 0
+          },
+          "timing": {
+            "complete_inference_ms": 11776.650417,
+            "real_time_factor": 0.23705012916666668
+          },
+          "resources": {
+            "mlx_peak_memory_bytes": 5283677364
+          },
+          "generation": {
+            "token_count": 632,
+            "finish_reason": "audio_end",
+            "transcription_delay_ms": 2400
+          }
+        },
+        {
+          "captured_at": "2026-07-21T14:19:47.681Z",
+          "backend": {
+            "id": "apple-speechtranscriber",
+            "locale": "fr-FR",
+            "execution": "repository-owned Rust/Swift task ABI in a normal host process"
+          },
+          "transcript": {
+            "text": "Un livre audio est un enregistrement, un livre ou autre texte écrit lu à haute voix et fourni sans l'écrit. Il peut aussi avoir recours au podcast et être issu d'un recours à la synthèse vocale. offrant ainsi une accessibilité accrue aux personnes malvoyantes ou dyslexiques. Le rapport à la littérature se trouve modifié par le recours à l'oue, plutôt qu'à la vue, traditionnellement attaché à l'imprimé. Les progrès techniques, notamment en matière d'enregistrement et de restitution sonore, l'envie de nouveautés et de nombreuses autres qualités, gain de temps, de mobilité et d'encombrement physique de stockage, lecture en communauté, plaisir de l'écoute, rapport décomplexé au texte pour les apprenants, contribue à l'essor considérable du livre audio à la fin du XXe siècle et début du XXIe siècle.",
+            "sha256": "a66d57dec47ecf0dc02b026920a1cf3f67e17ab2cb046e6308f715f0a1b84a2f",
+            "segment_count": 128,
+            "update_count": 226,
+            "final_update_count": 3,
+            "volatile_update_count": 223,
+            "revoke_count": 0
+          },
+          "quality": {
+            "reference_word_count": 127,
+            "hypothesis_word_count": 127,
+            "word_edits": 3,
+            "wer": 0.023622047244094488,
+            "reference_character_count": 657,
+            "hypothesis_character_count": 653,
+            "character_edits": 4,
+            "cer": 0.0060882800608828
+          },
+          "timing": {
+            "first_result_ms": 64.119625,
+            "complete_inference_ms": 578.608708,
+            "real_time_factor": 0.011646713123993558
+          }
+        }
+      ],
+      "comparison": {
+        "completed_backend_count": 5,
+        "expected_backend_count": 5,
+        "remaining_backends": [],
+        "lowest_observed_wer_backends": [
+          "voxtral-realtime-4b-mlx-direct-2400ms"
+        ],
+        "observations": [
+          "All five required ASR backends received the identical normalized PCM digest.",
+          "WER and CER are receiver-specific roundtrip diagnostics, not standalone TTS quality scores.",
+          "Listening review remains required for pronunciation, voice identity, and prosody."
+        ]
+      }
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "packages": {
+      "mlx": "0.32.0",
+      "mlx-audio": "0.4.5",
+      "mlx-lm": "0.31.3",
+      "numpy": "2.5.1",
+      "transformers": "5.12.1"
+    },
+    "supported_speakers": [],
+    "supported_languages": [
+      "auto",
+      "chinese",
+      "english",
+      "german",
+      "italian",
+      "portuguese",
+      "spanish",
+      "japanese",
+      "korean",
+      "french",
+      "russian"
+    ]
+  },
+  "conclusion": {
+    "reference_path_proven": true,
+    "public_contract_accepted": false,
+    "quality_decision_ready": false,
+    "next": "Complete listening review before promoting this voice and content cell.",
+    "calibration_disposition": "passed-native-content-gate-listening-pending"
+  }
+}

@@ -226,7 +226,8 @@
             "three-German-content-types-passed-listening-pending",
             "multilingual-content-type-expansion-pending",
             "multilingual-content-type-expansion-in-progress-English-dialogue-failed",
-            "multilingual-content-type-expansion-in-progress-English-dialogue-failed-Spanish-passed"
+            "multilingual-content-type-expansion-in-progress-English-dialogue-failed-Spanish-passed",
+            "multilingual-content-type-expansion-in-progress-French-failures-recorded"
           ]
         },
         "voice_mode": {

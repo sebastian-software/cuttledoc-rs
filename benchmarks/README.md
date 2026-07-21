@@ -193,7 +193,9 @@ complete decade recovery. The English dialogue is a pinned failed control:
 Qwen repeats one question until the 1,200-token limit and omits the last 32
 reference words. All three Spanish cells complete without a shared content
 omission, although “a elegir” remains open for pronunciation review. French
-and Portuguese remain next; listening review precedes full-matrix promotion.
+native-factual speech passes, while its technical list and dialogue expose two
+pinned truncation failures. Portuguese is next; listening review precedes
+full-matrix promotion.
 
 Candidate-level rights reviews live under [`rights`](rights/) and are
 validated with the rest of the benchmark data. They cannot authorize a
