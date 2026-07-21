@@ -5,9 +5,7 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 manifest=${CUTTLEDOC_TEXT_GENERATION_MANIFEST:-$repo_root/spikes/text-generation-mlx-reference/model-manifest.json}
 
-while IFS=$'\t' read -r manifest_id repository revision; do
-  model_dir=${1:-/tmp/cuttledoc-$manifest_id}
-done < <(
+IFS=$'\t' read -r manifest_id repository revision < <(
   node -e '
     const manifest = require(process.argv[1]);
     process.stdout.write([
@@ -17,6 +15,11 @@ done < <(
     ].join("\t") + "\n");
   ' "$manifest"
 )
+if [[ -z "$manifest_id" ]] || [[ -z "$repository" ]] || [[ -z "$revision" ]]; then
+  echo "Manifest did not provide model id, conversion repository, and revision: $manifest" >&2
+  exit 1
+fi
+model_dir=${1:-/tmp/cuttledoc-$manifest_id}
 
 mkdir -p "$model_dir"
 

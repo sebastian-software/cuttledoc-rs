@@ -6,11 +6,7 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 project="$repo_root/spikes/text-generation-mlx-reference"
 manifest=${CUTTLEDOC_TEXT_GENERATION_MANIFEST:-$project/model-manifest.json}
 
-while IFS=$'\t' read -r manifest_id fixture_relative prompt_relative; do
-  fixture=${CUTTLEDOC_TEXT_GENERATION_FIXTURE:-$repo_root/$fixture_relative}
-  prompt=${CUTTLEDOC_TEXT_GENERATION_PROMPT:-$repo_root/$prompt_relative}
-  model_dir=${CUTTLEDOC_TEXT_GENERATION_MODEL_DIR:-/tmp/cuttledoc-$manifest_id}
-done < <(
+IFS=$'\t' read -r manifest_id fixture_relative prompt_relative < <(
   node -e '
     const manifest = require(process.argv[1]);
     process.stdout.write([
@@ -20,6 +16,13 @@ done < <(
     ].join("\t") + "\n");
   ' "$manifest"
 )
+if [[ -z "$manifest_id" ]] || [[ -z "$fixture_relative" ]] || [[ -z "$prompt_relative" ]]; then
+  echo "Manifest did not provide model id, fixture, and prompt paths: $manifest" >&2
+  exit 1
+fi
+fixture=${CUTTLEDOC_TEXT_GENERATION_FIXTURE:-$repo_root/$fixture_relative}
+prompt=${CUTTLEDOC_TEXT_GENERATION_PROMPT:-$repo_root/$prompt_relative}
+model_dir=${CUTTLEDOC_TEXT_GENERATION_MODEL_DIR:-/tmp/cuttledoc-$manifest_id}
 
 output=${CUTTLEDOC_TEXT_GENERATION_OUTPUT:-/tmp/cuttledoc-text-generation-mlx-reference.json}
 source_revision=$(git -C "$repo_root" rev-parse HEAD)
