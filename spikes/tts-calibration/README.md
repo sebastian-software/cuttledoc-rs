@@ -54,6 +54,8 @@ The local default paths reproduce the reviewed host setup. Every backend path
 has an explicit CLI override for another machine. Normalization starts at the
 f32 synthesis master rather than the convenience PCM16 WAV, avoiding an
 unnecessary quantization before the five receivers see the shared 16 kHz PCM.
+Whisper, Qwen, and Apple receive the language or locale recorded by the TTS
+run; the model-managed Parakeet and Voxtral paths are not forced to German.
 
 Both German Qwen profiles are checked in under `benchmarks/raw`. The
 `qwen-de-clear-documentary` profile completed the passage but all five ASR

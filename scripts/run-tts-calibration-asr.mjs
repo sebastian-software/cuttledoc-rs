@@ -37,6 +37,11 @@ const audioPath = requiredPath(values.audio, '--audio');
 const referencePath = requiredPath(values.reference, '--reference');
 const outputPath = requiredPath(values.output, '--output');
 const ttsRun = JSON.parse(await readFile(resultPath, 'utf8'));
+const locale = ttsRun.input?.locale;
+if (!/^[a-z]{2}-[A-Z]{2}$/.test(locale ?? '')) {
+  throw new Error(`TTS run has no supported BCP 47 locale: ${locale}`);
+}
+const language = locale.slice(0, 2);
 const reference = (await readFile(referencePath, 'utf8')).trim();
 const referenceDigest = createHash('sha256').update(reference).digest('hex');
 if (referenceDigest !== ttsRun.input?.text_sha256) {
@@ -167,7 +172,7 @@ try {
     },
   };
   ttsRun.conclusion.next =
-    'Review pronunciation and prosody, then decide whether to run the second German Qwen profile.';
+    'Review pronunciation and prosody, then apply the recorded calibration gate.';
   await writeFile(outputPath, `${JSON.stringify(ttsRun, null, 2)}\n`);
   process.stdout.write(
     `${JSON.stringify({
@@ -199,7 +204,7 @@ async function runLegacy(backend, normalizedPath, temporaryDirectory) {
     '--model-dir',
     backend === 'whisper' ? paths.whisperModel : paths.parakeetModel,
     '--language',
-    'de',
+    language,
     '--repetitions',
     '1',
     '--output',
@@ -216,7 +221,7 @@ async function runLegacy(backend, normalizedPath, temporaryDirectory) {
       backend === 'whisper'
         ? 'whisper-large-v3-turbo-coreml-whispercpp'
         : 'parakeet-tdt-0.6b-v3-coreml',
-    locale: backend === 'whisper' ? 'de' : 'model-managed',
+    locale: backend === 'whisper' ? language : 'model-managed',
     execution: 'existing legacy CoreML Node adapter in a normal host process',
     text: representative.text,
     segmentCount: representative.segments.length,
@@ -244,7 +249,7 @@ function runQwen(normalizedPath) {
     'transcribe',
     paths.qwenModel,
     normalizedPath,
-    'de',
+    language,
     'gpu',
   ]));
   return contentCheck({
@@ -281,7 +286,7 @@ function runVoxtral(normalizedPath) {
   ]));
   return contentCheck({
     id: 'voxtral-realtime-4b-mlx-direct-2400ms',
-    locale: 'de',
+    locale: 'model-managed',
     execution: 'repository-owned C++ task ABI over official MLX',
     text: native.generation.text,
     segmentCount: 1,
@@ -304,7 +309,7 @@ function runVoxtral(normalizedPath) {
 
 function runApple(normalizedPath) {
   const binary = join(paths.appleBuild, 'cuttledoc-speech-spike');
-  const output = commandOutput(binary, [normalizedPath, '--locale', 'de-DE'], {
+  const output = commandOutput(binary, [normalizedPath, '--locale', locale], {
     ...process.env,
     DYLD_LIBRARY_PATH: paths.appleBuild,
   });
@@ -317,7 +322,7 @@ function runApple(normalizedPath) {
   const text = finalUpdates.map((update) => update.text).join('');
   return contentCheck({
     id: 'apple-speechtranscriber',
-    locale: 'de-DE',
+    locale,
     execution: 'repository-owned Rust/Swift task ABI in a normal host process',
     text,
     segmentCount: finalUpdates.reduce(
