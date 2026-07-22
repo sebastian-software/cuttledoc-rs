@@ -274,7 +274,12 @@ function renderPrompt(template, fixture, contract) {
   return rendered;
 }
 
-function correctionSchema() {
+function correctionSchema(numericBounds) {
+  const confidence = { type: 'number' };
+  if (numericBounds) {
+    confidence.minimum = 0;
+    confidence.maximum = 1;
+  }
   return {
     type: 'object',
     additionalProperties: false,
@@ -300,7 +305,7 @@ function correctionSchema() {
               ],
             },
             reason: { type: 'string' },
-            confidence: { type: 'number', minimum: 0, maximum: 1 },
+            confidence,
           },
         },
       },
@@ -318,7 +323,7 @@ async function runRequest(manifest, contract, prompt, apiKey) {
       json_schema: {
         name: 'bounded_transcript_correction_v1',
         strict: true,
-        schema: correctionSchema(),
+        schema: correctionSchema(request.json_schema_numeric_bounds),
       },
     },
     provider: {
@@ -479,6 +484,8 @@ async function main() {
       generation: contract,
       gateway_request: {
         token_limit_field: manifest.request_defaults.token_limit_field,
+        json_schema_numeric_bounds:
+          manifest.request_defaults.json_schema_numeric_bounds,
         response_format: manifest.request_defaults.response_format,
         temperature: manifest.request_defaults.temperature,
         seed: manifest.request_defaults.seed,

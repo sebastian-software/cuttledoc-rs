@@ -51,6 +51,7 @@
   },
   "request_defaults": {
     "token_limit_field": "max_completion_tokens",
+    "json_schema_numeric_bounds": true,
     "temperature": null,
     "seed": 0,
     "reasoning": {

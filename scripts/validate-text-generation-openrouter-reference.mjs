@@ -220,6 +220,7 @@ function validateCandidateShape(candidate) {
     defaults?.token_limit_field,
   ) ||
       !gateway?.supported_parameters.includes(defaults.token_limit_field) ||
+      typeof defaults?.json_schema_numeric_bounds !== 'boolean' ||
       ![0, null].includes(defaults?.temperature) ||
       ![0, null].includes(defaults?.seed) || !reasoningValid ||
       defaults?.response_format?.type !== 'json_schema' ||
@@ -339,6 +340,8 @@ async function validateExperiment(experiment, path) {
         run.procedure?.evaluation_reference_visible_to_model !== false ||
         run.procedure?.gateway_request?.token_limit_field !==
           candidate.request_defaults.token_limit_field ||
+        run.procedure?.gateway_request?.json_schema_numeric_bounds !==
+          candidate.request_defaults.json_schema_numeric_bounds ||
         run.procedure?.gateway_request?.provider?.allow_fallbacks !== false ||
         run.procedure?.gateway_request?.provider?.data_collection !== 'deny' ||
         run.procedure?.gateway_request?.provider?.zdr !== true) {

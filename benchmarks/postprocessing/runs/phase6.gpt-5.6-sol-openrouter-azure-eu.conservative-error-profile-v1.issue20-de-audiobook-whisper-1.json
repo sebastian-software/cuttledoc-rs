@@ -1,0 +1,263 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase6.gpt-5.6-sol-openrouter-azure-eu.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-22T07:16:02.585Z",
+  "source_revision": "0aa950f4c245afb4ea6772daf229d4b0eab2d0a3",
+  "purpose": "development-quality-screen",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "gpt-5.6-sol-openrouter-azure-eu",
+    "role": "frontier-quality-control",
+    "model": {
+      "requested_id": "openai/gpt-5.6-sol",
+      "allowed_response_ids": [
+        "openai/gpt-5.6-sol",
+        "openai/gpt-5.6-sol-20260709"
+      ],
+      "upstream_identity": "OpenAI GPT-5.6 Sol",
+      "provider_model_identity": "openai/gpt-5.6-sol-20260709",
+      "release": "2026-07-09",
+      "weights": "proprietary",
+      "license": "Hosted commercial service",
+      "context_tokens": 1050000,
+      "identity_limit": "The model and serving implementation are proprietary; the API identity is the strongest artifact boundary available to this probe."
+    },
+    "gateway": {
+      "name": "OpenRouter",
+      "requested_model": "openai/gpt-5.6-sol",
+      "provider_slug": "azure/eu",
+      "provider_name": "Azure",
+      "served_model": "openai/gpt-5.6-sol",
+      "served_provider": "Azure"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-audiobook-whisper-conservative",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "procedure": {
+    "experiment_id": "gpt-5.6-sol-openrouter.conservative-error-profile-v1.de-audiobook",
+    "generation": {
+      "prompt_id": "conservative-error-profile-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-edits",
+      "structured_output_contract": "bounded-transcript-correction-v1",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "max_tokens": 1024,
+      "timeout_ms": 180000,
+      "rationale": "Measure a frontier ceiling for the bounded correction task without treating a paid API as the product runtime."
+    },
+    "gateway_request": {
+      "token_limit_field": "max_completion_tokens",
+      "json_schema_numeric_bounds": true,
+      "response_format": {
+        "type": "json_schema",
+        "schema_id": "bounded-transcript-correction-v1",
+        "strict": true
+      },
+      "temperature": null,
+      "seed": 0,
+      "reasoning": {
+        "effort": "none",
+        "exclude": true
+      },
+      "provider": {
+        "only": [
+          "azure/eu"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true,
+        "data_collection": "deny",
+        "zdr": true
+      }
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "execution_boundary": "Remote OpenRouter API; no local model-runtime claim"
+  },
+  "measurements": {
+    "requests": [
+      {
+        "response_id": "gen-1784704553-srJnGmx6iJ48qKwgsOGO",
+        "served_model": "openai/gpt-5.6-sol",
+        "served_provider": "Azure",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 655.977625,
+        "usage": {
+          "prompt_tokens": 724,
+          "completion_tokens": 391,
+          "total_tokens": 1115,
+          "cost_usd": 0.016885,
+          "is_byok": false
+        }
+      },
+      {
+        "response_id": "gen-1784704557-BKvBUBJJ259zP6D803tV",
+        "served_model": "openai/gpt-5.6-sol",
+        "served_provider": "Azure",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 295.99566700000014,
+        "usage": {
+          "prompt_tokens": 724,
+          "completion_tokens": 418,
+          "total_tokens": 1142,
+          "cost_usd": 0.017776,
+          "is_byok": false
+        }
+      }
+    ],
+    "aggregate": {
+      "total_cost_usd": 0.034661,
+      "total_prompt_tokens": 1448,
+      "total_completion_tokens": 809
+    },
+    "deterministic_repeat": {
+      "text_identical": false,
+      "requirement": "observation-only; remote repeat equality is not an acceptance gate"
+    },
+    "latency_claim_limit": "Client-observed request duration includes gateway, queue, provider, and network time and is not comparable to local MLX measurements."
+  },
+  "output": {
+    "text": "Wie aber kam sie hier auf meinen Tisch, und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz eines offen vor mir liegenden Buches.",
+    "text_sha256": "04f72a8f10d626db4bb36fa05ef2b34b23aad9ddbef68cd944fdfbf36a3ab5ff",
+    "raw_text": "{\"text\":\"Wie aber kam sie hier auf meinen Tisch, und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz eines offen vor mir liegenden Buches.\",\"edits\":[{\"original\":\"wie\",\"replacement\":\"Wie\",\"class\":\"surface\",\"reason\":\"Capitalization at the beginning of the sentence.\",\"confidence\":1.0},{\"original\":\"tisch und\",\"replacement\":\"Tisch, und\",\"class\":\"surface\",\"reason\":\"Noun capitalization and comma separating coordinated clauses.\",\"confidence\":0.99},{\"original\":\"schautete\",\"replacement\":\"schauderte\",\"class\":\"contextual-misrecognition\",\"reason\":\"In the immediate construction „warum … ich, wenn ich sie ansah“, the reaction verb „schauderte“ is overwhelmingly supported; „schautete“ is not a standard inflected form here.\",\"confidence\":0.98},{\"original\":\"ich wenn\",\"replacement\":\"ich, wenn\",\"class\":\"surface\",\"reason\":\"Comma before the subordinate clause introduced by „wenn“.\",\"confidence\":1.0},{\"original\":\"ansah diese\",\"replacement\":\"ansah? Diese\",\"class\":\"surface\",\"reason\":\"Question boundary followed by capitalization of the next sentence.\",\"confidence\":1.0},{\"original\":\"lassen meine\",\"replacement\":\"lassen. Meine\",\"class\":\"surface\",\"reason\":\"Sentence boundary and capitalization.\",\"confidence\":1.0},{\"original\":\"blicke\",\"replacement\":\"Blicke\",\"class\":\"surface\",\"reason\":\"German noun capitalization.\",\"confidence\":1.0},{\"original\":\"satz\",\"replacement\":\"Satz\",\"class\":\"surface\",\"reason\":\"German noun capitalization.\",\"confidence\":1.0},{\"original\":\"buches\",\"replacement\":\"Buches.\",\"class\":\"surface\",\"reason\":\"German noun capitalization and terminal punctuation.\",\"confidence\":1.0}]}",
+    "raw_text_sha256": "e79696b2e8e7442e480b34d2c9510c365e102ebe53bb421ce14897289771024a",
+    "reported_edits": [
+      {
+        "original": "wie",
+        "replacement": "Wie",
+        "class": "surface",
+        "reason": "Capitalization at the beginning of the sentence.",
+        "confidence": 1
+      },
+      {
+        "original": "tisch und",
+        "replacement": "Tisch, und",
+        "class": "surface",
+        "reason": "Noun capitalization and comma separating coordinated clauses.",
+        "confidence": 0.99
+      },
+      {
+        "original": "schautete",
+        "replacement": "schauderte",
+        "class": "contextual-misrecognition",
+        "reason": "In the immediate construction „warum … ich, wenn ich sie ansah“, the reaction verb „schauderte“ is overwhelmingly supported; „schautete“ is not a standard inflected form here.",
+        "confidence": 0.98
+      },
+      {
+        "original": "ich wenn",
+        "replacement": "ich, wenn",
+        "class": "surface",
+        "reason": "Comma before the subordinate clause introduced by „wenn“.",
+        "confidence": 1
+      },
+      {
+        "original": "ansah diese",
+        "replacement": "ansah? Diese",
+        "class": "surface",
+        "reason": "Question boundary followed by capitalization of the next sentence.",
+        "confidence": 1
+      },
+      {
+        "original": "lassen meine",
+        "replacement": "lassen. Meine",
+        "class": "surface",
+        "reason": "Sentence boundary and capitalization.",
+        "confidence": 1
+      },
+      {
+        "original": "blicke",
+        "replacement": "Blicke",
+        "class": "surface",
+        "reason": "German noun capitalization.",
+        "confidence": 1
+      },
+      {
+        "original": "satz",
+        "replacement": "Satz",
+        "class": "surface",
+        "reason": "German noun capitalization.",
+        "confidence": 1
+      },
+      {
+        "original": "buches",
+        "replacement": "Buches.",
+        "class": "surface",
+        "reason": "German noun capitalization and terminal punctuation.",
+        "confidence": 1
+      }
+    ],
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "audit": {
+      "lexical_edits_fully_reported": true,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 1
+    },
+    "lexical_diff": {
+      "input_word_count": 39,
+      "output_word_count": 39,
+      "edit_distance": 1,
+      "operations": [
+        {
+          "type": "replace",
+          "input_index": 10,
+          "output_index": 10,
+          "input": "schautete",
+          "output": "schauderte"
+        }
+      ]
+    },
+    "gates": {
+      "policy_mode": "bounded-lexical",
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": false,
+      "accepted": true,
+      "quality_accepted": false
+    },
+    "diagnostic_wer": {
+      "input": 0.02564102564102564,
+      "output": 0,
+      "reference_status": "dataset-transcript-unverified",
+      "claim_limit": "Development-only diagnostic against an unverified dataset transcript; not a quality-selection result."
+    }
+  },
+  "conclusion": {
+    "remote_reference_executed": true,
+    "development_output_contract_accepted": true,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "claim_limit": "This run screens one development fixture and API contract. Human-verified target-domain audio remains required for model selection."
+  }
+}

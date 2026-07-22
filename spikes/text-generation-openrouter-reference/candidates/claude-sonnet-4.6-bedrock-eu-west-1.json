@@ -51,6 +51,7 @@
   },
   "request_defaults": {
     "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": false,
     "temperature": 0,
     "seed": null,
     "reasoning": null,
@@ -60,5 +61,5 @@
       "strict": true
     }
   },
-  "claim_limit": "Remote frontier quality control only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+  "claim_limit": "Remote frontier quality control only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default. Bedrock rejects numeric minimum/maximum in structured-output schemas, so the repository parser alone enforces confidence in the 0-1 range."
 }

@@ -68,6 +68,7 @@
     },
     "gateway_request": {
       "token_limit_field": "max_tokens",
+      "json_schema_numeric_bounds": true,
       "response_format": {
         "type": "json_schema",
         "schema_id": "bounded-transcript-correction-v1",
