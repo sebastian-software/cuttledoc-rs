@@ -58,7 +58,10 @@
     "json_schema_numeric_bounds": false,
     "temperature": null,
     "seed": null,
-    "reasoning": null,
+    "reasoning": {
+      "effort": "low",
+      "exclude": true
+    },
     "response_format": {
       "type": "json_schema",
       "schema_id": "bounded-transcript-correction-v1",
