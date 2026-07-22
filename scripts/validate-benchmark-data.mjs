@@ -4186,6 +4186,14 @@ const schemaPaths = [
     repoRoot,
     'benchmarks/schema/postprocessing-factorial-cells.schema.json',
   ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-local-state.schema.json',
+  ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-local-audio.schema.json',
+  ),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);

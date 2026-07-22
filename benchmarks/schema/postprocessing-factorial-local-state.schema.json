@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-local-state.schema.json",
+  "title": "Cuttledoc local factorial benchmark run state",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "source_revision",
+    "created_at",
+    "updated_at",
+    "host",
+    "paths",
+    "inputs",
+    "capabilities",
+    "voice_resolutions",
+    "progress"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_revision": { "$ref": "#/$defs/gitSha" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "host": { "type": "object" },
+    "paths": {
+      "type": "object",
+      "required": ["output_directory", "text_directory"],
+      "properties": {
+        "output_directory": { "$ref": "#/$defs/nonEmptyString" },
+        "text_directory": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "inputs": { "type": "object" },
+    "capabilities": { "type": "object" },
+    "voice_resolutions": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": [
+          "voice_slot_id",
+          "locale",
+          "tts_engine",
+          "selector",
+          "voice_locale",
+          "voice_identity_seed",
+          "status",
+          "evidence"
+        ],
+        "properties": {
+          "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+          "locale": { "$ref": "#/$defs/nonEmptyString" },
+          "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+          "selector": {
+            "oneOf": [
+              { "$ref": "#/$defs/nonEmptyString" },
+              { "type": "null" }
+            ]
+          },
+          "voice_locale": { "$ref": "#/$defs/nonEmptyString" },
+          "voice_identity_seed": {
+            "oneOf": [
+              { "type": "integer", "minimum": 0 },
+              { "type": "null" }
+            ]
+          },
+          "status": {
+            "enum": [
+              "inventory-required",
+              "pinned-candidate",
+              "resolved-candidate",
+              "model-missing",
+              "qualified",
+              "rejected"
+            ]
+          },
+          "evidence": { "$ref": "#/$defs/nonEmptyString" },
+          "inventory": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "progress": { "type": "object" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+  }
+}

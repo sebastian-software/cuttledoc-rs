@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-local-audio.schema.json",
+  "title": "Cuttledoc local factorial audio artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "source_revision",
+    "captured_at",
+    "unit",
+    "voice",
+    "input",
+    "audio",
+    "normalized_audio",
+    "runtime_summary",
+    "disposition"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_revision": { "$ref": "#/$defs/gitSha" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "unit": { "type": "object" },
+    "voice": { "type": "object" },
+    "input": { "type": "object" },
+    "audio": { "$ref": "#/$defs/audio" },
+    "normalized_audio": { "$ref": "#/$defs/audio" },
+    "runtime_summary": { "type": "object" },
+    "disposition": {
+      "enum": [
+        "generated-pending-stt-qualification",
+        "qualified",
+        "rejected"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "audio": {
+      "type": "object",
+      "required": [
+        "path",
+        "sample_format",
+        "sample_rate_hz",
+        "channel_count",
+        "sample_count",
+        "byte_count",
+        "duration_ms",
+        "sha256"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "sample_format": { "const": "f32le" },
+        "sample_rate_hz": { "type": "integer", "minimum": 1 },
+        "channel_count": { "const": 1 },
+        "sample_count": { "type": "integer", "minimum": 1 },
+        "byte_count": { "type": "integer", "minimum": 4 },
+        "duration_ms": { "type": "number", "exclusiveMinimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "minimum_sample": { "type": "number" },
+        "maximum_sample": { "type": "number" },
+        "rms": { "type": "number", "minimum": 0 },
+        "non_finite_sample_count": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

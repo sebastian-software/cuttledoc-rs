@@ -170,3 +170,35 @@ node scripts/generate-postprocessing-factorial-matrix.mjs --check
 node scripts/validate-postprocessing-factorial-plan.mjs --self-test
 node spikes/text-generation-openrouter-reference/run_reference.mjs --self-test
 ```
+
+## Resumable local execution
+
+The local TTS and STT stages write large, host-specific artifacts below the
+ignored `artifacts/postprocessing-factorial-local` directory by default. The
+runner verifies all 30 materialized passages before creating state, records
+host capabilities, resolves Apple voice identifiers from the installed voice
+inventory, and treats every audio unit as an independently digest-pinned
+checkpoint. A valid existing checkpoint is resumed rather than regenerated.
+
+Initialize and inspect the local run with:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs init
+node scripts/run-postprocessing-factorial-local.mjs resolve-voices
+node scripts/run-postprocessing-factorial-local.mjs status
+```
+
+Run one qualification artifact per resolved Apple voice before expanding the
+full Apple slice:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs run-apple-tts \
+  --qualification-only
+```
+
+The runner retains both the engine-native mono `f32le` master and one derived
+16 kHz mono `f32le` normalization. The normalized digest is the single input
+that all STT engines must share. Qwen and Voxtral execution is enabled only
+when the exact model format pinned by the factorial plan is present; an older
+or differently quantized local snapshot is reported as unavailable rather
+than substituted silently.
