@@ -20,8 +20,8 @@
     ],
     "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
     "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
-    "max_tokens": 384,
-    "timeout_ms": 120000,
+    "max_tokens": 1024,
+    "timeout_ms": 180000,
     "rationale": "Screen an official-provider multilingual open-weight model with hidden-reference context and the same external lexical audit used by the local matrix."
   },
   "result_contract": {

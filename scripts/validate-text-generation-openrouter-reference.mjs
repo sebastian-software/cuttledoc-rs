@@ -330,8 +330,8 @@ async function validateExperiment(experiment, path) {
         run.fixture?.transcript_sha256 !== sha256(fixture.transcript) ||
         run.fixture?.reference_visible_to_model !== false ||
         run.procedure?.experiment_id !== experiment.id ||
-        run.procedure?.generation?.prompt_sha256 !==
-          experiment.generation_contract.prompt_sha256 ||
+        JSON.stringify(run.procedure?.generation) !==
+          JSON.stringify(experiment.generation_contract) ||
         run.procedure?.evaluation_reference_visible_to_model !== false ||
         run.procedure?.gateway_request?.provider?.allow_fallbacks !== false ||
         run.procedure?.gateway_request?.provider?.data_collection !== 'deny' ||
@@ -371,9 +371,18 @@ async function validateExperiment(experiment, path) {
 
     const outputText = run.output?.text ?? '';
     const rawText = run.output?.raw_text ?? '';
-    const audit = externalAudit(fixture, outputText, run.output?.reported_edits);
+    const parsedOutputValid = run.output?.parser?.valid === true;
+    const external = externalAudit(fixture, outputText, run.output?.reported_edits);
+    const audit = parsedOutputValid
+      ? external
+      : {
+        diff: external.diff,
+        lexicalEditsFullyReported: false,
+        protectedSpansUnchanged: false,
+        reportedLexicalEditCount: null,
+      };
     const expectedAccepted = outputText.length > 0 &&
-      run.output?.parser?.valid === true &&
+      parsedOutputValid &&
       audit.lexicalEditsFullyReported && audit.protectedSpansUnchanged;
     if (sha256(outputText) !== run.output?.text_sha256 ||
         sha256(rawText) !== run.output?.raw_text_sha256 ||
