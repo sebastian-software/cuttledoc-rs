@@ -69,6 +69,7 @@ const defaultQwenRecoveryOutput = join(
   'benchmarks/postprocessing/qualifications/' +
     'qwen3-tts-clear-voice-recovery-1.json',
 );
+const qwenChunkingRevision = 'sentence-aware-word-bounded-v1';
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -749,11 +750,12 @@ async function runQwenTts(state) {
       throw new Error(`${unit.id}: Qwen voice contract is incomplete`);
     }
     if (!selected) throw new Error(`${unit.id}: selected passage is missing`);
+    await rm(outputDirectory, { recursive: true, force: true });
     if (values.force) {
-      await Promise.all([
-        rm(outputDirectory, { recursive: true, force: true }),
-        rm(join(paths.qwenWorker, unit.id), { recursive: true, force: true }),
-      ]);
+      await rm(join(paths.qwenWorker, unit.id), {
+        recursive: true,
+        force: true,
+      });
     }
     jobs.push({
       id: unit.id,
@@ -817,6 +819,9 @@ async function materializeQwenAudio({ job, unit, voice, selected, state }) {
     workerResult.input.text_sha256 !== job.text_sha256 ||
     workerResult.generation.instruction !== voice.selector ||
     workerResult.generation.seed !== voice.voice_identity_seed ||
+    workerResult.generation.chunking?.revision !== qwenChunkingRevision ||
+    workerResult.termination.completed_all_chunks !== true ||
+    workerResult.termination.reached_max_tokens !== false ||
     raw.length !== workerResult.audio.byte_count ||
     sha256(raw) !== workerResult.audio.sha256
   ) {
@@ -1133,9 +1138,7 @@ async function runStt(state) {
       if (!values.force && await validSttArtifact(outputDirectory, unit)) {
         skipped += 1;
       } else {
-        if (values.force) {
-          await rm(outputDirectory, { recursive: true, force: true });
-        }
+        await rm(outputDirectory, { recursive: true, force: true });
         remaining.push(unit);
       }
     }
@@ -1910,6 +1913,15 @@ async function validAudioArtifact(directory, unit) {
     if (
       manifest.id !== unit.id ||
       manifest.plan_revision !== (await readJson(paths.plan)).revision
+    ) return false;
+    if (
+      unit.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio' &&
+      (
+        manifest.runtime_summary?.generation?.chunking?.revision !==
+          qwenChunkingRevision ||
+        manifest.runtime_summary?.termination?.completed_all_chunks !== true ||
+        manifest.runtime_summary?.termination?.reached_max_tokens !== false
+      )
     ) return false;
     for (const record of [manifest.audio, manifest.normalized_audio]) {
       const bytes = await readFile(join(directory, record.path));

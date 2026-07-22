@@ -228,9 +228,13 @@ node scripts/run-postprocessing-factorial-local.mjs summarize-qualification \
   --engine qwen
 ```
 
-Qwen repeats reuse the voice slot's identity seed exactly. A generation that
-reaches the token ceiling is retained for diagnosis but fails the technical
-gate instead of being treated as a shorter successful utterance.
+Qwen repeats reuse the voice slot's identity seed exactly. Long inputs use the
+pinned `sentence-aware-word-bounded-v1` policy: it prefers sentence boundaries
+after 45 words, enforces a hard 55-word limit, resets the qualified identity
+seed for every chunk, and inserts 250 ms of silence between chunks. Every chunk
+must finish normally below the 1,200-token ceiling. A capped chunk invalidates
+the complete audio unit instead of silently turning missing speech into STT
+errors.
 
 If a pinned Qwen identity fails that gate, the recovery plan tests the next
 three seeds without changing its description. It selects the first seed that

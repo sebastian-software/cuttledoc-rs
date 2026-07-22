@@ -5,6 +5,7 @@ import hashlib
 import importlib.metadata
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -12,6 +13,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+
+
+CHUNKING_REVISION = "sentence-aware-word-bounded-v1"
+CHUNK_TARGET_WORDS = 45
+CHUNK_MAX_WORDS = 55
+INTER_CHUNK_SILENCE_MS = 250
+TERMINAL_WORD = re.compile(r"[.!?…]+[\"'”’»›)\]]*$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -64,6 +72,10 @@ def valid_checkpoint(directory: Path, job: dict, source_revision: str) -> bool:
             and result["input"]["text_sha256"] == job["text_sha256"]
             and result["generation"]["instruction"] == job["instruction"]
             and result["generation"]["seed"] == job["seed"]
+            and result["generation"]["chunking"]["revision"]
+            == CHUNKING_REVISION
+            and result["termination"]["completed_all_chunks"] is True
+            and result["termination"]["reached_max_tokens"] is False
             and audio_path.stat().st_size == result["audio"]["byte_count"]
             and sha256_file(audio_path) == result["audio"]["sha256"]
         )
@@ -93,25 +105,50 @@ def validate_job(job: dict) -> str:
     return text
 
 
-def generate_job(
-    model,
-    job: dict,
-    text: str,
-    generation: dict,
-    sample_rate: int,
-    model_load_ms: float,
-    source_revision: str,
-    output_root: Path,
-) -> dict:
-    final_directory = output_root / job["id"]
-    if valid_checkpoint(final_directory, job, source_revision):
-        return {"id": job["id"], "status": "resumed"}
-    shutil.rmtree(final_directory, ignore_errors=True)
+def split_text_chunks(text: str) -> list[str]:
+    words = text.split()
+    if not words:
+        raise ValueError("text must not be empty")
+    sentences: list[list[str]] = []
+    sentence: list[str] = []
+    for word in words:
+        sentence.append(word)
+        if TERMINAL_WORD.search(word) is not None:
+            sentences.append(sentence)
+            sentence = []
+    if sentence:
+        sentences.append(sentence)
 
+    chunks: list[str] = []
+    current: list[str] = []
+    for sentence in sentences:
+        while len(sentence) > CHUNK_MAX_WORDS:
+            if current:
+                chunks.append(" ".join(current))
+                current = []
+            chunks.append(" ".join(sentence[:CHUNK_MAX_WORDS]))
+            sentence = sentence[CHUNK_MAX_WORDS:]
+        if current and len(current) + len(sentence) > CHUNK_MAX_WORDS:
+            chunks.append(" ".join(current))
+            current = []
+        current.extend(sentence)
+        if len(current) >= CHUNK_TARGET_WORDS:
+            chunks.append(" ".join(current))
+            current = []
+    if current:
+        chunks.append(" ".join(current))
+    if any(len(chunk.split()) > CHUNK_MAX_WORDS for chunk in chunks):
+        raise RuntimeError("chunk word limit was not enforced")
+    if " ".join(chunks) != " ".join(words):
+        raise RuntimeError("chunking changed normalized input text")
+    return chunks
+
+
+def generate_chunk(model, job: dict, text: str, generation: dict) -> tuple:
+    # Reusing the identity seed for every chunk stabilizes the designed voice
+    # while keeping the complete document exactly reproducible.
     np.random.seed(job["seed"])
     mx.random.seed(job["seed"])
-    mx.reset_peak_memory()
-    started = time.perf_counter_ns()
     generator = model.generate_voice_design(
         text=text,
         instruct=job["instruction"],
@@ -127,6 +164,7 @@ def generate_job(
     arrays: list[np.ndarray] = []
     outputs: list[dict] = []
     first_audio_ns: int | None = None
+    started = time.perf_counter_ns()
     for output in generator:
         if first_audio_ns is None:
             first_audio_ns = time.perf_counter_ns()
@@ -144,11 +182,77 @@ def generate_job(
     completed = time.perf_counter_ns()
     if not arrays or first_audio_ns is None:
         raise RuntimeError(f"{job['id']}: Qwen3-TTS returned no audio")
+    token_count = sum(item["token_count"] for item in outputs)
+    # mlx-audio 0.4.5 reports is_final_chunk=false for both capped and normally
+    # completed non-streaming calls, so the pinned token ceiling is authoritative.
+    reached_max_tokens = token_count >= generation["max_tokens"]
+    if reached_max_tokens:
+        raise RuntimeError(
+            f"{job['id']}: chunk reached the {generation['max_tokens']} token limit"
+        )
     audio = np.concatenate(arrays).astype("<f4", copy=False)
+    return audio, outputs, first_audio_ns, started, completed, token_count
+
+
+def generate_job(
+    model,
+    job: dict,
+    text: str,
+    generation: dict,
+    sample_rate: int,
+    model_load_ms: float,
+    source_revision: str,
+    output_root: Path,
+) -> dict:
+    final_directory = output_root / job["id"]
+    if valid_checkpoint(final_directory, job, source_revision):
+        return {"id": job["id"], "status": "resumed"}
+    shutil.rmtree(final_directory, ignore_errors=True)
+
+    mx.reset_peak_memory()
+    started = time.perf_counter_ns()
+    text_chunks = split_text_chunks(text)
+    audio_parts: list[np.ndarray] = []
+    chunk_results: list[dict] = []
+    first_audio_ns: int | None = None
+    silence_samples = round(sample_rate * INTER_CHUNK_SILENCE_MS / 1000)
+    for index, chunk_text in enumerate(text_chunks):
+        (
+            chunk_audio,
+            outputs,
+            chunk_first_audio_ns,
+            chunk_started,
+            chunk_completed,
+            token_count,
+        ) = generate_chunk(model, job, chunk_text, generation)
+        if first_audio_ns is None:
+            first_audio_ns = chunk_first_audio_ns
+        if index > 0:
+            audio_parts.append(np.zeros(silence_samples, dtype="<f4"))
+        audio_parts.append(chunk_audio)
+        chunk_results.append(
+            {
+                "index": index,
+                "text_sha256": sha256_bytes(chunk_text.encode("utf-8")),
+                "character_count": len(chunk_text),
+                "word_count": len(chunk_text.split()),
+                "seed": job["seed"],
+                "audio_sample_count": int(chunk_audio.size),
+                "duration_ms": int(chunk_audio.size) * 1000.0 / sample_rate,
+                "token_count": token_count,
+                "synthesis_ms": (chunk_completed - chunk_started) / 1_000_000,
+                "outputs": outputs,
+                "completed": True,
+            }
+        )
+    completed = time.perf_counter_ns()
+    if not audio_parts or first_audio_ns is None:
+        raise RuntimeError(f"{job['id']}: Qwen3-TTS returned no audio")
+    audio = np.concatenate(audio_parts).astype("<f4", copy=False)
     if not np.isfinite(audio).all():
         raise RuntimeError(f"{job['id']}: Qwen3-TTS returned non-finite audio")
     raw = audio.tobytes()
-    token_count = sum(item["token_count"] for item in outputs)
+    token_count = sum(item["token_count"] for item in chunk_results)
     duration_ms = int(audio.size) * 1000.0 / sample_rate
     temporary = Path(tempfile.mkdtemp(prefix=f".{job['id']}-", dir=output_root))
     try:
@@ -170,6 +274,13 @@ def generate_job(
                 "instruction": job["instruction"],
                 "seed": job["seed"],
                 **generation,
+                "chunking": {
+                    "revision": CHUNKING_REVISION,
+                    "target_words": CHUNK_TARGET_WORDS,
+                    "maximum_words": CHUNK_MAX_WORDS,
+                    "inter_chunk_silence_ms": INTER_CHUNK_SILENCE_MS,
+                    "seed_policy": "reset-identity-seed-per-chunk",
+                },
             },
             "audio": {
                 "path": "audio.f32le",
@@ -192,15 +303,17 @@ def generate_job(
                 "real_time_factor": (completed - started) / 1_000_000 / duration_ms,
                 "token_count": token_count,
                 "mlx_peak_memory_bytes": int(mx.get_peak_memory()),
-                "outputs": outputs,
+                "chunks": chunk_results,
                 "packages": {
                     "mlx": importlib.metadata.version("mlx"),
                     "mlx-audio": importlib.metadata.version("mlx-audio"),
                 },
             },
             "termination": {
-                "reached_max_tokens": token_count >= generation["max_tokens"],
-                "configured_max_tokens": generation["max_tokens"],
+                "completed_all_chunks": True,
+                "reached_max_tokens": False,
+                "chunk_count": len(chunk_results),
+                "configured_max_tokens_per_chunk": generation["max_tokens"],
             },
         }
         (temporary / "result.json").write_text(
@@ -218,6 +331,18 @@ def self_test() -> None:
     raw = np.array([-0.5, 0.5], dtype="<f4").tobytes()
     if sha256_bytes(raw) != hashlib.sha256(raw).hexdigest():
         raise RuntimeError("self-test digest failure")
+    short = "One short sentence stays intact."
+    if split_text_chunks(short) != [short]:
+        raise RuntimeError("self-test short chunk failure")
+    source = " ".join(
+        f"Sentence {index} has enough words for a boundary."
+        for index in range(20)
+    )
+    chunks = split_text_chunks(source)
+    if len(chunks) < 2 or " ".join(chunks) != source:
+        raise RuntimeError("self-test chunk preservation failure")
+    if any(len(chunk.split()) > CHUNK_MAX_WORDS for chunk in chunks):
+        raise RuntimeError("self-test chunk limit failure")
     print("Qwen VoiceDesign batch runner: self-test passed")
 
 
