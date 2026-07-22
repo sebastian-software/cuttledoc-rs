@@ -28,6 +28,25 @@ fixture, not a quality ranking. The three accepted outputs match its unverified
 dataset reference, but only independent human gold can label edits beneficial
 and estimate regression rates.
 
+## Multi-page follow-up
+
+The quality follow-up uses eight sections, eight German Apple voices, 995
+normalized reference words, 506.7 seconds of clean synthesized speech, and 60
+raw Whisper word errors. It therefore supersedes the one-word fixture for
+development-quality reasoning while retaining the earlier probe as a fast
+contract smoke test.
+
+| Candidate | Contract | Micro-WER | Improved / unchanged / regressed sections | Two-request cost |
+| --- | --- | ---: | --- | ---: |
+| Raw Whisper | n/a | 6.03% | n/a | n/a |
+| Qwen 3.5 122B-A10B | Passed; unsupported changes to `5.0` and `2025` | 2.51% | 6 / 1 / 1 | $0.0254754 |
+| GPT-5.6 Sol | Failed; one output change missing from its edit ledger | 0.50% | 6 / 2 / 0 | $0.2455266 |
+| Claude Sonnet 4.6 | Passed | 3.12% | 5 / 3 / 0 | $0.1521399 |
+| Mistral Small 3.2 24B | Blocked twice by pinned Parasail endpoint HTTP 429 | — | — | not recorded |
+
+The full methodology, per-error interpretation, and decision boundary are in
+[`postprocessing-long-form-evaluation.md`](../../docs/postprocessing-long-form-evaluation.md).
+
 Every request disables provider fallback, requires all requested parameters,
 denies data collection, and requires a zero-data-retention route. The gateway
 also enforces a strict JSON Schema. This is a pragmatic hosted-product

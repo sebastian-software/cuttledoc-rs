@@ -169,18 +169,45 @@ function countSequence(words, sequence) {
   return count;
 }
 
-function pairCounts(pairs) {
-  const counts = new Map();
-  for (const pair of pairs) {
-    const key = JSON.stringify(pair);
-    counts.set(key, (counts.get(key) ?? 0) + 1);
+function reportedEditAudit(source, target, edits) {
+  const sourceWords = normalizedWords(source);
+  const targetWords = normalizedWords(target);
+  const reconstructed = [];
+  let cursor = 0;
+  let reportedLexicalEditCount = 0;
+  for (const edit of edits) {
+    const original = normalizedWords(edit.original);
+    const replacement = normalizedWords(edit.replacement);
+    if (JSON.stringify(original) === JSON.stringify(replacement)) continue;
+    reportedLexicalEditCount += wordDiff(
+      edit.original,
+      edit.replacement,
+    ).edit_distance;
+    if (original.length === 0) {
+      return { fullyReported: false, reportedLexicalEditCount };
+    }
+    let match = -1;
+    for (let index = cursor;
+      index <= sourceWords.length - original.length;
+      index += 1) {
+      if (original.every((word, offset) =>
+        sourceWords[index + offset] === word)) {
+        match = index;
+        break;
+      }
+    }
+    if (match < 0) {
+      return { fullyReported: false, reportedLexicalEditCount };
+    }
+    reconstructed.push(...sourceWords.slice(cursor, match), ...replacement);
+    cursor = match + original.length;
   }
-  return counts;
-}
-
-function equalCounts(left, right) {
-  return left.size === right.size &&
-    [...left].every(([key, value]) => right.get(key) === value);
+  reconstructed.push(...sourceWords.slice(cursor));
+  return {
+    fullyReported: reconstructed.length === targetWords.length &&
+      reconstructed.every((word, index) => word === targetWords[index]),
+    reportedLexicalEditCount,
+  };
 }
 
 function invalidOutput(text, edits, error, sections = null) {
@@ -227,15 +254,11 @@ function parseCorrectionObject(parsed, fixture) {
   }
 
   const diff = wordDiff(fixture.transcript, parsed.text);
-  const operationPairs = pairCounts(diff.operations.map((operation) => [
-    normalizedWords(operation.input ?? ''),
-    normalizedWords(operation.output ?? ''),
-  ]));
-  const reportedPairs = pairCounts(parsed.edits.flatMap((edit) =>
-    wordDiff(edit.original, edit.replacement).operations.map((operation) => [
-      normalizedWords(operation.input ?? ''),
-      normalizedWords(operation.output ?? ''),
-    ])));
+  const reported = reportedEditAudit(
+    fixture.transcript,
+    parsed.text,
+    parsed.edits,
+  );
   const inputWords = normalizedWords(fixture.transcript);
   const outputWords = normalizedWords(parsed.text);
   const protectedSpansUnchanged = (fixture.protected_spans ?? []).every((span) => {
@@ -247,10 +270,9 @@ function parseCorrectionObject(parsed, fixture) {
     reported_edits: parsed.edits,
     parser: { valid: true, error: null },
     audit: {
-      lexical_edits_fully_reported: equalCounts(operationPairs, reportedPairs),
+      lexical_edits_fully_reported: reported.fullyReported,
       protected_spans_unchanged: protectedSpansUnchanged,
-      reported_lexical_edit_count: [...reportedPairs.values()]
-        .reduce((sum, value) => sum + value, 0),
+      reported_lexical_edit_count: reported.reportedLexicalEditCount,
       section_ids_preserved: null,
     },
   };

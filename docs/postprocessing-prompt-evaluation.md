@@ -24,6 +24,7 @@ The exact prompt text and digests are pinned by
 | Historical Cuttledoc 2 | broad proofreading | reproduce the prior baseline and its regression behavior |
 | Surface only | none | improve punctuation, capitalization, and structure with a mechanically enforceable lexical invariant |
 | Conservative error profile | bounded contextual edits | test whether backend/language/domain error classes learned on development sources improve precision |
+| Conservative sections | bounded contextual edits with immutable section ids | test multi-page correction coverage, section regressions, and cross-field audit behavior |
 | Targeted spans | supplied alternatives at supplied spans only | test the safest lexical repair path when ASR confidence, alternatives, glossary checks, or deterministic validators identify a suspect span |
 
 The surface-only mode is rejected whenever its case- and
@@ -178,3 +179,13 @@ a capability the local prompt-only runs did not receive. Human-verified German
 professional-audio sources must establish beneficial-edit precision, harmful
 edit rate, presentation gain, and per-source regressions before this prompt or
 any model advances.
+
+The follow-up
+[`long-form development screen`](postprocessing-long-form-evaluation.md)
+uses 995 German reference words, eight voices, and 60 raw Whisper errors. GPT-5.6
+Sol reaches 0.50% diagnostic micro-WER with no section regression but omits one
+edit-ledger entry; Qwen reaches 2.51% but makes two unsupported factual changes
+in an already exact section; Claude passes the full contract without a section
+regression at 3.12%. These results supersede the single-word fixture for
+development-quality reasoning, but remain synthetic and do not select a
+product model.

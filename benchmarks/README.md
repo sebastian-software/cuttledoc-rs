@@ -292,6 +292,9 @@ The next prompt candidates are immutable benchmark inputs under
 [`postprocessing/prompts`](postprocessing/prompts/); their hashes, edit
 permissions, context fields, output contracts, and mechanical rejection gates
 are pinned by the prompt manifest.
+The multi-page German follow-up fixture and its section-level findings are
+documented in
+[`docs/postprocessing-long-form-evaluation.md`](../docs/postprocessing-long-form-evaluation.md).
 
 Run one candidate across the bounded set and write its immutable aggregate
 outside the repository before review:

@@ -1,0 +1,1691 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase7.gpt-5.6-sol-openrouter-azure-eu.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
+  "captured_at": "2026-07-22T07:47:27.772Z",
+  "source_revision": "b6316f6f497262c1c3d1829b07cfc0a8df473067",
+  "purpose": "development-quality-screen",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "gpt-5.6-sol-openrouter-azure-eu",
+    "role": "frontier-quality-control",
+    "model": {
+      "requested_id": "openai/gpt-5.6-sol",
+      "allowed_response_ids": [
+        "openai/gpt-5.6-sol",
+        "openai/gpt-5.6-sol-20260709"
+      ],
+      "upstream_identity": "OpenAI GPT-5.6 Sol",
+      "provider_model_identity": "openai/gpt-5.6-sol-20260709",
+      "release": "2026-07-09",
+      "weights": "proprietary",
+      "license": "Hosted commercial service",
+      "context_tokens": 1050000,
+      "identity_limit": "The model and serving implementation are proprietary; the API identity is the strongest artifact boundary available to this probe."
+    },
+    "gateway": {
+      "name": "OpenRouter",
+      "requested_model": "openai/gpt-5.6-sol",
+      "provider_slug": "azure/eu",
+      "provider_name": "Azure",
+      "served_model": "openai/gpt-5.6-sol",
+      "served_provider": "Azure"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-synthetic-multipage-whisper-1",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "clean synthetic documentary prose and dialogue",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "synthetic-source-reference",
+    "transcript_sha256": "55bde635a4c6792d4b265e99afa9af4ce6694c804578891a8d8c5cac27a2e41c",
+    "section_count": 8,
+    "reference_word_count": 995,
+    "reference_visible_to_model": false
+  },
+  "procedure": {
+    "experiment_id": "gpt-5.6-sol-openrouter.conservative-sections-v1.de-synthetic-multipage",
+    "generation": {
+      "prompt_id": "conservative-sections-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-section-edits",
+      "structured_output_contract": "bounded-transcript-sections-v1",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "sections"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-sections-v1.txt",
+      "prompt_sha256": "1febeaca7c2a35e41ee4c8315a3ae3adf2c56c3511c26441e5c6165703adc421",
+      "max_tokens": 8192,
+      "timeout_ms": 300000,
+      "rationale": "Replace the one-word capability probe with an eight-section, eight-voice German development screen while preserving exact section-level audit boundaries."
+    },
+    "gateway_request": {
+      "token_limit_field": "max_completion_tokens",
+      "json_schema_numeric_bounds": true,
+      "response_format": {
+        "type": "json_schema",
+        "schema_id": "bounded-transcript-sections-v1",
+        "strict": true
+      },
+      "temperature": null,
+      "seed": 0,
+      "reasoning": {
+        "effort": "none",
+        "exclude": true
+      },
+      "provider": {
+        "only": [
+          "azure/eu"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true,
+        "data_collection": "deny",
+        "zdr": true
+      }
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "sections"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "execution_boundary": "Remote OpenRouter API; no local model-runtime claim"
+  },
+  "measurements": {
+    "requests": [
+      {
+        "response_id": "gen-1784706279-cJyQ5P0I4v6yOC9cLoQ6",
+        "served_model": "openai/gpt-5.6-sol",
+        "served_provider": "Azure",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 1149.222167,
+        "usage": {
+          "prompt_tokens": 2406,
+          "completion_tokens": 3459,
+          "total_tokens": 5865,
+          "cost_usd": 0.12738,
+          "is_byok": false
+        }
+      },
+      {
+        "response_id": "gen-1784706374-6fpbdY3cmdIJvH1mA4O3",
+        "served_model": "openai/gpt-5.6-sol",
+        "served_provider": "Azure",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 501.1080840000068,
+        "usage": {
+          "prompt_tokens": 2406,
+          "completion_tokens": 3448,
+          "total_tokens": 5854,
+          "cost_usd": 0.1181466,
+          "is_byok": false
+        }
+      }
+    ],
+    "aggregate": {
+      "total_cost_usd": 0.24552659999999998,
+      "total_prompt_tokens": 4812,
+      "total_completion_tokens": 6907
+    },
+    "deterministic_repeat": {
+      "text_identical": false,
+      "requirement": "observation-only; remote repeat equality is not an acceptance gate"
+    },
+    "latency_claim_limit": "Client-observed request duration includes gateway, queue, provider, and network time and is not comparable to local MLX measurements."
+  },
+  "output": {
+    "text": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf Intelligenz im Sinne der Nachbildung menschlichen Verhaltens, beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache, beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds; ihm stehen beispielsweise traditionelle Logik und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden: schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.\n\nDer Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt, ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.\n\nKünstliche neuronale Netze, KNN, im Sinne von Warren McCulloch und Walter Pitts, 1943, Alan Turings Überlegungen zur maschinellen Intelligenz, siehe auch Turing-Test, um 1950 und Frank Rosenblatts Implementierungen des Perzeptrons ab 1957 waren Vorläufer zur Entwicklung der künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, u. a. MYCIN zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten KI-Winter. Verbesserte Expertensysteme in den 1980ern, vor allem aufgrund erhöhter Rechenleistung, und Verfahren zum Training mehrschichtiger Netze, u. a. Paul Werbos, heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten KI-Winter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, u. a. Deep-Learning-Ansätze mittels Deep Blue für Schach, 1997, und AlphaGo für Go, 2017, führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Large Language Models 2022.\n\nUm ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen. Dazu stellt ein Mensch per Terminal, Bildschirm und Tastatur oder auch Lautsprecher und Mikrofon beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Loebner-Preis für den Turing-Test.\n\nEine Fragestellung der KI ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei, soweit möglich, formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die KI damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren, logische Programmierung, behilflich wären. Zwei Schwierigkeiten zeichneten sich ab. In vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten, maschinelles Lernen. Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der KI wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universelle Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.\n\nKünstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.\n\nDer Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Erstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte, hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.\n\n„Was macht eine Aufnahme eigentlich leicht verständlich?“, fragt Mara. „Vor allem Ruhe“, antwortet Jonas. „Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht.“ Mara rückt etwas näher an das Mikrofon. „Also genügt ein gutes Gerät?“ „Nein. Der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders.“ „Und wenn jemand beim Sprechen den Kopf bewegt?“ Jonas lacht. „Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzielen.“ Mara macht eine kurze Pause. „Das klingt weniger technisch, als ich erwartet hatte.“ „Gute Technik fällt kaum auf“, sagt Jonas. „Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.“",
+    "text_sha256": "bf403e4eda47ac891f3c799405c8231cc366bc56a1aebfad6a5df3ae617970a2",
+    "raw_text": "{\"sections\":[{\"id\":\"synthetic-de-description\",\"text\":\"Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf Intelligenz im Sinne der Nachbildung menschlichen Verhaltens, beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache, beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds; ihm stehen beispielsweise traditionelle Logik und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden: schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.\",\"edits\":[]},{\"id\":\"synthetic-de-origin\",\"text\":\"Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt, ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.\",\"edits\":[{\"original\":\"John Garty\",\"replacement\":\"John McCarthy\",\"class\":\"contextual-misrecognition\",\"reason\":\"John McCarthy prägte den Begriff „Artificial Intelligence“ im Zusammenhang mit dem Dartmouth-Projekt.\",\"confidence\":0.99},{\"original\":\"Rockefeller Stiftung\",\"replacement\":\"Rockefeller-Stiftung\",\"class\":\"word-boundary\",\"reason\":\"Der Name der Stiftung wird im Deutschen als Zusammensetzung mit Bindestrich geschrieben.\",\"confidence\":0.99},{\"original\":\"Dartmouth-Summer-Research-Projekt Unartificial Intelligence\",\"replacement\":\"Dartmouth Summer Research Project on Artificial Intelligence\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der unmittelbare Kontext bezeichnet den bekannten englischen Projekttitel; „Unartificial“ ist eine klare ASR-Fehlerkennung.\",\"confidence\":0.99},{\"original\":\"Ein Forschungsprojekt\",\"replacement\":\"ein Forschungsprojekt\",\"class\":\"surface\",\"reason\":\"Der Ausdruck ist eine Apposition zum vorherigen Projektnamen und setzt den Satz fort.\",\"confidence\":0.98},{\"original\":\"Intelligenze Augmentation\",\"replacement\":\"Intelligence Augmentation\",\"class\":\"contextual-misrecognition\",\"reason\":\"Engelbarts etablierter englischer Begriff lautet „Intelligence Augmentation“.\",\"confidence\":0.99},{\"original\":\"Vielen Dank.\",\"replacement\":\"\",\"class\":\"contextual-misrecognition\",\"reason\":\"Die isolierte Schlussformel ist im dokumentarischen Sachtext ein wahrscheinliches End-of-passage-Artefakt.\",\"confidence\":0.97}]},{\"id\":\"synthetic-de-precursors\",\"text\":\"Künstliche neuronale Netze, KNN, im Sinne von Warren McCulloch und Walter Pitts, 1943, Alan Turings Überlegungen zur maschinellen Intelligenz, siehe auch Turing-Test, um 1950 und Frank Rosenblatts Implementierungen des Perzeptrons ab 1957 waren Vorläufer zur Entwicklung der künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, u. a. MYCIN zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten KI-Winter. Verbesserte Expertensysteme in den 1980ern, vor allem aufgrund erhöhter Rechenleistung, und Verfahren zum Training mehrschichtiger Netze, u. a. Paul Werbos, heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten KI-Winter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, u. a. Deep-Learning-Ansätze mittels Deep Blue für Schach, 1997, und AlphaGo für Go, 2017, führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Large Language Models 2022.\",\"edits\":[{\"original\":\"Warren Muguloch\",\"replacement\":\"Warren McCulloch\",\"class\":\"contextual-misrecognition\",\"reason\":\"Walter Pitts entwickelte die genannten frühen neuronalen Netze gemeinsam mit Warren McCulloch.\",\"confidence\":0.99},{\"original\":\"Alain Thurings\",\"replacement\":\"Alan Turings\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der Kontext zur maschinellen Intelligenz bezeichnet Alan Turing.\",\"confidence\":0.99},{\"original\":\"Thuring Test\",\"replacement\":\"Turing-Test\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der nach Alan Turing benannte Test heißt Turing-Test.\",\"confidence\":0.99},{\"original\":\"Rosenblatt's\",\"replacement\":\"Rosenblatts\",\"class\":\"surface\",\"reason\":\"Der deutsche Genitiv des Namens wird ohne Apostroph gebildet.\",\"confidence\":0.99},{\"original\":\"UA-Mythen\",\"replacement\":\"u. a. MYCIN\",\"class\":\"contextual-misrecognition\",\"reason\":\"Das Expertensystem zur Diagnose und Therapie von Infektionskrankheiten hieß MYCIN; „UA“ entspricht der gesprochenen Abkürzung „u. a.“.\",\"confidence\":0.99},{\"original\":\"Keywinter\",\"replacement\":\"KI-Winter\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.\",\"confidence\":0.99},{\"original\":\"1980er N\",\"replacement\":\"1980ern\",\"class\":\"word-boundary\",\"reason\":\"Das getrennte „N“ gehört zur gesprochenen Dativendung von „1980ern“.\",\"confidence\":0.99},{\"original\":\"Rechenleistung und Verfahren\",\"replacement\":\"Rechenleistung, und Verfahren\",\"class\":\"surface\",\"reason\":\"Das Komma trennt zwei koordinierte Ursachen des Aufschwungs.\",\"confidence\":0.9},{\"original\":\"UA-Paul-Verbus\",\"replacement\":\"u. a. Paul Werbos\",\"class\":\"contextual-misrecognition\",\"reason\":\"Paul Werbos ist im Kontext mehrschichtiger Netze und Backpropagation gemeint; „UA“ entspricht „u. a.“.\",\"confidence\":0.99},{\"original\":\"Keywinter\",\"replacement\":\"KI-Winter\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.\",\"confidence\":0.99},{\"original\":\"UA-Deep-Lerninansätze mittels D-Ruhe\",\"replacement\":\"u. a. Deep-Learning-Ansätze mittels Deep Blue\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der Schachcomputer von 1997 heißt Deep Blue; die übrigen Formen sind erkennbare Lautschrift-Fehler.\",\"confidence\":0.99},{\"original\":\"Alpha-Go\",\"replacement\":\"AlphaGo\",\"class\":\"word-boundary\",\"reason\":\"Der Name des Go-Systems wird zusammengeschrieben.\",\"confidence\":0.99},{\"original\":\"Lage-Language-Modus\",\"replacement\":\"Large Language Models\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der Kontext des Durchbruchs 2022 stützt eindeutig den englischen technischen Begriff „Large Language Models“.\",\"confidence\":0.99}]},{\"id\":\"synthetic-de-turing-test\",\"text\":\"Um ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen. Dazu stellt ein Mensch per Terminal, Bildschirm und Tastatur oder auch Lautsprecher und Mikrofon beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Loebner-Preis für den Turing-Test.\",\"edits\":[{\"original\":\"Ruebener-Preis\",\"replacement\":\"Loebner-Preis\",\"class\":\"contextual-misrecognition\",\"reason\":\"Der seit 1991 vergebene Wettbewerb zum Turing-Test heißt Loebner-Preis.\",\"confidence\":0.99}]},{\"id\":\"synthetic-de-methods\",\"text\":\"Eine Fragestellung der KI ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei, soweit möglich, formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die KI damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren, logische Programmierung, behilflich wären. Zwei Schwierigkeiten zeichneten sich ab. In vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten, maschinelles Lernen. Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der KI wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universelle Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.\",\"edits\":[{\"original\":\"Key\",\"replacement\":\"KI\",\"class\":\"contextual-misrecognition\",\"reason\":\"Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.\",\"confidence\":0.99},{\"original\":\"Key\",\"replacement\":\"KI\",\"class\":\"contextual-misrecognition\",\"reason\":\"Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.\",\"confidence\":0.99},{\"original\":\"Key\",\"replacement\":\"KI\",\"class\":\"contextual-misrecognition\",\"reason\":\"Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.\",\"confidence\":0.99}]},{\"id\":\"synthetic-de-applications\",\"text\":\"Künstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.\",\"edits\":[]},{\"id\":\"synthetic-de-native\",\"text\":\"Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Erstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte, hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.\",\"edits\":[{\"original\":\"Ebenenfläche\",\"replacement\":\"ebenen Fläche\",\"class\":\"word-boundary\",\"reason\":\"Nach „einer anderen“ sind Adjektiv und Substantiv getrennt zu schreiben.\",\"confidence\":0.99},{\"original\":\"Handschriften, Manuskripte hergestellt\",\"replacement\":\"Handschriften, Manuskripte, hergestellt\",\"class\":\"surface\",\"reason\":\"„Manuskripte“ ist eine erläuternde Apposition und wird durch Kommas abgetrennt.\",\"confidence\":0.96},{\"original\":\"Skripturien\",\"replacement\":\"Skriptorien\",\"class\":\"contextual-misrecognition\",\"reason\":\"Die Schreibstuben mittelalterlicher Klöster heißen „Skriptorien“.\",\"confidence\":0.99},{\"original\":\"in eine Druckpresse\",\"replacement\":\"in einer Druckpresse\",\"class\":\"asr-inflection\",\"reason\":\"Die Ortsangabe erfordert nach „in“ den Dativ.\",\"confidence\":0.99}]},{\"id\":\"synthetic-de-dialogue\",\"text\":\"„Was macht eine Aufnahme eigentlich leicht verständlich?“, fragt Mara. „Vor allem Ruhe“, antwortet Jonas. „Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht.“ Mara rückt etwas näher an das Mikrofon. „Also genügt ein gutes Gerät?“ „Nein. Der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders.“ „Und wenn jemand beim Sprechen den Kopf bewegt?“ Jonas lacht. „Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzielen.“ Mara macht eine kurze Pause. „Das klingt weniger technisch, als ich erwartet hatte.“ „Gute Technik fällt kaum auf“, sagt Jonas. „Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.“\",\"edits\":[{\"original\":\"Fragezeichen, fragt Mara.\",\"replacement\":\"?“, fragt Mara.\",\"class\":\"surface\",\"reason\":\"„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.\",\"confidence\":0.99},{\"original\":\"Punkt Mara\",\"replacement\":\".“ Mara\",\"class\":\"surface\",\"reason\":\"„Punkt“ ist ein gesprochenes Satzzeichenlabel.\",\"confidence\":0.99},{\"original\":\"Fragezeichen, nein.\",\"replacement\":\"?“ „Nein.\",\"class\":\"surface\",\"reason\":\"„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel und markiert den Sprecherwechsel.\",\"confidence\":0.99},{\"original\":\"an das Punkt und\",\"replacement\":\"anders.“ „Und\",\"class\":\"contextual-misrecognition\",\"reason\":\"„Jede Stimme klingt anders“ ist durch den unmittelbaren Kontext eindeutig; „Punkt“ ist zusätzlich ein gesprochenes Satzzeichenlabel.\",\"confidence\":0.99},{\"original\":\"Fragezeichen, Jonas\",\"replacement\":\"?“ Jonas\",\"class\":\"surface\",\"reason\":\"„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.\",\"confidence\":0.99},{\"original\":\"Punkt Mara\",\"replacement\":\".“ Mara\",\"class\":\"surface\",\"reason\":\"„Punkt“ ist ein gesprochenes Satzzeichenlabel.\",\"confidence\":0.99},{\"original\":\"Punkt gute\",\"replacement\":\".“ „Gute\",\"class\":\"surface\",\"reason\":\"„Punkt“ ist ein gesprochenes Satzzeichenlabel und der neue Satz beginnt groß.\",\"confidence\":0.99},{\"original\":\"Vielen Dank.\",\"replacement\":\"\",\"class\":\"contextual-misrecognition\",\"reason\":\"Die isolierte Schlussformel gehört nicht zum Dialog und ist ein wahrscheinliches End-of-passage-Artefakt.\",\"confidence\":0.97}] }]}",
+    "raw_text_sha256": "a18622baef03726f0b8da32ee1cf825ff90dd96f3962184bdfd3f8b8eb6f81f4",
+    "reported_edits": [
+      {
+        "original": "John Garty",
+        "replacement": "John McCarthy",
+        "class": "contextual-misrecognition",
+        "reason": "John McCarthy prägte den Begriff „Artificial Intelligence“ im Zusammenhang mit dem Dartmouth-Projekt.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Rockefeller Stiftung",
+        "replacement": "Rockefeller-Stiftung",
+        "class": "word-boundary",
+        "reason": "Der Name der Stiftung wird im Deutschen als Zusammensetzung mit Bindestrich geschrieben.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Dartmouth-Summer-Research-Projekt Unartificial Intelligence",
+        "replacement": "Dartmouth Summer Research Project on Artificial Intelligence",
+        "class": "contextual-misrecognition",
+        "reason": "Der unmittelbare Kontext bezeichnet den bekannten englischen Projekttitel; „Unartificial“ ist eine klare ASR-Fehlerkennung.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Ein Forschungsprojekt",
+        "replacement": "ein Forschungsprojekt",
+        "class": "surface",
+        "reason": "Der Ausdruck ist eine Apposition zum vorherigen Projektnamen und setzt den Satz fort.",
+        "confidence": 0.98
+      },
+      {
+        "original": "Intelligenze Augmentation",
+        "replacement": "Intelligence Augmentation",
+        "class": "contextual-misrecognition",
+        "reason": "Engelbarts etablierter englischer Begriff lautet „Intelligence Augmentation“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Vielen Dank.",
+        "replacement": "",
+        "class": "contextual-misrecognition",
+        "reason": "Die isolierte Schlussformel ist im dokumentarischen Sachtext ein wahrscheinliches End-of-passage-Artefakt.",
+        "confidence": 0.97
+      },
+      {
+        "original": "Warren Muguloch",
+        "replacement": "Warren McCulloch",
+        "class": "contextual-misrecognition",
+        "reason": "Walter Pitts entwickelte die genannten frühen neuronalen Netze gemeinsam mit Warren McCulloch.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Alain Thurings",
+        "replacement": "Alan Turings",
+        "class": "contextual-misrecognition",
+        "reason": "Der Kontext zur maschinellen Intelligenz bezeichnet Alan Turing.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Thuring Test",
+        "replacement": "Turing-Test",
+        "class": "contextual-misrecognition",
+        "reason": "Der nach Alan Turing benannte Test heißt Turing-Test.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Rosenblatt's",
+        "replacement": "Rosenblatts",
+        "class": "surface",
+        "reason": "Der deutsche Genitiv des Namens wird ohne Apostroph gebildet.",
+        "confidence": 0.99
+      },
+      {
+        "original": "UA-Mythen",
+        "replacement": "u. a. MYCIN",
+        "class": "contextual-misrecognition",
+        "reason": "Das Expertensystem zur Diagnose und Therapie von Infektionskrankheiten hieß MYCIN; „UA“ entspricht der gesprochenen Abkürzung „u. a.“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Keywinter",
+        "replacement": "KI-Winter",
+        "class": "contextual-misrecognition",
+        "reason": "Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "1980er N",
+        "replacement": "1980ern",
+        "class": "word-boundary",
+        "reason": "Das getrennte „N“ gehört zur gesprochenen Dativendung von „1980ern“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Rechenleistung und Verfahren",
+        "replacement": "Rechenleistung, und Verfahren",
+        "class": "surface",
+        "reason": "Das Komma trennt zwei koordinierte Ursachen des Aufschwungs.",
+        "confidence": 0.9
+      },
+      {
+        "original": "UA-Paul-Verbus",
+        "replacement": "u. a. Paul Werbos",
+        "class": "contextual-misrecognition",
+        "reason": "Paul Werbos ist im Kontext mehrschichtiger Netze und Backpropagation gemeint; „UA“ entspricht „u. a.“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Keywinter",
+        "replacement": "KI-Winter",
+        "class": "contextual-misrecognition",
+        "reason": "Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "UA-Deep-Lerninansätze mittels D-Ruhe",
+        "replacement": "u. a. Deep-Learning-Ansätze mittels Deep Blue",
+        "class": "contextual-misrecognition",
+        "reason": "Der Schachcomputer von 1997 heißt Deep Blue; die übrigen Formen sind erkennbare Lautschrift-Fehler.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Alpha-Go",
+        "replacement": "AlphaGo",
+        "class": "word-boundary",
+        "reason": "Der Name des Go-Systems wird zusammengeschrieben.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Lage-Language-Modus",
+        "replacement": "Large Language Models",
+        "class": "contextual-misrecognition",
+        "reason": "Der Kontext des Durchbruchs 2022 stützt eindeutig den englischen technischen Begriff „Large Language Models“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Ruebener-Preis",
+        "replacement": "Loebner-Preis",
+        "class": "contextual-misrecognition",
+        "reason": "Der seit 1991 vergebene Wettbewerb zum Turing-Test heißt Loebner-Preis.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Key",
+        "replacement": "KI",
+        "class": "contextual-misrecognition",
+        "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Key",
+        "replacement": "KI",
+        "class": "contextual-misrecognition",
+        "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Key",
+        "replacement": "KI",
+        "class": "contextual-misrecognition",
+        "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Ebenenfläche",
+        "replacement": "ebenen Fläche",
+        "class": "word-boundary",
+        "reason": "Nach „einer anderen“ sind Adjektiv und Substantiv getrennt zu schreiben.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Handschriften, Manuskripte hergestellt",
+        "replacement": "Handschriften, Manuskripte, hergestellt",
+        "class": "surface",
+        "reason": "„Manuskripte“ ist eine erläuternde Apposition und wird durch Kommas abgetrennt.",
+        "confidence": 0.96
+      },
+      {
+        "original": "Skripturien",
+        "replacement": "Skriptorien",
+        "class": "contextual-misrecognition",
+        "reason": "Die Schreibstuben mittelalterlicher Klöster heißen „Skriptorien“.",
+        "confidence": 0.99
+      },
+      {
+        "original": "in eine Druckpresse",
+        "replacement": "in einer Druckpresse",
+        "class": "asr-inflection",
+        "reason": "Die Ortsangabe erfordert nach „in“ den Dativ.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Fragezeichen, fragt Mara.",
+        "replacement": "?“, fragt Mara.",
+        "class": "surface",
+        "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Punkt Mara",
+        "replacement": ".“ Mara",
+        "class": "surface",
+        "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Fragezeichen, nein.",
+        "replacement": "?“ „Nein.",
+        "class": "surface",
+        "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel und markiert den Sprecherwechsel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "an das Punkt und",
+        "replacement": "anders.“ „Und",
+        "class": "contextual-misrecognition",
+        "reason": "„Jede Stimme klingt anders“ ist durch den unmittelbaren Kontext eindeutig; „Punkt“ ist zusätzlich ein gesprochenes Satzzeichenlabel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Fragezeichen, Jonas",
+        "replacement": "?“ Jonas",
+        "class": "surface",
+        "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Punkt Mara",
+        "replacement": ".“ Mara",
+        "class": "surface",
+        "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Punkt gute",
+        "replacement": ".“ „Gute",
+        "class": "surface",
+        "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel und der neue Satz beginnt groß.",
+        "confidence": 0.99
+      },
+      {
+        "original": "Vielen Dank.",
+        "replacement": "",
+        "class": "contextual-misrecognition",
+        "reason": "Die isolierte Schlussformel gehört nicht zum Dialog und ist ein wahrscheinliches End-of-passage-Artefakt.",
+        "confidence": 0.97
+      }
+    ],
+    "sections": [
+      {
+        "id": "synthetic-de-description",
+        "text": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf Intelligenz im Sinne der Nachbildung menschlichen Verhaltens, beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache, beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds; ihm stehen beispielsweise traditionelle Logik und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden: schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.",
+        "reported_edits": [],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 0,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 155,
+          "output_word_count": 155,
+          "edit_distance": 0,
+          "operations": []
+        },
+        "diagnostic_wer": {
+          "input": 0,
+          "output": 0,
+          "delta": 0
+        },
+        "text_sha256": "ec66fc04dc4078f89272e167a632179076663a4d11e278cefa2fb70d3e6215ef"
+      },
+      {
+        "id": "synthetic-de-origin",
+        "text": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt, ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligence Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+        "reported_edits": [
+          {
+            "original": "John Garty",
+            "replacement": "John McCarthy",
+            "class": "contextual-misrecognition",
+            "reason": "John McCarthy prägte den Begriff „Artificial Intelligence“ im Zusammenhang mit dem Dartmouth-Projekt.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Rockefeller Stiftung",
+            "replacement": "Rockefeller-Stiftung",
+            "class": "word-boundary",
+            "reason": "Der Name der Stiftung wird im Deutschen als Zusammensetzung mit Bindestrich geschrieben.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Dartmouth-Summer-Research-Projekt Unartificial Intelligence",
+            "replacement": "Dartmouth Summer Research Project on Artificial Intelligence",
+            "class": "contextual-misrecognition",
+            "reason": "Der unmittelbare Kontext bezeichnet den bekannten englischen Projekttitel; „Unartificial“ ist eine klare ASR-Fehlerkennung.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Ein Forschungsprojekt",
+            "replacement": "ein Forschungsprojekt",
+            "class": "surface",
+            "reason": "Der Ausdruck ist eine Apposition zum vorherigen Projektnamen und setzt den Satz fort.",
+            "confidence": 0.98
+          },
+          {
+            "original": "Intelligenze Augmentation",
+            "replacement": "Intelligence Augmentation",
+            "class": "contextual-misrecognition",
+            "reason": "Engelbarts etablierter englischer Begriff lautet „Intelligence Augmentation“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Vielen Dank.",
+            "replacement": "",
+            "class": "contextual-misrecognition",
+            "reason": "Die isolierte Schlussformel ist im dokumentarischen Sachtext ein wahrscheinliches End-of-passage-Artefakt.",
+            "confidence": 0.97
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 7,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 106,
+          "output_word_count": 105,
+          "edit_distance": 7,
+          "operations": [
+            {
+              "type": "replace",
+              "input_index": 13,
+              "output_index": 13,
+              "input": "garty",
+              "output": "mccarthy"
+            },
+            {
+              "type": "insert",
+              "input_index": 27,
+              "output_index": 27,
+              "input": null,
+              "output": "project"
+            },
+            {
+              "type": "replace",
+              "input_index": 27,
+              "output_index": 28,
+              "input": "projekt",
+              "output": "on"
+            },
+            {
+              "type": "replace",
+              "input_index": 28,
+              "output_index": 29,
+              "input": "unartificial",
+              "output": "artificial"
+            },
+            {
+              "type": "replace",
+              "input_index": 74,
+              "output_index": 75,
+              "input": "intelligenze",
+              "output": "intelligence"
+            },
+            {
+              "type": "delete",
+              "input_index": 104,
+              "output_index": 105,
+              "input": "vielen",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 105,
+              "output_index": 105,
+              "input": "dank",
+              "output": null
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.0761904761904762,
+          "output": 0.009523809523809525,
+          "delta": -0.06666666666666668
+        },
+        "text_sha256": "08c4f110b278c27890c49df53590a637b17320b68938cec87ac8fedb8c4a4227"
+      },
+      {
+        "id": "synthetic-de-precursors",
+        "text": "Künstliche neuronale Netze, KNN, im Sinne von Warren McCulloch und Walter Pitts, 1943, Alan Turings Überlegungen zur maschinellen Intelligenz, siehe auch Turing-Test, um 1950 und Frank Rosenblatts Implementierungen des Perzeptrons ab 1957 waren Vorläufer zur Entwicklung der künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, u. a. MYCIN zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten KI-Winter. Verbesserte Expertensysteme in den 1980ern, vor allem aufgrund erhöhter Rechenleistung, und Verfahren zum Training mehrschichtiger Netze, u. a. Paul Werbos, heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten KI-Winter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, u. a. Deep-Learning-Ansätze mittels Deep Blue für Schach, 1997, und AlphaGo für Go, 2017, führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Large Language Models 2022.",
+        "reported_edits": [
+          {
+            "original": "Warren Muguloch",
+            "replacement": "Warren McCulloch",
+            "class": "contextual-misrecognition",
+            "reason": "Walter Pitts entwickelte die genannten frühen neuronalen Netze gemeinsam mit Warren McCulloch.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Alain Thurings",
+            "replacement": "Alan Turings",
+            "class": "contextual-misrecognition",
+            "reason": "Der Kontext zur maschinellen Intelligenz bezeichnet Alan Turing.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Thuring Test",
+            "replacement": "Turing-Test",
+            "class": "contextual-misrecognition",
+            "reason": "Der nach Alan Turing benannte Test heißt Turing-Test.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Rosenblatt's",
+            "replacement": "Rosenblatts",
+            "class": "surface",
+            "reason": "Der deutsche Genitiv des Namens wird ohne Apostroph gebildet.",
+            "confidence": 0.99
+          },
+          {
+            "original": "UA-Mythen",
+            "replacement": "u. a. MYCIN",
+            "class": "contextual-misrecognition",
+            "reason": "Das Expertensystem zur Diagnose und Therapie von Infektionskrankheiten hieß MYCIN; „UA“ entspricht der gesprochenen Abkürzung „u. a.“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Keywinter",
+            "replacement": "KI-Winter",
+            "class": "contextual-misrecognition",
+            "reason": "Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "1980er N",
+            "replacement": "1980ern",
+            "class": "word-boundary",
+            "reason": "Das getrennte „N“ gehört zur gesprochenen Dativendung von „1980ern“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Rechenleistung und Verfahren",
+            "replacement": "Rechenleistung, und Verfahren",
+            "class": "surface",
+            "reason": "Das Komma trennt zwei koordinierte Ursachen des Aufschwungs.",
+            "confidence": 0.9
+          },
+          {
+            "original": "UA-Paul-Verbus",
+            "replacement": "u. a. Paul Werbos",
+            "class": "contextual-misrecognition",
+            "reason": "Paul Werbos ist im Kontext mehrschichtiger Netze und Backpropagation gemeint; „UA“ entspricht „u. a.“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Keywinter",
+            "replacement": "KI-Winter",
+            "class": "contextual-misrecognition",
+            "reason": "Der etablierte Begriff für die beschriebene Forschungsflaute ist „KI-Winter“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "UA-Deep-Lerninansätze mittels D-Ruhe",
+            "replacement": "u. a. Deep-Learning-Ansätze mittels Deep Blue",
+            "class": "contextual-misrecognition",
+            "reason": "Der Schachcomputer von 1997 heißt Deep Blue; die übrigen Formen sind erkennbare Lautschrift-Fehler.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Alpha-Go",
+            "replacement": "AlphaGo",
+            "class": "word-boundary",
+            "reason": "Der Name des Go-Systems wird zusammengeschrieben.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Lage-Language-Modus",
+            "replacement": "Large Language Models",
+            "class": "contextual-misrecognition",
+            "reason": "Der Kontext des Durchbruchs 2022 stützt eindeutig den englischen technischen Begriff „Large Language Models“.",
+            "confidence": 0.99
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": false,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 28,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 163,
+          "output_word_count": 166,
+          "edit_distance": 29,
+          "operations": [
+            {
+              "type": "replace",
+              "input_index": 8,
+              "output_index": 8,
+              "input": "muguloch",
+              "output": "mcculloch"
+            },
+            {
+              "type": "replace",
+              "input_index": 13,
+              "output_index": 13,
+              "input": "alain",
+              "output": "alan"
+            },
+            {
+              "type": "replace",
+              "input_index": 14,
+              "output_index": 14,
+              "input": "thurings",
+              "output": "turings"
+            },
+            {
+              "type": "replace",
+              "input_index": 21,
+              "output_index": 21,
+              "input": "thuring",
+              "output": "turing"
+            },
+            {
+              "type": "delete",
+              "input_index": 27,
+              "output_index": 27,
+              "input": "rosenblatt",
+              "output": null
+            },
+            {
+              "type": "replace",
+              "input_index": 28,
+              "output_index": 27,
+              "input": "s",
+              "output": "rosenblatts"
+            },
+            {
+              "type": "replace",
+              "input_index": 35,
+              "output_index": 34,
+              "input": "vorläufe",
+              "output": "vorläufer"
+            },
+            {
+              "type": "insert",
+              "input_index": 45,
+              "output_index": 44,
+              "input": null,
+              "output": "u"
+            },
+            {
+              "type": "replace",
+              "input_index": 45,
+              "output_index": 45,
+              "input": "ua",
+              "output": "a"
+            },
+            {
+              "type": "replace",
+              "input_index": 46,
+              "output_index": 46,
+              "input": "mythen",
+              "output": "mycin"
+            },
+            {
+              "type": "insert",
+              "input_index": 65,
+              "output_index": 65,
+              "input": null,
+              "output": "ki"
+            },
+            {
+              "type": "replace",
+              "input_index": 65,
+              "output_index": 66,
+              "input": "keywinter",
+              "output": "winter"
+            },
+            {
+              "type": "delete",
+              "input_index": 70,
+              "output_index": 71,
+              "input": "1980er",
+              "output": null
+            },
+            {
+              "type": "replace",
+              "input_index": 71,
+              "output_index": 71,
+              "input": "n",
+              "output": "1980ern"
+            },
+            {
+              "type": "insert",
+              "input_index": 83,
+              "output_index": 83,
+              "input": null,
+              "output": "u"
+            },
+            {
+              "type": "replace",
+              "input_index": 83,
+              "output_index": 84,
+              "input": "ua",
+              "output": "a"
+            },
+            {
+              "type": "replace",
+              "input_index": 85,
+              "output_index": 86,
+              "input": "verbus",
+              "output": "werbos"
+            },
+            {
+              "type": "insert",
+              "input_index": 115,
+              "output_index": 116,
+              "input": null,
+              "output": "ki"
+            },
+            {
+              "type": "replace",
+              "input_index": 115,
+              "output_index": 117,
+              "input": "keywinter",
+              "output": "winter"
+            },
+            {
+              "type": "insert",
+              "input_index": 130,
+              "output_index": 132,
+              "input": null,
+              "output": "u"
+            },
+            {
+              "type": "replace",
+              "input_index": 130,
+              "output_index": 133,
+              "input": "ua",
+              "output": "a"
+            },
+            {
+              "type": "insert",
+              "input_index": 132,
+              "output_index": 135,
+              "input": null,
+              "output": "learning"
+            },
+            {
+              "type": "replace",
+              "input_index": 132,
+              "output_index": 136,
+              "input": "lerninansätze",
+              "output": "ansätze"
+            },
+            {
+              "type": "replace",
+              "input_index": 134,
+              "output_index": 138,
+              "input": "d",
+              "output": "deep"
+            },
+            {
+              "type": "replace",
+              "input_index": 135,
+              "output_index": 139,
+              "input": "ruhe",
+              "output": "blue"
+            },
+            {
+              "type": "delete",
+              "input_index": 140,
+              "output_index": 144,
+              "input": "alpha",
+              "output": null
+            },
+            {
+              "type": "replace",
+              "input_index": 141,
+              "output_index": 144,
+              "input": "go",
+              "output": "alphago"
+            },
+            {
+              "type": "replace",
+              "input_index": 159,
+              "output_index": 162,
+              "input": "lage",
+              "output": "large"
+            },
+            {
+              "type": "replace",
+              "input_index": 161,
+              "output_index": 164,
+              "input": "modus",
+              "output": "models"
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.1746987951807229,
+          "output": 0,
+          "delta": -0.1746987951807229
+        },
+        "text_sha256": "d6d8ca973d16360874a25371974e5cd8a9a6006954cea5a16db86522c5297b12"
+      },
+      {
+        "id": "synthetic-de-turing-test",
+        "text": "Um ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen. Dazu stellt ein Mensch per Terminal, Bildschirm und Tastatur oder auch Lautsprecher und Mikrofon beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Loebner-Preis für den Turing-Test.",
+        "reported_edits": [
+          {
+            "original": "Ruebener-Preis",
+            "replacement": "Loebner-Preis",
+            "class": "contextual-misrecognition",
+            "reason": "Der seit 1991 vergebene Wettbewerb zum Turing-Test heißt Loebner-Preis.",
+            "confidence": 0.99
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 1,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 126,
+          "output_word_count": 126,
+          "edit_distance": 1,
+          "operations": [
+            {
+              "type": "replace",
+              "input_index": 120,
+              "output_index": 120,
+              "input": "ruebener",
+              "output": "loebner"
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.007936507936507936,
+          "output": 0,
+          "delta": -0.007936507936507936
+        },
+        "text_sha256": "96419341910819861ef0a75967605b154c4d91a3e3d29a0f2acaea07226566d6"
+      },
+      {
+        "id": "synthetic-de-methods",
+        "text": "Eine Fragestellung der KI ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei, soweit möglich, formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die KI damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren, logische Programmierung, behilflich wären. Zwei Schwierigkeiten zeichneten sich ab. In vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten, maschinelles Lernen. Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der KI wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universelle Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.",
+        "reported_edits": [
+          {
+            "original": "Key",
+            "replacement": "KI",
+            "class": "contextual-misrecognition",
+            "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Key",
+            "replacement": "KI",
+            "class": "contextual-misrecognition",
+            "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Key",
+            "replacement": "KI",
+            "class": "contextual-misrecognition",
+            "reason": "Im Text über künstliche Intelligenz ist die gesprochene Abkürzung „KI“ gemeint.",
+            "confidence": 0.99
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 3,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 137,
+          "output_word_count": 137,
+          "edit_distance": 3,
+          "operations": [
+            {
+              "type": "replace",
+              "input_index": 3,
+              "output_index": 3,
+              "input": "key",
+              "output": "ki"
+            },
+            {
+              "type": "replace",
+              "input_index": 47,
+              "output_index": 47,
+              "input": "key",
+              "output": "ki"
+            },
+            {
+              "type": "replace",
+              "input_index": 99,
+              "output_index": 99,
+              "input": "key",
+              "output": "ki"
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.029197080291970802,
+          "output": 0.0072992700729927005,
+          "delta": -0.021897810218978103
+        },
+        "text_sha256": "abfd06dc8a87c454838d9b85a148b400d8360b9b667e7455477a5a928c640dfb"
+      },
+      {
+        "id": "synthetic-de-applications",
+        "text": "Künstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.",
+        "reported_edits": [],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 0,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 79,
+          "output_word_count": 79,
+          "edit_distance": 0,
+          "operations": []
+        },
+        "diagnostic_wer": {
+          "input": 0,
+          "output": 0,
+          "delta": 0
+        },
+        "text_sha256": "91fe3e5fbeef6483e48a1ee88018b6adc775bf0038ed6e987fec1a867571200a"
+      },
+      {
+        "id": "synthetic-de-native",
+        "text": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Erstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte, hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+        "reported_edits": [
+          {
+            "original": "Ebenenfläche",
+            "replacement": "ebenen Fläche",
+            "class": "word-boundary",
+            "reason": "Nach „einer anderen“ sind Adjektiv und Substantiv getrennt zu schreiben.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Handschriften, Manuskripte hergestellt",
+            "replacement": "Handschriften, Manuskripte, hergestellt",
+            "class": "surface",
+            "reason": "„Manuskripte“ ist eine erläuternde Apposition und wird durch Kommas abgetrennt.",
+            "confidence": 0.96
+          },
+          {
+            "original": "Skripturien",
+            "replacement": "Skriptorien",
+            "class": "contextual-misrecognition",
+            "reason": "Die Schreibstuben mittelalterlicher Klöster heißen „Skriptorien“.",
+            "confidence": 0.99
+          },
+          {
+            "original": "in eine Druckpresse",
+            "replacement": "in einer Druckpresse",
+            "class": "asr-inflection",
+            "reason": "Die Ortsangabe erfordert nach „in“ den Dativ.",
+            "confidence": 0.99
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 4,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 103,
+          "output_word_count": 104,
+          "edit_distance": 4,
+          "operations": [
+            {
+              "type": "insert",
+              "input_index": 28,
+              "output_index": 28,
+              "input": null,
+              "output": "ebenen"
+            },
+            {
+              "type": "replace",
+              "input_index": 28,
+              "output_index": 29,
+              "input": "ebenenfläche",
+              "output": "fläche"
+            },
+            {
+              "type": "replace",
+              "input_index": 51,
+              "output_index": 52,
+              "input": "skripturien",
+              "output": "skriptorien"
+            },
+            {
+              "type": "replace",
+              "input_index": 74,
+              "output_index": 75,
+              "input": "eine",
+              "output": "einer"
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.04807692307692308,
+          "output": 0.009615384615384616,
+          "delta": -0.038461538461538464
+        },
+        "text_sha256": "6a02cc30e35c5dcc06bc12020f868c119e20493e1fcdecc3905c883299ba302b"
+      },
+      {
+        "id": "synthetic-de-dialogue",
+        "text": "„Was macht eine Aufnahme eigentlich leicht verständlich?“, fragt Mara. „Vor allem Ruhe“, antwortet Jonas. „Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht.“ Mara rückt etwas näher an das Mikrofon. „Also genügt ein gutes Gerät?“ „Nein. Der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders.“ „Und wenn jemand beim Sprechen den Kopf bewegt?“ Jonas lacht. „Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzielen.“ Mara macht eine kurze Pause. „Das klingt weniger technisch, als ich erwartet hatte.“ „Gute Technik fällt kaum auf“, sagt Jonas. „Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.“",
+        "reported_edits": [
+          {
+            "original": "Fragezeichen, fragt Mara.",
+            "replacement": "?“, fragt Mara.",
+            "class": "surface",
+            "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Punkt Mara",
+            "replacement": ".“ Mara",
+            "class": "surface",
+            "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Fragezeichen, nein.",
+            "replacement": "?“ „Nein.",
+            "class": "surface",
+            "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel und markiert den Sprecherwechsel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "an das Punkt und",
+            "replacement": "anders.“ „Und",
+            "class": "contextual-misrecognition",
+            "reason": "„Jede Stimme klingt anders“ ist durch den unmittelbaren Kontext eindeutig; „Punkt“ ist zusätzlich ein gesprochenes Satzzeichenlabel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Fragezeichen, Jonas",
+            "replacement": "?“ Jonas",
+            "class": "surface",
+            "reason": "„Fragezeichen“ ist ein gesprochenes Satzzeichenlabel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Punkt Mara",
+            "replacement": ".“ Mara",
+            "class": "surface",
+            "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Punkt gute",
+            "replacement": ".“ „Gute",
+            "class": "surface",
+            "reason": "„Punkt“ ist ein gesprochenes Satzzeichenlabel und der neue Satz beginnt groß.",
+            "confidence": 0.99
+          },
+          {
+            "original": "Vielen Dank.",
+            "replacement": "",
+            "class": "contextual-misrecognition",
+            "reason": "Die isolierte Schlussformel gehört nicht zum Dialog und ist ein wahrscheinliches End-of-passage-Artefakt.",
+            "confidence": 0.97
+          }
+        ],
+        "parser": {
+          "valid": true,
+          "error": null
+        },
+        "audit": {
+          "lexical_edits_fully_reported": true,
+          "protected_spans_unchanged": true,
+          "reported_lexical_edit_count": 11,
+          "section_ids_preserved": null
+        },
+        "lexical_diff": {
+          "input_word_count": 133,
+          "output_word_count": 123,
+          "edit_distance": 11,
+          "operations": [
+            {
+              "type": "delete",
+              "input_index": 7,
+              "output_index": 7,
+              "input": "fragezeichen",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 30,
+              "output_index": 29,
+              "input": "punkt",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 43,
+              "output_index": 41,
+              "input": "fragezeichen",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 61,
+              "output_index": 58,
+              "input": "an",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 62,
+              "output_index": 58,
+              "input": "das",
+              "output": null
+            },
+            {
+              "type": "replace",
+              "input_index": 63,
+              "output_index": 58,
+              "input": "punkt",
+              "output": "anders"
+            },
+            {
+              "type": "delete",
+              "input_index": 72,
+              "output_index": 67,
+              "input": "fragezeichen",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 92,
+              "output_index": 86,
+              "input": "punkt",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 106,
+              "output_index": 99,
+              "input": "punkt",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 131,
+              "output_index": 123,
+              "input": "vielen",
+              "output": null
+            },
+            {
+              "type": "delete",
+              "input_index": 132,
+              "output_index": 123,
+              "input": "dank",
+              "output": null
+            }
+          ]
+        },
+        "diagnostic_wer": {
+          "input": 0.10569105691056911,
+          "output": 0.016260162601626018,
+          "delta": -0.08943089430894309
+        },
+        "text_sha256": "da60caee32b56b1c0425b07b53fc0138aa2957c273b26ee04180a709f51b710c"
+      }
+    ],
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "audit": {
+      "lexical_edits_fully_reported": false,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 54,
+      "section_ids_preserved": true
+    },
+    "lexical_diff": {
+      "input_word_count": 1002,
+      "output_word_count": 995,
+      "edit_distance": 55,
+      "operations": [
+        {
+          "type": "replace",
+          "input_index": 168,
+          "output_index": 168,
+          "input": "garty",
+          "output": "mccarthy"
+        },
+        {
+          "type": "insert",
+          "input_index": 182,
+          "output_index": 182,
+          "input": null,
+          "output": "project"
+        },
+        {
+          "type": "replace",
+          "input_index": 182,
+          "output_index": 183,
+          "input": "projekt",
+          "output": "on"
+        },
+        {
+          "type": "replace",
+          "input_index": 183,
+          "output_index": 184,
+          "input": "unartificial",
+          "output": "artificial"
+        },
+        {
+          "type": "replace",
+          "input_index": 229,
+          "output_index": 230,
+          "input": "intelligenze",
+          "output": "intelligence"
+        },
+        {
+          "type": "delete",
+          "input_index": 259,
+          "output_index": 260,
+          "input": "vielen",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 260,
+          "output_index": 260,
+          "input": "dank",
+          "output": null
+        },
+        {
+          "type": "replace",
+          "input_index": 269,
+          "output_index": 268,
+          "input": "muguloch",
+          "output": "mcculloch"
+        },
+        {
+          "type": "replace",
+          "input_index": 274,
+          "output_index": 273,
+          "input": "alain",
+          "output": "alan"
+        },
+        {
+          "type": "replace",
+          "input_index": 275,
+          "output_index": 274,
+          "input": "thurings",
+          "output": "turings"
+        },
+        {
+          "type": "replace",
+          "input_index": 282,
+          "output_index": 281,
+          "input": "thuring",
+          "output": "turing"
+        },
+        {
+          "type": "delete",
+          "input_index": 288,
+          "output_index": 287,
+          "input": "rosenblatt",
+          "output": null
+        },
+        {
+          "type": "replace",
+          "input_index": 289,
+          "output_index": 287,
+          "input": "s",
+          "output": "rosenblatts"
+        },
+        {
+          "type": "replace",
+          "input_index": 296,
+          "output_index": 294,
+          "input": "vorläufe",
+          "output": "vorläufer"
+        },
+        {
+          "type": "insert",
+          "input_index": 306,
+          "output_index": 304,
+          "input": null,
+          "output": "u"
+        },
+        {
+          "type": "replace",
+          "input_index": 306,
+          "output_index": 305,
+          "input": "ua",
+          "output": "a"
+        },
+        {
+          "type": "replace",
+          "input_index": 307,
+          "output_index": 306,
+          "input": "mythen",
+          "output": "mycin"
+        },
+        {
+          "type": "insert",
+          "input_index": 326,
+          "output_index": 325,
+          "input": null,
+          "output": "ki"
+        },
+        {
+          "type": "replace",
+          "input_index": 326,
+          "output_index": 326,
+          "input": "keywinter",
+          "output": "winter"
+        },
+        {
+          "type": "delete",
+          "input_index": 331,
+          "output_index": 331,
+          "input": "1980er",
+          "output": null
+        },
+        {
+          "type": "replace",
+          "input_index": 332,
+          "output_index": 331,
+          "input": "n",
+          "output": "1980ern"
+        },
+        {
+          "type": "insert",
+          "input_index": 344,
+          "output_index": 343,
+          "input": null,
+          "output": "u"
+        },
+        {
+          "type": "replace",
+          "input_index": 344,
+          "output_index": 344,
+          "input": "ua",
+          "output": "a"
+        },
+        {
+          "type": "replace",
+          "input_index": 346,
+          "output_index": 346,
+          "input": "verbus",
+          "output": "werbos"
+        },
+        {
+          "type": "insert",
+          "input_index": 376,
+          "output_index": 376,
+          "input": null,
+          "output": "ki"
+        },
+        {
+          "type": "replace",
+          "input_index": 376,
+          "output_index": 377,
+          "input": "keywinter",
+          "output": "winter"
+        },
+        {
+          "type": "insert",
+          "input_index": 391,
+          "output_index": 392,
+          "input": null,
+          "output": "u"
+        },
+        {
+          "type": "replace",
+          "input_index": 391,
+          "output_index": 393,
+          "input": "ua",
+          "output": "a"
+        },
+        {
+          "type": "insert",
+          "input_index": 393,
+          "output_index": 395,
+          "input": null,
+          "output": "learning"
+        },
+        {
+          "type": "replace",
+          "input_index": 393,
+          "output_index": 396,
+          "input": "lerninansätze",
+          "output": "ansätze"
+        },
+        {
+          "type": "replace",
+          "input_index": 395,
+          "output_index": 398,
+          "input": "d",
+          "output": "deep"
+        },
+        {
+          "type": "replace",
+          "input_index": 396,
+          "output_index": 399,
+          "input": "ruhe",
+          "output": "blue"
+        },
+        {
+          "type": "delete",
+          "input_index": 401,
+          "output_index": 404,
+          "input": "alpha",
+          "output": null
+        },
+        {
+          "type": "replace",
+          "input_index": 402,
+          "output_index": 404,
+          "input": "go",
+          "output": "alphago"
+        },
+        {
+          "type": "replace",
+          "input_index": 420,
+          "output_index": 422,
+          "input": "lage",
+          "output": "large"
+        },
+        {
+          "type": "replace",
+          "input_index": 422,
+          "output_index": 424,
+          "input": "modus",
+          "output": "models"
+        },
+        {
+          "type": "replace",
+          "input_index": 544,
+          "output_index": 546,
+          "input": "ruebener",
+          "output": "loebner"
+        },
+        {
+          "type": "replace",
+          "input_index": 553,
+          "output_index": 555,
+          "input": "key",
+          "output": "ki"
+        },
+        {
+          "type": "replace",
+          "input_index": 597,
+          "output_index": 599,
+          "input": "key",
+          "output": "ki"
+        },
+        {
+          "type": "replace",
+          "input_index": 649,
+          "output_index": 651,
+          "input": "key",
+          "output": "ki"
+        },
+        {
+          "type": "insert",
+          "input_index": 794,
+          "output_index": 796,
+          "input": null,
+          "output": "ebenen"
+        },
+        {
+          "type": "replace",
+          "input_index": 794,
+          "output_index": 797,
+          "input": "ebenenfläche",
+          "output": "fläche"
+        },
+        {
+          "type": "replace",
+          "input_index": 817,
+          "output_index": 820,
+          "input": "skripturien",
+          "output": "skriptorien"
+        },
+        {
+          "type": "replace",
+          "input_index": 840,
+          "output_index": 843,
+          "input": "eine",
+          "output": "einer"
+        },
+        {
+          "type": "delete",
+          "input_index": 876,
+          "output_index": 879,
+          "input": "fragezeichen",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 899,
+          "output_index": 901,
+          "input": "punkt",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 912,
+          "output_index": 913,
+          "input": "fragezeichen",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 930,
+          "output_index": 930,
+          "input": "an",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 931,
+          "output_index": 930,
+          "input": "das",
+          "output": null
+        },
+        {
+          "type": "replace",
+          "input_index": 932,
+          "output_index": 930,
+          "input": "punkt",
+          "output": "anders"
+        },
+        {
+          "type": "delete",
+          "input_index": 941,
+          "output_index": 939,
+          "input": "fragezeichen",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 961,
+          "output_index": 958,
+          "input": "punkt",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 975,
+          "output_index": 971,
+          "input": "punkt",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 1000,
+          "output_index": 995,
+          "input": "vielen",
+          "output": null
+        },
+        {
+          "type": "delete",
+          "input_index": 1001,
+          "output_index": 995,
+          "input": "dank",
+          "output": null
+        }
+      ]
+    },
+    "gates": {
+      "policy_mode": "bounded-lexical",
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": false,
+      "accepted": false,
+      "quality_accepted": false
+    },
+    "diagnostic_wer": {
+      "input": 0.06030150753768844,
+      "output": 0.005025125628140704,
+      "reference_word_count": 995,
+      "section_count": 8,
+      "section_outcomes": {
+        "improved": 6,
+        "unchanged": 2,
+        "regressed": 0
+      },
+      "reference_status": "synthetic-source-reference",
+      "claim_limit": "Development-only diagnostic against exact synthetic source text; it measures round-trip restoration and regressions, not held-out professional-audio quality."
+    }
+  },
+  "conclusion": {
+    "remote_reference_executed": true,
+    "development_output_contract_accepted": false,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "claim_limit": "This run screens one development fixture and API contract. Human-verified target-domain audio remains required for model selection."
+  }
+}

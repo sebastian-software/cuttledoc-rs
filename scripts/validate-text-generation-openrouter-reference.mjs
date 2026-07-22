@@ -126,45 +126,62 @@ function countSequence(words, sequence) {
   return count;
 }
 
-function pairCounts(pairs) {
-  const counts = new Map();
-  for (const pair of pairs) {
-    const key = JSON.stringify(pair);
-    counts.set(key, (counts.get(key) ?? 0) + 1);
+function reportedEditAudit(source, target, edits) {
+  const sourceWords = normalizedWords(source);
+  const targetWords = normalizedWords(target);
+  const reconstructed = [];
+  let cursor = 0;
+  let reportedLexicalEditCount = 0;
+  for (const edit of edits) {
+    const original = normalizedWords(edit.original ?? '');
+    const replacement = normalizedWords(edit.replacement ?? '');
+    if (JSON.stringify(original) === JSON.stringify(replacement)) continue;
+    reportedLexicalEditCount += wordDiff(
+      edit.original ?? '',
+      edit.replacement ?? '',
+    ).edit_distance;
+    if (original.length === 0) {
+      return { fullyReported: false, reportedLexicalEditCount };
+    }
+    let match = -1;
+    for (let index = cursor;
+      index <= sourceWords.length - original.length;
+      index += 1) {
+      if (original.every((word, offset) =>
+        sourceWords[index + offset] === word)) {
+        match = index;
+        break;
+      }
+    }
+    if (match < 0) {
+      return { fullyReported: false, reportedLexicalEditCount };
+    }
+    reconstructed.push(...sourceWords.slice(cursor, match), ...replacement);
+    cursor = match + original.length;
   }
-  return counts;
-}
-
-function equalCounts(left, right) {
-  return left.size === right.size &&
-    [...left].every(([key, value]) => right.get(key) === value);
+  reconstructed.push(...sourceWords.slice(cursor));
+  return {
+    fullyReported: reconstructed.length === targetWords.length &&
+      reconstructed.every((word, index) => word === targetWords[index]),
+    reportedLexicalEditCount,
+  };
 }
 
 function externalAudit(fixture, text, edits) {
   const diff = wordDiff(fixture.transcript, text);
-  const operations = pairCounts(diff.operations.map((operation) => [
-    normalizedWords(operation.input ?? ''),
-    normalizedWords(operation.output ?? ''),
-  ]));
   const reported = Array.isArray(edits)
-    ? pairCounts(edits.flatMap((edit) =>
-      wordDiff(edit.original ?? '', edit.replacement ?? '').operations
-        .map((operation) => [
-          normalizedWords(operation.input ?? ''),
-          normalizedWords(operation.output ?? ''),
-        ])))
-    : new Map();
+    ? reportedEditAudit(fixture.transcript, text, edits)
+    : { fullyReported: false, reportedLexicalEditCount: null };
   const inputWords = normalizedWords(fixture.transcript);
   const outputWords = normalizedWords(text);
   return {
     diff,
-    lexicalEditsFullyReported: equalCounts(operations, reported),
+    lexicalEditsFullyReported: reported.fullyReported,
     protectedSpansUnchanged: (fixture.protected_spans ?? []).every((span) => {
       const words = normalizedWords(span);
       return countSequence(inputWords, words) === countSequence(outputWords, words);
     }),
-    reportedLexicalEditCount: [...reported.values()]
-      .reduce((sum, value) => sum + value, 0),
+    reportedLexicalEditCount: reported.reportedLexicalEditCount,
   };
 }
 
@@ -580,6 +597,25 @@ if (process.argv.includes('--self-test')) {
   secret.gateway.api_key = 'sk-or-v1-self-test';
   if (validateCandidateShape(secret).length === 0) {
     failures.push('self-test failed to reject secret material');
+  }
+  const multiwordLedger = reportedEditAudit(
+    "John Garty und Rosenblatt's",
+    'John McCarthy und Rosenblatts',
+    [
+      { original: 'John Garty', replacement: 'John McCarthy' },
+      { original: "Rosenblatt's", replacement: 'Rosenblatts' },
+    ],
+  );
+  if (!multiwordLedger.fullyReported) {
+    failures.push('self-test failed to accept a complete multiword edit ledger');
+  }
+  const missingEdit = reportedEditAudit(
+    'Vorläufe zur Entwicklung',
+    'Vorläufer zur Entwicklung',
+    [],
+  );
+  if (missingEdit.fullyReported) {
+    failures.push('self-test failed to reject an unreported lexical change');
   }
 }
 
