@@ -233,7 +233,8 @@ function validateCandidateShape(candidate) {
     errors.push('pricing snapshot is invalid');
   }
   const reasoningValid = defaults?.reasoning === null ||
-    (defaults?.reasoning?.effort === 'none' && defaults.reasoning.exclude === true);
+    (['none', 'low'].includes(defaults?.reasoning?.effort) &&
+      defaults.reasoning.exclude === true);
   if (!['max_tokens', 'max_completion_tokens'].includes(
     defaults?.token_limit_field,
   ) ||

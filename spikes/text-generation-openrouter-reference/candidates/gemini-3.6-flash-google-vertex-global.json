@@ -58,7 +58,7 @@
     "temperature": null,
     "seed": 0,
     "reasoning": {
-      "effort": "none",
+      "effort": "low",
       "exclude": true
     },
     "response_format": {
@@ -67,5 +67,5 @@
       "strict": true
     }
   },
-  "claim_limit": "Remote fast-frontier quality candidate only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+  "claim_limit": "Remote fast-frontier quality candidate only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default. The endpoint rejects disabled reasoning, so the lowest explicit effort is part of this candidate tuple."
 }
