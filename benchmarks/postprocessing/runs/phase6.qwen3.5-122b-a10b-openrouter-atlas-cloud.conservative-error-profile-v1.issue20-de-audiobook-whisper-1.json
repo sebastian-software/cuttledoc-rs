@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase6.qwen3.5-122b-a10b-openrouter-atlas-cloud.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-22T07:13:09.745Z",
+  "source_revision": "fe38914b7c4d048e75141ea2cce637927afa3eeb",
+  "purpose": "development-quality-screen",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "qwen3.5-122b-a10b-openrouter-atlas-cloud",
+    "role": "large-open-weight-quality-candidate",
+    "model": {
+      "requested_id": "qwen/qwen3.5-122b-a10b",
+      "allowed_response_ids": [
+        "qwen/qwen3.5-122b-a10b",
+        "qwen/qwen3.5-122b-a10b-20260224"
+      ],
+      "upstream_identity": "Qwen/Qwen3.5-122B-A10B",
+      "provider_model_identity": "qwen/qwen3.5-122b-a10b-20260224",
+      "release": "2026-02-24",
+      "weights": "open",
+      "license": "Apache-2.0",
+      "context_tokens": 262144,
+      "identity_limit": "OpenRouter and AtlasCloud expose the named upstream model, but the hosted FP8 artifact and serving implementation are opaque to this repository."
+    },
+    "gateway": {
+      "name": "OpenRouter",
+      "requested_model": "qwen/qwen3.5-122b-a10b",
+      "provider_slug": "atlas-cloud",
+      "provider_name": "AtlasCloud",
+      "served_model": "qwen/qwen3.5-122b-a10b",
+      "served_provider": "AtlasCloud"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-audiobook-whisper-conservative",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "procedure": {
+    "experiment_id": "qwen3.5-122b-a10b-openrouter.conservative-error-profile-v1.de-audiobook",
+    "generation": {
+      "prompt_id": "conservative-error-profile-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-edits",
+      "structured_output_contract": "bounded-transcript-correction-v1",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "max_tokens": 1024,
+      "timeout_ms": 180000,
+      "rationale": "Screen a substantially larger open-weight model with hidden-reference context and the same external lexical audit used by the local matrix."
+    },
+    "gateway_request": {
+      "response_format": {
+        "type": "json_schema",
+        "schema_id": "bounded-transcript-correction-v1",
+        "strict": true
+      },
+      "temperature": 0,
+      "seed": 0,
+      "reasoning": {
+        "effort": "none",
+        "exclude": true
+      },
+      "provider": {
+        "only": [
+          "atlas-cloud"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true,
+        "data_collection": "deny",
+        "zdr": true
+      }
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "execution_boundary": "Remote OpenRouter API; no local model-runtime claim"
+  },
+  "measurements": {
+    "requests": [
+      {
+        "response_id": "gen-1784704368-TD0u7WEScuByWHfrWSGn",
+        "served_model": "qwen/qwen3.5-122b-a10b",
+        "served_provider": "AtlasCloud",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 1223.61125,
+        "usage": {
+          "prompt_tokens": 683,
+          "completion_tokens": 738,
+          "total_tokens": 1421,
+          "cost_usd": 0.0019761,
+          "is_byok": false
+        }
+      },
+      {
+        "response_id": "gen-1784704378-J0vfZCbl8xxGKuZeblwE",
+        "served_model": "qwen/qwen3.5-122b-a10b",
+        "served_provider": "AtlasCloud",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 963.3402910000004,
+        "usage": {
+          "prompt_tokens": 683,
+          "completion_tokens": 778,
+          "total_tokens": 1461,
+          "cost_usd": 0.0020721,
+          "is_byok": false
+        }
+      }
+    ],
+    "aggregate": {
+      "total_cost_usd": 0.0040482,
+      "total_prompt_tokens": 1366,
+      "total_completion_tokens": 1516
+    },
+    "deterministic_repeat": {
+      "text_identical": false,
+      "requirement": "observation-only; remote repeat equality is not an acceptance gate"
+    },
+    "latency_claim_limit": "Client-observed request duration includes gateway, queue, provider, and network time and is not comparable to local MLX measurements."
+  },
+  "output": {
+    "text": "Wie aber kam sie hier auf meinen Tisch, und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz eines offen vor mir liegenden Buches.",
+    "text_sha256": "e108182476e901802cccb11f08aebef8ca68f1044cbde2e5aa4c77810c0e39d5",
+    "raw_text": "{\n  \"text\": \"Wie aber kam sie hier auf meinen Tisch, und warum schauderte ich, wenn ich sie ansah? Diese Fragen wollten sich in keiner Weise beantworten lassen. Meine Blicke fielen schließlich auf den unterstrichenen Satz eines offen vor mir liegenden Buches.\",\n  \"edits\": [\n    {\n      \"original\": \"wie\",\n      \"replacement\": \"Wie\",\n      \"class\": \"surface\",\n      \"reason\": \"Sentence start capitalization\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"tisch\",\n      \"replacement\": \"Tisch\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"und\",\n      \"replacement\": \", und\",\n      \"class\": \"surface\",\n      \"reason\": \"Comma before coordinating conjunction joining independent clauses\",\n      \"confidence\": 0.9\n    },\n    {\n      \"original\": \"schautete\",\n      \"replacement\": \"schauderte\",\n      \"class\": \"contextual-misrecognition\",\n      \"reason\": \"Context implies shivering/fear ('schauderte') rather than non-existent verb 'schautete'; fits audiobook narrative tone\",\n      \"confidence\": 0.95\n    },\n    {\n      \"original\": \"wenn ich sie ansah diese\",\n      \"replacement\": \"wenn ich sie ansah? Diese\",\n      \"class\": \"surface\",\n      \"reason\": \"End of question clause and start of new sentence; capitalization of 'Diese'\",\n      \"confidence\": 0.95\n    },\n    {\n      \"original\": \"fragen\",\n      \"replacement\": \"Fragen\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"in keiner weise\",\n      \"replacement\": \"in keiner Weise\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German; protected span 'in keiner weise' corrected for case only\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"lassen meine\",\n      \"replacement\": \"lassen. Meine\",\n      \"class\": \"surface\",\n      \"reason\": \"End of sentence and start of new sentence; capitalization of 'Meine'\",\n      \"confidence\": 0.95\n    },\n    {\n      \"original\": \"blicke\",\n      \"replacement\": \"Blicke\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"satz\",\n      \"replacement\": \"Satz\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German\",\n      \"confidence\": 1.0\n    },\n    {\n      \"original\": \"buches\",\n      \"replacement\": \"Buches\",\n      \"class\": \"surface\",\n      \"reason\": \"Noun capitalization in German\",\n      \"confidence\": 1.0\n    }\n  ]\n}",
+    "raw_text_sha256": "8d3b7c9847a56f9bda66f3356c3c1721148b4ce0144aff8bfacb34fb697ed00c",
+    "reported_edits": [
+      {
+        "original": "wie",
+        "replacement": "Wie",
+        "class": "surface",
+        "reason": "Sentence start capitalization",
+        "confidence": 1
+      },
+      {
+        "original": "tisch",
+        "replacement": "Tisch",
+        "class": "surface",
+        "reason": "Noun capitalization in German",
+        "confidence": 1
+      },
+      {
+        "original": "und",
+        "replacement": ", und",
+        "class": "surface",
+        "reason": "Comma before coordinating conjunction joining independent clauses",
+        "confidence": 0.9
+      },
+      {
+        "original": "schautete",
+        "replacement": "schauderte",
+        "class": "contextual-misrecognition",
+        "reason": "Context implies shivering/fear ('schauderte') rather than non-existent verb 'schautete'; fits audiobook narrative tone",
+        "confidence": 0.95
+      },
+      {
+        "original": "wenn ich sie ansah diese",
+        "replacement": "wenn ich sie ansah? Diese",
+        "class": "surface",
+        "reason": "End of question clause and start of new sentence; capitalization of 'Diese'",
+        "confidence": 0.95
+      },
+      {
+        "original": "fragen",
+        "replacement": "Fragen",
+        "class": "surface",
+        "reason": "Noun capitalization in German",
+        "confidence": 1
+      },
+      {
+        "original": "in keiner weise",
+        "replacement": "in keiner Weise",
+        "class": "surface",
+        "reason": "Noun capitalization in German; protected span 'in keiner weise' corrected for case only",
+        "confidence": 1
+      },
+      {
+        "original": "lassen meine",
+        "replacement": "lassen. Meine",
+        "class": "surface",
+        "reason": "End of sentence and start of new sentence; capitalization of 'Meine'",
+        "confidence": 0.95
+      },
+      {
+        "original": "blicke",
+        "replacement": "Blicke",
+        "class": "surface",
+        "reason": "Noun capitalization in German",
+        "confidence": 1
+      },
+      {
+        "original": "satz",
+        "replacement": "Satz",
+        "class": "surface",
+        "reason": "Noun capitalization in German",
+        "confidence": 1
+      },
+      {
+        "original": "buches",
+        "replacement": "Buches",
+        "class": "surface",
+        "reason": "Noun capitalization in German",
+        "confidence": 1
+      }
+    ],
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "audit": {
+      "lexical_edits_fully_reported": true,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 1
+    },
+    "lexical_diff": {
+      "input_word_count": 39,
+      "output_word_count": 39,
+      "edit_distance": 1,
+      "operations": [
+        {
+          "type": "replace",
+          "input_index": 10,
+          "output_index": 10,
+          "input": "schautete",
+          "output": "schauderte"
+        }
+      ]
+    },
+    "gates": {
+      "policy_mode": "bounded-lexical",
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": false,
+      "accepted": true,
+      "quality_accepted": false
+    },
+    "diagnostic_wer": {
+      "input": 0.02564102564102564,
+      "output": 0,
+      "reference_status": "dataset-transcript-unverified",
+      "claim_limit": "Development-only diagnostic against an unverified dataset transcript; not a quality-selection result."
+    }
+  },
+  "conclusion": {
+    "remote_reference_executed": true,
+    "development_output_contract_accepted": true,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "claim_limit": "This run screens one development fixture and API contract. Human-verified target-domain audio remains required for model selection."
+  }
+}

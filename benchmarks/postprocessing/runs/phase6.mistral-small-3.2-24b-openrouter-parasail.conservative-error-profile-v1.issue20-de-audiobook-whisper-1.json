@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase6.mistral-small-3.2-24b-openrouter-parasail.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-22T07:12:37.836Z",
+  "source_revision": "fe38914b7c4d048e75141ea2cce637927afa3eeb",
+  "purpose": "development-quality-screen",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "mistral-small-3.2-24b-openrouter-parasail",
+    "role": "multilingual-open-weight-quality-candidate",
+    "model": {
+      "requested_id": "mistralai/mistral-small-3.2-24b-instruct",
+      "allowed_response_ids": [
+        "mistralai/mistral-small-3.2-24b-instruct",
+        "mistralai/mistral-small-3.2-24b-instruct-2506"
+      ],
+      "upstream_identity": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+      "provider_model_identity": "mistralai/mistral-small-3.2-24b-instruct-2506",
+      "release": "2025-06",
+      "weights": "open",
+      "license": "Apache-2.0",
+      "context_tokens": 131072,
+      "identity_limit": "Parasail serves the named release, but the hosted BF16 artifact and serving implementation are opaque to this repository."
+    },
+    "gateway": {
+      "name": "OpenRouter",
+      "requested_model": "mistralai/mistral-small-3.2-24b-instruct",
+      "provider_slug": "parasail",
+      "provider_name": "Parasail",
+      "served_model": "mistralai/mistral-small-3.2-24b-instruct",
+      "served_provider": "Parasail"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-audiobook-whisper-conservative",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "procedure": {
+    "experiment_id": "mistral-small-3.2-24b-openrouter.conservative-error-profile-v1.de-audiobook",
+    "generation": {
+      "prompt_id": "conservative-error-profile-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-edits",
+      "structured_output_contract": "bounded-transcript-correction-v1",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "max_tokens": 1024,
+      "timeout_ms": 180000,
+      "rationale": "Screen an official-provider multilingual open-weight model with hidden-reference context and the same external lexical audit used by the local matrix."
+    },
+    "gateway_request": {
+      "response_format": {
+        "type": "json_schema",
+        "schema_id": "bounded-transcript-correction-v1",
+        "strict": true
+      },
+      "temperature": 0,
+      "seed": 0,
+      "reasoning": null,
+      "provider": {
+        "only": [
+          "parasail"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true,
+        "data_collection": "deny",
+        "zdr": true
+      }
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "execution_boundary": "Remote OpenRouter API; no local model-runtime claim"
+  },
+  "measurements": {
+    "requests": [
+      {
+        "response_id": "gen-1784704352-LevEtFnr3NV43prs5Ylb",
+        "served_model": "mistralai/mistral-small-3.2-24b-instruct",
+        "served_provider": "Parasail",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 696.0198330000001,
+        "usage": {
+          "prompt_tokens": 653,
+          "completion_tokens": 143,
+          "total_tokens": 796,
+          "cost_usd": 0.00010167,
+          "is_byok": false
+        }
+      },
+      {
+        "response_id": "gen-1784704355-OWcFPURPLNcLOzPcKMZm",
+        "served_model": "mistralai/mistral-small-3.2-24b-instruct",
+        "served_provider": "Parasail",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 435.74187500000016,
+        "usage": {
+          "prompt_tokens": 653,
+          "completion_tokens": 143,
+          "total_tokens": 796,
+          "cost_usd": 0.00007607,
+          "is_byok": false
+        }
+      }
+    ],
+    "aggregate": {
+      "total_cost_usd": 0.00017774,
+      "total_prompt_tokens": 1306,
+      "total_completion_tokens": 286
+    },
+    "deterministic_repeat": {
+      "text_identical": true,
+      "requirement": "observation-only; remote repeat equality is not an acceptance gate"
+    },
+    "latency_claim_limit": "Client-observed request duration includes gateway, queue, provider, and network time and is not comparable to local MLX measurements."
+  },
+  "output": {
+    "text": "wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+    "text_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "raw_text": "{\n  \"text\": \"wie aber kam sie hier auf meinen tisch und warum schautete ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches\",\n  \"edits\": [\n    {\n      \"original\": \"schautete\",\n      \"replacement\": \"schaute\",\n      \"class\": \"contextual-misrecognition\",\n      \"reason\": \"immediate context suggests 'schaute' (past tense of 'schauen') is the correct verb form\",\n      \"confidence\": 0.9\n    }\n  ]\n}",
+    "raw_text_sha256": "8f1421c00ed4f8be30a0c29ed5d54f80c45c363d5576c4c118660cf6ca521862",
+    "reported_edits": [
+      {
+        "original": "schautete",
+        "replacement": "schaute",
+        "class": "contextual-misrecognition",
+        "reason": "immediate context suggests 'schaute' (past tense of 'schauen') is the correct verb form",
+        "confidence": 0.9
+      }
+    ],
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "audit": {
+      "lexical_edits_fully_reported": false,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 1
+    },
+    "lexical_diff": {
+      "input_word_count": 39,
+      "output_word_count": 39,
+      "edit_distance": 0,
+      "operations": []
+    },
+    "gates": {
+      "policy_mode": "bounded-lexical",
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": true,
+      "accepted": false,
+      "quality_accepted": false
+    },
+    "diagnostic_wer": {
+      "input": 0.02564102564102564,
+      "output": 0.02564102564102564,
+      "reference_status": "dataset-transcript-unverified",
+      "claim_limit": "Development-only diagnostic against an unverified dataset transcript; not a quality-selection result."
+    }
+  },
+  "conclusion": {
+    "remote_reference_executed": true,
+    "development_output_contract_accepted": false,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "claim_limit": "This run screens one development fixture and API contract. Human-verified target-domain audio remains required for model selection."
+  }
+}
