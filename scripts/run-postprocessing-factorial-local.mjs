@@ -69,7 +69,7 @@ const defaultQwenRecoveryOutput = join(
   'benchmarks/postprocessing/qualifications/' +
     'qwen3-tts-clear-voice-recovery-1.json',
 );
-const qwenChunkingRevision = 'sentence-aware-word-bounded-v1';
+const qwenChunkingRevision = 'sentence-aware-adaptive-v2';
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,

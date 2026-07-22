@@ -15,10 +15,12 @@ from pathlib import Path
 import numpy as np
 
 
-CHUNKING_REVISION = "sentence-aware-word-bounded-v1"
+CHUNKING_REVISION = "sentence-aware-adaptive-v2"
 CHUNK_TARGET_WORDS = 45
 CHUNK_MAX_WORDS = 55
 INTER_CHUNK_SILENCE_MS = 250
+ADAPTIVE_MIN_SPLIT_WORDS = 4
+ADAPTIVE_MAX_DEPTH = 4
 TERMINAL_WORD = re.compile(r"[.!?…]+[\"'”’»›)\]]*$")
 
 
@@ -186,12 +188,103 @@ def generate_chunk(model, job: dict, text: str, generation: dict) -> tuple:
     # mlx-audio 0.4.5 reports is_final_chunk=false for both capped and normally
     # completed non-streaming calls, so the pinned token ceiling is authoritative.
     reached_max_tokens = token_count >= generation["max_tokens"]
-    if reached_max_tokens:
-        raise RuntimeError(
-            f"{job['id']}: chunk reached the {generation['max_tokens']} token limit"
-        )
     audio = np.concatenate(arrays).astype("<f4", copy=False)
-    return audio, outputs, first_audio_ns, started, completed, token_count
+    return (
+        audio,
+        outputs,
+        first_audio_ns,
+        started,
+        completed,
+        token_count,
+        reached_max_tokens,
+    )
+
+
+def split_chunk_for_retry(text: str) -> tuple[str, str]:
+    words = text.split()
+    if len(words) < ADAPTIVE_MIN_SPLIT_WORDS * 2:
+        raise RuntimeError("chunk is too short for another deterministic split")
+    midpoint = len(words) // 2
+    boundaries = [
+        index + 1
+        for index, word in enumerate(words[:-1])
+        if ADAPTIVE_MIN_SPLIT_WORDS <= index + 1
+        and len(words) - (index + 1) >= ADAPTIVE_MIN_SPLIT_WORDS
+        and TERMINAL_WORD.search(word) is not None
+    ]
+    split_at = min(boundaries, key=lambda value: abs(value - midpoint)) \
+        if boundaries else midpoint
+    split_at = max(
+        ADAPTIVE_MIN_SPLIT_WORDS,
+        min(split_at, len(words) - ADAPTIVE_MIN_SPLIT_WORDS),
+    )
+    left = " ".join(words[:split_at])
+    right = " ".join(words[split_at:])
+    if f"{left} {right}" != " ".join(words):
+        raise RuntimeError("adaptive split changed normalized input text")
+    return left, right
+
+
+def generate_chunk_adaptively(
+    model,
+    job: dict,
+    text: str,
+    generation: dict,
+    path: str,
+    depth: int,
+    attempts: list[dict],
+) -> list[dict]:
+    (
+        audio,
+        outputs,
+        first_audio_ns,
+        started,
+        completed,
+        token_count,
+        reached_max_tokens,
+    ) = generate_chunk(model, job, text, generation)
+    attempt = {
+        "path": path,
+        "depth": depth,
+        "text_sha256": sha256_bytes(text.encode("utf-8")),
+        "word_count": len(text.split()),
+        "token_count": token_count,
+        "synthesis_ms": (completed - started) / 1_000_000,
+        "reached_max_tokens": reached_max_tokens,
+    }
+    attempts.append(attempt)
+    if not reached_max_tokens:
+        return [{
+            "path": path,
+            "depth": depth,
+            "text": text,
+            "audio": audio,
+            "outputs": outputs,
+            "first_audio_ns": first_audio_ns,
+            "started": started,
+            "completed": completed,
+            "token_count": token_count,
+        }]
+    if depth >= ADAPTIVE_MAX_DEPTH:
+        raise RuntimeError(
+            f"{job['id']}: chunk {path} still reached the token limit "
+            f"at adaptive depth {depth}"
+        )
+    try:
+        left, right = split_chunk_for_retry(text)
+    except RuntimeError as error:
+        raise RuntimeError(
+            f"{job['id']}: chunk {path} reached the token limit and "
+            "cannot be split further"
+        ) from error
+    return [
+        *generate_chunk_adaptively(
+            model, job, left, generation, f"{path}.0", depth + 1, attempts
+        ),
+        *generate_chunk_adaptively(
+            model, job, right, generation, f"{path}.1", depth + 1, attempts
+        ),
+    ]
 
 
 def generate_job(
@@ -214,34 +307,46 @@ def generate_job(
     text_chunks = split_text_chunks(text)
     audio_parts: list[np.ndarray] = []
     chunk_results: list[dict] = []
+    attempts: list[dict] = []
     first_audio_ns: int | None = None
     silence_samples = round(sample_rate * INTER_CHUNK_SILENCE_MS / 1000)
-    for index, chunk_text in enumerate(text_chunks):
-        (
-            chunk_audio,
-            outputs,
-            chunk_first_audio_ns,
-            chunk_started,
-            chunk_completed,
-            token_count,
-        ) = generate_chunk(model, job, chunk_text, generation)
-        if first_audio_ns is None:
-            first_audio_ns = chunk_first_audio_ns
+    completed_chunks: list[dict] = []
+    for initial_index, chunk_text in enumerate(text_chunks):
+        completed_chunks.extend(generate_chunk_adaptively(
+            model,
+            job,
+            chunk_text,
+            generation,
+            str(initial_index),
+            0,
+            attempts,
+        ))
+    if " ".join(chunk["text"] for chunk in completed_chunks) != " ".join(
+        text.split()
+    ):
+        raise RuntimeError(f"{job['id']}: adaptive generation changed input text")
+    for index, chunk in enumerate(completed_chunks):
+        if first_audio_ns is None or chunk["first_audio_ns"] < first_audio_ns:
+            first_audio_ns = chunk["first_audio_ns"]
         if index > 0:
             audio_parts.append(np.zeros(silence_samples, dtype="<f4"))
-        audio_parts.append(chunk_audio)
+        audio_parts.append(chunk["audio"])
         chunk_results.append(
             {
                 "index": index,
-                "text_sha256": sha256_bytes(chunk_text.encode("utf-8")),
-                "character_count": len(chunk_text),
-                "word_count": len(chunk_text.split()),
+                "path": chunk["path"],
+                "split_depth": chunk["depth"],
+                "text_sha256": sha256_bytes(chunk["text"].encode("utf-8")),
+                "character_count": len(chunk["text"]),
+                "word_count": len(chunk["text"].split()),
                 "seed": job["seed"],
-                "audio_sample_count": int(chunk_audio.size),
-                "duration_ms": int(chunk_audio.size) * 1000.0 / sample_rate,
-                "token_count": token_count,
-                "synthesis_ms": (chunk_completed - chunk_started) / 1_000_000,
-                "outputs": outputs,
+                "audio_sample_count": int(chunk["audio"].size),
+                "duration_ms": int(chunk["audio"].size) * 1000.0 / sample_rate,
+                "token_count": chunk["token_count"],
+                "synthesis_ms": (
+                    chunk["completed"] - chunk["started"]
+                ) / 1_000_000,
+                "outputs": chunk["outputs"],
                 "completed": True,
             }
         )
@@ -252,7 +357,8 @@ def generate_job(
     if not np.isfinite(audio).all():
         raise RuntimeError(f"{job['id']}: Qwen3-TTS returned non-finite audio")
     raw = audio.tobytes()
-    token_count = sum(item["token_count"] for item in chunk_results)
+    emitted_token_count = sum(item["token_count"] for item in chunk_results)
+    attempted_token_count = sum(item["token_count"] for item in attempts)
     duration_ms = int(audio.size) * 1000.0 / sample_rate
     temporary = Path(tempfile.mkdtemp(prefix=f".{job['id']}-", dir=output_root))
     try:
@@ -280,6 +386,8 @@ def generate_job(
                     "maximum_words": CHUNK_MAX_WORDS,
                     "inter_chunk_silence_ms": INTER_CHUNK_SILENCE_MS,
                     "seed_policy": "reset-identity-seed-per-chunk",
+                    "adaptive_minimum_split_words": ADAPTIVE_MIN_SPLIT_WORDS,
+                    "adaptive_maximum_depth": ADAPTIVE_MAX_DEPTH,
                 },
             },
             "audio": {
@@ -301,9 +409,11 @@ def generate_job(
                 "first_audio_ms": (first_audio_ns - started) / 1_000_000,
                 "complete_synthesis_ms": (completed - started) / 1_000_000,
                 "real_time_factor": (completed - started) / 1_000_000 / duration_ms,
-                "token_count": token_count,
+                "token_count": emitted_token_count,
+                "attempted_token_count": attempted_token_count,
                 "mlx_peak_memory_bytes": int(mx.get_peak_memory()),
                 "chunks": chunk_results,
+                "attempts": attempts,
                 "packages": {
                     "mlx": importlib.metadata.version("mlx"),
                     "mlx-audio": importlib.metadata.version("mlx-audio"),
@@ -313,6 +423,12 @@ def generate_job(
                 "completed_all_chunks": True,
                 "reached_max_tokens": False,
                 "chunk_count": len(chunk_results),
+                "adaptive_retry_count": sum(
+                    attempt["reached_max_tokens"] for attempt in attempts
+                ),
+                "maximum_split_depth": max(
+                    chunk["split_depth"] for chunk in chunk_results
+                ),
                 "configured_max_tokens_per_chunk": generation["max_tokens"],
             },
         }
@@ -343,6 +459,12 @@ def self_test() -> None:
         raise RuntimeError("self-test chunk preservation failure")
     if any(len(chunk.split()) > CHUNK_MAX_WORDS for chunk in chunks):
         raise RuntimeError("self-test chunk limit failure")
+    retry_source = " ".join(f"word-{index}" for index in range(20))
+    left, right = split_chunk_for_retry(retry_source)
+    if f"{left} {right}" != retry_source:
+        raise RuntimeError("self-test adaptive split preservation failure")
+    if abs(len(left.split()) - len(right.split())) > 1:
+        raise RuntimeError("self-test adaptive split balance failure")
     print("Qwen VoiceDesign batch runner: self-test passed")
 
 
