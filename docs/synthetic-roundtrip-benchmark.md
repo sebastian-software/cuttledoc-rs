@@ -32,11 +32,11 @@ a strong or weak voice cannot disappear inside one aggregate.
 The machine-readable contract is
 [`synthetic-roundtrip-plan.json`](../benchmarks/fixtures/synthetic-roundtrip-plan.json).
 
-The exact 22-passage selection is
+The exact 35-passage selection is
 [`synthetic-roundtrip-selection.json`](../benchmarks/fixtures/synthetic-roundtrip-selection.json).
-The repository materializer retrieves ten pinned MediaWiki revisions, reads
-five digest-pinned repository-authored sources, and reproduces all 22
-expected text digests. It writes the full CC BY-SA passage and attribution
+The repository materializer retrieves eleven pinned MediaWiki revisions, reads
+ten digest-pinned repository-authored sources, and reproduces all 35 expected
+text digests. It writes the full CC BY-SA passage and attribution
 package to the caller-selected local output directory. Reviewed fixtures may
 additionally enter `benchmarks/assets` with an explicit per-asset license and
 attribution package.
@@ -45,9 +45,8 @@ The downstream transcript-correction study expands this calibration corpus to
 two independent passages per language and content type and locks the TTS ×
 voice × generation × STT × LLM repetitions in the
 [`factorial postprocessing benchmark`](postprocessing-factorial-benchmark.md).
-Its missing passage and voice qualifications are explicit execution blockers;
-the current 22-passage calibration set is not silently treated as the complete
-factorial corpus.
+Its native-language and voice qualifications are explicit execution blockers;
+materialized text is not silently treated as reviewed speech.
 
 ```sh
 node scripts/materialize-synthetic-roundtrip.mjs \
@@ -67,18 +66,20 @@ The primary non-Asian locale set is `de-DE`, `en-US`, `es-419`, `fr-FR`, and
 `pt-BR`. Each locale has a separate three-part calibration slice so aggregate
 WER cannot obscure language- or content-specific behavior:
 
-| Locale | Technical cell | Native-factual cell | Dialogue cell |
+| Locale | Technical passages | Native-factual passages | Dialogue passages |
 | --- | --- | --- | --- |
-| `de-DE` | `synthetic-de-origin` | `synthetic-de-native` | `synthetic-de-dialogue` |
-| `en-US` | `synthetic-en-reasoning` | `synthetic-en-native` | `synthetic-en-dialogue` |
-| `es-419` | `synthetic-es-technical` | `synthetic-es-native` | `synthetic-es-dialogue` |
-| `fr-FR` | `synthetic-fr-technical` | `synthetic-fr-native` | `synthetic-fr-dialogue` |
-| `pt-BR` | `synthetic-pt-technical` | `synthetic-pt-native` | `synthetic-pt-dialogue` |
+| `de-DE` | `synthetic-de-origin`, `synthetic-de-methods` | `synthetic-de-native`, `synthetic-de-native-2` | `synthetic-de-dialogue`, `synthetic-de-dialogue-2` |
+| `en-US` | `synthetic-en-reasoning`, `synthetic-en-nlp` | `synthetic-en-native`, `synthetic-en-native-2` | `synthetic-en-dialogue`, `synthetic-en-dialogue-2` |
+| `es-419` | `synthetic-es-technical`, `synthetic-es-technical-2` | `synthetic-es-native`, `synthetic-es-native-2` | `synthetic-es-dialogue`, `synthetic-es-dialogue-2` |
+| `fr-FR` | `synthetic-fr-technical`, `synthetic-fr-technical-2` | `synthetic-fr-native`, `synthetic-fr-native-2` | `synthetic-fr-dialogue`, `synthetic-fr-dialogue-2` |
+| `pt-BR` | `synthetic-pt-technical`, `synthetic-pt-technical-2` | `synthetic-pt-native`, `synthetic-pt-native-2` | `synthetic-pt-dialogue`, `synthetic-pt-dialogue-2` |
 
 The technical and native-factual cells use exact, digest-pinned Wikipedia
 revisions. The dialogues are repository-authored and idiomatically adapted
-around the same recording scenario; they are comparable in intent but are not
-claimed to have identical linguistic difficulty.
+around two recording scenarios; they are comparable in intent but are not
+claimed to have identical linguistic difficulty. The Spanish, French, and
+Portuguese text and regional varieties still require native-language review
+before matrix execution.
 
 The Spanish and Portuguese source editions provide practical clean-speech
 controls, not universal regional coverage. In particular, an `es-419` result
@@ -87,9 +88,9 @@ must not be generalized beyond the actual text and generated voice. Future
 native-variety material may strengthen those cells without changing this
 limitation.
 
-The dialogue is currently synthesized by one described voice. It isolates the
-effect of conversational text and punctuation; it is not a two-speaker or
-speaker-diarization test.
+Each dialogue is synthesized as one continuous reading rather than a
+speaker-diarization test. The factorial matrix uses two separately pinned voice
+identities per TTS engine and locale.
 
 All selected text is available under CC BY-SA 4.0. Materialization preserves
 the source identity, exact revision or repository digest, history/authorship

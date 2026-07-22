@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-passages-3",
-  "plan_revision": "synthetic-roundtrip-pilot-5",
+  "revision": "synthetic-roundtrip-passages-4",
+  "plan_revision": "synthetic-roundtrip-pilot-6",
   "purpose": "diagnostic-materialization",
   "text_encoding": "utf-8",
   "paragraph_joiner": "\n\n",
@@ -112,6 +112,7 @@
         },
         {
           "id": "synthetic-de-methods",
+          "content_type": "de-technical",
           "segments": [
             {
               "section_path": [
@@ -197,6 +198,29 @@
             "numbers and dates",
             "parenthetical punctuation"
           ]
+        },
+        {
+          "id": "synthetic-de-native-2",
+          "content_type": "de-native",
+          "segments": [
+            {
+              "section_path": [
+                "Geschichte des Buchdrucks",
+                "Früher Buchdruck in Asien"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1077,
+          "verbatim_sha256": "5044486515305d4f7698f351a87ce63a14bfbc98f72e268f92d39d3934b16cd0",
+          "spoken_sha256": "5044486515305d4f7698f351a87ce63a14bfbc98f72e268f92d39d3934b16cd0",
+          "phenomena": [
+            "native German factual prose",
+            "proper names",
+            "numbers and dates",
+            "German compounds",
+            "long sentences"
+          ]
         }
       ]
     },
@@ -233,6 +257,43 @@
             "quoted speech",
             "German compounds",
             "spoken numbers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-de-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "de-DE",
+      "path": "benchmarks/fixtures/text/synthetic-de-dialogue-2.txt",
+      "title": "A careful second take",
+      "revision": "7e1e296232602a2cca50d546ec64dc99c7e8861aa449f3e97c473036a82a3663",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-de-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-de-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, A careful second take, revision 7e1e29623260",
+      "passages": [
+        {
+          "id": "synthetic-de-dialogue-2",
+          "content_type": "de-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 934,
+          "verbatim_sha256": "c9067e6ffcffd8ee3f2678a309dbdf809878d358f1040f99300be85fe82ad375",
+          "spoken_sha256": "c9067e6ffcffd8ee3f2678a309dbdf809878d358f1040f99300be85fe82ad375",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "spoken numbers",
+            "audio editing terminology"
           ]
         }
       ]
@@ -277,6 +338,7 @@
         },
         {
           "id": "synthetic-en-nlp",
+          "content_type": "en-technical",
           "segments": [
             {
               "section_path": [
@@ -357,6 +419,28 @@
             "quoted terminology",
             "long sentences"
           ]
+        },
+        {
+          "id": "synthetic-en-native-2",
+          "content_type": "en-native",
+          "segments": [
+            {
+              "section_path": [
+                "Production"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1376,
+          "verbatim_sha256": "4418f2164fbd2f547d62250f18f1626255f6ab711639a61c3512b384b010e2bc",
+          "spoken_sha256": "4418f2164fbd2f547d62250f18f1626255f6ab711639a61c3512b384b010e2bc",
+          "phenomena": [
+            "native-language factual prose",
+            "audio production terminology",
+            "currency amounts",
+            "numbers and dates",
+            "long sentences"
+          ]
         }
       ]
     },
@@ -397,6 +481,43 @@
       ]
     },
     {
+      "id": "cuttledoc-authored-en-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "en-US",
+      "path": "benchmarks/fixtures/text/synthetic-en-dialogue-2.txt",
+      "title": "A careful second take",
+      "revision": "8b1809663bc02ab81099156294d1e74f83ab2ca4b0a5de7f94bfccfb4758f18f",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-en-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-en-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, A careful second take, revision 8b1809663bc0",
+      "passages": [
+        {
+          "id": "synthetic-en-dialogue-2",
+          "content_type": "en-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 860,
+          "verbatim_sha256": "b757013213dc10b04a0b6544fc59f8dc77ed741626490d80ade2d54d03981278",
+          "spoken_sha256": "b757013213dc10b04a0b6544fc59f8dc77ed741626490d80ade2d54d03981278",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "spoken numbers",
+            "audio editing terminology"
+          ]
+        }
+      ]
+    },
+    {
       "id": "es-wikipedia-inteligencia-artificial-174423117",
       "kind": "mediawiki",
       "locale": "es-419",
@@ -430,6 +551,28 @@
             "technical terminology and abbreviations",
             "embedded English terms where natural",
             "parenthetical punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-es-technical-2",
+          "content_type": "es-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Objetivos",
+                "Razonamiento y resolución de problemas"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 855,
+          "verbatim_sha256": "0e969a9473331221adc92ad423ac8a04e20a7acf4996dcd8e45ee84bb5cfe1f3",
+          "spoken_sha256": "0e969a9473331221adc92ad423ac8a04e20a7acf4996dcd8e45ee84bb5cfe1f3",
+          "phenomena": [
+            "technical terminology",
+            "numbers and dates",
+            "quoted phrases",
             "long sentences"
           ]
         }
@@ -469,6 +612,27 @@
             "native-language factual prose",
             "enumeration",
             "punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-es-native-2",
+          "content_type": "es-native",
+          "segments": [
+            {
+              "section_path": [
+                "Usos"
+              ],
+              "paragraph_index": 1
+            }
+          ],
+          "character_count": 903,
+          "verbatim_sha256": "49e58e09b7c6f89c1455b5c7d5dda65323186977b6020391de51e4b682c6e28b",
+          "spoken_sha256": "49e58e09b7c6f89c1455b5c7d5dda65323186977b6020391de51e4b682c6e28b",
+          "phenomena": [
+            "native-language factual prose",
+            "enumeration",
+            "accessibility terminology",
             "long sentences"
           ]
         }
@@ -511,6 +675,43 @@
       ]
     },
     {
+      "id": "cuttledoc-authored-es-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "es-419",
+      "path": "benchmarks/fixtures/text/synthetic-es-dialogue-2.txt",
+      "title": "Una segunda toma cuidadosa",
+      "revision": "103e8120a101d9fd263dd199457a35318d34749c68f6dc9b1cd00a68243687d2",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-es-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-es-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Una segunda toma cuidadosa, revision 103e8120a101",
+      "passages": [
+        {
+          "id": "synthetic-es-dialogue-2",
+          "content_type": "es-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 928,
+          "verbatim_sha256": "e86eef78fa12ef9b5ef9fe466628e5cb0508f4a42e0f31cb6b6cfb95f15be513",
+          "spoken_sha256": "e86eef78fa12ef9b5ef9fe466628e5cb0508f4a42e0f31cb6b6cfb95f15be513",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "spoken numbers",
+            "audio editing terminology"
+          ]
+        }
+      ]
+    },
+    {
       "id": "fr-wikipedia-intelligence-artificielle-237681031",
       "kind": "mediawiki",
       "locale": "fr-FR",
@@ -544,6 +745,28 @@
             "technical terminology and abbreviations",
             "embedded English terms where natural",
             "enumeration",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-fr-technical-2",
+          "content_type": "fr-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Techniques",
+                "Apprentissage automatique"
+              ],
+              "paragraph_index": 1
+            }
+          ],
+          "character_count": 1147,
+          "verbatim_sha256": "ccc2febfbf84739ac5d106c4b69df3c3e4942d960d8e32914d2ea7af76c0765f",
+          "spoken_sha256": "ccc2febfbf84739ac5d106c4b69df3c3e4942d960d8e32914d2ea7af76c0765f",
+          "phenomena": [
+            "technical terminology",
+            "enumeration",
+            "parenthetical punctuation",
             "long sentences"
           ]
         }
@@ -583,6 +806,27 @@
             "native-language factual prose",
             "parenthetical punctuation",
             "numbers and dates",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-fr-native-2",
+          "content_type": "fr-native",
+          "segments": [
+            {
+              "section_path": [
+                "Littératie"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 934,
+          "verbatim_sha256": "b4355f81635e0d5a40e11fbed1c772093ea414d077f5cede3c0c837119a54df9",
+          "spoken_sha256": "b4355f81635e0d5a40e11fbed1c772093ea414d077f5cede3c0c837119a54df9",
+          "phenomena": [
+            "native-language factual prose",
+            "education terminology",
+            "apostrophes and contractions",
             "long sentences"
           ]
         }
@@ -625,6 +869,43 @@
       ]
     },
     {
+      "id": "cuttledoc-authored-fr-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "fr-FR",
+      "path": "benchmarks/fixtures/text/synthetic-fr-dialogue-2.txt",
+      "title": "Une deuxième prise soignée",
+      "revision": "9090c63b500743aeeab9a62eafd034ed7037c3e52fb93b9f3cdfd5c15bd84709",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-fr-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-fr-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Une deuxième prise soignée, revision 9090c63b5007",
+      "passages": [
+        {
+          "id": "synthetic-fr-dialogue-2",
+          "content_type": "fr-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 960,
+          "verbatim_sha256": "f1e0993f7b5d632b7d5abfd4fa56c92ead195b531945da73b3da5f9c41e1994a",
+          "spoken_sha256": "f1e0993f7b5d632b7d5abfd4fa56c92ead195b531945da73b3da5f9c41e1994a",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "spoken numbers",
+            "audio editing terminology"
+          ]
+        }
+      ]
+    },
+    {
       "id": "pt-wikipedia-inteligencia-artificial-72427477",
       "kind": "mediawiki",
       "locale": "pt-BR",
@@ -658,6 +939,29 @@
           "phenomena": [
             "technical terminology and abbreviations",
             "embedded English terms where natural",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        },
+        {
+          "id": "synthetic-pt-technical-2",
+          "content_type": "pt-technical",
+          "segments": [
+            {
+              "section_path": [
+                "Classificações e subcampos",
+                "Principais subcampos técnicos"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1391,
+          "verbatim_sha256": "65d6abc9986f9e6287612adb62ac7893a9102c3b69e7dc43f48076d0fbb1487d",
+          "spoken_sha256": "65d6abc9986f9e6287612adb62ac7893a9102c3b69e7dc43f48076d0fbb1487d",
+          "phenomena": [
+            "technical terminology and abbreviations",
+            "embedded English terms where natural",
+            "proper names",
             "parenthetical punctuation",
             "long sentences"
           ]
@@ -704,6 +1008,52 @@
       ]
     },
     {
+      "id": "pt-wikipedia-podcast-71775380",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "api_url": "https://pt.wikipedia.org/w/api.php",
+      "page_id": 72942,
+      "title": "Podcast",
+      "revision_id": 71775380,
+      "parent_revision_id": 71119271,
+      "revision_timestamp": "2026-02-21T18:05:01Z",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=71775380&title=Podcast",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Podcast&action=history",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Wikipedia contributors, Podcast, revision 71775380",
+      "passages": [
+        {
+          "id": "synthetic-pt-native-2",
+          "content_type": "pt-native",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            },
+            {
+              "section_path": [
+                "Funcionamento"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 1097,
+          "verbatim_sha256": "c87834a8a405449c8ccf87bf1faa9b65d3a2771214a3b540804070e9aade73d0",
+          "spoken_sha256": "c87834a8a405449c8ccf87bf1faa9b65d3a2771214a3b540804070e9aade73d0",
+          "phenomena": [
+            "native-language factual prose",
+            "audio format abbreviations",
+            "embedded English terms where natural",
+            "parenthetical punctuation",
+            "long sentences"
+          ]
+        }
+      ]
+    },
+    {
       "id": "cuttledoc-authored-pt-dialogue-1",
       "kind": "repository-authored",
       "locale": "pt-BR",
@@ -735,6 +1085,43 @@
             "question and answer turns",
             "quoted speech",
             "microphone terminology"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cuttledoc-authored-pt-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "pt-BR",
+      "path": "benchmarks/fixtures/text/synthetic-pt-dialogue-2.txt",
+      "title": "Uma segunda tomada cuidadosa",
+      "revision": "80fe89cfa198ed0e21e893886a9787444b94150558689aa82fa53a254cb140fb",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-pt-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-pt-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Cuttledoc contributors, Uma segunda tomada cuidadosa, revision 80fe89cfa198",
+      "passages": [
+        {
+          "id": "synthetic-pt-dialogue-2",
+          "content_type": "pt-dialogue",
+          "segments": [
+            {
+              "section_path": [
+                "lead"
+              ],
+              "paragraph_index": 0
+            }
+          ],
+          "character_count": 918,
+          "verbatim_sha256": "d92b75efe06bd0e57bd26f621ccc6483b3b5453ca17196e237a89c1fb3d117e7",
+          "spoken_sha256": "d92b75efe06bd0e57bd26f621ccc6483b3b5453ca17196e237a89c1fb3d117e7",
+          "phenomena": [
+            "conversational dialogue",
+            "question and answer turns",
+            "quoted speech",
+            "spoken numbers",
+            "audio editing terminology"
           ]
         }
       ]

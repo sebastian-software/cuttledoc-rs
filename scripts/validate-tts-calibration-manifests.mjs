@@ -553,7 +553,7 @@ function validateAdditionalQwenCalibration(evidence, manifest, acceptedSelection
       run.schema_version !== '1.0.0' ||
       run.run_id !== `phase5.qwen3-tts-1.7b-voicedesign.${profile.id}.1` ||
       !/^[0-9a-f]{40}$/.test(run.source_revision ?? '') ||
-      run.selection_revision !== acceptedSelection.revision ||
+      !acceptedSelectionRevision(run.selection_revision, acceptedSelection) ||
       run.purpose !== 'calibration') {
     errors.push(`${prefix}run identity or selected passage differs`);
     return errors;
@@ -924,7 +924,8 @@ function validate(items, acceptedPlan) {
 function acceptedSelectionRevision(revision, selection) {
   return revision === selection.revision ||
     revision === 'synthetic-roundtrip-passages-1' ||
-    revision === 'synthetic-roundtrip-passages-2';
+    revision === 'synthetic-roundtrip-passages-2' ||
+    revision === 'synthetic-roundtrip-passages-3';
 }
 
 function validateQwenCalibrationRun(run, manifest, acceptedSelection) {

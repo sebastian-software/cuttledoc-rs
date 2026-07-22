@@ -153,11 +153,11 @@ function validateSelection(selection) {
     }
   }
   const minimumPassages = new Map([
-    ['de-DE', 8],
-    ['en-US', 5],
-    ['es-419', 3],
-    ['fr-FR', 3],
-    ['pt-BR', 3],
+    ['de-DE', 10],
+    ['en-US', 7],
+    ['es-419', 6],
+    ['fr-FR', 6],
+    ['pt-BR', 6],
   ]);
   for (const [locale, minimum] of minimumPassages) {
     if ((localeCounts.get(locale) ?? 0) < minimum) {
@@ -208,12 +208,21 @@ async function fetchSource(source) {
     format: 'json',
     formatversion: '2',
   });
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'cuttledoc-rs synthetic benchmark materializer',
-    },
-    signal: AbortSignal.timeout(30_000),
-  });
+  let response;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    response = await fetch(url, {
+      headers: {
+        'User-Agent': 'cuttledoc-rs synthetic benchmark materializer',
+      },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (response.status !== 429 || attempt === 3) break;
+    const retryAfterSeconds = Number(response.headers.get('retry-after'));
+    const delayMs = Number.isFinite(retryAfterSeconds)
+      ? Math.min(Math.max(retryAfterSeconds * 1_000, 1_000), 15_000)
+      : 1_000 * (2 ** attempt);
+    await new Promise((accept) => setTimeout(accept, delayMs));
+  }
   if (!response.ok) {
     throw new Error(`${source.id}: MediaWiki returned HTTP ${response.status}`);
   }
@@ -266,6 +275,7 @@ async function materialize(selection, outputDirectory) {
   const temporaryDirectory = `${outputDirectory}.tmp-${process.pid}`;
   await mkdir(temporaryDirectory);
   try {
+    const lastMediaWikiRequestByApi = new Map();
     const outputManifest = {
       schema_version: selection.schema_version,
       selection_revision: selection.revision,
@@ -276,6 +286,16 @@ async function materialize(selection, outputDirectory) {
       passages: [],
     };
     for (const source of selection.sources) {
+      if (source.kind === 'mediawiki') {
+        const previousRequest = lastMediaWikiRequestByApi.get(source.api_url);
+        if (previousRequest !== undefined) {
+          const delayMs = Math.max(0, 5_000 - (Date.now() - previousRequest));
+          if (delayMs > 0) {
+            await new Promise((accept) => setTimeout(accept, delayMs));
+          }
+        }
+        lastMediaWikiRequestByApi.set(source.api_url, Date.now());
+      }
       const paragraphs = await fetchSource(source);
       outputManifest.sources.push({
         id: source.id,

@@ -110,6 +110,11 @@ function readinessForPassage(slot, knownPassageIds) {
   } else if (!knownPassageIds.has(slot.passage_id)) {
     blockers.push('passage-id:not-in-source-selection');
   }
+  if (!['not-required', 'native-review-complete'].includes(
+    slot.language_review_status,
+  )) {
+    blockers.push(`passage-language-review:${slot.language_review_status}`);
+  }
   return blockers;
 }
 

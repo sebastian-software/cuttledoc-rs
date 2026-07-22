@@ -7,6 +7,7 @@ on:
       - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/import-target-domain-source.mjs"
       - "scripts/materialize-target-domain-corpus.mjs"
+      - "scripts/materialize-synthetic-roundtrip.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/archive-qwen-tts-calibration.mjs"
@@ -36,6 +37,7 @@ on:
       - "scripts/fetch-audiobook-pilot.mjs"
       - "scripts/import-target-domain-source.mjs"
       - "scripts/materialize-target-domain-corpus.mjs"
+      - "scripts/materialize-synthetic-roundtrip.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
       - "scripts/archive-qwen-tts-calibration.mjs"
@@ -100,6 +102,8 @@ jobs:
         run: node scripts/import-target-domain-source.mjs --self-test
       - name: Verify target-domain corpus materializer
         run: node scripts/materialize-target-domain-corpus.mjs --self-test
+      - name: Verify synthetic roundtrip materializer
+        run: node scripts/materialize-synthetic-roundtrip.mjs --self-test
       - name: Verify deterministic ASR error analysis
         run: >-
           node scripts/analyze-asr-errors.mjs

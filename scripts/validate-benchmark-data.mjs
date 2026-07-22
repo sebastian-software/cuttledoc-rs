@@ -208,7 +208,7 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
       decisionScope?.backend_selection_blocking !== false ||
       decisionScope?.current_required_cell !== 'de-DE/podcast' ||
       decisionScope?.primary_comparison_plan_revision !==
-        'synthetic-roundtrip-pilot-5' ||
+        'synthetic-roundtrip-pilot-6' ||
       decisionScope?.numeric_quality_claims_require_human_gold !== true ||
       !(decisionScope?.reason?.length > 0)) {
     errors.push('decision_scope must keep the corpus an optional German podcast control');
@@ -586,18 +586,24 @@ function validateSyntheticRoundtripPlan(plan) {
     'de-wikipedia-kuenstliche-intelligenz-268935951',
     'de-wikipedia-buchdruck-268791130',
     'cuttledoc-authored-de-dialogue-1',
+    'cuttledoc-authored-de-dialogue-2',
     'en-wikipedia-artificial-intelligence-1365114492',
     'en-wikipedia-audiobook-1355975145',
     'cuttledoc-authored-en-dialogue-1',
+    'cuttledoc-authored-en-dialogue-2',
     'es-wikipedia-inteligencia-artificial-174423117',
     'es-wikipedia-audiolibro-174385246',
     'cuttledoc-authored-es-dialogue-1',
+    'cuttledoc-authored-es-dialogue-2',
     'fr-wikipedia-intelligence-artificielle-237681031',
     'fr-wikipedia-livre-audio-235403403',
     'cuttledoc-authored-fr-dialogue-1',
+    'cuttledoc-authored-fr-dialogue-2',
     'pt-wikipedia-inteligencia-artificial-72427477',
     'pt-wikipedia-audiolivro-64246519',
+    'pt-wikipedia-podcast-71775380',
     'cuttledoc-authored-pt-dialogue-1',
+    'cuttledoc-authored-pt-dialogue-2',
   ];
 
   if (plan.schema_version !== schemaVersion) {
@@ -635,11 +641,11 @@ function validateSyntheticRoundtripPlan(plan) {
     errors.push('initial scope topic must remain clean-produced-speech');
   }
   const minimumPassages = {
-    'de-DE': 8,
-    'en-US': 5,
-    'es-419': 3,
-    'fr-FR': 3,
-    'pt-BR': 3,
+    'de-DE': 10,
+    'en-US': 7,
+    'es-419': 6,
+    'fr-FR': 6,
+    'pt-BR': 6,
   };
   if (Object.entries(minimumPassages).some(
     ([locale, minimum]) =>
@@ -935,20 +941,35 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   const coveredPhenomena = new Set();
   const expectedContentTypes = new Map([
     ['synthetic-de-origin', 'de-codeswitch'],
+    ['synthetic-de-methods', 'de-technical'],
     ['synthetic-de-native', 'de-native'],
+    ['synthetic-de-native-2', 'de-native'],
     ['synthetic-de-dialogue', 'de-dialogue'],
+    ['synthetic-de-dialogue-2', 'de-dialogue'],
     ['synthetic-en-reasoning', 'en-technical'],
+    ['synthetic-en-nlp', 'en-technical'],
     ['synthetic-en-native', 'en-native'],
+    ['synthetic-en-native-2', 'en-native'],
     ['synthetic-en-dialogue', 'en-dialogue'],
+    ['synthetic-en-dialogue-2', 'en-dialogue'],
     ['synthetic-es-technical', 'es-technical'],
+    ['synthetic-es-technical-2', 'es-technical'],
     ['synthetic-es-native', 'es-native'],
+    ['synthetic-es-native-2', 'es-native'],
     ['synthetic-es-dialogue', 'es-dialogue'],
+    ['synthetic-es-dialogue-2', 'es-dialogue'],
     ['synthetic-fr-technical', 'fr-technical'],
+    ['synthetic-fr-technical-2', 'fr-technical'],
     ['synthetic-fr-native', 'fr-native'],
+    ['synthetic-fr-native-2', 'fr-native'],
     ['synthetic-fr-dialogue', 'fr-dialogue'],
+    ['synthetic-fr-dialogue-2', 'fr-dialogue'],
     ['synthetic-pt-technical', 'pt-technical'],
+    ['synthetic-pt-technical-2', 'pt-technical'],
     ['synthetic-pt-native', 'pt-native'],
+    ['synthetic-pt-native-2', 'pt-native'],
     ['synthetic-pt-dialogue', 'pt-dialogue'],
+    ['synthetic-pt-dialogue-2', 'pt-dialogue'],
   ]);
   for (const source of selection.sources ?? []) {
     if (sourceIds.has(source.id)) errors.push(`duplicate source id: ${source.id}`);
@@ -1068,8 +1089,22 @@ function validateSyntheticRoundtripSelection(selection, plan) {
   ]);
   for (const [locale, prefix] of contentCellLocales) {
     const expectedTypes = prefix === 'de'
-      ? ['de-codeswitch', 'de-native', 'de-dialogue']
-      : [`${prefix}-technical`, `${prefix}-native`, `${prefix}-dialogue`];
+      ? [
+        'de-codeswitch',
+        'de-technical',
+        'de-native',
+        'de-native',
+        'de-dialogue',
+        'de-dialogue',
+      ]
+      : [
+        `${prefix}-technical`,
+        `${prefix}-technical`,
+        `${prefix}-native`,
+        `${prefix}-native`,
+        `${prefix}-dialogue`,
+        `${prefix}-dialogue`,
+      ];
     const actualTypes = (selection.sources ?? [])
       .filter((source) => source.locale === locale)
       .flatMap((source) => source.passages ?? [])
@@ -1085,7 +1120,8 @@ function validateSyntheticRoundtripSelection(selection, plan) {
 function acceptedSelectionRevision(revision, selection) {
   return revision === selection.revision ||
     revision === 'synthetic-roundtrip-passages-1' ||
-    revision === 'synthetic-roundtrip-passages-2';
+    revision === 'synthetic-roundtrip-passages-2' ||
+    revision === 'synthetic-roundtrip-passages-3';
 }
 
 function validateAppleTtsRun(run, selection) {

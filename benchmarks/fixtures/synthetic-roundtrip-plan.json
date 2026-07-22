@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "revision": "synthetic-roundtrip-pilot-5",
-  "evidence_date": "2026-07-21",
+  "revision": "synthetic-roundtrip-pilot-6",
+  "evidence_date": "2026-07-22",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/13",
   "purpose": "decision-support",
   "relationship_to_target_domain": {
@@ -21,11 +21,11 @@
     "primary_locale": "de-DE",
     "topic": "clean-produced-speech",
     "minimum_passages_per_locale": {
-      "de-DE": 8,
-      "en-US": 5,
-      "es-419": 3,
-      "fr-FR": 3,
-      "pt-BR": 3
+      "de-DE": 10,
+      "en-US": 7,
+      "es-419": 6,
+      "fr-FR": 6,
+      "pt-BR": 6
     },
     "minimum_passage_duration_ms": 45000,
     "maximum_passage_duration_ms": 90000,
@@ -80,7 +80,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "lead"
+        "lead",
+        "Geschichte des Buchdrucks"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -100,6 +101,29 @@
       "revision": "51bb13dc91460c0d653d792042f8aa5b5b148fc9894e43a6c6d0e6cf23088203",
       "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
       "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-de-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-de-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "de-DE",
+      "title": "A careful second take",
+      "revision": "7e1e296232602a2cca50d546ec64dc99c7e8861aa449f3e97c473036a82a3663",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-de-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-de-dialogue-2.txt",
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
@@ -152,7 +176,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "lead"
+        "lead",
+        "Production"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -188,6 +213,29 @@
       }
     },
     {
+      "id": "cuttledoc-authored-en-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "en-US",
+      "title": "A careful second take",
+      "revision": "8b1809663bc02ab81099156294d1e74f83ab2ca4b0a5de7f94bfccfb4758f18f",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-en-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-en-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
       "id": "es-wikipedia-inteligencia-artificial-174423117",
       "kind": "mediawiki",
       "locale": "es-419",
@@ -198,7 +246,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "Tendencias"
+        "Tendencias",
+        "Objetivos"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -221,7 +270,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "Características"
+        "Características",
+        "Usos"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -257,6 +307,29 @@
       }
     },
     {
+      "id": "cuttledoc-authored-es-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "es-419",
+      "title": "Una segunda toma cuidadosa",
+      "revision": "103e8120a101d9fd263dd199457a35318d34749c68f6dc9b1cd00a68243687d2",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-es-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-es-dialogue-2.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
       "id": "fr-wikipedia-intelligence-artificielle-237681031",
       "kind": "mediawiki",
       "locale": "fr-FR",
@@ -267,7 +340,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "Définition"
+        "Définition",
+        "Techniques"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -290,7 +364,8 @@
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
-        "lead"
+        "lead",
+        "Littératie"
       ],
       "materialization_policy": {
         "pin_exact_revision": true,
@@ -310,6 +385,29 @@
       "revision": "03703f7c33e12ea120df1844383194f8231593e35212b4306e947f76a370c70b",
       "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
       "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-fr-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-fr-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "fr-FR",
+      "title": "Une deuxième prise soignée",
+      "revision": "9090c63b500743aeeab9a62eafd034ed7037c3e52fb93b9f3cdfd5c15bd84709",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-fr-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-fr-dialogue-2.txt",
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [
@@ -373,6 +471,30 @@
       }
     },
     {
+      "id": "pt-wikipedia-podcast-71775380",
+      "kind": "mediawiki",
+      "locale": "pt-BR",
+      "title": "Podcast",
+      "revision": "71775380",
+      "revision_url": "https://pt.wikipedia.org/w/index.php?oldid=71775380&title=Podcast",
+      "history_url": "https://pt.wikipedia.org/w/index.php?title=Podcast&action=history",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead",
+        "Funcionamento"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
       "id": "cuttledoc-authored-pt-dialogue-1",
       "kind": "repository-authored",
       "locale": "pt-BR",
@@ -380,6 +502,29 @@
       "revision": "876ebf34ab63a75fc39364195fd7ffa751e077cb37eab23b6605a307ef54b1e2",
       "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
       "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-pt-dialogue.txt",
+      "license": "CC-BY-SA-4.0",
+      "selection_status": "materialized",
+      "required_sections": [
+        "lead"
+      ],
+      "materialization_policy": {
+        "pin_exact_revision": true,
+        "record_verbatim_text_sha256": true,
+        "record_spoken_text_sha256": true,
+        "record_change_notice": true,
+        "preserve_attribution": true,
+        "generated_audio_location": "lossless-local-opus-repository-after-rights-review",
+        "redistribution": "CC-BY-SA-4.0-with-attribution-after-codec-control"
+      }
+    },
+    {
+      "id": "cuttledoc-authored-pt-dialogue-2",
+      "kind": "repository-authored",
+      "locale": "pt-BR",
+      "title": "Uma segunda tomada cuidadosa",
+      "revision": "80fe89cfa198ed0e21e893886a9787444b94150558689aa82fa53a254cb140fb",
+      "revision_url": "https://github.com/sebastian-software/cuttledoc-rs/blob/main/benchmarks/fixtures/text/synthetic-pt-dialogue-2.txt",
+      "history_url": "https://github.com/sebastian-software/cuttledoc-rs/commits/main/benchmarks/fixtures/text/synthetic-pt-dialogue-2.txt",
       "license": "CC-BY-SA-4.0",
       "selection_status": "materialized",
       "required_sections": [

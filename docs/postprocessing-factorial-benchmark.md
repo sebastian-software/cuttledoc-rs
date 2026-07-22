@@ -1,6 +1,6 @@
 # Factorial transcript-postprocessing benchmark
 
-**Status:** design locked; corpus expansion and voice qualification block
+**Status:** design locked; native-language review and voice qualification block
 execution.
 
 **Evidence date:** 2026-07-22.
@@ -105,7 +105,7 @@ WER.
 
 The primary matrix cannot start until all of the following are true:
 
-1. All 30 passage slots are materialized, revision- and digest-pinned,
+1. All 30 passage slots remain materialized, revision- and digest-pinned,
    rights-reviewed, and appropriate for their declared content type.
 2. Non-German and non-English source text and voice output have native-language
    review. Spanish `es-ES` and Portuguese `pt-PT` Voxtral presets remain
@@ -120,11 +120,15 @@ The primary matrix cannot start until all of the following are true:
 6. A dry-run token and cost estimate based on the completed multilingual
    documents is reviewed and an explicit budget is approved.
 
-The current corpus supplies 17 of 30 passage slots. The missing 13 are the
-second native-factual and dialogue passages for German and English, plus the
-second technical, native-factual, and dialogue passages for Spanish, French,
-and Portuguese. These remain explicit blockers rather than being filled with
-unreviewed translations or additional repeats.
+The current selection contains 35 passages from 21 pinned sources. Thirty
+passages fill the factorial cells; five earlier German and English calibration
+passages remain available outside the locked matrix. Every language/content
+cell now has two independently digest-pinned texts. German and English use two
+technical passages already in the calibration corpus, while the second factual
+passages come from different article sections and the second dialogues are new
+repository sources. The Spanish, French, and Portuguese candidates are
+materialized but remain blocked until native-language review accepts the text,
+regional variety, and dialogue idiom.
 
 ## Remote execution and cost boundary
 

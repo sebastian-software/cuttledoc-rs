@@ -9,7 +9,7 @@ selection="$repo_root/benchmarks/fixtures/synthetic-roundtrip-selection.json"
 runner="$repo_root/spikes/tts-calibration/run_qwen_voicedesign.py"
 profile=${CUTTLEDOC_TTS_PROFILE:-qwen-de-clear-documentary}
 model_dir=${CUTTLEDOC_QWEN3_TTS_VOICEDESIGN_MODEL_DIR:-/tmp/cuttledoc-qwen3-tts-1.7b-voicedesign-mlx-bf16}
-text_dir=${CUTTLEDOC_TTS_TEXT_DIR:-/tmp/cuttledoc-synthetic-roundtrip-passages-3}
+text_dir=${CUTTLEDOC_TTS_TEXT_DIR:-/tmp/cuttledoc-synthetic-roundtrip-passages-4}
 output_dir=${CUTTLEDOC_QWEN3_TTS_VOICEDESIGN_OUTPUT_DIR:-/tmp/cuttledoc-qwen3-tts-voicedesign-calibration}
 source_revision=$(git -C "$repo_root" rev-parse HEAD)
 

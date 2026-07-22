@@ -58,8 +58,9 @@ async function validatePlan(plan, selection, promptManifest) {
 
   addError(errors, plan.schema_version === '1.0.0',
     'schema_version must be 1.0.0');
-  addError(errors, plan.status === 'design-locked-corpus-expansion-required',
-    'status must retain the corpus-expansion execution gate');
+  addError(errors, plan.status ===
+    'design-locked-native-review-and-voice-qualification-required',
+  'status must retain native-review and voice-qualification gates');
   addError(errors, /^\d{4}-\d{2}-\d{2}$/.test(plan.evidence_date ?? ''),
     'evidence_date must be an ISO date');
   addError(errors, plan.source_selection.path ===
@@ -115,12 +116,17 @@ async function validatePlan(plan, selection, promptManifest) {
     } else {
       errors.push(`${slot.id}: invalid passage status`);
     }
+    const expectedLanguageReview = ['de-DE', 'en-US'].includes(slot.locale)
+      ? 'not-required'
+      : 'native-review-required';
+    addError(errors, slot.language_review_status === expectedLanguageReview,
+      `${slot.id}: language review status differs from the execution policy`);
   }
   const materializedCount = passageSlots.filter((slot) =>
     slot.status === 'materialized').length;
   const pendingCount = passageSlots.length - materializedCount;
-  addError(errors, materializedCount === 17 && pendingCount === 13,
-    'the locked plan must identify 17 materialized and 13 pending passages');
+  addError(errors, materializedCount === 30 && pendingCount === 0,
+    'the locked plan must materialize all 30 passage slots');
   addError(errors, plan.source_selection.materialized_passage_slots ===
     materializedCount && plan.source_selection.pending_passage_slots ===
     pendingCount, 'source selection passage counts do not reconcile');

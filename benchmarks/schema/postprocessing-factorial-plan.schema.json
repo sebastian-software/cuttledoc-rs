@@ -30,6 +30,7 @@
     "status": {
       "enum": [
         "design-locked-corpus-expansion-required",
+        "design-locked-native-review-and-voice-qualification-required",
         "ready-for-dry-run",
         "ready-for-execution",
         "complete"
@@ -286,7 +287,7 @@
     },
     "passageSlot": {
       "type": "object",
-      "required": ["id", "locale", "content_type", "index", "passage_id", "status"],
+      "required": ["id", "locale", "content_type", "index", "passage_id", "status", "language_review_status"],
       "properties": {
         "id": { "$ref": "#/$defs/nonEmptyString" },
         "locale": { "$ref": "#/$defs/nonEmptyString" },
@@ -295,7 +296,10 @@
         "passage_id": {
           "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
         },
-        "status": { "enum": ["materialized", "source-selection-required"] }
+        "status": { "enum": ["materialized", "source-selection-required"] },
+        "language_review_status": {
+          "enum": ["not-required", "native-review-required", "native-review-complete"]
+        }
       },
       "additionalProperties": false
     },
