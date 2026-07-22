@@ -1472,6 +1472,10 @@ async function summarizeLocalSlice(state) {
     `${values.engine}.${state.plan_revision}.json`,
   );
   const audioRecords = [...audioManifests.values()];
+  const generationDiagnostics = localGenerationDiagnostics(
+    engineId,
+    audioRecords,
+  );
   const report = {
     schema_version: '1.0.0',
     id: `${values.engine}-${state.plan_revision}-local-stt-slice`,
@@ -1499,6 +1503,7 @@ async function summarizeLocalSlice(state) {
       unique_normalized_audio_digests: new Set(audioRecords.map((manifest) =>
         manifest.normalized_audio.sha256)).size,
     },
+    generation_diagnostics: generationDiagnostics,
     aggregates: {
       overall: aggregateSliceObservations(observations, []),
       by_stt_model: aggregateSliceObservations(observations, ['stt_model']),
@@ -1542,6 +1547,57 @@ async function summarizeLocalSlice(state) {
     `Wrote ${relative(repoRoot, output)}: ${audioRecords.length} audio, ` +
     `${observations.length} STT observations\n`,
   );
+}
+
+function localGenerationDiagnostics(engineId, audioRecords) {
+  if (engineId !== 'qwen3-tts-1.7b-voicedesign-mlx-audio') {
+    return {
+      mode: 'engine-native-single-pass',
+      policy_revision: 'avspeechsynthesizer-native',
+      document_count: audioRecords.length,
+      completed_document_count: audioRecords.length,
+      token_limit_failure_count: 0,
+    };
+  }
+  const policies = new Set(audioRecords.map((manifest) =>
+    manifest.runtime_summary.generation.chunking.revision));
+  const tokenLimits = new Set(audioRecords.map((manifest) =>
+    manifest.runtime_summary.termination.configured_max_tokens_per_chunk));
+  const pauses = new Set(audioRecords.map((manifest) =>
+    manifest.runtime_summary.generation.chunking.inter_chunk_silence_ms));
+  if (policies.size !== 1 || tokenLimits.size !== 1 || pauses.size !== 1) {
+    throw new Error('Qwen slice spans multiple chunking policies');
+  }
+  const terminations = audioRecords.map((manifest) =>
+    manifest.runtime_summary.termination);
+  const successfulChunkTokenCounts = audioRecords.flatMap((manifest) =>
+    manifest.runtime_summary.runtime.chunks.map((chunk) => chunk.token_count));
+  return {
+    mode: 'sentence-aware-adaptive-chunking',
+    policy_revision: [...policies][0],
+    document_count: audioRecords.length,
+    completed_document_count: terminations.filter((termination) =>
+      termination.completed_all_chunks === true).length,
+    token_limit_failure_count: terminations.filter((termination) =>
+      termination.reached_max_tokens === true).length,
+    total_emitted_chunks: terminations.reduce(
+      (sum, termination) => sum + termination.chunk_count,
+      0,
+    ),
+    documents_with_adaptive_retries: terminations.filter((termination) =>
+      termination.adaptive_retry_count > 0).length,
+    total_adaptive_retries: terminations.reduce(
+      (sum, termination) => sum + termination.adaptive_retry_count,
+      0,
+    ),
+    maximum_split_depth: Math.max(...terminations.map((termination) =>
+      termination.maximum_split_depth)),
+    maximum_successful_chunk_token_count: Math.max(
+      ...successfulChunkTokenCounts,
+    ),
+    configured_max_tokens_per_chunk: [...tokenLimits][0],
+    inter_chunk_silence_ms: [...pauses][0],
+  };
 }
 
 function aggregateSliceObservations(observations, fields) {

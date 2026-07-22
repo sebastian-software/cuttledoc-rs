@@ -13,6 +13,7 @@
     "evidence_captured_through",
     "slice",
     "artifacts",
+    "generation_diagnostics",
     "aggregates",
     "repeat_stability",
     "observations",
@@ -41,6 +42,37 @@
         "stt_count": { "type": "integer", "minimum": 1 },
         "total_audio_duration_ms": { "type": "number", "exclusiveMinimum": 0 },
         "unique_normalized_audio_digests": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "generation_diagnostics": {
+      "type": "object",
+      "required": [
+        "mode",
+        "policy_revision",
+        "document_count",
+        "completed_document_count",
+        "token_limit_failure_count"
+      ],
+      "properties": {
+        "mode": { "$ref": "#/$defs/nonEmptyString" },
+        "policy_revision": { "$ref": "#/$defs/nonEmptyString" },
+        "document_count": { "type": "integer", "minimum": 1 },
+        "completed_document_count": { "type": "integer", "minimum": 0 },
+        "token_limit_failure_count": { "type": "integer", "minimum": 0 },
+        "total_emitted_chunks": { "type": "integer", "minimum": 1 },
+        "documents_with_adaptive_retries": { "type": "integer", "minimum": 0 },
+        "total_adaptive_retries": { "type": "integer", "minimum": 0 },
+        "maximum_split_depth": { "type": "integer", "minimum": 0 },
+        "maximum_successful_chunk_token_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "configured_max_tokens_per_chunk": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inter_chunk_silence_ms": { "type": "integer", "minimum": 0 }
       },
       "additionalProperties": false
     },

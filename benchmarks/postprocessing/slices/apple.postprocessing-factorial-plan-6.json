@@ -21,6 +21,13 @@
     "total_audio_duration_ms": 7206909.375,
     "unique_normalized_audio_digests": 60
   },
+  "generation_diagnostics": {
+    "mode": "engine-native-single-pass",
+    "policy_revision": "avspeechsynthesizer-native",
+    "document_count": 120,
+    "completed_document_count": 120,
+    "token_limit_failure_count": 0
+  },
   "aggregates": {
     "overall": [
       {

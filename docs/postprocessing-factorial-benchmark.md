@@ -277,6 +277,29 @@ The report retains every cell's digests and WER/CER, publishes language,
 content, voice, and recognizer strata, and separately measures whether the two
 generation repeats produced identical audio and transcripts.
 
+## Current complete local slices
+
+Plan revision 6 has complete Apple and Qwen VoiceDesign slices. The values
+below are macro mean channel WER percentages: they measure the complete
+TTS-to-STT path and must not be presented as isolated STT accuracy.
+
+| TTS source | STT receiver | Overall | German | English | Spanish | French | Portuguese |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Apple | Whisper | 3.32 | 4.39 | 2.18 | 2.48 | 3.15 | 4.38 |
+| Apple | Qwen3-ASR | 8.60 | 12.90 | 7.65 | 4.49 | 5.93 | 12.04 |
+| Apple | Parakeet | 7.56 | 8.48 | 10.21 | 3.08 | 6.74 | 9.31 |
+| Qwen VoiceDesign | Whisper | 2.18 | 1.91 | 2.22 | 1.29 | 2.58 | 2.92 |
+| Qwen VoiceDesign | Qwen3-ASR | 7.59 | 7.59 | 5.71 | 7.28 | 4.67 | 12.69 |
+| Qwen VoiceDesign | Parakeet | 7.91 | 4.65 | 5.10 | 10.63 | 7.17 | 12.02 |
+
+Across all three receivers, Apple has 6.49% macro mean WER and Qwen has
+5.89%. That aggregate hides material reversals by language and receiver, so the
+language strata remain the selection evidence. Both slices produced 60/60
+identical normalized repeat pairs and 180/180 identical transcript pairs.
+Qwen emitted 418 successful chunks across 120 documents; two documents needed
+one deterministic adaptive retry each, no document remained capped, and the
+largest successful chunk used 441 of the allowed 1,200 tokens.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only
