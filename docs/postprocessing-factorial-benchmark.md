@@ -245,6 +245,13 @@ The recovery result is only a proposal for a factorial-plan revision. The
 selected identities still have to rerun the complete three-receiver
 qualification under that new revision before the full slice can expand.
 
+Plan revision 4 applies the bounded recovery result: `qwen-de-clear` moves
+from identity seed 1 to 2 and `qwen-es-clear` from seed 1 to 3. The other eight
+Qwen slots passed the first three-receiver gate and are marked qualified. The
+two replacements remain explicitly pending until the complete ten-voice Qwen
+qualification is rerun under revision 4; the generated ledger therefore makes
+96 Qwen audio cells ready and keeps the replacement-dependent cells blocked.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only

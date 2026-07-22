@@ -168,8 +168,8 @@ async function validatePlan(plan, selection, promptManifest) {
       slot.locale === locale &&
       slot.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio')
       .map((slot) => slot.voice_identity_seed);
-    addError(errors, same(seeds, [0, 1]),
-      `${locale}: Qwen voice identity seeds must be [0,1]`);
+    addError(errors, seeds.length === 2 && unique(seeds) && seeds.includes(0),
+      `${locale}: Qwen voice identities require two distinct seeds including 0`);
   }
 
   const policies = new Map(plan.generation_sampling.engine_policies.map(
