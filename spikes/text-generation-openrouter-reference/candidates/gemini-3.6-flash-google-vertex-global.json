@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "id": "gemini-3.6-flash-openrouter-google-vertex-global",
+  "task": "text-generation",
+  "candidate_role": "fast-frontier-quality-candidate",
+  "model": {
+    "requested_id": "google/gemini-3.6-flash",
+    "allowed_response_ids": [
+      "google/gemini-3.6-flash",
+      "google/gemini-3.6-flash-20260721"
+    ],
+    "upstream_identity": "Google Gemini 3.6 Flash",
+    "provider_model_identity": "google/gemini-3.6-flash-20260721",
+    "release": "2026-07-21",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1048576,
+    "identity_limit": "The model and serving implementation are proprietary; the dated Google Vertex API identity is the strongest artifact boundary available to this probe."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "google-vertex/global",
+    "provider_name": "Google",
+    "endpoint_tag": "google-vertex/global",
+    "endpoint_identity": "Google Vertex Global | google/gemini-3.6-flash-20260721",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "seed",
+      "response_format",
+      "stop",
+      "structured_outputs",
+      "tools",
+      "tool_choice",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "google-vertex/global"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.0000015",
+      "completion": "0.0000075",
+      "input_cache_read": "0.00000015"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": true,
+    "temperature": null,
+    "seed": 0,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote fast-frontier quality candidate only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+}

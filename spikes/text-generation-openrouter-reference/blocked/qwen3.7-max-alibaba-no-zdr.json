@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3.7-max-openrouter-alibaba-no-zdr",
+  "captured_at": "2026-07-22",
+  "status": "blocked-pending-explicit-privacy-exception",
+  "requested_model": {
+    "id": "qwen/qwen3.7-max",
+    "catalog_identity": "qwen/qwen3.7-max-20260520",
+    "name": "Qwen: Qwen3.7 Max",
+    "context_tokens": 1000000
+  },
+  "available_endpoint": {
+    "provider_slug": "alibaba",
+    "provider_name": "Alibaba",
+    "tag": "alibaba",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "temperature",
+      "top_p",
+      "seed",
+      "presence_penalty",
+      "response_format",
+      "tools",
+      "tool_choice",
+      "structured_outputs",
+      "logprobs",
+      "top_logprobs"
+    ]
+  },
+  "policy_check": {
+    "catalog_endpoint": "https://openrouter.ai/api/v1/models/qwen/qwen3.7-max/endpoints",
+    "zdr_endpoint": "https://openrouter.ai/api/v1/endpoints/zdr",
+    "listed_as_zdr": false,
+    "current_runner_requires_zdr": true,
+    "data_collection_would_remain": "deny"
+  },
+  "blocker": "Alibaba is the only catalog endpoint for Qwen3.7 Max and was absent from OpenRouter's dynamic ZDR endpoint list. The repository will not weaken the established per-request ZDR requirement without explicit approval.",
+  "unblock_condition": "Explicitly authorize one development-only request policy exception for the public synthetic benchmark fixture, with provider fallback still disabled and data_collection kept at deny."
+}

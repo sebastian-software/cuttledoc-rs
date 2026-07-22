@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0.0",
+  "id": "claude-sonnet-5-openrouter-azure-us-east-2",
+  "task": "text-generation",
+  "candidate_role": "current-frontier-quality-control",
+  "model": {
+    "requested_id": "anthropic/claude-sonnet-5",
+    "allowed_response_ids": [
+      "anthropic/claude-sonnet-5",
+      "anthropic/claude-sonnet-5-20260630"
+    ],
+    "upstream_identity": "Anthropic Claude Sonnet 5",
+    "provider_model_identity": "anthropic/claude-sonnet-5-20260630",
+    "release": "2026-06-30",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1000000,
+    "identity_limit": "The model and serving implementation are proprietary; the dated Azure API identity is the strongest artifact boundary available to this probe."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "azure/us-east-2",
+    "provider_name": "Azure",
+    "endpoint_tag": "azure/us-east-2",
+    "endpoint_identity": "Azure US East 2 | anthropic/claude-sonnet-5-20260630",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "structured_outputs",
+      "max_tokens",
+      "max_completion_tokens",
+      "tools",
+      "tool_choice",
+      "response_format",
+      "verbosity",
+      "stop",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "azure/us-east-2"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.000002",
+      "completion": "0.00001",
+      "input_cache_read": "0.0000002"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_completion_tokens",
+    "json_schema_numeric_bounds": false,
+    "temperature": null,
+    "seed": null,
+    "reasoning": null,
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote current-frontier quality control only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+}

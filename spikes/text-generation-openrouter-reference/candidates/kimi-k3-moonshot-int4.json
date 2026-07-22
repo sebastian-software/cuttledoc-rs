@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-openrouter-moonshot-int4",
+  "task": "text-generation",
+  "candidate_role": "frontier-quality-candidate",
+  "model": {
+    "requested_id": "moonshotai/kimi-k3",
+    "allowed_response_ids": [
+      "moonshotai/kimi-k3",
+      "moonshotai/kimi-k3-20260715"
+    ],
+    "upstream_identity": "Moonshot AI Kimi K3",
+    "provider_model_identity": "moonshotai/kimi-k3-20260715",
+    "release": "2026-07-15",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1048576,
+    "identity_limit": "OpenRouter exposes a dated first-party Moonshot API identity and an INT4 serving tag; no public Kimi K3 weight artifact is pinned by this repository."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "moonshotai/int4",
+    "provider_name": "Moonshot AI",
+    "endpoint_tag": "moonshotai/int4",
+    "endpoint_identity": "Moonshot AI INT4 | moonshotai/kimi-k3-20260715",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "stop",
+      "frequency_penalty",
+      "presence_penalty",
+      "structured_outputs",
+      "response_format",
+      "tool_choice",
+      "tools",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "moonshotai/int4"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.000003",
+      "completion": "0.000015",
+      "input_cache_read": "0.0000003"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": false,
+    "temperature": null,
+    "seed": null,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote development-quality candidate only; first-party hosted INT4 behavior is not evidence for a local artifact or embedded runtime."
+}
