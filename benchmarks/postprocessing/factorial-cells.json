@@ -3,7 +3,7 @@
   "schema_version": "1.0.0",
   "id": "postprocessing-factorial-primary-languages-v1-cells",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
-  "plan_revision": "postprocessing-factorial-plan-4",
+  "plan_revision": "postprocessing-factorial-plan-5",
   "source_selection_revision": "synthetic-roundtrip-passages-4",
   "generation": {
     "generator": "scripts/generate-postprocessing-factorial-matrix.mjs",
@@ -133,10 +133,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-technical-a--qwen-de-clear--repeat-2",
@@ -150,10 +148,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-technical-a--voxtral-de-female--seed-0-repeat-1",
@@ -333,10 +329,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-technical-b--qwen-de-clear--repeat-2",
@@ -350,10 +344,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-technical-b--voxtral-de-female--seed-0-repeat-1",
@@ -533,10 +525,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-native-a--qwen-de-clear--repeat-2",
@@ -550,10 +540,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-native-a--voxtral-de-female--seed-0-repeat-1",
@@ -733,10 +721,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-native-b--qwen-de-clear--repeat-2",
@@ -750,10 +736,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-native-b--voxtral-de-female--seed-0-repeat-1",
@@ -933,10 +917,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-dialogue-a--qwen-de-clear--repeat-2",
@@ -950,10 +932,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-dialogue-a--voxtral-de-female--seed-0-repeat-1",
@@ -1133,10 +1113,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-dialogue-b--qwen-de-clear--repeat-2",
@@ -1150,10 +1128,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--de-dialogue-b--voxtral-de-female--seed-0-repeat-1",
@@ -2509,10 +2485,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-technical-a--qwen-es-clear--repeat-2",
@@ -2526,10 +2500,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-technical-a--voxtral-es-female--seed-0-repeat-1",
@@ -2709,10 +2681,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-technical-b--qwen-es-clear--repeat-2",
@@ -2726,10 +2696,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-technical-b--voxtral-es-female--seed-0-repeat-1",
@@ -2909,10 +2877,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-native-a--qwen-es-clear--repeat-2",
@@ -2926,10 +2892,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-native-a--voxtral-es-female--seed-0-repeat-1",
@@ -3109,10 +3073,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-native-b--qwen-es-clear--repeat-2",
@@ -3126,10 +3088,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-native-b--voxtral-es-female--seed-0-repeat-1",
@@ -3309,10 +3269,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-dialogue-a--qwen-es-clear--repeat-2",
@@ -3326,10 +3284,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-dialogue-a--voxtral-es-female--seed-0-repeat-1",
@@ -3509,10 +3465,8 @@
       "realization_id": "repeat-1",
       "generation_seed": null,
       "generation_repeat": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-dialogue-b--qwen-es-clear--repeat-2",
@@ -3526,10 +3480,8 @@
       "realization_id": "repeat-2",
       "generation_seed": null,
       "generation_repeat": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "audio--es-dialogue-b--voxtral-es-female--seed-0-repeat-1",
@@ -6353,10 +6305,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -6366,10 +6316,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -6379,10 +6327,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -6392,10 +6338,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -6405,10 +6349,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -6418,10 +6360,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-a--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -6809,10 +6749,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -6822,10 +6760,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -6835,10 +6771,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -6848,10 +6782,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -6861,10 +6793,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -6874,10 +6804,8 @@
       "content_type": "technical",
       "passage_slot_id": "de-technical-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-technical-b--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -7265,10 +7193,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -7278,10 +7204,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -7291,10 +7215,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -7304,10 +7226,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -7317,10 +7237,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -7330,10 +7248,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-a--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -7721,10 +7637,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -7734,10 +7648,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -7747,10 +7659,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -7760,10 +7670,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -7773,10 +7681,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -7786,10 +7692,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "de-native-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-native-b--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -8177,10 +8081,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -8190,10 +8092,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -8203,10 +8103,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -8216,10 +8114,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -8229,10 +8125,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -8242,10 +8136,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-a--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -8633,10 +8525,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -8646,10 +8536,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -8659,10 +8547,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -8672,10 +8558,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -8685,10 +8569,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -8698,10 +8580,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "de-dialogue-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--de-dialogue-b--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -11753,10 +11633,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -11766,10 +11644,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -11779,10 +11655,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -11792,10 +11666,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -11805,10 +11677,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -11818,10 +11688,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-a--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -12209,10 +12077,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -12222,10 +12088,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -12235,10 +12099,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -12248,10 +12110,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -12261,10 +12121,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -12274,10 +12132,8 @@
       "content_type": "technical",
       "passage_slot_id": "es-technical-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-technical-b--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -12665,10 +12521,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -12678,10 +12532,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -12691,10 +12543,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -12704,10 +12554,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -12717,10 +12565,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -12730,10 +12576,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-a--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -13121,10 +12965,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -13134,10 +12976,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -13147,10 +12987,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -13160,10 +12998,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -13173,10 +13009,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -13186,10 +13020,8 @@
       "content_type": "native-factual",
       "passage_slot_id": "es-native-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-native-b--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -13577,10 +13409,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -13590,10 +13420,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -13603,10 +13431,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -13616,10 +13442,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -13629,10 +13453,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -13642,10 +13464,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-a",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-a--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -14033,10 +13853,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -14046,10 +13864,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -14059,10 +13875,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -14072,10 +13886,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -14085,10 +13897,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "qwen3-asr-0.6b-mlx-direct",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -14098,10 +13908,8 @@
       "content_type": "dialogue",
       "passage_slot_id": "es-dialogue-b",
       "stt_model": "parakeet-tdt-0.6b-v3-coreml",
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "stt--audio--es-dialogue-b--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -20912,10 +20720,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -20962,10 +20768,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -21012,10 +20816,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -21062,10 +20864,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -21112,10 +20912,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -21162,10 +20960,8 @@
           "stt_unit_id": "stt--audio--de-dialogue-b--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--de-DE--voxtral-de-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -24476,10 +24272,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct",
@@ -24526,10 +24320,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
@@ -24576,10 +24368,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp",
@@ -24626,10 +24416,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct",
@@ -24676,10 +24464,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml",
@@ -24726,10 +24512,8 @@
           "stt_unit_id": "stt--audio--es-dialogue-b--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml"
         }
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ]
+      "status": "ready",
+      "blockers": []
     },
     {
       "id": "document--es-419--voxtral-es-female--seed-0-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
@@ -30363,10 +30147,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         694,
         1543
@@ -30380,10 +30162,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         392,
         1551
@@ -30397,10 +30177,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         839,
         1788
@@ -30414,10 +30192,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         726,
         1381
@@ -30431,10 +30207,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         525,
         1190
@@ -30448,10 +30222,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         80,
         1020
@@ -30465,10 +30237,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         433,
         1677
@@ -30482,10 +30252,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         746,
         1015
@@ -30499,10 +30267,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         297,
         981
@@ -30516,10 +30282,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         13,
         1481
@@ -30533,10 +30297,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         157,
         1348
@@ -30550,10 +30312,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         56,
         1449
@@ -30567,10 +30327,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         618,
         939
@@ -30584,10 +30342,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         434,
         1465
@@ -30601,10 +30357,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         314,
         1265
@@ -30618,10 +30372,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         491,
         1353
@@ -30635,10 +30387,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         77,
         1436
@@ -30652,10 +30402,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         129,
         1264
@@ -30669,10 +30417,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         767,
         1330
@@ -30686,10 +30432,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         697,
         1074
@@ -30703,10 +30447,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         408,
         1269
@@ -30720,10 +30462,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         376,
         1792
@@ -30737,10 +30477,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         625,
         1234
@@ -30754,10 +30492,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         576,
         918
@@ -30771,10 +30507,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         891,
         1785
@@ -30788,10 +30522,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         86,
         1311
@@ -30805,10 +30537,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         683,
         1631
@@ -30822,10 +30552,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         833,
         1338
@@ -30839,10 +30567,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         477,
         1615
@@ -30856,10 +30582,8 @@
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--de-DE--qwen-de-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         837,
         1737
@@ -36303,10 +36027,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         680,
         1602
@@ -36320,10 +36042,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         20,
         1128
@@ -36337,10 +36057,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         871,
         1111
@@ -36354,10 +36072,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         414,
         1539
@@ -36371,10 +36087,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         461,
         1280
@@ -36388,10 +36102,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         800,
         1639
@@ -36405,10 +36117,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         652,
         1577
@@ -36422,10 +36132,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         835,
         1403
@@ -36439,10 +36147,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         439,
         1130
@@ -36456,10 +36162,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         459,
         1799
@@ -36473,10 +36177,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         664,
         1610
@@ -36490,10 +36192,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         322,
         1231
@@ -36507,10 +36207,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         49,
         1470
@@ -36524,10 +36222,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         483,
         1747
@@ -36541,10 +36237,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         537,
         1088
@@ -36558,10 +36252,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         516,
         1321
@@ -36575,10 +36267,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         361,
         1565
@@ -36592,10 +36282,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         140,
         1364
@@ -36609,10 +36297,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         331,
         1309
@@ -36626,10 +36312,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--whisper-large-v3-turbo-coreml-whispercpp--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         662,
         1538
@@ -36643,10 +36327,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         748,
         1139
@@ -36660,10 +36342,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         530,
         1386
@@ -36677,10 +36357,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         259,
         1037
@@ -36694,10 +36372,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         130,
         1146
@@ -36711,10 +36387,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--qwen3-asr-0.6b-mlx-direct--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         79,
         1525
@@ -36728,10 +36402,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-sol--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         804,
         1116
@@ -36745,10 +36417,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--google--gemini-3.6-flash--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         170,
         1248
@@ -36762,10 +36432,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--openai--gpt-5.6-terra--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         768,
         1776
@@ -36779,10 +36447,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--moonshotai--kimi-k3--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         543,
         1750
@@ -36796,10 +36462,8 @@
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-1",
         "llm-run--document--es-419--qwen-es-clear--repeat-2--parakeet-tdt-0.6b-v3-coreml--anthropic--claude-sonnet-5--repeat-2"
       ],
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "global_execution_orders": [
         854,
         991
@@ -43878,10 +43542,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 13,
       "global_execution_order": 13
     },
@@ -43974,10 +43636,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 20,
       "global_execution_order": 20
     },
@@ -44358,10 +44018,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 49,
       "global_execution_order": 49
     },
@@ -44452,10 +44110,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 56,
       "global_execution_order": 56
     },
@@ -44734,10 +44390,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 77,
       "global_execution_order": 77
     },
@@ -44762,10 +44416,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 79,
       "global_execution_order": 79
     },
@@ -44776,10 +44428,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 80,
       "global_execution_order": 80
     },
@@ -44860,10 +44510,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 86,
       "global_execution_order": 86
     },
@@ -45434,10 +45082,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 129,
       "global_execution_order": 129
     },
@@ -45448,10 +45094,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 130,
       "global_execution_order": 130
     },
@@ -45580,10 +45224,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 140,
       "global_execution_order": 140
     },
@@ -45808,10 +45450,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 157,
       "global_execution_order": 157
     },
@@ -45978,10 +45618,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 170,
       "global_execution_order": 170
     },
@@ -47176,10 +46814,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 259,
       "global_execution_order": 259
     },
@@ -47692,10 +47328,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 297,
       "global_execution_order": 297
     },
@@ -47922,10 +47556,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 314,
       "global_execution_order": 314
     },
@@ -48028,10 +47660,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 322,
       "global_execution_order": 322
     },
@@ -48148,10 +47778,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 331,
       "global_execution_order": 331
     },
@@ -48558,10 +48186,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 361,
       "global_execution_order": 361
     },
@@ -48764,10 +48390,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 376,
       "global_execution_order": 376
     },
@@ -48986,10 +48610,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 392,
       "global_execution_order": 392
     },
@@ -49198,10 +48820,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 408,
       "global_execution_order": 408
     },
@@ -49280,10 +48900,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 414,
       "global_execution_order": 414
     },
@@ -49536,10 +49154,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 433,
       "global_execution_order": 433
     },
@@ -49550,10 +49166,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 434,
       "global_execution_order": 434
     },
@@ -49618,10 +49232,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 439,
       "global_execution_order": 439
     },
@@ -49894,10 +49506,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 459,
       "global_execution_order": 459
     },
@@ -49922,10 +49532,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 461,
       "global_execution_order": 461
     },
@@ -50140,10 +49748,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 477,
       "global_execution_order": 477
     },
@@ -50224,10 +49830,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 483,
       "global_execution_order": 483
     },
@@ -50330,10 +49934,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 491,
       "global_execution_order": 491
     },
@@ -50674,10 +50276,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 516,
       "global_execution_order": 516
     },
@@ -50794,10 +50394,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 525,
       "global_execution_order": 525
     },
@@ -50860,10 +50458,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 530,
       "global_execution_order": 530
     },
@@ -50954,10 +50550,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 537,
       "global_execution_order": 537
     },
@@ -51032,10 +50626,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 543,
       "global_execution_order": 543
     },
@@ -51468,10 +51060,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 576,
       "global_execution_order": 576
     },
@@ -52032,10 +51622,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 618,
       "global_execution_order": 618
     },
@@ -52126,10 +51714,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 625,
       "global_execution_order": 625
     },
@@ -52494,10 +52080,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 652,
       "global_execution_order": 652
     },
@@ -52626,10 +52210,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 662,
       "global_execution_order": 662
     },
@@ -52652,10 +52234,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 664,
       "global_execution_order": 664
     },
@@ -52866,10 +52446,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 680,
       "global_execution_order": 680
     },
@@ -52908,10 +52486,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 683,
       "global_execution_order": 683
     },
@@ -53052,10 +52628,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 694,
       "global_execution_order": 694
     },
@@ -53094,10 +52668,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 697,
       "global_execution_order": 697
     },
@@ -53486,10 +53058,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 726,
       "global_execution_order": 726
     },
@@ -53760,10 +53330,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 746,
       "global_execution_order": 746
     },
@@ -53788,10 +53356,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 748,
       "global_execution_order": 748
     },
@@ -54038,10 +53604,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 767,
       "global_execution_order": 767
     },
@@ -54052,10 +53616,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 768,
       "global_execution_order": 768
     },
@@ -54478,10 +54040,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 800,
       "global_execution_order": 800
     },
@@ -54534,10 +54094,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 804,
       "global_execution_order": 804
     },
@@ -54926,10 +54484,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 833,
       "global_execution_order": 833
     },
@@ -54954,10 +54510,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 835,
       "global_execution_order": 835
     },
@@ -54982,10 +54536,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 837,
       "global_execution_order": 837
     },
@@ -55010,10 +54562,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 839,
       "global_execution_order": 839
     },
@@ -55210,10 +54760,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 854,
       "global_execution_order": 854
     },
@@ -55438,10 +54986,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 871,
       "global_execution_order": 871
     },
@@ -55700,10 +55246,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 1,
       "execution_block": 1,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 891,
       "global_execution_order": 891
     },
@@ -56064,10 +55608,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 18,
       "global_execution_order": 918
     },
@@ -56348,10 +55890,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 39,
       "global_execution_order": 939
     },
@@ -56920,10 +56460,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 81,
       "global_execution_order": 981
     },
@@ -57054,10 +56592,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 91,
       "global_execution_order": 991
     },
@@ -57384,10 +56920,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 115,
       "global_execution_order": 1015
     },
@@ -57448,10 +56982,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 120,
       "global_execution_order": 1020
     },
@@ -57672,10 +57204,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 137,
       "global_execution_order": 1037
     },
@@ -58172,10 +57702,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 174,
       "global_execution_order": 1074
     },
@@ -58364,10 +57892,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 188,
       "global_execution_order": 1088
     },
@@ -58672,10 +58198,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 211,
       "global_execution_order": 1111
     },
@@ -58742,10 +58266,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 216,
       "global_execution_order": 1116
     },
@@ -58908,10 +58430,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 228,
       "global_execution_order": 1128
     },
@@ -58936,10 +58456,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 230,
       "global_execution_order": 1130
     },
@@ -59054,10 +58572,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 239,
       "global_execution_order": 1139
     },
@@ -59150,10 +58666,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 246,
       "global_execution_order": 1146
     },
@@ -59744,10 +59258,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 290,
       "global_execution_order": 1190
     },
@@ -60290,10 +59802,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 331,
       "global_execution_order": 1231
     },
@@ -60330,10 +59840,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 334,
       "global_execution_order": 1234
     },
@@ -60518,10 +60026,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 348,
       "global_execution_order": 1248
     },
@@ -60734,10 +60240,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 364,
       "global_execution_order": 1264
     },
@@ -60748,10 +60252,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 365,
       "global_execution_order": 1265
     },
@@ -60800,10 +60302,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 369,
       "global_execution_order": 1269
     },
@@ -60948,10 +60448,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 380,
       "global_execution_order": 1280
     },
@@ -61344,10 +60842,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 409,
       "global_execution_order": 1309
     },
@@ -61372,10 +60868,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 411,
       "global_execution_order": 1311
     },
@@ -61508,10 +61002,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 421,
       "global_execution_order": 1321
     },
@@ -61628,10 +61120,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 430,
       "global_execution_order": 1330
     },
@@ -61736,10 +61226,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 438,
       "global_execution_order": 1338
     },
@@ -61872,10 +61360,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 448,
       "global_execution_order": 1348
     },
@@ -61938,10 +61424,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 453,
       "global_execution_order": 1353
     },
@@ -62088,10 +61572,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 464,
       "global_execution_order": 1364
     },
@@ -62322,10 +61804,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 481,
       "global_execution_order": 1381
     },
@@ -62390,10 +61870,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 486,
       "global_execution_order": 1386
     },
@@ -62618,10 +62096,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 503,
       "global_execution_order": 1403
     },
@@ -63060,10 +62536,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 536,
       "global_execution_order": 1436
     },
@@ -63228,10 +62702,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 549,
       "global_execution_order": 1449
     },
@@ -63446,10 +62918,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 565,
       "global_execution_order": 1465
     },
@@ -63512,10 +62982,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 570,
       "global_execution_order": 1470
     },
@@ -63658,10 +63126,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 581,
       "global_execution_order": 1481
     },
@@ -64242,10 +63708,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 625,
       "global_execution_order": 1525
     },
@@ -64416,10 +63880,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 638,
       "global_execution_order": 1538
     },
@@ -64430,10 +63892,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 639,
       "global_execution_order": 1539
     },
@@ -64486,10 +63946,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 643,
       "global_execution_order": 1543
     },
@@ -64598,10 +64056,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 651,
       "global_execution_order": 1551
     },
@@ -64790,10 +64246,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 665,
       "global_execution_order": 1565
     },
@@ -64952,10 +64406,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 677,
       "global_execution_order": 1577
     },
@@ -65286,10 +64738,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 702,
       "global_execution_order": 1602
     },
@@ -65396,10 +64846,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 710,
       "global_execution_order": 1610
     },
@@ -65464,10 +64912,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 715,
       "global_execution_order": 1615
     },
@@ -65678,10 +65124,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 731,
       "global_execution_order": 1631
     },
@@ -65782,10 +65226,8 @@
       "llm_model": "openai/gpt-5.6-sol",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 739,
       "global_execution_order": 1639
     },
@@ -66284,10 +65726,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 777,
       "global_execution_order": 1677
     },
@@ -67090,10 +66530,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 837,
       "global_execution_order": 1737
     },
@@ -67224,10 +66662,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 847,
       "global_execution_order": 1747
     },
@@ -67264,10 +66700,8 @@
       "llm_model": "moonshotai/kimi-k3",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 850,
       "global_execution_order": 1750
     },
@@ -67608,10 +67042,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 876,
       "global_execution_order": 1776
     },
@@ -67732,10 +67164,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 885,
       "global_execution_order": 1785
     },
@@ -67774,10 +67204,8 @@
       "llm_model": "openai/gpt-5.6-terra",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 888,
       "global_execution_order": 1788
     },
@@ -67830,10 +67258,8 @@
       "llm_model": "google/gemini-3.6-flash",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 892,
       "global_execution_order": 1792
     },
@@ -67928,10 +67354,8 @@
       "llm_model": "anthropic/claude-sonnet-5",
       "repetition": 2,
       "execution_block": 2,
-      "status": "blocked",
-      "blockers": [
-        "voice-slot:recovery-selected-three-receiver-qualification-pending"
-      ],
+      "status": "ready",
+      "blockers": [],
       "block_execution_order": 899,
       "global_execution_order": 1799
     },

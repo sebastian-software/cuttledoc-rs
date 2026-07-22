@@ -245,12 +245,13 @@ The recovery result is only a proposal for a factorial-plan revision. The
 selected identities still have to rerun the complete three-receiver
 qualification under that new revision before the full slice can expand.
 
-Plan revision 4 applies the bounded recovery result: `qwen-de-clear` moves
+Plan revision 4 applied the bounded recovery result: `qwen-de-clear` moved
 from identity seed 1 to 2 and `qwen-es-clear` from seed 1 to 3. The other eight
-Qwen slots passed the first three-receiver gate and are marked qualified. The
-two replacements remain explicitly pending until the complete ten-voice Qwen
-qualification is rerun under revision 4; the generated ledger therefore makes
-96 Qwen audio cells ready and keeps the replacement-dependent cells blocked.
+Qwen slots passed the first three-receiver gate. The complete revision-4
+rerun then passed all ten identities without a token-limit failure. Plan
+revision 5 consequently marks every Qwen slot qualified and makes all 120
+Qwen audio cells ready; Apple host voices and the exact Voxtral BF16 artifact
+remain separate execution gates.
 
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
