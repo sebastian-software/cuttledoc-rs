@@ -1,7 +1,8 @@
 # Long-form transcript postprocessing screen
 
-**Status:** German multi-page development screen complete for three hosted
-models; the pinned Mistral endpoint is temporarily blocked.
+**Status:** German multi-page development screen complete for seven hosted
+models. The pinned Mistral endpoint is temporarily blocked, and Qwen3.7 Max is
+privacy-blocked pending an explicit exception to the repository's ZDR rule.
 
 **Evidence date:** 2026-07-22.
 
@@ -35,13 +36,19 @@ route. Cost covers those two recorded requests.
 | Raw Whisper | n/a | 60 | 6.03% | n/a | n/a | n/a |
 | Qwen 3.5 122B-A10B / AtlasCloud FP8 | Passed | 25 | 2.51% | 58.3% | 6 / 1 / 1 | $0.0254754 |
 | GPT-5.6 Sol / Azure EU | Failed: one unreported lexical change | 5 | 0.50% | 91.7% | 6 / 2 / 0 | $0.2455266 |
-| Claude Sonnet 4.6 / Bedrock EU West 1 | Passed | 31 | 3.12% | 48.3% | 5 / 3 / 0 | $0.1521399 |
+| Claude Sonnet 4.6 / Bedrock EU West 1 (historical) | Passed | 31 | 3.12% | 48.3% | 5 / 3 / 0 | $0.1521399 |
+| Gemini 3.6 Flash / Google Vertex Global | Failed: one unreported lexical change | 9 | 0.90% | 85.0% | 6 / 1 / 1 | $0.0716760 |
+| Kimi K3 / Moonshot AI INT4 | Passed | 23 | 2.31% | 61.7% | 6 / 2 / 0 | $0.1387416 |
+| GPT-5.6 Luna / Azure EU | Failed: all six lexical changes unreported | 54 | 5.43% | 10.0% | 1 / 7 / 0 | $0.0294822 |
+| Claude Sonnet 5 / Azure US East 2 | Passed | 28 | 2.81% | 53.3% | 5 / 3 / 0 | $0.1449660 |
 | Mistral Small 3.2 24B / Parasail BF16 | Blocked: upstream HTTP 429 twice | — | — | — | — | not recorded |
+| Qwen3.7 Max / Alibaba | Blocked: no ZDR endpoint in the captured OpenRouter catalog | — | — | — | — | not run |
 
-All three complete remote repeats differed. The recorded cost of the three
-complete two-request results is $0.4231419. Requests from the blocked Mistral
-attempts and an abandoned Qwen invocation have no complete response record and
-are intentionally excluded rather than estimated.
+Gemini was the only one of the seven complete long-form results whose two raw
+responses were identical. The recorded cost of the seven complete two-request
+results is $0.8080077. Requests from the blocked Mistral attempts, an abandoned
+historical Qwen invocation, and Sonnet 5's initial token-limit failure have no
+complete response record and are intentionally excluded rather than estimated.
 
 ## Findings
 
@@ -62,11 +69,44 @@ precisely the high-severity regression that an aggregate WER improvement would
 hide. Qwen therefore passes the mechanical ledger contract but is not a safe
 quality candidate under this prompt.
 
-Claude was the only result to combine a complete edit ledger with zero section
-regressions. It was substantially more conservative: it left several
-recoverable names, abbreviations, spoken punctuation labels, and the closing
-`Vielen Dank` hallucination untouched. It is the safest complete result here,
-not the most capable one.
+Claude Sonnet 4.6 was the only original result to combine a complete edit
+ledger with zero section regressions. It was substantially more conservative:
+it left several recoverable names, abbreviations, spoken punctuation labels,
+and the closing `Vielen Dank` hallucination untouched. It is the safest
+complete original result here, not the most capable one.
+
+The expanded current-model screen changes that comparison without producing a
+winner. Gemini 3.6 Flash came closest to GPT-5.6 Sol at nine errors and repeated
+byte-identically, but it changed an already correct `Industrie 5.0` to
+`Industrie 4.0` based on world knowledge. It reported that harmful change, yet
+omitted one other lexical change from its ledger, so both the section-regression
+gate and cross-field audit caught independent problems. The Google endpoint
+also rejects disabled reasoning; explicit low effort is therefore part of the
+pinned candidate tuple.
+
+Kimi K3 is the strongest new result that passed the entire contract: 23 errors,
+six improved sections, and no regression. It is less accurate than GPT-5.6 Sol
+and Gemini on this fixture but safer under the current bounded prompt. Claude
+Sonnet 5 also passed completely with no regression, but its 28 errors are only
+a modest improvement over the historical Sonnet 4.6 result's 31. Sonnet 5 is
+now the active Anthropic control; Sonnet 4.6 remains in the table solely as
+historical evidence, not because the old model is still preferred.
+
+GPT-5.6 Luna is not an upgrade over GPT-5.6 Sol for this task under the pinned
+no-reasoning tuple. It made only six lexical changes, reported none of them, and
+reduced the error count from 60 to 54. The family name is therefore not a
+quality ordering: Sol remains the much stronger observed GPT-5.6 control on
+this fixture. Sonnet 5 initially consumed the full 8,192-token completion
+budget without emitting content; explicit low reasoning produced the complete
+record above. Client-observed request durations ranged from about 0.7 seconds
+for Gemini and Luna to roughly 10.2 seconds for Kimi, but these remote gateway
+measurements are not comparable to local runtime latency.
+
+Qwen3.7 Max exists in the captured OpenRouter catalog, but Alibaba was its only
+endpoint and was absent from OpenRouter's dynamic ZDR list. The fixture is
+public synthetic text, so a tightly scoped non-ZDR run could be defensible, but
+the repository does not silently relax the established privacy policy. Its
+blocked manifest preserves the exact reason and awaits explicit approval.
 
 The audit now verifies edit completeness by applying reported, non-overlapping
 lexical replacements to the normalized input in source order and comparing the

@@ -61,11 +61,12 @@ porting.
 The separate
 [`OpenRouter quality reference`](../spikes/text-generation-openrouter-reference/README.md)
 ran Qwen 3.5 122B-A10B, Mistral Small 3.2 24B, GPT-5.6 Sol, and Claude Sonnet
-4.6 against the same hidden-reference German development fixture. Qwen, GPT,
-and Claude each applied and reported the one reference-matching lexical
-correction; Mistral reported a different edit but failed to apply it to its
-text, so the external audit rejected the result. Claude produced the narrowest
-accepted response and the only identical accepted repeat.
+4.6 in its initial historical matrix against the same hidden-reference German
+development fixture. Qwen, GPT, and Claude each applied and reported the one
+reference-matching lexical correction; Mistral reported a different edit but
+failed to apply it to its text, so the external audit rejected the result.
+Claude produced the narrowest accepted response and the only identical
+accepted repeat.
 
 These are remote quality controls, not Apple-local runtime measurements.
 Provider fallbacks were disabled and ZDR routes were pinned, but hosted model
@@ -74,6 +75,15 @@ network, queue, and provider. The $0.05134114 recorded final matrix establishes
 an inexpensive development ceiling; it provides no MLX/Core ML latency,
 memory, energy, packaging, or model-size evidence and still cannot select
 quality from one inspected, unverified fixture.
+
+The later multi-page screen adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Luna, and
+Claude Sonnet 5. Sonnet 5 replaces 4.6 as the active Anthropic control; the old
+result remains only for reproducibility. Kimi and Sonnet 5 pass the full
+bounded contract without a section regression. Gemini reaches 0.90% diagnostic
+WER but changes a correct `Industrie 5.0` to `Industrie 4.0`; Luna improves only
+one section. Qwen3.7 Max is cataloged but not run because no ZDR endpoint was
+available. These remote results refine the quality shortlist and still provide
+no local-runtime evidence.
 
 ## Candidate review
 

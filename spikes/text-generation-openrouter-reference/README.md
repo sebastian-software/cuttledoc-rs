@@ -4,8 +4,8 @@ This reference path screens larger hosted models before Cuttledoc invests in an
 embedded MLX or Core ML port. It complements, but does not replace, the pinned
 local MLX reference under `spikes/text-generation-mlx-reference/`.
 
-The first matrix holds the German development fixture and conservative prompt
-constant while varying four model/provider tuples:
+The initial historical matrix held the German development fixture and
+conservative prompt constant while varying four model/provider tuples:
 
 | Role | Model | Pinned provider |
 | --- | --- | --- |
@@ -28,6 +28,17 @@ fixture, not a quality ranking. The three accepted outputs match its unverified
 dataset reference, but only independent human gold can label edits beneficial
 and estimate regression rates.
 
+The multi-page quality screen adds current frontier controls without deleting
+the reproducible historical records:
+
+| Role | Model | Pinned provider | Routing status |
+| --- | --- | --- | --- |
+| Fast frontier candidate | Gemini 3.6 Flash | Google Vertex Global | ZDR; explicit low reasoning required |
+| Frontier candidate | Kimi K3 | Moonshot AI INT4 | ZDR |
+| GPT family control | GPT-5.6 Luna | Azure EU | ZDR |
+| Current Anthropic control | Claude Sonnet 5 | Azure US East 2 | ZDR; replaces Sonnet 4.6 as the active control |
+| Frontier candidate | Qwen3.7 Max | Alibaba | Blocked: no cataloged ZDR route; explicit privacy exception required |
+
 ## Multi-page follow-up
 
 The quality follow-up uses eight sections, eight German Apple voices, 995
@@ -41,8 +52,13 @@ contract smoke test.
 | Raw Whisper | n/a | 6.03% | n/a | n/a |
 | Qwen 3.5 122B-A10B | Passed; unsupported changes to `5.0` and `2025` | 2.51% | 6 / 1 / 1 | $0.0254754 |
 | GPT-5.6 Sol | Failed; one output change missing from its edit ledger | 0.50% | 6 / 2 / 0 | $0.2455266 |
-| Claude Sonnet 4.6 | Passed | 3.12% | 5 / 3 / 0 | $0.1521399 |
+| Claude Sonnet 4.6 (historical) | Passed | 3.12% | 5 / 3 / 0 | $0.1521399 |
+| Gemini 3.6 Flash | Failed; one output change missing from its edit ledger, one regressed section | 0.90% | 6 / 1 / 1 | $0.0716760 |
+| Kimi K3 | Passed | 2.31% | 6 / 2 / 0 | $0.1387416 |
+| GPT-5.6 Luna | Failed; all six output changes missing from its edit ledger | 5.43% | 1 / 7 / 0 | $0.0294822 |
+| Claude Sonnet 5 | Passed | 2.81% | 5 / 3 / 0 | $0.1449660 |
 | Mistral Small 3.2 24B | Blocked twice by pinned Parasail endpoint HTTP 429 | — | — | not recorded |
+| Qwen3.7 Max | Blocked because the only cataloged endpoint was not ZDR | — | — | not run |
 
 The full methodology, per-error interpretation, and decision boundary are in
 [`postprocessing-long-form-evaluation.md`](../../docs/postprocessing-long-form-evaluation.md).
@@ -54,6 +70,11 @@ capability, so these runs are not directly identical to the local prompt-only
 MLX structured-output attempts. The repository still parses the JSON, derives
 the lexical diff independently, verifies that every lexical edit was reported,
 and checks protected spans.
+
+Qwen3.7 Max is deliberately not an implicit exception to that policy. Its
+blocker record captures the 2026-07-22 catalog state. A one-time run may be
+added only after explicit approval and must remain pinned to the public
+synthetic fixture, deny provider data collection, and disable fallback.
 
 The fixture's evaluation reference is never sent to the model. Its diagnostic
 WER remains development-only because the dataset transcript is unverified. A

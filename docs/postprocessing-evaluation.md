@@ -113,6 +113,14 @@ it is not a quality ranking or a reason to ship a hosted provider. The strict
 gateway schema also makes this a hosted product-capability result rather than a
 directly identical replay of the prompt-only local MLX attempts.
 
+The subsequent long-form screen retains those records as historical controls
+and adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Luna, and Claude Sonnet 5. Sonnet 5,
+not 4.6, is the active Anthropic comparison. Kimi and Sonnet 5 pass the complete
+contract without a section regression; Gemini is more accurate but makes one
+unsupported factual correction, and Luna barely improves the transcript.
+Qwen3.7 Max remains unexecuted because the captured catalog offered no ZDR
+route.
+
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus
 their source-grouped development/validation/test discipline are defined in
