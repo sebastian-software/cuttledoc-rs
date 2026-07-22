@@ -225,6 +225,53 @@ function invalidOutput(text, edits, error, sections = null) {
   };
 }
 
+function isSectionedContract(structuredOutputContract) {
+  return [
+    'bounded-transcript-sections-v1',
+    'bounded-transcript-sections-local-diff-v2',
+  ].includes(structuredOutputContract);
+}
+
+function usesLocalAuthoritativeDiff(structuredOutputContract) {
+  return structuredOutputContract ===
+    'bounded-transcript-sections-local-diff-v2';
+}
+
+function protectedSpansUnchanged(fixture, text) {
+  const inputWords = normalizedWords(fixture.transcript);
+  const outputWords = normalizedWords(text);
+  return (fixture.protected_spans ?? []).every((span) => {
+    const words = normalizedWords(span);
+    return countSequence(inputWords, words) === countSequence(outputWords, words);
+  });
+}
+
+function parseLocalDiffCorrectionObject(parsed, fixture) {
+  if (parsed === null || Array.isArray(parsed) ||
+      typeof parsed !== 'object' || typeof parsed.text !== 'string') {
+    return invalidOutput(
+      '',
+      null,
+      'output must be an object with a string text field',
+    );
+  }
+  return {
+    text: parsed.text,
+    reported_edits: null,
+    parser: { valid: true, error: null },
+    audit: {
+      lexical_edits_fully_reported: null,
+      protected_spans_unchanged: protectedSpansUnchanged(
+        fixture,
+        parsed.text,
+      ),
+      reported_lexical_edit_count: null,
+      section_ids_preserved: null,
+      authoritative_diff_source: 'repository-local-input-output-diff',
+    },
+  };
+}
+
 function parseCorrectionObject(parsed, fixture) {
   if (parsed === null || Array.isArray(parsed) ||
       typeof parsed !== 'object' || typeof parsed.text !== 'string') {
@@ -259,21 +306,19 @@ function parseCorrectionObject(parsed, fixture) {
     parsed.text,
     parsed.edits,
   );
-  const inputWords = normalizedWords(fixture.transcript);
-  const outputWords = normalizedWords(parsed.text);
-  const protectedSpansUnchanged = (fixture.protected_spans ?? []).every((span) => {
-    const words = normalizedWords(span);
-    return countSequence(inputWords, words) === countSequence(outputWords, words);
-  });
   return {
     text: parsed.text,
     reported_edits: parsed.edits,
     parser: { valid: true, error: null },
     audit: {
       lexical_edits_fully_reported: reported.fullyReported,
-      protected_spans_unchanged: protectedSpansUnchanged,
+      protected_spans_unchanged: protectedSpansUnchanged(
+        fixture,
+        parsed.text,
+      ),
       reported_lexical_edit_count: reported.reportedLexicalEditCount,
       section_ids_preserved: null,
+      authoritative_diff_source: 'model-authored-edit-ledger-audited-locally',
     },
   };
 }
@@ -285,9 +330,12 @@ function parseOutput(rawText, fixture, structuredOutputContract) {
   } catch (error) {
     return invalidOutput('', null, error.message);
   }
-  if (structuredOutputContract !== 'bounded-transcript-sections-v1') {
+  if (!isSectionedContract(structuredOutputContract)) {
     return parseCorrectionObject(parsed, fixture);
   }
+  const localAuthoritativeDiff = usesLocalAuthoritativeDiff(
+    structuredOutputContract,
+  );
   if (parsed === null || Array.isArray(parsed) || typeof parsed !== 'object' ||
       !Array.isArray(parsed.sections)) {
     return invalidOutput('', null, 'output must contain a sections array');
@@ -306,7 +354,9 @@ function parseOutput(rawText, fixture, structuredOutputContract) {
   }
 
   const sections = parsed.sections.map((section, index) => {
-    const corrected = parseCorrectionObject(section, fixture.sections[index]);
+    const corrected = localAuthoritativeDiff
+      ? parseLocalDiffCorrectionObject(section, fixture.sections[index])
+      : parseCorrectionObject(section, fixture.sections[index]);
     const inputWer = wordErrorRate(
       fixture.sections[index].evaluation_reference,
       fixture.sections[index].transcript,
@@ -337,19 +387,28 @@ function parseOutput(rawText, fixture, structuredOutputContract) {
   }
   return {
     text: sections.map((section) => section.text.trim()).join('\n\n'),
-    reported_edits: sections.flatMap((section) => section.reported_edits),
+    reported_edits: localAuthoritativeDiff
+      ? null
+      : sections.flatMap((section) => section.reported_edits),
     sections,
     parser: { valid: true, error: null },
     audit: {
-      lexical_edits_fully_reported: sections.every((section) =>
-        section.audit.lexical_edits_fully_reported),
+      lexical_edits_fully_reported: localAuthoritativeDiff
+        ? null
+        : sections.every((section) =>
+          section.audit.lexical_edits_fully_reported),
       protected_spans_unchanged: sections.every((section) =>
         section.audit.protected_spans_unchanged),
-      reported_lexical_edit_count: sections.reduce(
-        (sum, section) => sum + section.audit.reported_lexical_edit_count,
-        0,
-      ),
+      reported_lexical_edit_count: localAuthoritativeDiff
+        ? null
+        : sections.reduce(
+          (sum, section) => sum + section.audit.reported_lexical_edit_count,
+          0,
+        ),
       section_ids_preserved: true,
+      authoritative_diff_source: localAuthoritativeDiff
+        ? 'repository-local-input-output-diff'
+        : 'model-authored-edit-ledger-audited-locally',
     },
   };
 }
@@ -389,6 +448,9 @@ function renderPrompt(template, fixture, contract) {
 }
 
 function correctionSchema(numericBounds, structuredOutputContract) {
+  const localAuthoritativeDiff = usesLocalAuthoritativeDiff(
+    structuredOutputContract,
+  );
   const confidence = { type: 'number' };
   if (numericBounds) {
     confidence.minimum = 0;
@@ -426,9 +488,27 @@ function correctionSchema(numericBounds, structuredOutputContract) {
       },
     },
   };
-  if (structuredOutputContract !== 'bounded-transcript-sections-v1') {
+  if (!isSectionedContract(structuredOutputContract)) {
     return correction;
   }
+  const sectionCorrection = localAuthoritativeDiff
+    ? {
+      type: 'object',
+      additionalProperties: false,
+      required: ['id', 'text'],
+      properties: {
+        id: { type: 'string' },
+        text: { type: 'string' },
+      },
+    }
+    : {
+      ...correction,
+      required: ['id', 'text', 'edits'],
+      properties: {
+        id: { type: 'string' },
+        ...correction.properties,
+      },
+    };
   return {
     type: 'object',
     additionalProperties: false,
@@ -436,14 +516,7 @@ function correctionSchema(numericBounds, structuredOutputContract) {
     properties: {
       sections: {
         type: 'array',
-        items: {
-          ...correction,
-          required: ['id', 'text', 'edits'],
-          properties: {
-            id: { type: 'string' },
-            ...correction.properties,
-          },
-        },
+        items: sectionCorrection,
       },
     },
   };
@@ -645,8 +718,13 @@ async function main() {
   const nonempty = correctedText.length > 0;
   const lexicalInvariant = normalizedWords(correctedText).join('\n') ===
     normalizedWords(fixture.transcript).join('\n');
+  const modelAuthoredEditLedgerRequired = !usesLocalAuthoritativeDiff(
+    contract.structured_output_contract,
+  );
+  const editLedgerAccepted = !modelAuthoredEditLedgerRequired ||
+    parsed.audit.lexical_edits_fully_reported === true;
   const mechanicallyAccepted = nonempty && parsed.parser.valid &&
-    parsed.audit.lexical_edits_fully_reported &&
+    editLedgerAccepted &&
     parsed.audit.protected_spans_unchanged;
   const requests = [first.evidence, repeat.evidence];
   const costs = requests.map((request) => request.usage.cost_usd);
@@ -752,6 +830,11 @@ async function main() {
         policy_mode: contract.policy_mode,
         nonempty,
         case_and_punctuation_insensitive_lexical_invariant: lexicalInvariant,
+        model_authored_edit_ledger_required: modelAuthoredEditLedgerRequired,
+        authoritative_diff_source: parsed.audit.authoritative_diff_source ??
+          (modelAuthoredEditLedgerRequired
+            ? 'model-authored-edit-ledger-audited-locally'
+            : 'repository-local-input-output-diff'),
         accepted: mechanicallyAccepted,
         quality_accepted: false,
       },
@@ -798,4 +881,71 @@ async function main() {
   }));
 }
 
-await main();
+function selfTest() {
+  const fixture = {
+    transcript: 'Model 7 bleibt.\n\nNoch ein Satz.',
+    evaluation_reference: 'Modell 7 bleibt.\n\nNoch ein Satz.',
+    sections: [
+      {
+        id: 'technical-a',
+        transcript: 'Model 7 bleibt.',
+        evaluation_reference: 'Modell 7 bleibt.',
+        protected_spans: ['7'],
+      },
+      {
+        id: 'native-a',
+        transcript: 'Noch ein Satz.',
+        evaluation_reference: 'Noch ein Satz.',
+        protected_spans: [],
+      },
+    ],
+  };
+  const contract = 'bounded-transcript-sections-local-diff-v2';
+  const parsed = parseOutput(JSON.stringify({
+    sections: [
+      { id: 'technical-a', text: 'Modell 7 bleibt.' },
+      { id: 'native-a', text: 'Noch ein Satz.' },
+    ],
+  }), fixture, contract);
+  if (!parsed.parser.valid || parsed.reported_edits !== null ||
+      parsed.audit.lexical_edits_fully_reported !== null ||
+      parsed.audit.reported_lexical_edit_count !== null ||
+      parsed.audit.protected_spans_unchanged !== true ||
+      parsed.audit.section_ids_preserved !== true ||
+      parsed.audit.authoritative_diff_source !==
+        'repository-local-input-output-diff' ||
+      parsed.sections[0].lexical_diff.edit_distance !== 1) {
+    throw new Error('local-diff v2 self-test failed');
+  }
+  const changedProtectedSpan = parseOutput(JSON.stringify({
+    sections: [
+      { id: 'technical-a', text: 'Modell 8 bleibt.' },
+      { id: 'native-a', text: 'Noch ein Satz.' },
+    ],
+  }), fixture, contract);
+  if (changedProtectedSpan.audit.protected_spans_unchanged !== false) {
+    throw new Error('local-diff v2 failed to protect a pinned span');
+  }
+  const reordered = parseOutput(JSON.stringify({
+    sections: [
+      { id: 'native-a', text: 'Noch ein Satz.' },
+      { id: 'technical-a', text: 'Modell 7 bleibt.' },
+    ],
+  }), fixture, contract);
+  if (reordered.parser.valid !== false) {
+    throw new Error('local-diff v2 accepted reordered section ids');
+  }
+  const schema = correctionSchema(true, contract);
+  const required = schema.properties.sections.items.required;
+  if (!required.includes('id') || !required.includes('text') ||
+      required.includes('edits')) {
+    throw new Error('local-diff v2 response schema still requires an edit ledger');
+  }
+  console.log('Validated OpenRouter local-diff v2 runner contract');
+}
+
+if (process.argv.length === 3 && process.argv[2] === '--self-test') {
+  selfTest();
+} else {
+  await main();
+}

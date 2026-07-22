@@ -83,6 +83,7 @@ jobs:
         run: |
           node scripts/validate-text-generation-openrouter-reference.mjs --self-test
           node --check spikes/text-generation-openrouter-reference/run_reference.mjs
+          node spikes/text-generation-openrouter-reference/run_reference.mjs --self-test
       - name: Validate factorial postprocessing matrix
         run: |
           node scripts/generate-postprocessing-factorial-matrix.mjs --check

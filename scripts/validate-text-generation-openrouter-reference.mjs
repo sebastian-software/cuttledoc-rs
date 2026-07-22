@@ -290,6 +290,11 @@ function validateExperimentShape(experiment) {
       outputMode: 'json-section-edits',
       inputField: 'sections',
     },
+    'bounded-transcript-sections-local-diff-v2': {
+      promptId: 'conservative-sections-local-diff-v2',
+      outputMode: 'json-section-text',
+      inputField: 'sections',
+    },
   };
   const profile = contractProfiles[contract?.structured_output_contract];
   if (experiment.schema_version !== '1.0.0' || !(experiment.id?.length > 0)) {
@@ -354,8 +359,14 @@ async function validateExperiment(experiment, path) {
         experiment.generation_contract.prompt_id) {
     errors.push('candidate, prompt, or hidden-reference fixture is invalid');
   }
-  const sectioned = experiment.generation_contract.structured_output_contract ===
-    'bounded-transcript-sections-v1';
+  const structuredOutputContract =
+    experiment.generation_contract.structured_output_contract;
+  const sectioned = [
+    'bounded-transcript-sections-v1',
+    'bounded-transcript-sections-local-diff-v2',
+  ].includes(structuredOutputContract);
+  const localAuthoritativeDiff = structuredOutputContract ===
+    'bounded-transcript-sections-local-diff-v2';
   if (sectioned) {
     const sections = fixture.sections;
     const ids = sections?.map((section) => section.id) ?? [];
@@ -507,20 +518,38 @@ async function validateExperiment(experiment, path) {
             ? 0
             : outputDiff.edit_distance / denominator;
           const storedWer = section.diagnostic_wer;
+          const expectedLexicalEditsFullyReported = localAuthoritativeDiff
+            ? null
+            : audited.lexicalEditsFullyReported;
+          const expectedReportedLexicalEditCount = localAuthoritativeDiff
+            ? null
+            : audited.reportedLexicalEditCount;
           const recordValid = sha256(section.text ?? '') === section.text_sha256 &&
             section.parser?.valid === true &&
             section.audit?.lexical_edits_fully_reported ===
-              audited.lexicalEditsFullyReported &&
+              expectedLexicalEditsFullyReported &&
             section.audit?.protected_spans_unchanged ===
               audited.protectedSpansUnchanged &&
             section.audit?.reported_lexical_edit_count ===
-              audited.reportedLexicalEditCount &&
+              expectedReportedLexicalEditCount &&
+            (!localAuthoritativeDiff ||
+              (section.reported_edits === null &&
+               section.audit?.authoritative_diff_source ===
+                'repository-local-input-output-diff')) &&
             JSON.stringify(section.lexical_diff) ===
               JSON.stringify(audited.diff) &&
             storedWer?.input === inputWer &&
             storedWer?.output === outputWer &&
             storedWer?.delta === outputWer - inputWer;
-          return { audited, recordValid };
+          return {
+            audited: {
+              ...audited,
+              lexicalEditsFullyReported:
+                expectedLexicalEditsFullyReported,
+              reportedLexicalEditCount: expectedReportedLexicalEditCount,
+            },
+            recordValid,
+          };
         })
         : [];
       sectionAudit = {
@@ -547,7 +576,15 @@ async function validateExperiment(experiment, path) {
       errors.push('sectioned result requires section-level output records');
     }
     const audit = parsedOutputValid
-      ? external
+      ? {
+        ...external,
+        lexicalEditsFullyReported: localAuthoritativeDiff
+          ? null
+          : external.lexicalEditsFullyReported,
+        reportedLexicalEditCount: localAuthoritativeDiff
+          ? null
+          : external.reportedLexicalEditCount,
+      }
       : {
         diff: external.diff,
         lexicalEditsFullyReported: false,
@@ -563,7 +600,8 @@ async function validateExperiment(experiment, path) {
     }
     const expectedAccepted = outputText.length > 0 &&
       parsedOutputValid &&
-      audit.lexicalEditsFullyReported && audit.protectedSpansUnchanged &&
+      (localAuthoritativeDiff || audit.lexicalEditsFullyReported) &&
+      audit.protectedSpansUnchanged &&
       (!sectioned || sectionAudit?.idsPreserved === true);
     if (sha256(outputText) !== run.output?.text_sha256 ||
         sha256(rawText) !== run.output?.raw_text_sha256 ||
@@ -573,6 +611,13 @@ async function validateExperiment(experiment, path) {
           audit.protectedSpansUnchanged ||
         run.output?.audit?.reported_lexical_edit_count !==
           audit.reportedLexicalEditCount ||
+        (localAuthoritativeDiff &&
+          (run.output?.reported_edits !== null ||
+           run.output?.audit?.authoritative_diff_source !==
+            'repository-local-input-output-diff' ||
+           run.output?.gates?.model_authored_edit_ledger_required !== false ||
+           run.output?.gates?.authoritative_diff_source !==
+            'repository-local-input-output-diff')) ||
         (sectioned && run.output?.audit?.section_ids_preserved !== true) ||
         JSON.stringify(run.output?.lexical_diff) !== JSON.stringify(audit.diff) ||
         run.output?.gates?.policy_mode !== 'bounded-lexical' ||
