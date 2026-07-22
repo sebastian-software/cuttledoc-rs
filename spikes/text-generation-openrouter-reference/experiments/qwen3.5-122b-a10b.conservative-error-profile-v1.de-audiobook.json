@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "id": "qwen3.5-122b-a10b-openrouter.conservative-error-profile-v1.de-audiobook",
-  "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/qwen3.5-122b-a10b-alibaba.json",
+  "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/qwen3.5-122b-a10b-atlas-cloud.json",
   "generation_contract": {
     "prompt_id": "conservative-error-profile-v1",
     "policy_mode": "bounded-lexical",
@@ -25,10 +25,10 @@
     "rationale": "Screen a substantially larger open-weight model with hidden-reference context and the same external lexical audit used by the local matrix."
   },
   "result_contract": {
-    "run_id": "phase6.qwen3.5-122b-a10b-openrouter-alibaba.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+    "run_id": "phase6.qwen3.5-122b-a10b-openrouter-atlas-cloud.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
     "purpose": "development-quality-screen",
     "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json",
-    "result_path": "benchmarks/postprocessing/runs/phase6.qwen3.5-122b-a10b-openrouter-alibaba.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
+    "result_path": "benchmarks/postprocessing/runs/phase6.qwen3.5-122b-a10b-openrouter-atlas-cloud.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
     "result_required": false
   }
 }

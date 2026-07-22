@@ -9,10 +9,10 @@ constant while varying four model/provider tuples:
 
 | Role | Model | Pinned provider |
 | --- | --- | --- |
-| Large open-weight candidate | Qwen 3.5 122B-A10B | Alibaba |
-| Multilingual open-weight candidate | Mistral Small 3.2 24B | Mistral |
-| Frontier ceiling | GPT-5.6 Sol | OpenAI |
-| Second frontier-family ceiling | Claude Sonnet 4.6 | Anthropic |
+| Large open-weight candidate | Qwen 3.5 122B-A10B | AtlasCloud FP8 |
+| Multilingual open-weight candidate | Mistral Small 3.2 24B | Parasail BF16 |
+| Frontier ceiling | GPT-5.6 Sol | Azure EU |
+| Second frontier-family ceiling | Claude Sonnet 4.6 | Bedrock EU West 1 |
 
 Every request disables provider fallback, requires all requested parameters,
 denies data collection, and requires a zero-data-retention route. The gateway
@@ -39,7 +39,7 @@ revision=$(git rev-parse HEAD)
 
 node --env-file=.env.local \
   spikes/text-generation-openrouter-reference/run_reference.mjs \
-  --manifest spikes/text-generation-openrouter-reference/candidates/qwen3.5-122b-a10b-alibaba.json \
+  --manifest spikes/text-generation-openrouter-reference/candidates/qwen3.5-122b-a10b-atlas-cloud.json \
   --experiment spikes/text-generation-openrouter-reference/experiments/qwen3.5-122b-a10b.conservative-error-profile-v1.de-audiobook.json \
   --fixture benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json \
   --prompt benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt \

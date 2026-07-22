@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "mistral-small-3.2-24b-openrouter-mistral",
+  "id": "mistral-small-3.2-24b-openrouter-parasail",
   "task": "text-generation",
   "candidate_role": "multilingual-open-weight-quality-candidate",
   "model": {
@@ -15,16 +15,16 @@
     "weights": "open",
     "license": "Apache-2.0",
     "context_tokens": 131072,
-    "identity_limit": "The official Mistral provider serves the named release, but the hosted artifact and serving implementation are opaque to this repository."
+    "identity_limit": "Parasail serves the named release, but the hosted BF16 artifact and serving implementation are opaque to this repository."
   },
   "gateway": {
     "name": "OpenRouter",
     "endpoint": "https://openrouter.ai/api/v1/chat/completions",
     "catalog_captured_at": "2026-07-22",
-    "provider_slug": "mistral",
-    "provider_name": "Mistral",
-    "endpoint_tag": "mistral",
-    "endpoint_identity": "Mistral | mistralai/mistral-small-3.2-24b-instruct-2506",
+    "provider_slug": "parasail",
+    "provider_name": "Parasail",
+    "endpoint_tag": "parasail/bf16",
+    "endpoint_identity": "Parasail | mistralai/mistral-small-3.2-24b-instruct-2506",
     "supported_parameters": [
       "max_tokens",
       "temperature",
@@ -35,7 +35,7 @@
     ],
     "request_policy": {
       "only": [
-        "mistral"
+        "parasail"
       ],
       "allow_fallbacks": false,
       "require_parameters": true,
@@ -43,9 +43,9 @@
       "zdr": true
     },
     "pricing_snapshot_usd_per_token": {
-      "prompt": "0.0000001",
+      "prompt": "0.00000009",
       "completion": "0.0000003",
-      "input_cache_read": "0.00000001"
+      "input_cache_read": "0.00000005"
     }
   },
   "request_defaults": {

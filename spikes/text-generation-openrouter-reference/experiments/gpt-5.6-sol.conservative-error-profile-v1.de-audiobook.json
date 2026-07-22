@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "id": "gpt-5.6-sol-openrouter.conservative-error-profile-v1.de-audiobook",
-  "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-sol-openai.json",
+  "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-sol-azure-eu.json",
   "generation_contract": {
     "prompt_id": "conservative-error-profile-v1",
     "policy_mode": "bounded-lexical",
@@ -25,10 +25,10 @@
     "rationale": "Measure a frontier ceiling for the bounded correction task without treating a paid API as the product runtime."
   },
   "result_contract": {
-    "run_id": "phase6.gpt-5.6-sol-openrouter-openai.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+    "run_id": "phase6.gpt-5.6-sol-openrouter-azure-eu.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
     "purpose": "development-quality-screen",
     "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json",
-    "result_path": "benchmarks/postprocessing/runs/phase6.gpt-5.6-sol-openrouter-openai.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
+    "result_path": "benchmarks/postprocessing/runs/phase6.gpt-5.6-sol-openrouter-azure-eu.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
     "result_required": false
   }
 }

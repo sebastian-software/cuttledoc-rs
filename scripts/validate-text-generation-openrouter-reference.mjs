@@ -193,7 +193,7 @@ function validateCandidateShape(candidate) {
   if (gateway?.name !== 'OpenRouter' ||
       gateway?.endpoint !== 'https://openrouter.ai/api/v1/chat/completions' ||
       !/^\d{4}-\d{2}-\d{2}$/.test(gateway?.catalog_captured_at ?? '') ||
-      !/^[a-z0-9-]+$/.test(gateway?.provider_slug ?? '') ||
+      !/^[a-z0-9/-]+$/.test(gateway?.provider_slug ?? '') ||
       !(gateway?.provider_name?.length > 0) ||
       !(gateway?.endpoint_tag?.length > 0) ||
       !(gateway?.endpoint_identity?.length > 0) ||

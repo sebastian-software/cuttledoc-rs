@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "qwen3.5-122b-a10b-openrouter-alibaba",
+  "id": "qwen3.5-122b-a10b-openrouter-atlas-cloud",
   "task": "text-generation",
   "candidate_role": "large-open-weight-quality-candidate",
   "model": {
@@ -15,16 +15,16 @@
     "weights": "open",
     "license": "Apache-2.0",
     "context_tokens": 262144,
-    "identity_limit": "OpenRouter and Alibaba expose the named upstream model, but the hosted artifact and serving implementation are opaque to this repository."
+    "identity_limit": "OpenRouter and AtlasCloud expose the named upstream model, but the hosted FP8 artifact and serving implementation are opaque to this repository."
   },
   "gateway": {
     "name": "OpenRouter",
     "endpoint": "https://openrouter.ai/api/v1/chat/completions",
     "catalog_captured_at": "2026-07-22",
-    "provider_slug": "alibaba",
-    "provider_name": "Alibaba",
-    "endpoint_tag": "alibaba",
-    "endpoint_identity": "Alibaba | qwen/qwen3.5-122b-a10b-20260224",
+    "provider_slug": "atlas-cloud",
+    "provider_name": "AtlasCloud",
+    "endpoint_tag": "atlas-cloud/fp8",
+    "endpoint_identity": "AtlasCloud | qwen/qwen3.5-122b-a10b-20260224",
     "supported_parameters": [
       "reasoning",
       "include_reasoning",
@@ -37,7 +37,7 @@
     ],
     "request_policy": {
       "only": [
-        "alibaba"
+        "atlas-cloud"
       ],
       "allow_fallbacks": false,
       "require_parameters": true,
@@ -45,9 +45,9 @@
       "zdr": true
     },
     "pricing_snapshot_usd_per_token": {
-      "prompt": "0.00000026",
-      "completion": "0.00000208",
-      "discount": "0.35"
+      "prompt": "0.0000003",
+      "completion": "0.0000024",
+      "input_cache_read": "0.0000003"
     }
   },
   "request_defaults": {
