@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-local-qualification.schema.json",
+  "title": "Cuttledoc local factorial TTS qualification report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "evidence_source_revision",
+    "evidence_captured_through",
+    "qualification_slice",
+    "policy",
+    "aggregates",
+    "voices",
+    "disposition",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "evidence_source_revision": { "$ref": "#/$defs/gitSha" },
+    "evidence_captured_through": { "type": "string", "format": "date-time" },
+    "qualification_slice": {
+      "type": "object",
+      "required": [
+        "tts_engine",
+        "passage_selector",
+        "generation_repeat",
+        "voice_count",
+        "audio_count",
+        "stt_count"
+      ],
+      "properties": {
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_selector": { "$ref": "#/$defs/nonEmptyString" },
+        "generation_repeat": { "type": "integer", "minimum": 1 },
+        "voice_count": { "type": "integer", "minimum": 1 },
+        "audio_count": { "type": "integer", "minimum": 1 },
+        "stt_count": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "policy": { "type": "object" },
+    "aggregates": {
+      "type": "object",
+      "required": ["by_stt_model", "by_locale"],
+      "properties": {
+        "by_stt_model": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/aggregate" }
+        },
+        "by_locale": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/aggregate" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "voices": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/voice" }
+    },
+    "disposition": {
+      "enum": ["technical-gate-passed", "technical-gate-failed"]
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "aggregate": {
+      "type": "object",
+      "required": [
+        "observation_count",
+        "mean_wer",
+        "minimum_wer",
+        "maximum_wer",
+        "mean_cer"
+      ],
+      "properties": {
+        "stt_model": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "observation_count": { "type": "integer", "minimum": 1 },
+        "mean_wer": { "type": "number", "minimum": 0 },
+        "minimum_wer": { "type": "number", "minimum": 0 },
+        "maximum_wer": { "type": "number", "minimum": 0 },
+        "mean_cer": { "type": "number", "minimum": 0 }
+      },
+      "oneOf": [
+        { "required": ["stt_model"] },
+        { "required": ["locale"] }
+      ],
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "stt_model",
+        "transcript_sha256",
+        "transcript_word_count",
+        "wer",
+        "cer",
+        "inference_ms"
+      ],
+      "properties": {
+        "stt_model": { "$ref": "#/$defs/nonEmptyString" },
+        "transcript_sha256": { "$ref": "#/$defs/sha256" },
+        "transcript_word_count": { "type": "integer", "minimum": 0 },
+        "wer": { "type": "number", "minimum": 0 },
+        "cer": { "type": "number", "minimum": 0 },
+        "inference_ms": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "voice": {
+      "type": "object",
+      "required": [
+        "voice_slot_id",
+        "locale",
+        "passage_slot_id",
+        "passage_id",
+        "identifier",
+        "resolved_locale",
+        "name",
+        "audio_unit_id",
+        "master_sha256",
+        "normalized_sha256",
+        "duration_ms",
+        "sample_rate_hz",
+        "rms",
+        "non_finite_sample_count",
+        "best_wer",
+        "worst_wer",
+        "observations",
+        "technical_gate"
+      ],
+      "properties": {
+        "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_id": { "$ref": "#/$defs/nonEmptyString" },
+        "identifier": { "$ref": "#/$defs/nonEmptyString" },
+        "resolved_locale": { "$ref": "#/$defs/nonEmptyString" },
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "audio_unit_id": { "$ref": "#/$defs/nonEmptyString" },
+        "master_sha256": { "$ref": "#/$defs/sha256" },
+        "normalized_sha256": { "$ref": "#/$defs/sha256" },
+        "duration_ms": { "type": "number", "exclusiveMinimum": 0 },
+        "sample_rate_hz": { "type": "integer", "minimum": 1 },
+        "rms": { "type": "number", "minimum": 0 },
+        "non_finite_sample_count": { "type": "integer", "minimum": 0 },
+        "best_wer": { "type": "number", "minimum": 0 },
+        "worst_wer": { "type": "number", "minimum": 0 },
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/observation" }
+        },
+        "technical_gate": { "enum": ["passed", "failed"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

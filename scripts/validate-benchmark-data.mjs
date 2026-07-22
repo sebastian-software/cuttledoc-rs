@@ -4198,6 +4198,10 @@ const schemaPaths = [
     repoRoot,
     'benchmarks/schema/postprocessing-factorial-local-stt.schema.json',
   ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-local-qualification.schema.json',
+  ),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);

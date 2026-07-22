@@ -204,7 +204,15 @@ same persisted normalized PCM digest:
 ```sh
 node scripts/run-postprocessing-factorial-local.mjs run-stt \
   --qualification-only --backend all
+node scripts/run-postprocessing-factorial-local.mjs summarize-qualification
 ```
+
+The summary command keeps raw audio and transcripts in the ignored artifact
+directory, but writes a compact, digest-pinned qualification report to
+`benchmarks/postprocessing/qualifications`. This first gate only detects broken
+or unintelligible synthesis before expansion. It deliberately retains
+recognizer disagreement and does not turn a single synthetic passage into an
+engine ranking or a claim about human podcast and audiobook quality.
 
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input

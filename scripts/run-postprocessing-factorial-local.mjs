@@ -41,6 +41,11 @@ const defaultParakeetVadDirectory = '/Users/sebastian/.cache/parakeet-coreml/vad
 const defaultQwenAsrBinary =
   '/private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect';
 const defaultQwenAsrModelDirectory = '/private/tmp/cuttledoc-qwen3-asr/model';
+const defaultQualificationOutput = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications/' +
+    'apple-avspeechsynthesizer.technical-a-1.json',
+);
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -100,6 +105,10 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: defaultQwenAsrModelDirectory,
     },
+    'qualification-output': {
+      type: 'string',
+      default: defaultQualificationOutput,
+    },
     locale: { type: 'string' },
     limit: { type: 'string' },
     'qualification-only': { type: 'boolean', default: false },
@@ -113,12 +122,14 @@ if (![
   'resolve-voices',
   'run-apple-tts',
   'run-stt',
+  'summarize-qualification',
   'status',
   'self-test',
 ].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
-      '<init|resolve-voices|run-apple-tts|run-stt|status|self-test> [options]',
+      '<init|resolve-voices|run-apple-tts|run-stt|' +
+      'summarize-qualification|status|self-test> [options]',
   );
 }
 
@@ -138,6 +149,7 @@ const paths = {
   parakeetVad: resolve(values['parakeet-vad-dir']),
   qwenAsrBinary: resolve(values['qwen-asr-binary']),
   qwenAsrModel: resolve(values['qwen-asr-model-dir']),
+  qualificationOutput: resolve(values['qualification-output']),
 };
 paths.state = join(paths.output, 'state.json');
 paths.lock = join(paths.output, '.run.lock');
@@ -172,6 +184,9 @@ if (command === 'self-test') {
       await runStt(state);
       await writeState(state);
       await printStatus(state);
+    } else if (command === 'summarize-qualification') {
+      const state = await initializeState();
+      await summarizeAppleQualification(state);
     }
   });
 }
@@ -676,6 +691,171 @@ async function runStt(state) {
   process.stdout.write(
     `STT completed ${completed}, resumed ${skipped}, selected ${units.length}\n`,
   );
+}
+
+async function summarizeAppleQualification(state) {
+  const ledger = await readJson(paths.ledger);
+  const qualificationAudioUnits = ledger.audio_units.filter((unit) =>
+    unit.tts_engine === 'apple-avspeechsynthesizer' &&
+    unit.passage_slot_id.endsWith('technical-a') &&
+    unit.generation_repeat === 1);
+  if (qualificationAudioUnits.length !== 10) {
+    throw new Error('expected ten Apple qualification audio units');
+  }
+
+  const audioById = new Map();
+  const capturedAt = [];
+  const sourceRevisions = new Set();
+  for (const unit of qualificationAudioUnits) {
+    const directory = join(paths.audio, unit.id);
+    if (!await validAudioArtifact(directory, unit)) {
+      throw new Error(`${unit.id}: missing or invalid qualification audio`);
+    }
+    const manifest = await readJson(join(directory, 'manifest.json'));
+    audioById.set(unit.id, manifest);
+    capturedAt.push(manifest.captured_at);
+    sourceRevisions.add(manifest.source_revision);
+  }
+
+  const expectedSttUnits = ledger.stt_units.filter((unit) =>
+    audioById.has(unit.audio_unit_id));
+  if (expectedSttUnits.length !== 30) {
+    throw new Error('expected thirty Apple qualification STT units');
+  }
+  const sttByAudio = new Map();
+  for (const unit of expectedSttUnits) {
+    const directory = join(paths.stt, unit.id);
+    if (!await validSttArtifact(directory, unit)) {
+      throw new Error(`${unit.id}: missing or invalid qualification transcript`);
+    }
+    const manifest = await readJson(join(directory, 'manifest.json'));
+    if (!sttByAudio.has(unit.audio_unit_id)) {
+      sttByAudio.set(unit.audio_unit_id, []);
+    }
+    sttByAudio.get(unit.audio_unit_id).push(manifest);
+    capturedAt.push(manifest.captured_at);
+    sourceRevisions.add(manifest.source_revision);
+  }
+  if (sourceRevisions.size !== 1) {
+    throw new Error('qualification artifacts span multiple source revisions');
+  }
+
+  const maximumBestReceiverWer = 0.2;
+  const minimumMasterRms = 0.01;
+  const voices = qualificationAudioUnits.map((unit) => {
+    const audio = audioById.get(unit.id);
+    const observations = sttByAudio.get(unit.id)
+      .sort((left, right) =>
+        left.unit.stt_model.localeCompare(right.unit.stt_model))
+      .map((manifest) => ({
+        stt_model: manifest.unit.stt_model,
+        transcript_sha256: manifest.transcript.sha256,
+        transcript_word_count: manifest.transcript.word_count,
+        wer: manifest.quality.wer,
+        cer: manifest.quality.cer,
+        inference_ms: manifest.runtime.inference_ms,
+      }));
+    const bestWer = Math.min(...observations.map((item) => item.wer));
+    const passes =
+      audio.audio.non_finite_sample_count === 0 &&
+      audio.audio.rms >= minimumMasterRms &&
+      observations.length === 3 &&
+      bestWer <= maximumBestReceiverWer;
+    return {
+      voice_slot_id: unit.voice_slot_id,
+      locale: unit.locale,
+      passage_slot_id: unit.passage_slot_id,
+      passage_id: unit.passage_id,
+      identifier: audio.voice.identifier,
+      resolved_locale: audio.voice.resolved_locale,
+      name: audio.voice.inventory.name,
+      audio_unit_id: unit.id,
+      master_sha256: audio.audio.sha256,
+      normalized_sha256: audio.normalized_audio.sha256,
+      duration_ms: audio.audio.duration_ms,
+      sample_rate_hz: audio.audio.sample_rate_hz,
+      rms: audio.audio.rms,
+      non_finite_sample_count: audio.audio.non_finite_sample_count,
+      best_wer: bestWer,
+      worst_wer: Math.max(...observations.map((item) => item.wer)),
+      observations,
+      technical_gate: passes ? 'passed' : 'failed',
+    };
+  }).sort((left, right) =>
+    left.voice_slot_id.localeCompare(right.voice_slot_id));
+  const observations = voices.flatMap((voice) => voice.observations.map(
+    (observation) => ({ ...observation, locale: voice.locale }),
+  ));
+  const report = {
+    schema_version: '1.0.0',
+    id: 'apple-avspeechsynthesizer-technical-a-qualification-1',
+    plan_id: state.plan_id,
+    plan_revision: state.plan_revision,
+    source_selection_revision: state.source_selection_revision,
+    evidence_source_revision: [...sourceRevisions][0],
+    evidence_captured_through: capturedAt.sort().at(-1),
+    qualification_slice: {
+      tts_engine: 'apple-avspeechsynthesizer',
+      passage_selector: '*-technical-a',
+      generation_repeat: 1,
+      voice_count: voices.length,
+      audio_count: voices.length,
+      stt_count: observations.length,
+    },
+    policy: {
+      purpose: 'catastrophic technical screen before factorial expansion',
+      minimum_master_rms: minimumMasterRms,
+      maximum_non_finite_samples: 0,
+      required_stt_models_per_voice: 3,
+      maximum_best_receiver_wer: maximumBestReceiverWer,
+      receiver_rule:
+        'At least one locked STT receiver must meet the WER threshold; ' +
+        'receiver disagreement is retained as evidence, not used to reject ' +
+        'an otherwise intelligible voice.',
+    },
+    aggregates: {
+      by_stt_model: groupedQualificationMetrics(observations, 'stt_model'),
+      by_locale: groupedQualificationMetrics(observations, 'locale'),
+    },
+    voices,
+    disposition: voices.every((voice) => voice.technical_gate === 'passed')
+      ? 'technical-gate-passed'
+      : 'technical-gate-failed',
+    limitations: [
+      'This is one technical passage per voice, not the factorial benchmark.',
+      'Synthetic clean speech cannot establish quality on human podcasts or audiobooks.',
+      'WER measures the complete TTS-to-STT channel and is receiver-specific.',
+      'The technical gate does not replace optional perceptual listening review.',
+    ],
+  };
+  await atomicJson(paths.qualificationOutput, report);
+  process.stdout.write(
+    `Wrote ${relative(repoRoot, paths.qualificationOutput)}: ` +
+    `${voices.length} voices, ${observations.length} STT observations, ` +
+    `${report.disposition}\n`,
+  );
+}
+
+function groupedQualificationMetrics(observations, field) {
+  const groups = new Map();
+  for (const observation of observations) {
+    const key = observation[field];
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(observation);
+  }
+  return [...groups].sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, group]) => ({
+      [field]: key,
+      observation_count: group.length,
+      mean_wer: mean(group.map((item) => item.wer)),
+      minimum_wer: Math.min(...group.map((item) => item.wer)),
+      maximum_wer: Math.max(...group.map((item) => item.wer)),
+      mean_cer: mean(group.map((item) => item.cer)),
+    }));
+}
+
+function mean(numbers) {
+  return numbers.reduce((sum, value) => sum + value, 0) / numbers.length;
 }
 
 function sttModelsForOption(option) {

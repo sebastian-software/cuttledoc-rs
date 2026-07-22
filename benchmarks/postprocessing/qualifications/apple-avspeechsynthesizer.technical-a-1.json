@@ -1,0 +1,554 @@
+{
+  "schema_version": "1.0.0",
+  "id": "apple-avspeechsynthesizer-technical-a-qualification-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-3",
+  "source_selection_revision": "synthetic-roundtrip-passages-4",
+  "evidence_source_revision": "cff7c92477d7bb82d741d1513a655adda5732207",
+  "evidence_captured_through": "2026-07-22T12:26:59.831Z",
+  "qualification_slice": {
+    "tts_engine": "apple-avspeechsynthesizer",
+    "passage_selector": "*-technical-a",
+    "generation_repeat": 1,
+    "voice_count": 10,
+    "audio_count": 10,
+    "stt_count": 30
+  },
+  "policy": {
+    "purpose": "catastrophic technical screen before factorial expansion",
+    "minimum_master_rms": 0.01,
+    "maximum_non_finite_samples": 0,
+    "required_stt_models_per_voice": 3,
+    "maximum_best_receiver_wer": 0.2,
+    "receiver_rule": "At least one locked STT receiver must meet the WER threshold; receiver disagreement is retained as evidence, not used to reject an otherwise intelligible voice."
+  },
+  "aggregates": {
+    "by_stt_model": [
+      {
+        "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+        "observation_count": 10,
+        "mean_wer": 0.09265598662604113,
+        "minimum_wer": 0.01910828025477707,
+        "maximum_wer": 0.21428571428571427,
+        "mean_cer": 0.040628327980866186
+      },
+      {
+        "stt_model": "qwen3-asr-0.6b-mlx-direct",
+        "observation_count": 10,
+        "mean_wer": 0.07213844227590174,
+        "minimum_wer": 0,
+        "maximum_wer": 0.1650485436893204,
+        "mean_cer": 0.017534678029554513
+      },
+      {
+        "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+        "observation_count": 10,
+        "mean_wer": 0.04109341472057721,
+        "minimum_wer": 0,
+        "maximum_wer": 0.1262135922330097,
+        "mean_cer": 0.006887960132010788
+      }
+    ],
+    "by_locale": [
+      {
+        "locale": "de-DE",
+        "observation_count": 6,
+        "mean_wer": 0.1116504854368932,
+        "minimum_wer": 0.019417475728155338,
+        "maximum_wer": 0.1650485436893204,
+        "mean_cer": 0.038294797687861266
+      },
+      {
+        "locale": "en-US",
+        "observation_count": 6,
+        "mean_wer": 0.04415954415954416,
+        "minimum_wer": 0.02564102564102564,
+        "maximum_wer": 0.08547008547008547,
+        "mean_cer": 0.010242085661080074
+      },
+      {
+        "locale": "es-419",
+        "observation_count": 6,
+        "mean_wer": 0.024416135881104032,
+        "minimum_wer": 0,
+        "maximum_wer": 0.09554140127388536,
+        "mean_cer": 0.01888162672476398
+      },
+      {
+        "locale": "fr-FR",
+        "observation_count": 6,
+        "mean_wer": 0.05917874396135265,
+        "minimum_wer": 0.021739130434782608,
+        "maximum_wer": 0.14492753623188406,
+        "mean_cer": 0.012463033375580905
+      },
+      {
+        "locale": "pt-BR",
+        "observation_count": 6,
+        "mean_wer": 0.10374149659863946,
+        "minimum_wer": 0.04081632653061224,
+        "maximum_wer": 0.21428571428571427,
+        "mean_cer": 0.028536733454766244
+      }
+    ]
+  },
+  "voices": [
+    {
+      "voice_slot_id": "apple-de-a",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "com.apple.voice.compact.de-DE.Anna",
+      "resolved_locale": "de-DE",
+      "name": "Anna",
+      "audio_unit_id": "audio--de-technical-a--apple-de-a--repeat-1",
+      "master_sha256": "b8852d7d0f5408642ebb621127a06b275f952b54fe7044dcdab9a32c627aefa7",
+      "normalized_sha256": "f5e88825197a742be6a4a290cee1ad15be4b09a598e2207d4316c34c2f40d0a1",
+      "duration_ms": 55144.943310657596,
+      "sample_rate_hz": 22050,
+      "rms": 0.1297662393385546,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.019417475728155338,
+      "worst_wer": 0.13592233009708737,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "55e4a8b87e27c076e897a084b9996f86dbd1f88f6352c3dbc2cc2ef67accdb7d",
+          "transcript_word_count": 106,
+          "wer": 0.13592233009708737,
+          "cer": 0.08092485549132948,
+          "inference_ms": 777.1665409999987
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "990eb23b05c463d65f2309b70eb30a79b8e1e4bb3b4813070152ce1a87d62881",
+          "transcript_word_count": 101,
+          "wer": 0.08737864077669903,
+          "cer": 0.01878612716763006,
+          "inference_ms": 1994.10225
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "fea5b610452ec5700b84e53ba6894559e3c69c04395d348c6ea279db2a40a750",
+          "transcript_word_count": 104,
+          "wer": 0.019417475728155338,
+          "cer": 0,
+          "inference_ms": 1862.3819160000003
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-de-b",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "com.apple.eloquence.de-DE.Eddy",
+      "resolved_locale": "de-DE",
+      "name": "Eddy",
+      "audio_unit_id": "audio--de-technical-a--apple-de-b--repeat-1",
+      "master_sha256": "c755177d0864a1f425ae55f0b3927c53200975a02cbf8bdfa98472f9c9165f6d",
+      "normalized_sha256": "c755177d0864a1f425ae55f0b3927c53200975a02cbf8bdfa98472f9c9165f6d",
+      "duration_ms": 57821.25,
+      "sample_rate_hz": 16000,
+      "rms": 0.07848011312525753,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.1262135922330097,
+      "worst_wer": 0.1650485436893204,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "1792cebfbbac73f1cdec98d6a8ab0f7a555b5b0a7091ffcb731e6d7f7550409c",
+          "transcript_word_count": 100,
+          "wer": 0.13592233009708737,
+          "cer": 0.036127167630057806,
+          "inference_ms": 795.4050420000021
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "b89bb2dc7ad14413b2c7ad87aad8612d0c83948335c55b349becfff7a8ea89ad",
+          "transcript_word_count": 101,
+          "wer": 0.1650485436893204,
+          "cer": 0.06502890173410404,
+          "inference_ms": 2168.934292
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "7e5032e78b6e8a72c9620252b9d5e5f4c09259d7fbed10b718dd2eaf26e5663d",
+          "transcript_word_count": 102,
+          "wer": 0.1262135922330097,
+          "cer": 0.028901734104046242,
+          "inference_ms": 2550.5437500000007
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-en-a",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "com.apple.voice.compact.en-US.Samantha",
+      "resolved_locale": "en-US",
+      "name": "Samantha",
+      "audio_unit_id": "audio--en-technical-a--apple-en-a--repeat-1",
+      "master_sha256": "fe7a454003e2028fdafaa77f1c306067dedca9a3456adb95d12dcffba0b86d68",
+      "normalized_sha256": "7ed43d12eba402314df14a4b4ce6296ac95de4d483d1ca49e75660a199bffc51",
+      "duration_ms": 50519.90929705215,
+      "sample_rate_hz": 22050,
+      "rms": 0.17075932875907565,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.02564102564102564,
+      "worst_wer": 0.042735042735042736,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "2d641aa2a16867feab70c2c33b0f26c0ef01d6fd8ae8c0be1c14d6c08be9de59",
+          "transcript_word_count": 120,
+          "wer": 0.042735042735042736,
+          "cer": 0.008379888268156424,
+          "inference_ms": 725.1185000000005
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "dc5845d733550dacfca54be28d33477f848cc037ec12e32d882dde27d8ee1bda",
+          "transcript_word_count": 118,
+          "wer": 0.03418803418803419,
+          "cer": 0.0013966480446927375,
+          "inference_ms": 1523.831209
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "bc1f54eb30099ae28790d88efd73b01ce5553498398cd0d062b18790a2e8ae4d",
+          "transcript_word_count": 119,
+          "wer": 0.02564102564102564,
+          "cer": 0,
+          "inference_ms": 1932.993957999999
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-en-b",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "com.apple.speech.synthesis.voice.Fred",
+      "resolved_locale": "en-US",
+      "name": "Fred",
+      "audio_unit_id": "audio--en-technical-a--apple-en-b--repeat-1",
+      "master_sha256": "6505d57f06c0b737d0b946846ed50694b8277561d9283c9b52166769a7bc2d6c",
+      "normalized_sha256": "262c4b3c893948ca6783d36e36326803b48a4b7239b1da1bfbafd77db201d8ad",
+      "duration_ms": 61545.80498866213,
+      "sample_rate_hz": 22050,
+      "rms": 0.09057056838647894,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.02564102564102564,
+      "worst_wer": 0.08547008547008547,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "4f210cfdb0ef1ba457aecf72ed0bc8c4e48415d420aaec7e5555b9c3baf3625c",
+          "transcript_word_count": 121,
+          "wer": 0.08547008547008547,
+          "cer": 0.046089385474860335,
+          "inference_ms": 887.6391660000008
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "eaaf7cc18d835ef88325b204998f557b08de27ec498aa58e6083a1989954f132",
+          "transcript_word_count": 119,
+          "wer": 0.05128205128205128,
+          "cer": 0.00558659217877095,
+          "inference_ms": 1587.116709
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "524c36fd37e8686bec896a70fbc7a1a5fcd9135b7a2871a270dabcfc51172be9",
+          "transcript_word_count": 119,
+          "wer": 0.02564102564102564,
+          "cer": 0,
+          "inference_ms": 2267.9492910000045
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-es-a",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "com.apple.voice.compact.es-ES.Monica",
+      "resolved_locale": "es-ES",
+      "name": "Mónica",
+      "audio_unit_id": "audio--es-technical-a--apple-es-a--repeat-1",
+      "master_sha256": "dfd3c550c0b57d9da3eb825833cfe4d33ec84ff80e7acb620b917a6bf869e976",
+      "normalized_sha256": "1110469d7f8865ccd6c7a2b9d6daa0df85840f8bd9322bc13e958794cd419322",
+      "duration_ms": 56502.63038548753,
+      "sample_rate_hz": 22050,
+      "rms": 0.1398700388244982,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.012738853503184714,
+      "worst_wer": 0.09554140127388536,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "92998594ddb8b7eb359d5b03d19078bb287d9249a0789f3017296da303687d56",
+          "transcript_word_count": 143,
+          "wer": 0.09554140127388536,
+          "cer": 0.09259259259259259,
+          "inference_ms": 774.2574170000007
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "62234ce549112c44b5523eee4fdc166d0b6884dd32946676b080400a33c6f8c6",
+          "transcript_word_count": 157,
+          "wer": 0.012738853503184714,
+          "cer": 0.006535947712418301,
+          "inference_ms": 2510.538667
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "7a2f764eb17c4cb858ec0f0bdbe539b0b1379d904410907372c6f4bd534da90f",
+          "transcript_word_count": 155,
+          "wer": 0.01910828025477707,
+          "cer": 0.0010893246187363835,
+          "inference_ms": 2640.988624999998
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-es-b",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "com.apple.voice.compact.es-MX.Paulina",
+      "resolved_locale": "es-MX",
+      "name": "Paulina",
+      "audio_unit_id": "audio--es-technical-a--apple-es-b--repeat-1",
+      "master_sha256": "6791bf0cd6cc3600b1d5ab8fe227371b037fc7a4a16286349652b27fbbc4ba38",
+      "normalized_sha256": "33e044b0d10a45633326bc2b92d446a0034febb411c082c6254b28969466b44f",
+      "duration_ms": 71805.03401360544,
+      "sample_rate_hz": 22050,
+      "rms": 0.1528700869955223,
+      "non_finite_sample_count": 0,
+      "best_wer": 0,
+      "worst_wer": 0.01910828025477707,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "c02a66b38beeef252f36deb490b8265c1f6a5190c481067a21d1b4f90787dcad",
+          "transcript_word_count": 160,
+          "wer": 0.01910828025477707,
+          "cer": 0.013071895424836602,
+          "inference_ms": 995.439833000004
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "eeec2fed255e3e7a92426f8c2076f1546f3561a165ebc25cdf17ce416feba1aa",
+          "transcript_word_count": 157,
+          "wer": 0,
+          "cer": 0,
+          "inference_ms": 2170.627125
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "74d18357677e9e8f1b523387be33539b95dd7d994e4a38ba36b804e5114134f4",
+          "transcript_word_count": 157,
+          "wer": 0,
+          "cer": 0,
+          "inference_ms": 2608.337040999999
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-fr-a",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "com.apple.voice.compact.fr-FR.Thomas",
+      "resolved_locale": "fr-FR",
+      "name": "Thomas",
+      "audio_unit_id": "audio--fr-technical-a--apple-fr-a--repeat-1",
+      "master_sha256": "08ea326149830ed97e281bc4bb3fd7bdafac18a1fc5a3835ad74de7337ed782a",
+      "normalized_sha256": "cbe49af4d9ad1f276c59a3dc2023dc048137b17bf7d1a235b8a591e20f4641bc",
+      "duration_ms": 52938.77551020408,
+      "sample_rate_hz": 22050,
+      "rms": 0.17837454573254713,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.021739130434782608,
+      "worst_wer": 0.050724637681159424,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "639e09922da3ecc75ed69aa823c56c6408adf0d357d9c8e4c66e6f9cb96959e3",
+          "transcript_word_count": 139,
+          "wer": 0.050724637681159424,
+          "cer": 0.008871989860583017,
+          "inference_ms": 758.2328750000015
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "8ceac7a6eb47e4e195bbc4c8126a4280ecf9f35a6379f14eb8bcf8b5e2a44996",
+          "transcript_word_count": 138,
+          "wer": 0.021739130434782608,
+          "cer": 0.0063371356147021544,
+          "inference_ms": 2130.897458
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "ffd96741c565e2f457fbe2900d21e9590d02eaa2187d6b049e7c16dd919890c7",
+          "transcript_word_count": 138,
+          "wer": 0.036231884057971016,
+          "cer": 0.0076045627376425855,
+          "inference_ms": 2563.9354170000006
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-fr-b",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "com.apple.voice.compact.fr-CA.Amelie",
+      "resolved_locale": "fr-CA",
+      "name": "Amélie",
+      "audio_unit_id": "audio--fr-technical-a--apple-fr-b--repeat-1",
+      "master_sha256": "aa35afec6aab2c5c4f551038fed74d17c773ff147f947822b35f7245e3668d9c",
+      "normalized_sha256": "ca9cdc3ff25f799817852c8ec6cd0b46efe6994facefbb8b04338f7d2f43dc08",
+      "duration_ms": 48789.97732426304,
+      "sample_rate_hz": 22050,
+      "rms": 0.1940322641919808,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.036231884057971016,
+      "worst_wer": 0.14492753623188406,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "b98acfe39ac95774d4c0f0762741394a755316339ebde179ab591c44e568c3a3",
+          "transcript_word_count": 136,
+          "wer": 0.06521739130434782,
+          "cer": 0.029150823827629912,
+          "inference_ms": 743.0672919999997
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "9a4eb2188c9682a06d0683cf4736453fa4f5f96beb5e9e04d33f1261384b3b5a",
+          "transcript_word_count": 145,
+          "wer": 0.14492753623188406,
+          "cer": 0.015209125475285171,
+          "inference_ms": 1909.843709
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "1b4bac202dc16ae4ce686150fc23545012a018b944cb6db6235896d535276389",
+          "transcript_word_count": 138,
+          "wer": 0.036231884057971016,
+          "cer": 0.0076045627376425855,
+          "inference_ms": 1894.2887499999997
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-pt-a",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "com.apple.voice.compact.pt-BR.Luciana",
+      "resolved_locale": "pt-BR",
+      "name": "Luciana",
+      "audio_unit_id": "audio--pt-technical-a--apple-pt-a--repeat-1",
+      "master_sha256": "54086e9f55ec689d4a07afc4c9c3aa1f91a21ac7053541e51c8bad0db0ec4972",
+      "normalized_sha256": "c8090f0201cd61cf3b60af665f5d3adfb632558390d91dddbcc30f382c9e18b9",
+      "duration_ms": 46533.28798185941,
+      "sample_rate_hz": 22050,
+      "rms": 0.18279943564860815,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.08163265306122448,
+      "worst_wer": 0.21428571428571427,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "7c299e0a7e51cab49606c91f36aced752ec55078fd360bc586335a0039b6a3a1",
+          "transcript_word_count": 109,
+          "wer": 0.21428571428571427,
+          "cer": 0.0692167577413479,
+          "inference_ms": 643.690125000001
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "e80d636edc0c327d160a83881db6f5a4d1cb9b11e132500fdb465d66024c6c21",
+          "transcript_word_count": 99,
+          "wer": 0.09183673469387756,
+          "cer": 0.03642987249544627,
+          "inference_ms": 1554.25375
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "32de4c4ff1deaa08e084d82b2c859e6539376425f214f83bc5423168d1deeb87",
+          "transcript_word_count": 100,
+          "wer": 0.08163265306122448,
+          "cer": 0.018214936247723135,
+          "inference_ms": 1798.650250000006
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "apple-pt-b",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "com.apple.voice.compact.pt-PT.Joana",
+      "resolved_locale": "pt-PT",
+      "name": "Joana",
+      "audio_unit_id": "audio--pt-technical-a--apple-pt-b--repeat-1",
+      "master_sha256": "e4eeeca9c852828d1de9b230e79bed7a5165d06398410bcec27e45fe23d4df06",
+      "normalized_sha256": "a4fe0942748434afb1512826628448e1405c9535c4f68c55c1c310949a5f92eb",
+      "duration_ms": 43755.6462585034,
+      "sample_rate_hz": 22050,
+      "rms": 0.11067378988454363,
+      "non_finite_sample_count": 0,
+      "best_wer": 0.04081632653061224,
+      "worst_wer": 0.11224489795918367,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "ba94b0606e869cc6c2b2a4c8eb85c75f5273e085448ae2b0ad40bb9c58ef80f1",
+          "transcript_word_count": 99,
+          "wer": 0.08163265306122448,
+          "cer": 0.02185792349726776,
+          "inference_ms": 607.6962500000009
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "560089d0456f2f0aa5fc4df0ed821ac6435e6cb537616cded4ea1fa14f388d5b",
+          "transcript_word_count": 99,
+          "wer": 0.11224489795918367,
+          "cer": 0.020036429872495445,
+          "inference_ms": 1563.97775
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "81e8a442111358297681ecca3bcf1d180105f4746feeccda80aa905873fce776",
+          "transcript_word_count": 98,
+          "wer": 0.04081632653061224,
+          "cer": 0.00546448087431694,
+          "inference_ms": 1798.708958000003
+        }
+      ],
+      "technical_gate": "passed"
+    }
+  ],
+  "disposition": "technical-gate-passed",
+  "limitations": [
+    "This is one technical passage per voice, not the factorial benchmark.",
+    "Synthetic clean speech cannot establish quality on human podcasts or audiobooks.",
+    "WER measures the complete TTS-to-STT channel and is receiver-specific.",
+    "The technical gate does not replace optional perceptual listening review."
+  ]
+}
