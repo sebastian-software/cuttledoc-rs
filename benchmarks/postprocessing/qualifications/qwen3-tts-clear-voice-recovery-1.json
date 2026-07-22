@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3-tts-clear-voice-recovery-1",
+  "recovery_plan_id": "qwen3-tts-clear-voice-recovery-plan-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-3",
+  "source_selection_revision": "synthetic-roundtrip-passages-4",
+  "source_revision": "957c0135f117a86d53164375cf9f4727f5156b3b",
+  "captured_through": "2026-07-22T12:57:11.451726Z",
+  "selection_policy": {
+    "generation_must_finish_before_max_tokens": true,
+    "maximum_qwen_direct_wer": 0.2,
+    "rule": "Select the first passing seed in ascending candidate order; do not optimize the seed on the lowest observed WER."
+  },
+  "candidates": [
+    {
+      "id": "qwen-recovery--qwen-de-clear--seed-2",
+      "voice_slot_id": "qwen-de-clear",
+      "locale": "de-DE",
+      "passage_id": "synthetic-de-origin",
+      "instruction": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 2,
+      "audio_sha256": "ce313fcec3796a20710c468809e758fd19d1602fc4ef2f962f1d7b7b99fd6fc8",
+      "duration_ms": 53440,
+      "reached_max_tokens": false,
+      "transcript_sha256": "37ac455b0834d6c1500707c338793cee33b7bb455a23b29d7eff9cd797e1c25b",
+      "wer": 0.02912621359223301,
+      "cer": 0.0072254335260115606,
+      "technical_gate": "passed"
+    },
+    {
+      "id": "qwen-recovery--qwen-de-clear--seed-3",
+      "voice_slot_id": "qwen-de-clear",
+      "locale": "de-DE",
+      "passage_id": "synthetic-de-origin",
+      "instruction": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 3,
+      "audio_sha256": "058477969f76f0ea785b8deef9565b36799eeade4f64fa3dba8793d0afef30fd",
+      "duration_ms": 67520,
+      "reached_max_tokens": false,
+      "transcript_sha256": "23bc0b601adaf000bf6070bf8023428267f138e93b9145719c6609dabf46ce4e",
+      "wer": 0.019417475728155338,
+      "cer": 0.005780346820809248,
+      "technical_gate": "passed"
+    },
+    {
+      "id": "qwen-recovery--qwen-de-clear--seed-4",
+      "voice_slot_id": "qwen-de-clear",
+      "locale": "de-DE",
+      "passage_id": "synthetic-de-origin",
+      "instruction": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 4,
+      "audio_sha256": "98d900654e9a8f353d066883a3ce7ad5a029d1a01e803bc90b0da243f93d6d4c",
+      "duration_ms": 62560,
+      "reached_max_tokens": false,
+      "transcript_sha256": "225066b88e7de0f33fc8bef09b1c7f952d8d280bde37334a8e876e4d5fc2d4b8",
+      "wer": 0.038834951456310676,
+      "cer": 0.008670520231213872,
+      "technical_gate": "passed"
+    },
+    {
+      "id": "qwen-recovery--qwen-es-clear--seed-2",
+      "voice_slot_id": "qwen-es-clear",
+      "locale": "es-419",
+      "passage_id": "synthetic-es-technical",
+      "instruction": "A clear, calm Latin American Spanish voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 2,
+      "audio_sha256": "79ecf0891da9f2607ece48ff5a70453a88a9b8877e8d483c69646469e75ad4b9",
+      "duration_ms": 96000,
+      "reached_max_tokens": true,
+      "transcript_sha256": "aafe7dcd9e661bad2a2cc8fe96ff8a4544334812b34de200b0d08415d06bf6ce",
+      "wer": 0.29936305732484075,
+      "cer": 0.2668845315904139,
+      "technical_gate": "failed"
+    },
+    {
+      "id": "qwen-recovery--qwen-es-clear--seed-3",
+      "voice_slot_id": "qwen-es-clear",
+      "locale": "es-419",
+      "passage_id": "synthetic-es-technical",
+      "instruction": "A clear, calm Latin American Spanish voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 3,
+      "audio_sha256": "ca13684f5a14badde34d2489074cadba1a63ffbe65274bd4dbe6034ba8b5a63b",
+      "duration_ms": 77440,
+      "reached_max_tokens": false,
+      "transcript_sha256": "43e0af2a0a2c80ec44b99093af6159f20347c295b43abef1727f9054bbd7d6bd",
+      "wer": 0.012738853503184714,
+      "cer": 0.0196078431372549,
+      "technical_gate": "passed"
+    },
+    {
+      "id": "qwen-recovery--qwen-es-clear--seed-4",
+      "voice_slot_id": "qwen-es-clear",
+      "locale": "es-419",
+      "passage_id": "synthetic-es-technical",
+      "instruction": "A clear, calm Latin American Spanish voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "identity_seed": 4,
+      "audio_sha256": "bfd4db552d60b729a02174ed7a1fc413f3aa22857ba5cb6ffcf27e295cdb5fea",
+      "duration_ms": 86560,
+      "reached_max_tokens": false,
+      "transcript_sha256": "b39651122c5f9d37b9a8ad7d45de04644ffef0dd9c3a5be1bf30cc97b36a4143",
+      "wer": 0.050955414012738856,
+      "cer": 0.030501089324618737,
+      "technical_gate": "passed"
+    }
+  ],
+  "selections": [
+    {
+      "voice_slot_id": "qwen-de-clear",
+      "previous_identity_seed": 1,
+      "selected_identity_seed": 2,
+      "candidate_id": "qwen-recovery--qwen-de-clear--seed-2"
+    },
+    {
+      "voice_slot_id": "qwen-es-clear",
+      "previous_identity_seed": 1,
+      "selected_identity_seed": 3,
+      "candidate_id": "qwen-recovery--qwen-es-clear--seed-3"
+    }
+  ],
+  "disposition": "recovery-candidates-selected",
+  "limitations": [
+    "Recovery changes only the failed voice identity seed, not the description.",
+    "Candidate selection uses one pinned passage and the direct Qwen receiver.",
+    "The first passing seed is selected; WER is a gate, not an optimization target.",
+    "Selected identities must rerun the three-receiver qualification after plan revision."
+  ]
+}
