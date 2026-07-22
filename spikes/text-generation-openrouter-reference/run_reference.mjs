@@ -504,9 +504,39 @@ async function runRequest(manifest, contract, prompt, apiKey) {
     );
   }
   const envelope = JSON.parse(responseText);
-  const content = envelope.choices?.[0]?.message?.content;
+  const choice = envelope.choices?.[0];
+  const message = choice?.message;
+  const content = message?.content;
   if (typeof content !== 'string') {
-    throw new Error('OpenRouter response has no string message content');
+    const contentType = content === null
+      ? 'null'
+      : Array.isArray(content)
+        ? 'array'
+        : typeof content;
+    const diagnostic = {
+      response_id: envelope.id ?? null,
+      model: envelope.model ?? null,
+      provider: envelope.provider ?? null,
+      finish_reason: choice?.finish_reason ?? null,
+      envelope_keys: envelope !== null && typeof envelope === 'object'
+        ? Object.keys(envelope).sort()
+        : [],
+      choice_keys: choice !== null && typeof choice === 'object'
+        ? Object.keys(choice).sort()
+        : [],
+      message_keys: message !== null && typeof message === 'object'
+        ? Object.keys(message).sort()
+        : [],
+      content_type: contentType,
+      refusal_type: message?.refusal === null
+        ? 'null'
+        : typeof message?.refusal,
+      error_present: envelope.error !== undefined || choice?.error !== undefined,
+    };
+    throw new Error(
+      'OpenRouter response has no string message content: ' +
+      JSON.stringify(diagnostic),
+    );
   }
   if (envelope.provider !== manifest.gateway.provider_name) {
     throw new Error(
