@@ -196,6 +196,16 @@ node scripts/run-postprocessing-factorial-local.mjs run-apple-tts \
   --qualification-only
 ```
 
+Transcribe every locally completed qualification artifact through the three
+locked STT engines. Whisper engines are reused per language, Parakeet is reused
+across languages, and the repository-owned direct Qwen adapter runs against the
+same persisted normalized PCM digest:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs run-stt \
+  --qualification-only --backend all
+```
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only

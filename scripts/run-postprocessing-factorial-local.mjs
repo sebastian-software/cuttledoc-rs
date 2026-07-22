@@ -2,6 +2,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import {
   access,
   mkdir,
@@ -30,6 +31,16 @@ const defaultQwenModelDirectory =
   '/tmp/cuttledoc-qwen3-tts-1.7b-voicedesign-mlx-bf16';
 const defaultVoxtralModelDirectory =
   '/tmp/cuttledoc-voxtral-tts-4b-mlx-bf16';
+const defaultWhisperModuleDirectory = '/Users/sebastian/Workspace/whisper-coreml';
+const defaultWhisperModelDirectory =
+  '/Users/sebastian/.cache/whisper-coreml/models';
+const defaultParakeetModuleDirectory = '/Users/sebastian/Workspace/parakeet-coreml';
+const defaultParakeetModelDirectory =
+  '/Users/sebastian/.cache/parakeet-coreml/models';
+const defaultParakeetVadDirectory = '/Users/sebastian/.cache/parakeet-coreml/vad';
+const defaultQwenAsrBinary =
+  '/private/tmp/cuttledoc-qwen3-mlx-direct-build/cuttledoc-qwen3-mlx-inspect';
+const defaultQwenAsrModelDirectory = '/private/tmp/cuttledoc-qwen3-asr/model';
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -63,6 +74,32 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: '/private/tmp/cuttledoc-factorial-apple-tts-build',
     },
+    backend: { type: 'string', default: 'all' },
+    'whisper-module-dir': {
+      type: 'string',
+      default: defaultWhisperModuleDirectory,
+    },
+    'whisper-model-dir': {
+      type: 'string',
+      default: defaultWhisperModelDirectory,
+    },
+    'parakeet-module-dir': {
+      type: 'string',
+      default: defaultParakeetModuleDirectory,
+    },
+    'parakeet-model-dir': {
+      type: 'string',
+      default: defaultParakeetModelDirectory,
+    },
+    'parakeet-vad-dir': {
+      type: 'string',
+      default: defaultParakeetVadDirectory,
+    },
+    'qwen-asr-binary': { type: 'string', default: defaultQwenAsrBinary },
+    'qwen-asr-model-dir': {
+      type: 'string',
+      default: defaultQwenAsrModelDirectory,
+    },
     locale: { type: 'string' },
     limit: { type: 'string' },
     'qualification-only': { type: 'boolean', default: false },
@@ -75,12 +112,13 @@ if (![
   'init',
   'resolve-voices',
   'run-apple-tts',
+  'run-stt',
   'status',
   'self-test',
 ].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
-      '<init|resolve-voices|run-apple-tts|status|self-test> [options]',
+      '<init|resolve-voices|run-apple-tts|run-stt|status|self-test> [options]',
   );
 }
 
@@ -93,10 +131,18 @@ const paths = {
   qwenModel: resolve(values['qwen-model-dir']),
   voxtralModel: resolve(values['voxtral-model-dir']),
   appleBuild: resolve(values['apple-build-dir']),
+  whisperModule: resolve(values['whisper-module-dir']),
+  whisperModel: resolve(values['whisper-model-dir']),
+  parakeetModule: resolve(values['parakeet-module-dir']),
+  parakeetModel: resolve(values['parakeet-model-dir']),
+  parakeetVad: resolve(values['parakeet-vad-dir']),
+  qwenAsrBinary: resolve(values['qwen-asr-binary']),
+  qwenAsrModel: resolve(values['qwen-asr-model-dir']),
 };
 paths.state = join(paths.output, 'state.json');
 paths.lock = join(paths.output, '.run.lock');
 paths.audio = join(paths.output, 'audio');
+paths.stt = join(paths.output, 'stt');
 paths.appleInventory = join(paths.output, 'apple-voice-inventory.json');
 
 if (command === 'self-test') {
@@ -119,6 +165,11 @@ if (command === 'self-test') {
       const state = await initializeState();
       await requireAppleResolutions(state);
       await runAppleTts(state);
+      await writeState(state);
+      await printStatus(state);
+    } else if (command === 'run-stt') {
+      const state = await initializeState();
+      await runStt(state);
       await writeState(state);
       await printStatus(state);
     }
@@ -239,12 +290,32 @@ async function validateMaterializedPassages(plan, selection) {
 }
 
 async function capabilities() {
-  const [qwen, voxtral, ffmpeg, xcrun, rustc] = await Promise.all([
+  const [
+    qwen,
+    voxtral,
+    ffmpeg,
+    xcrun,
+    rustc,
+    whisperModule,
+    whisperModel,
+    parakeetModule,
+    parakeetModel,
+    parakeetVad,
+    qwenAsrBinary,
+    qwenAsrModel,
+  ] = await Promise.all([
     pathCapability(paths.qwenModel),
     pathCapability(paths.voxtralModel),
     commandCapability('ffmpeg'),
     commandCapability('xcrun'),
     commandCapability('rustc'),
+    pathCapability(paths.whisperModule),
+    pathCapability(paths.whisperModel),
+    pathCapability(paths.parakeetModule),
+    pathCapability(paths.parakeetModel),
+    pathCapability(paths.parakeetVad),
+    pathCapability(paths.qwenAsrBinary),
+    pathCapability(paths.qwenAsrModel),
   ]);
   return {
     apple_tts: {
@@ -255,6 +326,27 @@ async function capabilities() {
     normalization: { ffmpeg },
     qwen3_tts_bf16: qwen,
     voxtral_tts_bf16: voxtral,
+    stt: {
+      whisper: {
+        available: whisperModule.available && whisperModel.available,
+        module: whisperModule,
+        model: whisperModel,
+      },
+      parakeet: {
+        available:
+          parakeetModule.available &&
+          parakeetModel.available &&
+          parakeetVad.available,
+        module: parakeetModule,
+        model: parakeetModel,
+        vad: parakeetVad,
+      },
+      qwen3_mlx_direct: {
+        available: qwenAsrBinary.available && qwenAsrModel.available,
+        binary: qwenAsrBinary,
+        model: qwenAsrModel,
+      },
+    },
   };
 }
 
@@ -338,7 +430,14 @@ function pickAppleVoices(locale, voices) {
 }
 
 function appleVoiceScore(locale, voice) {
-  return (voice.language === locale ? 10_000 : 0) +
+  const familyScore =
+    voice.identifier.includes('.voice.compact.') ||
+    voice.identifier.includes('.voice.super-compact.')
+      ? 20_000
+      : voice.identifier.includes('.speech.synthesis.voice.')
+        ? 15_000
+        : 0;
+  return familyScore + (voice.language === locale ? 5_000 : 0) +
     (voice.quality_raw_value ?? 0) * 100 +
     (voice.gender_raw_value === 0 ? 0 : 10);
 }
@@ -505,6 +604,358 @@ async function generateAppleAudio({
   }
 }
 
+async function runStt(state) {
+  const ledger = await readJson(paths.ledger);
+  const selection = await readJson(paths.selection);
+  const selectedPassages = selectedPassageMap(selection);
+  const audioUnits = new Map(ledger.audio_units.map((unit) => [unit.id, unit]));
+  const requestedModels = sttModelsForOption(values.backend);
+  const limit = parseLimit(values.limit);
+  let units = [];
+  for (const unit of ledger.stt_units) {
+    if (!requestedModels.has(unit.stt_model)) continue;
+    const audioUnit = audioUnits.get(unit.audio_unit_id);
+    if (!audioUnit || (values.locale && unit.locale !== values.locale)) continue;
+    if (values['qualification-only'] && !(
+      audioUnit.passage_slot_id.endsWith('technical-a') &&
+      audioUnit.generation_repeat === 1
+    )) continue;
+    const audioDirectory = join(paths.audio, unit.audio_unit_id);
+    if (!await validAudioArtifact(audioDirectory, audioUnit)) continue;
+    units.push(unit);
+  }
+  if (limit !== null) units = units.slice(0, limit);
+  if (units.length === 0) {
+    throw new Error('no generated audio units match the requested STT slice');
+  }
+  const groups = new Map();
+  for (const unit of units) {
+    const key = unit.stt_model === 'whisper-large-v3-turbo-coreml-whispercpp'
+      ? `${unit.stt_model}:${unit.locale.slice(0, 2)}`
+      : unit.stt_model;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(unit);
+  }
+  let completed = 0;
+  let skipped = 0;
+  for (const group of groups.values()) {
+    const remaining = [];
+    for (const unit of group) {
+      const outputDirectory = join(paths.stt, unit.id);
+      if (!values.force && await validSttArtifact(outputDirectory, unit)) {
+        skipped += 1;
+      } else {
+        if (values.force) {
+          await rm(outputDirectory, { recursive: true, force: true });
+        }
+        remaining.push(unit);
+      }
+    }
+    if (remaining.length === 0) continue;
+    if (remaining[0].stt_model === 'qwen3-asr-0.6b-mlx-direct') {
+      for (const unit of remaining) {
+        const context = await loadSttContext(unit, audioUnits, selectedPassages);
+        const result = runQwenAsr(context, unit);
+        await writeSttArtifact(unit, context, result, state);
+        completed += 1;
+        process.stderr.write(
+          `qwen3 asr: ${unit.id} (${completed + skipped}/${units.length})\n`,
+        );
+      }
+    } else {
+      completed += await runLegacySttGroup(
+        remaining,
+        audioUnits,
+        selectedPassages,
+        state,
+      );
+    }
+    state.progress = await progress(ledger);
+    await writeState(state);
+  }
+  process.stdout.write(
+    `STT completed ${completed}, resumed ${skipped}, selected ${units.length}\n`,
+  );
+}
+
+function sttModelsForOption(option) {
+  const aliases = {
+    whisper: 'whisper-large-v3-turbo-coreml-whispercpp',
+    qwen3: 'qwen3-asr-0.6b-mlx-direct',
+    parakeet: 'parakeet-tdt-0.6b-v3-coreml',
+  };
+  if (option === 'all') return new Set(Object.values(aliases));
+  if (!aliases[option]) {
+    throw new Error('--backend must be all, whisper, qwen3, or parakeet');
+  }
+  return new Set([aliases[option]]);
+}
+
+async function runLegacySttGroup(units, audioUnits, selectedPassages, state) {
+  const model = units[0].stt_model;
+  const backend = model === 'whisper-large-v3-turbo-coreml-whispercpp'
+    ? 'whisper'
+    : 'parakeet';
+  const moduleDirectory = backend === 'whisper'
+    ? paths.whisperModule
+    : paths.parakeetModule;
+  const require = createRequire(import.meta.url);
+  const api = require(join(moduleDirectory, 'dist/index.cjs'));
+  const language = units[0].locale.slice(0, 2);
+  const engine = backend === 'whisper'
+    ? new api.WhisperAsrEngine({
+        modelPath: join(paths.whisperModel, 'ggml-large-v3-turbo.bin'),
+        language,
+        useGpu: true,
+      })
+    : new api.ParakeetAsrEngine({
+        modelDir: paths.parakeetModel,
+        vadDir: paths.parakeetVad,
+        autoDownload: false,
+      });
+  const loadStarted = performance.now();
+  await engine.initialize();
+  const loadMs = performance.now() - loadStarted;
+  try {
+    const warmupContext = await loadSttContext(
+      units[0],
+      audioUnits,
+      selectedPassages,
+    );
+    await transcribeLegacy(engine, backend, warmupContext.samples);
+    let completed = 0;
+    for (const unit of units) {
+      const context = await loadSttContext(unit, audioUnits, selectedPassages);
+      const started = performance.now();
+      const native = await transcribeLegacy(engine, backend, context.samples);
+      const wallMs = performance.now() - started;
+      const result = {
+        text: native.text.trim(),
+        runtime: {
+          backend,
+          version: engine.getVersion(),
+          requested_language: backend === 'whisper' ? language : 'model-managed',
+          model_load_ms: loadMs,
+          inference_ms: wallMs,
+          backend_ms: native.durationMs,
+          segments: normalizeSegments(
+            native.segments,
+            context.audioManifest.normalized_audio.duration_ms,
+          ),
+        },
+      };
+      await writeSttArtifact(unit, context, result, state);
+      completed += 1;
+      process.stderr.write(
+        `${backend}: ${unit.id} (${completed}/${units.length})\n`,
+      );
+    }
+    return completed;
+  } finally {
+    engine.cleanup();
+  }
+}
+
+async function transcribeLegacy(engine, backend, samples) {
+  return backend === 'parakeet'
+    ? engine.transcribe(samples, { sampleRate: 16_000 })
+    : engine.transcribe(samples, 16_000);
+}
+
+function runQwenAsr(context, unit) {
+  const libraryDirectory = dirname(paths.qwenAsrBinary);
+  const native = JSON.parse(commandOutput(paths.qwenAsrBinary, [
+    'transcribe',
+    paths.qwenAsrModel,
+    context.normalizedPath,
+    unit.locale.slice(0, 2),
+    'gpu',
+  ], {
+    env: { ...process.env, DYLD_LIBRARY_PATH: libraryDirectory },
+    maxBuffer: 32 * 1024 * 1024,
+  }).trim());
+  return {
+    text: native.text.trim(),
+    runtime: {
+      backend: 'qwen3-asr-0.6b-mlx-direct',
+      requested_language: unit.locale.slice(0, 2),
+      inference_ms: native.elapsed_ms,
+      peak_memory_bytes: native.peak_memory_bytes,
+      prompt_tokens: native.prompt_length,
+      generation_tokens: native.generation_tokens,
+      finish_reason: native.finish_reason,
+      stop_token: native.stop_token,
+    },
+  };
+}
+
+async function loadSttContext(unit, audioUnits, selectedPassages) {
+  const audioUnit = audioUnits.get(unit.audio_unit_id);
+  if (!audioUnit) throw new Error(`${unit.id}: audio unit is missing`);
+  const audioDirectory = join(paths.audio, unit.audio_unit_id);
+  const audioManifest = await readJson(join(audioDirectory, 'manifest.json'));
+  const normalizedPath = join(
+    audioDirectory,
+    audioManifest.normalized_audio.path,
+  );
+  const bytes = await readFile(normalizedPath);
+  if (
+    bytes.length !== audioManifest.normalized_audio.byte_count ||
+    sha256(bytes) !== audioManifest.normalized_audio.sha256
+  ) {
+    throw new Error(`${unit.id}: normalized audio digest differs`);
+  }
+  const owned = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  );
+  const selected = selectedPassages.get(audioUnit.passage_id);
+  if (!selected) throw new Error(`${unit.id}: selected passage is missing`);
+  const reference = (await readFile(
+    join(paths.text, `${audioUnit.passage_id}.txt`),
+    'utf8',
+  )).trim();
+  if (sha256(Buffer.from(reference)) !== selected.passage.spoken_sha256) {
+    throw new Error(`${unit.id}: reference text digest differs`);
+  }
+  return {
+    audioUnit,
+    audioDirectory,
+    audioManifest,
+    normalizedPath,
+    samples: new Float32Array(owned),
+    selected,
+    reference,
+  };
+}
+
+async function writeSttArtifact(unit, context, result, state) {
+  const outputDirectory = join(paths.stt, unit.id);
+  const temporary = await mkdtemp(join(paths.output, '.stt-tmp-'));
+  try {
+    const text = result.text.trim();
+    const transcriptBytes = Buffer.from(`${text}\n`);
+    const manifest = {
+      schema_version: '1.0.0',
+      id: unit.id,
+      plan_id: state.plan_id,
+      plan_revision: state.plan_revision,
+      source_selection_revision: state.source_selection_revision,
+      source_revision: gitRevision(),
+      captured_at: new Date().toISOString(),
+      unit,
+      source_audio: {
+        audio_unit_id: unit.audio_unit_id,
+        normalized_path: relative(paths.output, context.normalizedPath),
+        normalized_sha256: context.audioManifest.normalized_audio.sha256,
+        duration_ms: context.audioManifest.normalized_audio.duration_ms,
+      },
+      reference: {
+        passage_id: context.audioUnit.passage_id,
+        text_sha256: context.selected.passage.spoken_sha256,
+        word_count: words(context.reference).length,
+      },
+      transcript: {
+        path: 'transcript.txt',
+        sha256: sha256(transcriptBytes),
+        character_count: text.length,
+        word_count: words(text).length,
+        text,
+      },
+      quality: {
+        wer: errorRate(words(context.reference), words(text)),
+        cer: errorRate(characters(context.reference), characters(text)),
+      },
+      runtime: result.runtime,
+      disposition: 'measured-local-transcript',
+    };
+    await writeFile(join(temporary, 'transcript.txt'), transcriptBytes);
+    await writeFile(join(temporary, 'manifest.json'), json(manifest));
+    await mkdir(dirname(outputDirectory), { recursive: true });
+    await rename(temporary, outputDirectory);
+  } catch (error) {
+    await rm(temporary, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+async function validSttArtifact(directory, unit) {
+  try {
+    const manifest = await readJson(join(directory, 'manifest.json'));
+    if (manifest.id !== unit.id || manifest.plan_revision !==
+      (await readJson(paths.plan)).revision) return false;
+    const transcript = await readFile(join(directory, manifest.transcript.path));
+    if (sha256(transcript) !== manifest.transcript.sha256) return false;
+    const audioManifest = await readJson(join(
+      paths.audio,
+      unit.audio_unit_id,
+      'manifest.json',
+    ));
+    return manifest.source_audio.normalized_sha256 ===
+      audioManifest.normalized_audio.sha256;
+  } catch {
+    return false;
+  }
+}
+
+function normalizeSegments(segments, audioDurationMs) {
+  return (segments ?? []).map((segment) => {
+    if ('startMs' in segment) {
+      return {
+        start_ms: segment.startMs,
+        end_ms: segment.endMs,
+        text: segment.text,
+        confidence: segment.confidence ?? null,
+      };
+    }
+    return {
+      start_ms: segment.startTime * 1_000,
+      end_ms: Math.min(segment.endTime * 1_000, audioDurationMs),
+      text: segment.text,
+      confidence: null,
+    };
+  });
+}
+
+function words(text) {
+  return text
+    .toLocaleLowerCase('en-US')
+    .replace(/[^\p{L}\p{N}\s]/gu, '')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function characters(text) {
+  return words(text).join('').split('');
+}
+
+function errorRate(referenceItems, hypothesisItems) {
+  if (referenceItems.length === 0) return hypothesisItems.length === 0 ? 0 : 1;
+  let previous = Array.from(
+    { length: hypothesisItems.length + 1 },
+    (_, index) => index,
+  );
+  for (let referenceIndex = 1;
+    referenceIndex <= referenceItems.length;
+    referenceIndex += 1) {
+    const current = [referenceIndex];
+    for (let hypothesisIndex = 1;
+      hypothesisIndex <= hypothesisItems.length;
+      hypothesisIndex += 1) {
+      const substitution = previous[hypothesisIndex - 1] +
+        (referenceItems[referenceIndex - 1] ===
+        hypothesisItems[hypothesisIndex - 1] ? 0 : 1);
+      current[hypothesisIndex] = Math.min(
+        previous[hypothesisIndex] + 1,
+        current[hypothesisIndex - 1] + 1,
+        substitution,
+      );
+    }
+    previous = current;
+  }
+  return previous[hypothesisItems.length] / referenceItems.length;
+}
+
 function audioStatistics(buffer) {
   let minimum = Infinity;
   let maximum = -Infinity;
@@ -551,7 +1002,9 @@ async function validAudioArtifact(directory, unit) {
 
 async function progress(ledger) {
   const completedByEngine = {};
+  const completedBySttModel = {};
   let completedAudio = 0;
+  let completedStt = 0;
   try {
     const entries = await readdir(paths.audio, { withFileTypes: true });
     const units = new Map(ledger.audio_units.map((unit) => [unit.id, unit]));
@@ -568,6 +1021,22 @@ async function progress(ledger) {
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
+  try {
+    const entries = await readdir(paths.stt, { withFileTypes: true });
+    const units = new Map(ledger.stt_units.map((unit) => [unit.id, unit]));
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const unit = units.get(entry.name);
+      if (!unit || !await validSttArtifact(join(paths.stt, entry.name), unit)) {
+        continue;
+      }
+      completedStt += 1;
+      completedBySttModel[unit.stt_model] =
+        (completedBySttModel[unit.stt_model] ?? 0) + 1;
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
   return {
     audio: {
       expected: ledger.counts.total_audio_units,
@@ -577,8 +1046,9 @@ async function progress(ledger) {
     },
     stt: {
       expected: ledger.counts.total_stt_units,
-      completed: 0,
-      remaining: ledger.counts.total_stt_units,
+      completed: completedStt,
+      remaining: ledger.counts.total_stt_units - completedStt,
+      completed_by_model: completedBySttModel,
     },
     llm_documents: {
       expected: ledger.counts.llm_documents,
@@ -809,27 +1279,27 @@ function json(value) {
 function selfTest() {
   const selected = pickAppleVoices('de-DE', [
     {
-      identifier: 'fallback-female',
+      identifier: 'com.apple.voice.compact.de-AT.fallback-female',
       language: 'de-AT',
       quality_raw_value: 2,
       gender_raw_value: 2,
     },
     {
-      identifier: 'exact-male',
+      identifier: 'com.apple.voice.compact.de-DE.exact-male',
       language: 'de-DE',
       quality_raw_value: 1,
       gender_raw_value: 1,
     },
     {
-      identifier: 'exact-female',
+      identifier: 'com.apple.voice.compact.de-DE.exact-female',
       language: 'de-DE',
       quality_raw_value: 1,
       gender_raw_value: 2,
     },
   ]);
   if (
-    selected[0].identifier !== 'exact-female' ||
-    selected[1].identifier !== 'exact-male'
+    !selected[0].identifier.endsWith('exact-female') ||
+    !selected[1].identifier.endsWith('exact-male')
   ) {
     throw new Error('self-test: deterministic Apple voice selection failed');
   }
@@ -846,6 +1316,13 @@ function selfTest() {
   }
   if (parseLimit(undefined) !== null || parseLimit('2') !== 2) {
     throw new Error('self-test: limit parsing failed');
+  }
+  if (
+    errorRate(['one', 'two'], ['one', 'too']) !== 0.5 ||
+    sttModelsForOption('all').size !== 3 ||
+    !sttModelsForOption('qwen3').has('qwen3-asr-0.6b-mlx-direct')
+  ) {
+    throw new Error('self-test: STT selection or error rate failed');
   }
   process.stdout.write('factorial local runner: self-test passed\n');
 }

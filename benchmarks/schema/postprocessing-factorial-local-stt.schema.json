@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-local-stt.schema.json",
+  "title": "Cuttledoc local factorial STT artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "source_revision",
+    "captured_at",
+    "unit",
+    "source_audio",
+    "reference",
+    "transcript",
+    "quality",
+    "runtime",
+    "disposition"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_revision": { "$ref": "#/$defs/gitSha" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "unit": { "type": "object" },
+    "source_audio": {
+      "type": "object",
+      "required": [
+        "audio_unit_id",
+        "normalized_path",
+        "normalized_sha256",
+        "duration_ms"
+      ],
+      "properties": {
+        "audio_unit_id": { "$ref": "#/$defs/nonEmptyString" },
+        "normalized_path": { "$ref": "#/$defs/nonEmptyString" },
+        "normalized_sha256": { "$ref": "#/$defs/sha256" },
+        "duration_ms": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "required": ["passage_id", "text_sha256", "word_count"],
+      "properties": {
+        "passage_id": { "$ref": "#/$defs/nonEmptyString" },
+        "text_sha256": { "$ref": "#/$defs/sha256" },
+        "word_count": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "transcript": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "character_count",
+        "word_count",
+        "text"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "character_count": { "type": "integer", "minimum": 0 },
+        "word_count": { "type": "integer", "minimum": 0 },
+        "text": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "quality": {
+      "type": "object",
+      "required": ["wer", "cer"],
+      "properties": {
+        "wer": { "type": "number", "minimum": 0 },
+        "cer": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "runtime": { "type": "object" },
+    "disposition": { "const": "measured-local-transcript" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+  }
+}
