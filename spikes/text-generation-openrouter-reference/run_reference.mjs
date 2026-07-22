@@ -451,6 +451,7 @@ function correctionSchema(numericBounds, structuredOutputContract) {
 
 async function runRequest(manifest, contract, prompt, apiKey) {
   const request = manifest.request_defaults;
+  const requestPolicy = manifest.gateway.request_policy;
   const body = {
     model: manifest.model.requested_id,
     messages: [{ role: 'user', content: prompt }],
@@ -466,11 +467,11 @@ async function runRequest(manifest, contract, prompt, apiKey) {
       },
     },
     provider: {
-      only: [manifest.gateway.provider_slug],
-      allow_fallbacks: false,
-      require_parameters: true,
-      data_collection: 'deny',
-      zdr: true,
+      only: requestPolicy.only,
+      allow_fallbacks: requestPolicy.allow_fallbacks,
+      require_parameters: requestPolicy.require_parameters,
+      data_collection: requestPolicy.data_collection,
+      zdr: requestPolicy.zdr,
     },
   };
   body[request.token_limit_field] = contract.max_tokens;
@@ -576,6 +577,34 @@ function assertSuffix(actual, expected, label) {
   }
 }
 
+function assertPrivacyBoundary(manifest, experiment, fixture, args) {
+  const policy = manifest.gateway.request_policy;
+  if (!Array.isArray(policy?.only) || policy.only.length !== 1 ||
+      policy.only[0] !== manifest.gateway.provider_slug ||
+      policy.allow_fallbacks !== false ||
+      policy.require_parameters !== true ||
+      policy.data_collection !== 'deny' ||
+      typeof policy.zdr !== 'boolean') {
+    throw new Error('provider routing policy is not safely pinned');
+  }
+  if (policy.zdr) return;
+
+  const exception = manifest.gateway.privacy_exception;
+  if (exception?.status !== 'authorized-not-consumed' ||
+      exception.execution_limit !== 1 ||
+      exception.requests_per_execution !== 2 ||
+      exception.public_synthetic_only !== true ||
+      exception.run_id !== experiment.result_contract.run_id ||
+      exception.fixture_path !== experiment.result_contract.fixture_path ||
+      exception.result_path !== experiment.result_contract.result_path ||
+      fixture.development_only !== true ||
+      fixture.gold_status !== 'synthetic-source-reference') {
+    throw new Error('non-ZDR request lacks an active, exact-scope exception');
+  }
+  assertSuffix(args.fixture, exception.fixture_path, 'privacy exception fixture');
+  assertSuffix(args.output, exception.result_path, 'privacy exception output');
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!/^[0-9a-f]{40}$/.test(args['source-revision'])) {
@@ -595,6 +624,7 @@ async function main() {
   assertSuffix(args.manifest, experiment.model_manifest_path, 'manifest');
   assertSuffix(args.fixture, resultContract.fixture_path, 'fixture');
   assertSuffix(args.prompt, contract.prompt_path, 'prompt');
+  assertPrivacyBoundary(manifest, experiment, fixture, args);
   if (sha256(promptBytes) !== contract.prompt_sha256) {
     throw new Error('prompt SHA-256 drift');
   }
@@ -639,6 +669,9 @@ async function main() {
         provider_name: manifest.gateway.provider_name,
         served_model: first.evidence.served_model,
         served_provider: first.evidence.served_provider,
+        zdr: manifest.gateway.request_policy.zdr,
+        privacy_exception_id:
+          manifest.gateway.privacy_exception?.id ?? null,
       },
     },
     fixture: {
@@ -669,6 +702,12 @@ async function main() {
         seed: manifest.request_defaults.seed,
         reasoning: manifest.request_defaults.reasoning,
         provider: manifest.gateway.request_policy,
+        privacy_exception: manifest.gateway.privacy_exception === undefined
+          ? null
+          : {
+            ...manifest.gateway.privacy_exception,
+            status: 'consumed-by-this-run',
+          },
       },
       complete_generation_repetitions: 2,
       prompt_visible_fields: contract.context_fields,

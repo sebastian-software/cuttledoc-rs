@@ -224,8 +224,29 @@ function validateCandidateShape(candidate) {
       policy.only[0] !== gateway?.provider_slug ||
       policy?.allow_fallbacks !== false ||
       policy?.require_parameters !== true ||
-      policy?.data_collection !== 'deny' || policy?.zdr !== true) {
-    errors.push('provider routing must be pinned, no-fallback, and zero-retention');
+      policy?.data_collection !== 'deny' || typeof policy?.zdr !== 'boolean') {
+    errors.push('provider routing must be pinned, no-fallback, and deny collection');
+  }
+  const privacyException = gateway?.privacy_exception;
+  if (policy?.zdr === true && privacyException !== undefined) {
+    errors.push('ZDR candidates must not carry a privacy exception');
+  }
+  if (policy?.zdr === false && (
+    !/^[a-z0-9][a-z0-9.-]+$/.test(privacyException?.id ?? '') ||
+    !['authorized-not-consumed', 'consumed'].includes(
+      privacyException?.status,
+    ) ||
+    privacyException?.authorized_at !== '2026-07-22' ||
+    privacyException?.scope !== 'single-public-synthetic-development-screen' ||
+    privacyException?.execution_limit !== 1 ||
+    privacyException?.requests_per_execution !== 2 ||
+    privacyException?.public_synthetic_only !== true ||
+    !(privacyException?.run_id?.length > 0) ||
+    !(privacyException?.fixture_path?.length > 0) ||
+    !(privacyException?.result_path?.length > 0) ||
+    !(privacyException?.authorization_record?.length > 0)
+  )) {
+    errors.push('non-ZDR candidate lacks a bounded explicit privacy exception');
   }
   const pricing = Object.values(gateway?.pricing_snapshot_usd_per_token ?? {});
   if (pricing.length < 2 || pricing.some((value) =>
@@ -397,8 +418,27 @@ async function validateExperiment(experiment, path) {
           experiment.generation_contract.structured_output_contract ||
         run.procedure?.gateway_request?.provider?.allow_fallbacks !== false ||
         run.procedure?.gateway_request?.provider?.data_collection !== 'deny' ||
-        run.procedure?.gateway_request?.provider?.zdr !== true) {
+        run.procedure?.gateway_request?.provider?.zdr !==
+          candidate.gateway.request_policy.zdr) {
       errors.push('result violates the hidden-reference or routing boundary');
+    }
+    const privacyException = candidate.gateway.privacy_exception;
+    const recordedException =
+      run.procedure?.gateway_request?.privacy_exception ?? null;
+    if (candidate.gateway.request_policy.zdr === true) {
+      if (recordedException !== null) {
+        errors.push('ZDR result must not record a privacy exception');
+      }
+    } else if (recordedException?.id !== privacyException?.id ||
+        recordedException?.status !== 'consumed-by-this-run' ||
+        recordedException?.run_id !== run.run_id ||
+        recordedException?.fixture_path !==
+          experiment.result_contract.fixture_path ||
+        recordedException?.result_path !==
+          experiment.result_contract.result_path ||
+        run.candidate?.gateway?.zdr !== false ||
+        run.candidate?.gateway?.privacy_exception_id !== privacyException?.id) {
+      errors.push('non-ZDR result does not consume its exact privacy exception');
     }
 
     const requests = run.measurements?.requests;
@@ -598,6 +638,11 @@ if (process.argv.includes('--self-test')) {
   secret.gateway.api_key = 'sk-or-v1-self-test';
   if (validateCandidateShape(secret).length === 0) {
     failures.push('self-test failed to reject secret material');
+  }
+  const unboundedNonZdr = structuredClone(candidates[0]);
+  unboundedNonZdr.gateway.request_policy.zdr = false;
+  if (validateCandidateShape(unboundedNonZdr).length === 0) {
+    failures.push('self-test failed to reject unbounded non-ZDR routing');
   }
   const multiwordLedger = reportedEditAudit(
     "John Garty und Rosenblatt's",

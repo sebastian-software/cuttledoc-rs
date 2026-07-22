@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3.7-max-openrouter-alibaba-non-zdr-exception",
+  "task": "text-generation",
+  "candidate_role": "frontier-quality-candidate",
+  "model": {
+    "requested_id": "qwen/qwen3.7-max",
+    "allowed_response_ids": [
+      "qwen/qwen3.7-max",
+      "qwen/qwen3.7-max-20260520"
+    ],
+    "upstream_identity": "Alibaba Qwen3.7 Max",
+    "provider_model_identity": "qwen/qwen3.7-max-20260520",
+    "release": "2026-05-20",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1000000,
+    "identity_limit": "OpenRouter exposes one dated Alibaba API identity; no public weight artifact or alternate provider endpoint is pinned by this repository."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "alibaba",
+    "provider_name": "Alibaba",
+    "endpoint_tag": "alibaba",
+    "endpoint_identity": "Alibaba | qwen/qwen3.7-max-20260520",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "temperature",
+      "top_p",
+      "seed",
+      "presence_penalty",
+      "response_format",
+      "tools",
+      "tool_choice",
+      "structured_outputs",
+      "logprobs",
+      "top_logprobs"
+    ],
+    "request_policy": {
+      "only": [
+        "alibaba"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": false
+    },
+    "privacy_exception": {
+      "id": "qwen3.7-max-public-synthetic-once-2026-07-22",
+      "status": "authorized-not-consumed",
+      "authorized_at": "2026-07-22",
+      "scope": "single-public-synthetic-development-screen",
+      "execution_limit": 1,
+      "requests_per_execution": 2,
+      "public_synthetic_only": true,
+      "run_id": "phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
+      "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-synthetic-multipage-whisper-1.json",
+      "result_path": "benchmarks/postprocessing/runs/phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1.json",
+      "authorization_record": "Repository owner explicitly authorized one non-ZDR execution for this public synthetic benchmark in the active task on 2026-07-22."
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.000001475",
+      "completion": "0.000004425",
+      "input_cache_read": "0.000000295",
+      "input_cache_write": "0.00000184375"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": false,
+    "temperature": 0,
+    "seed": 0,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "One explicitly authorized non-ZDR development execution on public synthetic text only. This result is not a privacy precedent, embedded-runtime candidate, or product model selection."
+}
