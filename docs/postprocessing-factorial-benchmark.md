@@ -333,9 +333,13 @@ raw response, and rejects missing, reordered, or duplicate section ids:
 node scripts/run-postprocessing-factorial-local-llm.mjs run \
   --candidate qwen3.5-0.8b-4bit-mlx
 node scripts/run-postprocessing-factorial-local-llm.mjs run --candidate all
+node scripts/run-postprocessing-factorial-local-llm.mjs summarize
 ```
 
 `--locale`, `--limit`, and `--repetitions` provide bounded diagnostic slices;
 they do not change the locked full-screen counts. Gemma remains
 evaluation-only pending its explicit product-rights disposition, and mlx-lm
-remains the quality-reference runtime rather than a product dependency.
+remains the quality-reference runtime rather than a product dependency. The
+summary keeps strict contract compliance separate from diagnostic recovery:
+for example, JSON inside a prohibited Markdown fence can be inspected for the
+cause of a failure, but it never contributes to accepted postprocessed WER.
