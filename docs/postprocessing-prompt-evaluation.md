@@ -189,6 +189,8 @@ in an already exact section. The current-model expansion adds Gemini 3.6 Flash
 at 0.90% with one factual regression, contract-passing Kimi K3 at 2.31%,
 contract-passing Claude Sonnet 5 at 2.81%, and GPT-5.6 Luna at 5.43%. Claude
 Sonnet 4.6 remains a historical 3.12% control; Sonnet 5 is the active Anthropic
-candidate. These results supersede the single-word fixture for
-development-quality reasoning, but remain synthetic and do not select a
-product model.
+candidate. Qwen3.7 Max reaches 1.51% with no section regression under a
+consumed one-execution non-ZDR exception, but fails the exhaustive ledger gate
+because four repeated correction occurrences are not listed separately. These
+results supersede the single-word fixture for development-quality reasoning,
+but remain synthetic and do not select a product model.

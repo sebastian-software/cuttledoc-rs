@@ -51,7 +51,7 @@
     },
     "privacy_exception": {
       "id": "qwen3.7-max-public-synthetic-once-2026-07-22",
-      "status": "authorized-not-consumed",
+      "status": "consumed",
       "authorized_at": "2026-07-22",
       "scope": "single-public-synthetic-development-screen",
       "execution_limit": 1,
@@ -60,7 +60,10 @@
       "run_id": "phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
       "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-synthetic-multipage-whisper-1.json",
       "result_path": "benchmarks/postprocessing/runs/phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1.json",
-      "authorization_record": "Repository owner explicitly authorized one non-ZDR execution for this public synthetic benchmark in the active task on 2026-07-22."
+      "authorization_record": "Repository owner explicitly authorized one non-ZDR execution for this public synthetic benchmark in the active task on 2026-07-22.",
+      "consumed_at": "2026-07-22T08:49:27.638Z",
+      "consumed_by_run_id": "phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
+      "consumed_source_revision": "f50a92099ecf25c7e689cf9bc1aa4b09f13f5ad7"
     },
     "pricing_snapshot_usd_per_token": {
       "prompt": "0.000001475",

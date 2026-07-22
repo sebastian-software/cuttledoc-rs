@@ -1,8 +1,7 @@
 # Long-form transcript postprocessing screen
 
-**Status:** German multi-page development screen complete for seven hosted
-models. The pinned Mistral endpoint is temporarily blocked, and Qwen3.7 Max is
-privacy-blocked pending an explicit exception to the repository's ZDR rule.
+**Status:** German multi-page development screen complete for eight hosted
+models; the pinned Mistral endpoint remains temporarily blocked.
 
 **Evidence date:** 2026-07-22.
 
@@ -28,8 +27,10 @@ never rendered into the model prompt.
 ## Results
 
 Every complete model run contains two provider-pinned requests with fallback
-disabled, required parameters, denied data collection, and a zero-data-retention
-route. Cost covers those two recorded requests.
+disabled, required parameters, and denied data collection. All use a
+zero-data-retention route except the explicitly authorized, already consumed
+Qwen3.7 Max exception on public synthetic text. Cost covers the two recorded
+requests per run.
 
 | Candidate | Contract | Output errors | Micro-WER | Error reduction | Sections improved / unchanged / regressed | Recorded cost |
 | --- | --- | ---: | ---: | ---: | --- | ---: |
@@ -41,14 +42,15 @@ route. Cost covers those two recorded requests.
 | Kimi K3 / Moonshot AI INT4 | Passed | 23 | 2.31% | 61.7% | 6 / 2 / 0 | $0.1387416 |
 | GPT-5.6 Luna / Azure EU | Failed: all six lexical changes unreported | 54 | 5.43% | 10.0% | 1 / 7 / 0 | $0.0294822 |
 | Claude Sonnet 5 / Azure US East 2 | Passed | 28 | 2.81% | 53.3% | 5 / 3 / 0 | $0.1449660 |
+| Qwen3.7 Max / Alibaba, consumed non-ZDR exception | Failed: four repeated edit occurrences not enumerated | 15 | 1.51% | 75.0% | 6 / 2 / 0 | $0.044950625 |
 | Mistral Small 3.2 24B / Parasail BF16 | Blocked: upstream HTTP 429 twice | — | — | — | — | not recorded |
-| Qwen3.7 Max / Alibaba | Blocked: no ZDR endpoint in the captured OpenRouter catalog | — | — | — | — | not run |
 
-Gemini was the only one of the seven complete long-form results whose two raw
-responses were identical. The recorded cost of the seven complete two-request
-results is $0.8080077. Requests from the blocked Mistral attempts, an abandoned
-historical Qwen invocation, and Sonnet 5's initial token-limit failure have no
-complete response record and are intentionally excluded rather than estimated.
+Gemini was the only one of the eight complete long-form results whose two raw
+responses were identical. The recorded cost of the eight complete two-request
+results is $0.852958325. Requests from the blocked Mistral attempts, an
+abandoned historical Qwen invocation, and Sonnet 5's initial token-limit
+failure have no complete response record and are intentionally excluded rather
+than estimated.
 
 ## Findings
 
@@ -62,12 +64,12 @@ remaining mismatches also show why WER is not a complete correctness label:
 versus a number word include convention choices, while retained `erzielen`
 versus `erzwingen` is a substantive missed correction.
 
-Qwen fixed many difficult names and technical terms and reported every lexical
-change. It also rewrote an already exact section from `Industrie 5.0` and
+Qwen 3.5 fixed many difficult names and technical terms and reported every
+lexical change. It also rewrote an already exact section from `Industrie 5.0` and
 `2025` to `Industrie 4.0` and `2023`. Those two unsupported factual changes are
 precisely the high-severity regression that an aggregate WER improvement would
-hide. Qwen therefore passes the mechanical ledger contract but is not a safe
-quality candidate under this prompt.
+hide. Qwen 3.5 therefore passes the mechanical ledger contract but is not a
+safe quality candidate under this prompt.
 
 Claude Sonnet 4.6 was the only original result to combine a complete edit
 ledger with zero section regressions. It was substantially more conservative:
@@ -102,11 +104,22 @@ record above. Client-observed request durations ranged from about 0.7 seconds
 for Gemini and Luna to roughly 10.2 seconds for Kimi, but these remote gateway
 measurements are not comparable to local runtime latency.
 
-Qwen3.7 Max exists in the captured OpenRouter catalog, but Alibaba was its only
-endpoint and was absent from OpenRouter's dynamic ZDR list. The fixture is
-public synthetic text, so a tightly scoped non-ZDR run could be defensible, but
-the repository does not silently relax the established privacy policy. Its
-blocked manifest preserves the exact reason and awaits explicit approval.
+Qwen3.7 Max is the third-best text restorer in the complete matrix at 15 errors,
+behind GPT-5.6 Sol and Gemini. It improved six sections without a regression.
+Its mechanical rejection is narrower than Gemini's: `Key` to `KI` was applied
+three times but reported as one correction rule, and `Keywinter` to `KI-Winter`
+was applied twice but reported once. The output is therefore short by four
+per-occurrence ledger entries even though those repeated edits are beneficial.
+This reinforces the decision to derive the authoritative diff locally rather
+than requiring models to enumerate identical occurrences.
+
+Alibaba was the only cataloged Qwen3.7 Max endpoint and was absent from
+OpenRouter's dynamic ZDR list. The repository owner explicitly authorized one
+execution on this public synthetic fixture. The recorded request kept Alibaba
+pinned, fallback disabled, and data collection denied; only ZDR was relaxed.
+The manifest now marks the exception consumed, and the runner rejects another
+execution. This is evidence for this model screen, not a general privacy-policy
+change.
 
 The audit now verifies edit completeness by applying reported, non-overlapping
 lexical replacements to the normalized input in source order and comparing the

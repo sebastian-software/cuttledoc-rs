@@ -37,7 +37,7 @@ the reproducible historical records:
 | Frontier candidate | Kimi K3 | Moonshot AI INT4 | ZDR |
 | GPT family control | GPT-5.6 Luna | Azure EU | ZDR |
 | Current Anthropic control | Claude Sonnet 5 | Azure US East 2 | ZDR; replaces Sonnet 4.6 as the active control |
-| Frontier candidate | Qwen3.7 Max | Alibaba | Blocked: no cataloged ZDR route; explicit privacy exception required |
+| Frontier candidate | Qwen3.7 Max | Alibaba | Completed under an explicitly authorized and consumed one-execution non-ZDR exception |
 
 ## Multi-page follow-up
 
@@ -57,24 +57,26 @@ contract smoke test.
 | Kimi K3 | Passed | 2.31% | 6 / 2 / 0 | $0.1387416 |
 | GPT-5.6 Luna | Failed; all six output changes missing from its edit ledger | 5.43% | 1 / 7 / 0 | $0.0294822 |
 | Claude Sonnet 5 | Passed | 2.81% | 5 / 3 / 0 | $0.1449660 |
+| Qwen3.7 Max | Failed; four repeated correction occurrences not enumerated separately | 1.51% | 6 / 2 / 0 | $0.044950625 |
 | Mistral Small 3.2 24B | Blocked twice by pinned Parasail endpoint HTTP 429 | — | — | not recorded |
-| Qwen3.7 Max | Blocked because the only cataloged endpoint was not ZDR | — | — | not run |
 
 The full methodology, per-error interpretation, and decision boundary are in
 [`postprocessing-long-form-evaluation.md`](../../docs/postprocessing-long-form-evaluation.md).
 
 Every request disables provider fallback, requires all requested parameters,
-denies data collection, and requires a zero-data-retention route. The gateway
+and denies data collection. All candidates require a zero-data-retention route
+except the single consumed Qwen3.7 Max exception described below. The gateway
 also enforces a strict JSON Schema. This is a pragmatic hosted-product
 capability, so these runs are not directly identical to the local prompt-only
 MLX structured-output attempts. The repository still parses the JSON, derives
 the lexical diff independently, verifies that every lexical edit was reported,
 and checks protected spans.
 
-Qwen3.7 Max is deliberately not an implicit exception to that policy. Its
-blocker record captures the 2026-07-22 catalog state. A one-time run may be
-added only after explicit approval and must remain pinned to the public
-synthetic fixture, deny provider data collection, and disable fallback.
+Qwen3.7 Max was not made an implicit exception to that policy. Its blocker and
+candidate records capture the explicit repository-owner authorization, exact
+public fixture and result paths, one-execution/two-request limit, pinned Alibaba
+provider, disabled fallback, and denied data collection. After the successful
+run, the exception was marked consumed; the runner now refuses to reuse it.
 
 The fixture's evaluation reference is never sent to the model. Its diagnostic
 WER remains development-only because the dataset transcript is unverified. A

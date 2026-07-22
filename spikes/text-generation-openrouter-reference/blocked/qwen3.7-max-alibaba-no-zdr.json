@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "id": "qwen3.7-max-openrouter-alibaba-no-zdr",
   "captured_at": "2026-07-22",
-  "status": "resolved-by-explicit-single-execution-exception",
+  "status": "resolved-and-consumed-single-execution-exception",
   "requested_model": {
     "id": "qwen/qwen3.7-max",
     "catalog_identity": "qwen/qwen3.7-max-20260520",
@@ -43,6 +43,9 @@
     "scope": "One execution containing the runner's required two comparison requests against the public synthetic fixture only.",
     "constraints": "Alibaba remains pinned, fallback remains disabled, and data_collection remains deny. Only the ZDR requirement is relaxed.",
     "candidate_manifest": "spikes/text-generation-openrouter-reference/candidates/qwen3.7-max-alibaba-non-zdr-exception.json",
-    "authorization_record": "Repository owner explicitly approved the one-time non-ZDR exception in the active task."
+    "authorization_record": "Repository owner explicitly approved the one-time non-ZDR exception in the active task.",
+    "consumed_at": "2026-07-22T08:49:27.638Z",
+    "run_id": "phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
+    "result_path": "benchmarks/postprocessing/runs/phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1.json"
   }
 }

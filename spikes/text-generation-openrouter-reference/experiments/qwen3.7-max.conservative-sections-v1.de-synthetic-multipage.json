@@ -28,6 +28,6 @@
     "purpose": "development-quality-screen",
     "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-synthetic-multipage-whisper-1.json",
     "result_path": "benchmarks/postprocessing/runs/phase8.qwen3.7-max-openrouter-alibaba-non-zdr-exception.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1.json",
-    "result_required": false
+    "result_required": true
   }
 }

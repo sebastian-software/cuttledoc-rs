@@ -118,8 +118,9 @@ and adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Luna, and Claude Sonnet 5. Sonnet 5,
 not 4.6, is the active Anthropic comparison. Kimi and Sonnet 5 pass the complete
 contract without a section regression; Gemini is more accurate but makes one
 unsupported factual correction, and Luna barely improves the transcript.
-Qwen3.7 Max remains unexecuted because the captured catalog offered no ZDR
-route.
+Qwen3.7 Max reaches 1.51% without a section regression under an explicitly
+authorized, consumed one-execution non-ZDR exception; its ledger omits four
+repeated correction occurrences.
 
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus
