@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "postprocessing-prompts-2",
+  "revision": "postprocessing-prompts-3",
   "evidence_date": "2026-07-22",
   "split_policy": {
     "grouping_unit": "complete source work or episode",
@@ -107,6 +107,36 @@
         "valid JSON object",
         "section ids and order exactly match the input",
         "every lexical diff is reported in its own section",
+        "protected spans are unchanged",
+        "numbers, dates, units, names, terms, and negations change only when overwhelmingly supported"
+      ]
+    },
+    {
+      "id": "conservative-sections-local-diff-v2",
+      "path": "benchmarks/postprocessing/prompts/conservative-sections-local-diff-v2.txt",
+      "sha256": "02865763287e92528f45785e2d93f4ef916a67968abb7378c87bb4443b9808c9",
+      "source": "repository-authored replacement for the model-authored exhaustive edit ledger",
+      "mode": "bounded-lexical",
+      "output_contract": "JSON object with one complete corrected text per immutable section id; authoritative diffs are derived locally",
+      "allowed_edit_classes": [
+        "surface",
+        "word-boundary",
+        "contextual-misrecognition",
+        "asr-inflection"
+      ],
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "sections"
+      ],
+      "mechanical_gates": [
+        "valid JSON object",
+        "section ids and order exactly match the input",
+        "authoritative lexical diff is derived locally",
         "protected spans are unchanged",
         "numbers, dates, units, names, terms, and negations change only when overwhelmingly supported"
       ]

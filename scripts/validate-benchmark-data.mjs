@@ -4142,6 +4142,14 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/postprocessing-snapshot.schema.json'),
   join(repoRoot, 'benchmarks/schema/error-analysis.schema.json'),
   join(repoRoot, 'benchmarks/schema/postprocessing-prompts.schema.json'),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-plan.schema.json',
+  ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-cells.schema.json',
+  ),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);

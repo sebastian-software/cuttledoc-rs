@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-cells.schema.json",
+  "title": "Cuttledoc generated factorial postprocessing execution ledger",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "generation",
+    "counts",
+    "audio_units",
+    "stt_units",
+    "llm_documents",
+    "llm_model_runs",
+    "llm_requests_in_execution_order"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "generation": {
+      "type": "object",
+      "required": [
+        "generator",
+        "llm_execution_order_seed",
+        "execution_blocks",
+        "deterministic"
+      ],
+      "properties": {
+        "generator": { "$ref": "#/$defs/nonEmptyString" },
+        "llm_execution_order_seed": { "type": "integer", "minimum": 0 },
+        "execution_blocks": { "type": "integer", "minimum": 1 },
+        "deterministic": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "primary_audio_units",
+        "same_seed_control_audio_units",
+        "total_audio_units",
+        "primary_stt_units",
+        "same_seed_control_stt_units",
+        "total_stt_units",
+        "llm_documents",
+        "llm_model_runs",
+        "llm_requests"
+      ],
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "audio_units": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/audioUnit" }
+    },
+    "stt_units": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sttUnit" }
+    },
+    "llm_documents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/document" }
+    },
+    "llm_model_runs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/modelRun" }
+    },
+    "llm_requests_in_execution_order": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/request" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["ready", "blocked"] },
+    "blockers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "audioUnit": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "locale",
+        "content_type",
+        "passage_slot_id",
+        "passage_id",
+        "tts_engine",
+        "voice_slot_id",
+        "realization_id",
+        "generation_seed",
+        "generation_repeat",
+        "status",
+        "blockers"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "kind": { "enum": ["primary", "same-seed-reproducibility-control"] },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "content_type": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_id": {
+          "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
+        },
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "realization_id": { "$ref": "#/$defs/nonEmptyString" },
+        "generation_seed": {
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        },
+        "generation_repeat": { "type": "integer", "minimum": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "blockers": { "$ref": "#/$defs/blockers" }
+      },
+      "additionalProperties": false
+    },
+    "sttUnit": {
+      "type": "object",
+      "required": [
+        "id",
+        "audio_unit_id",
+        "kind",
+        "locale",
+        "content_type",
+        "passage_slot_id",
+        "stt_model",
+        "status",
+        "blockers"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "audio_unit_id": { "$ref": "#/$defs/nonEmptyString" },
+        "kind": { "enum": ["primary", "same-seed-reproducibility-control"] },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "content_type": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "stt_model": { "$ref": "#/$defs/nonEmptyString" },
+        "status": { "$ref": "#/$defs/status" },
+        "blockers": { "$ref": "#/$defs/blockers" }
+      },
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "required": ["section_id", "content_type", "passage_id", "stt_unit_id"],
+      "properties": {
+        "section_id": { "$ref": "#/$defs/nonEmptyString" },
+        "content_type": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_id": {
+          "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
+        },
+        "stt_unit_id": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "document": {
+      "type": "object",
+      "required": [
+        "id",
+        "locale",
+        "tts_engine",
+        "voice_slot_id",
+        "realization_id",
+        "stt_model",
+        "sections",
+        "status",
+        "blockers"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "realization_id": { "$ref": "#/$defs/nonEmptyString" },
+        "stt_model": { "$ref": "#/$defs/nonEmptyString" },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/section" }
+        },
+        "status": { "$ref": "#/$defs/status" },
+        "blockers": { "$ref": "#/$defs/blockers" }
+      },
+      "additionalProperties": false
+    },
+    "modelRun": {
+      "type": "object",
+      "required": [
+        "id",
+        "document_id",
+        "llm_model",
+        "request_ids",
+        "status",
+        "blockers",
+        "global_execution_orders"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "document_id": { "$ref": "#/$defs/nonEmptyString" },
+        "llm_model": { "$ref": "#/$defs/nonEmptyString" },
+        "request_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "status": { "$ref": "#/$defs/status" },
+        "blockers": { "$ref": "#/$defs/blockers" },
+        "global_execution_orders": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "id",
+        "llm_run_id",
+        "document_id",
+        "llm_model",
+        "repetition",
+        "execution_block",
+        "status",
+        "blockers",
+        "block_execution_order",
+        "global_execution_order"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "llm_run_id": { "$ref": "#/$defs/nonEmptyString" },
+        "document_id": { "$ref": "#/$defs/nonEmptyString" },
+        "llm_model": { "$ref": "#/$defs/nonEmptyString" },
+        "repetition": { "type": "integer", "minimum": 1 },
+        "execution_block": { "type": "integer", "minimum": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "blockers": { "$ref": "#/$defs/blockers" },
+        "block_execution_order": { "type": "integer", "minimum": 1 },
+        "global_execution_order": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

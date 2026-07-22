@@ -1,0 +1,320 @@
+{
+  "$schema": "../schema/postprocessing-factorial-plan.schema.json",
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-primary-languages-v1",
+  "revision": "postprocessing-factorial-plan-1",
+  "evidence_date": "2026-07-22",
+  "status": "design-locked-corpus-expansion-required",
+  "purpose": "Select transcript-postprocessing models against controlled variation in language, content, synthesis, voice, generation, and recognition while keeping every comparison paired to the same hidden source text.",
+  "source_selection": {
+    "path": "benchmarks/fixtures/synthetic-roundtrip-selection.json",
+    "revision": "synthetic-roundtrip-passages-3",
+    "materialized_passage_slots": 17,
+    "pending_passage_slots": 13,
+    "execution_gate": "All 30 passage slots must be materialized, digest-pinned, rights-reviewed, and native-language reviewed before the primary matrix can execute."
+  },
+  "axes": {
+    "locales": [
+      "de-DE",
+      "en-US",
+      "es-419",
+      "fr-FR",
+      "pt-BR"
+    ],
+    "content_types": [
+      "technical",
+      "native-factual",
+      "dialogue"
+    ],
+    "passages_per_content_type": 2,
+    "tts_engines": [
+      {
+        "id": "apple-avspeechsynthesizer",
+        "voice_mode": "installed-system-voice",
+        "manifest_path": null,
+        "sampling_policy": "repeat-without-seed"
+      },
+      {
+        "id": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+        "voice_mode": "description-plus-identity-seed",
+        "manifest_path": "spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json",
+        "sampling_policy": "repeat-fixed-voice-identity-seed"
+      },
+      {
+        "id": "voxtral-tts-4b-bf16-mlx-audio",
+        "voice_mode": "pinned-preset",
+        "manifest_path": "spikes/tts-calibration/voxtral-tts-4b-mlx-bf16.json",
+        "sampling_policy": "two-seeds-plus-same-seed-control"
+      }
+    ],
+    "voices_per_tts_engine_and_locale": 2,
+    "stt_models": [
+      {
+        "id": "whisper-large-v3-turbo-coreml-whispercpp",
+        "role": "mature-multilingual-baseline"
+      },
+      {
+        "id": "qwen3-asr-0.6b-mlx-direct",
+        "role": "compact-generative-mlx-candidate"
+      },
+      {
+        "id": "parakeet-tdt-0.6b-v3-coreml",
+        "role": "compact-transducer-control"
+      }
+    ],
+    "deferred_stt_extension": [
+      "apple-speechtranscriber",
+      "voxtral-realtime-4b-mlx-direct-2400ms"
+    ],
+    "llm_models": [
+      {
+        "id": "openai/gpt-5.6-sol",
+        "manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-sol-azure-eu.json",
+        "reference_two_request_cost_usd": 0.2455266
+      },
+      {
+        "id": "google/gemini-3.6-flash",
+        "manifest_path": "spikes/text-generation-openrouter-reference/candidates/gemini-3.6-flash-google-vertex-global.json",
+        "reference_two_request_cost_usd": 0.071676
+      },
+      {
+        "id": "openai/gpt-5.6-terra",
+        "manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-terra-azure-eu.json",
+        "reference_two_request_cost_usd": 0.1135068
+      },
+      {
+        "id": "moonshotai/kimi-k3",
+        "manifest_path": "spikes/text-generation-openrouter-reference/candidates/kimi-k3-moonshot-int4.json",
+        "reference_two_request_cost_usd": 0.1387416
+      },
+      {
+        "id": "anthropic/claude-sonnet-5",
+        "manifest_path": "spikes/text-generation-openrouter-reference/candidates/claude-sonnet-5-azure-us-east-2.json",
+        "reference_two_request_cost_usd": 0.144966
+      }
+    ],
+    "llm_repetitions": 2,
+    "excluded_llm_controls": [
+      {
+        "id": "qwen/qwen3.7-max",
+        "reason": "The only observed provider was non-ZDR and the explicitly authorized one-execution exception is consumed."
+      },
+      {
+        "id": "openai/gpt-5.6-luna",
+        "reason": "The German development screen showed only a 10% error reduction and no justification for full-matrix cost."
+      },
+      {
+        "id": "anthropic/claude-sonnet-4.6",
+        "reason": "Historical control replaced by Claude Sonnet 5."
+      }
+    ]
+  },
+  "passage_slots": [
+    { "id": "de-technical-a", "locale": "de-DE", "content_type": "technical", "index": 1, "passage_id": "synthetic-de-origin", "status": "materialized" },
+    { "id": "de-technical-b", "locale": "de-DE", "content_type": "technical", "index": 2, "passage_id": "synthetic-de-methods", "status": "materialized" },
+    { "id": "de-native-a", "locale": "de-DE", "content_type": "native-factual", "index": 1, "passage_id": "synthetic-de-native", "status": "materialized" },
+    { "id": "de-native-b", "locale": "de-DE", "content_type": "native-factual", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "de-dialogue-a", "locale": "de-DE", "content_type": "dialogue", "index": 1, "passage_id": "synthetic-de-dialogue", "status": "materialized" },
+    { "id": "de-dialogue-b", "locale": "de-DE", "content_type": "dialogue", "index": 2, "passage_id": null, "status": "source-selection-required" },
+
+    { "id": "en-technical-a", "locale": "en-US", "content_type": "technical", "index": 1, "passage_id": "synthetic-en-reasoning", "status": "materialized" },
+    { "id": "en-technical-b", "locale": "en-US", "content_type": "technical", "index": 2, "passage_id": "synthetic-en-nlp", "status": "materialized" },
+    { "id": "en-native-a", "locale": "en-US", "content_type": "native-factual", "index": 1, "passage_id": "synthetic-en-native", "status": "materialized" },
+    { "id": "en-native-b", "locale": "en-US", "content_type": "native-factual", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "en-dialogue-a", "locale": "en-US", "content_type": "dialogue", "index": 1, "passage_id": "synthetic-en-dialogue", "status": "materialized" },
+    { "id": "en-dialogue-b", "locale": "en-US", "content_type": "dialogue", "index": 2, "passage_id": null, "status": "source-selection-required" },
+
+    { "id": "es-technical-a", "locale": "es-419", "content_type": "technical", "index": 1, "passage_id": "synthetic-es-technical", "status": "materialized" },
+    { "id": "es-technical-b", "locale": "es-419", "content_type": "technical", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "es-native-a", "locale": "es-419", "content_type": "native-factual", "index": 1, "passage_id": "synthetic-es-native", "status": "materialized" },
+    { "id": "es-native-b", "locale": "es-419", "content_type": "native-factual", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "es-dialogue-a", "locale": "es-419", "content_type": "dialogue", "index": 1, "passage_id": "synthetic-es-dialogue", "status": "materialized" },
+    { "id": "es-dialogue-b", "locale": "es-419", "content_type": "dialogue", "index": 2, "passage_id": null, "status": "source-selection-required" },
+
+    { "id": "fr-technical-a", "locale": "fr-FR", "content_type": "technical", "index": 1, "passage_id": "synthetic-fr-technical", "status": "materialized" },
+    { "id": "fr-technical-b", "locale": "fr-FR", "content_type": "technical", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "fr-native-a", "locale": "fr-FR", "content_type": "native-factual", "index": 1, "passage_id": "synthetic-fr-native", "status": "materialized" },
+    { "id": "fr-native-b", "locale": "fr-FR", "content_type": "native-factual", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "fr-dialogue-a", "locale": "fr-FR", "content_type": "dialogue", "index": 1, "passage_id": "synthetic-fr-dialogue", "status": "materialized" },
+    { "id": "fr-dialogue-b", "locale": "fr-FR", "content_type": "dialogue", "index": 2, "passage_id": null, "status": "source-selection-required" },
+
+    { "id": "pt-technical-a", "locale": "pt-BR", "content_type": "technical", "index": 1, "passage_id": "synthetic-pt-technical", "status": "materialized" },
+    { "id": "pt-technical-b", "locale": "pt-BR", "content_type": "technical", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "pt-native-a", "locale": "pt-BR", "content_type": "native-factual", "index": 1, "passage_id": "synthetic-pt-native", "status": "materialized" },
+    { "id": "pt-native-b", "locale": "pt-BR", "content_type": "native-factual", "index": 2, "passage_id": null, "status": "source-selection-required" },
+    { "id": "pt-dialogue-a", "locale": "pt-BR", "content_type": "dialogue", "index": 1, "passage_id": "synthetic-pt-dialogue", "status": "materialized" },
+    { "id": "pt-dialogue-b", "locale": "pt-BR", "content_type": "dialogue", "index": 2, "passage_id": null, "status": "source-selection-required" }
+  ],
+  "voice_slots": [
+    { "id": "apple-de-a", "locale": "de-DE", "tts_engine": "apple-avspeechsynthesizer", "index": 1, "selector": null, "voice_locale": "de-DE", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-de-b", "locale": "de-DE", "tts_engine": "apple-avspeechsynthesizer", "index": 2, "selector": null, "voice_locale": "de-DE", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-en-a", "locale": "en-US", "tts_engine": "apple-avspeechsynthesizer", "index": 1, "selector": null, "voice_locale": "en-US", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-en-b", "locale": "en-US", "tts_engine": "apple-avspeechsynthesizer", "index": 2, "selector": null, "voice_locale": "en-US", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-es-a", "locale": "es-419", "tts_engine": "apple-avspeechsynthesizer", "index": 1, "selector": null, "voice_locale": "es-419", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-es-b", "locale": "es-419", "tts_engine": "apple-avspeechsynthesizer", "index": 2, "selector": null, "voice_locale": "es-419", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-fr-a", "locale": "fr-FR", "tts_engine": "apple-avspeechsynthesizer", "index": 1, "selector": null, "voice_locale": "fr-FR", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-fr-b", "locale": "fr-FR", "tts_engine": "apple-avspeechsynthesizer", "index": 2, "selector": null, "voice_locale": "fr-FR", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-pt-a", "locale": "pt-BR", "tts_engine": "apple-avspeechsynthesizer", "index": 1, "selector": null, "voice_locale": "pt-BR", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+    { "id": "apple-pt-b", "locale": "pt-BR", "tts_engine": "apple-avspeechsynthesizer", "index": 2, "selector": null, "voice_locale": "pt-BR", "voice_identity_seed": null, "status": "resolve-from-host-inventory" },
+
+    { "id": "qwen-de-warm", "locale": "de-DE", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 1, "selector": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.", "voice_locale": "de-DE", "voice_identity_seed": 0, "status": "content-calibrated-listening-pending" },
+    { "id": "qwen-de-clear", "locale": "de-DE", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 2, "selector": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady audiobook narration.", "voice_locale": "de-DE", "voice_identity_seed": 1, "status": "calibration-required" },
+    { "id": "qwen-en-warm", "locale": "en-US", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 1, "selector": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.", "voice_locale": "en-US", "voice_identity_seed": 0, "status": "content-calibrated-listening-pending" },
+    { "id": "qwen-en-clear", "locale": "en-US", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 2, "selector": "A clear, calm American English voice with precise articulation, restrained expression, and steady audiobook narration.", "voice_locale": "en-US", "voice_identity_seed": 1, "status": "calibration-required" },
+    { "id": "qwen-es-warm", "locale": "es-419", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 1, "selector": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.", "voice_locale": "es-419", "voice_identity_seed": 0, "status": "content-calibrated-native-review-pending" },
+    { "id": "qwen-es-clear", "locale": "es-419", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 2, "selector": "A clear, calm Latin American Spanish voice with precise articulation, restrained expression, and steady audiobook narration.", "voice_locale": "es-419", "voice_identity_seed": 1, "status": "calibration-required" },
+    { "id": "qwen-fr-warm", "locale": "fr-FR", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 1, "selector": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.", "voice_locale": "fr-FR", "voice_identity_seed": 0, "status": "content-calibrated-native-review-pending" },
+    { "id": "qwen-fr-clear", "locale": "fr-FR", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 2, "selector": "A clear, calm French-speaking voice with precise articulation, restrained expression, and steady audiobook narration.", "voice_locale": "fr-FR", "voice_identity_seed": 1, "status": "calibration-required" },
+    { "id": "qwen-pt-warm", "locale": "pt-BR", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 1, "selector": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.", "voice_locale": "pt-BR", "voice_identity_seed": 0, "status": "content-calibrated-native-review-pending" },
+    { "id": "qwen-pt-clear", "locale": "pt-BR", "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio", "index": 2, "selector": "A clear, calm Brazilian Portuguese voice with precise articulation, restrained expression, and steady audiobook narration.", "voice_locale": "pt-BR", "voice_identity_seed": 1, "status": "calibration-required" },
+
+    { "id": "voxtral-de-female", "locale": "de-DE", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 1, "selector": "de_female", "voice_locale": "de-DE", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-de-male", "locale": "de-DE", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 2, "selector": "de_male", "voice_locale": "de-DE", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-en-female", "locale": "en-US", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 1, "selector": "casual_female", "voice_locale": "en-US", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-en-male", "locale": "en-US", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 2, "selector": "casual_male", "voice_locale": "en-US", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-es-female", "locale": "es-419", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 1, "selector": "es_female", "voice_locale": "es-ES", "voice_identity_seed": null, "status": "regional-proxy-native-review-required" },
+    { "id": "voxtral-es-male", "locale": "es-419", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 2, "selector": "es_male", "voice_locale": "es-ES", "voice_identity_seed": null, "status": "regional-proxy-native-review-required" },
+    { "id": "voxtral-fr-female", "locale": "fr-FR", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 1, "selector": "fr_female", "voice_locale": "fr-FR", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-fr-male", "locale": "fr-FR", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 2, "selector": "fr_male", "voice_locale": "fr-FR", "voice_identity_seed": null, "status": "artifact-pinned-calibration-required" },
+    { "id": "voxtral-pt-female", "locale": "pt-BR", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 1, "selector": "pt_female", "voice_locale": "pt-PT", "voice_identity_seed": null, "status": "regional-proxy-native-review-required" },
+    { "id": "voxtral-pt-male", "locale": "pt-BR", "tts_engine": "voxtral-tts-4b-bf16-mlx-audio", "index": 2, "selector": "pt_male", "voice_locale": "pt-PT", "voice_identity_seed": null, "status": "regional-proxy-native-review-required" }
+  ],
+  "generation_sampling": {
+    "primary_realizations_per_voice_and_passage": 2,
+    "engine_policies": [
+      {
+        "tts_engine": "apple-avspeechsynthesizer",
+        "strategy": "repeat-without-seed",
+        "seeds": [],
+        "repetitions_per_seed_or_voice": 2,
+        "rationale": "The platform API exposes no generation seed; independent repeats measure host/runtime stability."
+      },
+      {
+        "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+        "strategy": "repeat-fixed-voice-identity-seed",
+        "seeds": [],
+        "repetitions_per_seed_or_voice": 2,
+        "rationale": "The seed participates in VoiceDesign identity and is pinned in each voice slot; repeats must reuse the exact instruction and identity seed."
+      },
+      {
+        "tts_engine": "voxtral-tts-4b-bf16-mlx-audio",
+        "strategy": "two-seeds-plus-same-seed-control",
+        "seeds": [
+          0,
+          1
+        ],
+        "repetitions_per_seed_or_voice": 1,
+        "rationale": "Preset identity is stable, so two generation seeds sample synthesis variance without changing the voice preset."
+      }
+    ],
+    "same_seed_reproducibility_control": {
+      "tts_engine": "voxtral-tts-4b-bf16-mlx-audio",
+      "seed": 0,
+      "additional_repetitions": 1,
+      "passage_slot_per_locale": "technical-a",
+      "voices_per_locale": 2,
+      "postprocessing_required": false,
+      "rationale": "One extra seed-0 generation per locale and preset separates same-seed runtime stability from the primary two-seed quality sample."
+    }
+  },
+  "document_grouping": {
+    "group_by": [
+      "locale",
+      "tts_engine",
+      "voice_slot",
+      "primary_realization",
+      "stt_model"
+    ],
+    "sections_per_document": 6,
+    "section_order": [
+      "technical-a",
+      "technical-b",
+      "native-a",
+      "native-b",
+      "dialogue-a",
+      "dialogue-b"
+    ],
+    "hidden_reference_visible_to_llm": false,
+    "reason": "Grouping the six language-local passages preserves section-level metrics while evaluating realistic multi-page context and reducing remote calls."
+  },
+  "prompt_contract": {
+    "id": "conservative-sections-local-diff-v2",
+    "path": "benchmarks/postprocessing/prompts/conservative-sections-local-diff-v2.txt",
+    "sha256": "02865763287e92528f45785e2d93f4ef916a67968abb7378c87bb4443b9808c9",
+    "structured_output_contract": "bounded-transcript-sections-local-diff-v2",
+    "model_authored_edit_ledger_required": false,
+    "authoritative_diff": "repository-local-input-output-diff",
+    "protected_span_gate": true,
+    "harmful_change_review": true
+  },
+  "execution_policy": {
+    "block_until_all_passage_slots_materialized": true,
+    "block_until_all_voice_slots_qualified": true,
+    "same_normalized_pcm_for_every_stt_model": true,
+    "retain_lossless_audio_locally": true,
+    "retain_reviewed_opus_fixture_in_repository": true,
+    "retain_raw_stt_transcripts": true,
+    "retain_every_llm_response": true,
+    "randomize_llm_execution_order_with_recorded_seed": true,
+    "llm_execution_order_seed": 20260722,
+    "require_provider_pin": true,
+    "require_no_fallback": true,
+    "require_zdr": true,
+    "native_review_required_for_non_german_and_non_english_passages": true,
+    "reporting": [
+      "per-language",
+      "per-content-type",
+      "per-passage",
+      "per-tts-engine",
+      "per-voice",
+      "per-generation-realization",
+      "per-stt-model",
+      "per-llm-model",
+      "macro-average-without-pooling-languages",
+      "source-grouped-confidence-intervals"
+    ],
+    "quality_metrics": [
+      "raw-stt-wer",
+      "postprocessed-wer",
+      "relative-error-reduction",
+      "harmful-edit-rate-on-correct-input-spans",
+      "section-regression-rate",
+      "proper-name-recall",
+      "number-date-unit-recall",
+      "technical-term-recall",
+      "presentation-only-change-count"
+    ],
+    "cost_policy": {
+      "require_dry_run_token_estimate": true,
+      "execute_in_complete_randomized_blocks": true,
+      "never_drop_failed_or_expensive_cells_after_observation": true,
+      "require_explicit_budget_approval_before_remote_execution": true,
+      "reference_two_request_cost_per_document_usd": 0.714417,
+      "projected_reference_cost_for_180_documents_usd": 128.59506,
+      "claim_limit": "Projection applies current German 995-word prompt/result costs to 180 future six-section documents; actual multilingual token counts and provider prices may differ."
+    }
+  },
+  "expected_counts": {
+    "passage_slots": 30,
+    "materialized_passage_slots": 17,
+    "pending_passage_slots": 13,
+    "voice_slots": 30,
+    "primary_audio_artifacts": 360,
+    "same_seed_control_audio_artifacts": 10,
+    "total_audio_artifacts": 370,
+    "primary_stt_transcripts": 1080,
+    "same_seed_control_stt_transcripts": 30,
+    "total_stt_transcripts": 1110,
+    "llm_documents": 180,
+    "llm_model_runs": 900,
+    "llm_requests": 1800,
+    "primary_section_level_outputs": 5400,
+    "section_level_repeat_observations": 10800
+  },
+  "decision_boundary": {
+    "synthetic_matrix_can_select_development_survivors": true,
+    "synthetic_matrix_can_satisfy_release_acceptance": false,
+    "held_out_professional_audio_required": true,
+    "claim": "The full matrix estimates robustness across controlled clean-speech generation and recognition error distributions. It does not replace held-out human podcast and audiobook evidence."
+  }
+}

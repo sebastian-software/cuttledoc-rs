@@ -1,0 +1,397 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-plan.schema.json",
+  "title": "Cuttledoc factorial transcript-postprocessing benchmark plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "revision",
+    "evidence_date",
+    "status",
+    "purpose",
+    "source_selection",
+    "axes",
+    "passage_slots",
+    "voice_slots",
+    "generation_sampling",
+    "document_grouping",
+    "prompt_contract",
+    "execution_policy",
+    "expected_counts",
+    "decision_boundary"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "revision": { "$ref": "#/$defs/nonEmptyString" },
+    "evidence_date": { "type": "string", "format": "date" },
+    "status": {
+      "enum": [
+        "design-locked-corpus-expansion-required",
+        "ready-for-dry-run",
+        "ready-for-execution",
+        "complete"
+      ]
+    },
+    "purpose": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection": {
+      "type": "object",
+      "required": [
+        "path",
+        "revision",
+        "materialized_passage_slots",
+        "pending_passage_slots",
+        "execution_gate"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "revision": { "$ref": "#/$defs/nonEmptyString" },
+        "materialized_passage_slots": { "type": "integer", "minimum": 0 },
+        "pending_passage_slots": { "type": "integer", "minimum": 0 },
+        "execution_gate": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "axes": {
+      "type": "object",
+      "required": [
+        "locales",
+        "content_types",
+        "passages_per_content_type",
+        "tts_engines",
+        "voices_per_tts_engine_and_locale",
+        "stt_models",
+        "deferred_stt_extension",
+        "llm_models",
+        "llm_repetitions",
+        "excluded_llm_controls"
+      ],
+      "properties": {
+        "locales": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "content_types": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "passages_per_content_type": { "type": "integer", "minimum": 2 },
+        "tts_engines": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ttsEngine" }
+        },
+        "voices_per_tts_engine_and_locale": { "type": "integer", "minimum": 2 },
+        "stt_models": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/modelWithRole" }
+        },
+        "deferred_stt_extension": { "$ref": "#/$defs/uniqueStrings" },
+        "llm_models": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/llmModel" }
+        },
+        "llm_repetitions": { "type": "integer", "minimum": 2 },
+        "excluded_llm_controls": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/excludedModel" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "passage_slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/passageSlot" }
+    },
+    "voice_slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/voiceSlot" }
+    },
+    "generation_sampling": {
+      "type": "object",
+      "required": [
+        "primary_realizations_per_voice_and_passage",
+        "engine_policies",
+        "same_seed_reproducibility_control"
+      ],
+      "properties": {
+        "primary_realizations_per_voice_and_passage": { "type": "integer", "minimum": 2 },
+        "engine_policies": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/enginePolicy" }
+        },
+        "same_seed_reproducibility_control": { "$ref": "#/$defs/sameSeedControl" }
+      },
+      "additionalProperties": false
+    },
+    "document_grouping": {
+      "type": "object",
+      "required": [
+        "group_by",
+        "sections_per_document",
+        "section_order",
+        "hidden_reference_visible_to_llm",
+        "reason"
+      ],
+      "properties": {
+        "group_by": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "sections_per_document": { "type": "integer", "minimum": 1 },
+        "section_order": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "hidden_reference_visible_to_llm": { "const": false },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "prompt_contract": {
+      "type": "object",
+      "required": [
+        "id",
+        "path",
+        "sha256",
+        "structured_output_contract",
+        "model_authored_edit_ledger_required",
+        "authoritative_diff",
+        "protected_span_gate",
+        "harmful_change_review"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "structured_output_contract": { "$ref": "#/$defs/nonEmptyString" },
+        "model_authored_edit_ledger_required": { "type": "boolean" },
+        "authoritative_diff": { "$ref": "#/$defs/nonEmptyString" },
+        "protected_span_gate": { "type": "boolean" },
+        "harmful_change_review": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "execution_policy": {
+      "type": "object",
+      "required": [
+        "block_until_all_passage_slots_materialized",
+        "block_until_all_voice_slots_qualified",
+        "same_normalized_pcm_for_every_stt_model",
+        "retain_lossless_audio_locally",
+        "retain_reviewed_opus_fixture_in_repository",
+        "retain_raw_stt_transcripts",
+        "retain_every_llm_response",
+        "randomize_llm_execution_order_with_recorded_seed",
+        "llm_execution_order_seed",
+        "require_provider_pin",
+        "require_no_fallback",
+        "require_zdr",
+        "native_review_required_for_non_german_and_non_english_passages",
+        "reporting",
+        "quality_metrics",
+        "cost_policy"
+      ],
+      "properties": {
+        "block_until_all_passage_slots_materialized": { "const": true },
+        "block_until_all_voice_slots_qualified": { "const": true },
+        "same_normalized_pcm_for_every_stt_model": { "const": true },
+        "retain_lossless_audio_locally": { "const": true },
+        "retain_reviewed_opus_fixture_in_repository": { "const": true },
+        "retain_raw_stt_transcripts": { "const": true },
+        "retain_every_llm_response": { "const": true },
+        "randomize_llm_execution_order_with_recorded_seed": { "const": true },
+        "llm_execution_order_seed": { "type": "integer", "minimum": 0 },
+        "require_provider_pin": { "const": true },
+        "require_no_fallback": { "const": true },
+        "require_zdr": { "const": true },
+        "native_review_required_for_non_german_and_non_english_passages": { "const": true },
+        "reporting": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "quality_metrics": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "cost_policy": { "$ref": "#/$defs/costPolicy" }
+      },
+      "additionalProperties": false
+    },
+    "expected_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "decision_boundary": {
+      "type": "object",
+      "required": [
+        "synthetic_matrix_can_select_development_survivors",
+        "synthetic_matrix_can_satisfy_release_acceptance",
+        "held_out_professional_audio_required",
+        "claim"
+      ],
+      "properties": {
+        "synthetic_matrix_can_select_development_survivors": { "const": true },
+        "synthetic_matrix_can_satisfy_release_acceptance": { "const": false },
+        "held_out_professional_audio_required": { "const": true },
+        "claim": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "uniqueStrings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "ttsEngine": {
+      "type": "object",
+      "required": ["id", "voice_mode", "manifest_path", "sampling_policy"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_mode": { "$ref": "#/$defs/nonEmptyString" },
+        "manifest_path": {
+          "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
+        },
+        "sampling_policy": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "modelWithRole": {
+      "type": "object",
+      "required": ["id", "role"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "role": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "llmModel": {
+      "type": "object",
+      "required": ["id", "manifest_path", "reference_two_request_cost_usd"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "manifest_path": { "$ref": "#/$defs/nonEmptyString" },
+        "reference_two_request_cost_usd": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "excludedModel": {
+      "type": "object",
+      "required": ["id", "reason"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "passageSlot": {
+      "type": "object",
+      "required": ["id", "locale", "content_type", "index", "passage_id", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "content_type": { "$ref": "#/$defs/nonEmptyString" },
+        "index": { "type": "integer", "minimum": 1 },
+        "passage_id": {
+          "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
+        },
+        "status": { "enum": ["materialized", "source-selection-required"] }
+      },
+      "additionalProperties": false
+    },
+    "voiceSlot": {
+      "type": "object",
+      "required": [
+        "id",
+        "locale",
+        "tts_engine",
+        "index",
+        "selector",
+        "voice_locale",
+        "voice_identity_seed",
+        "status"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "index": { "type": "integer", "minimum": 1 },
+        "selector": {
+          "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }]
+        },
+        "voice_locale": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_identity_seed": {
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        },
+        "status": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "enginePolicy": {
+      "type": "object",
+      "required": [
+        "tts_engine",
+        "strategy",
+        "seeds",
+        "repetitions_per_seed_or_voice",
+        "rationale"
+      ],
+      "properties": {
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "strategy": { "$ref": "#/$defs/nonEmptyString" },
+        "seeds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "repetitions_per_seed_or_voice": { "type": "integer", "minimum": 1 },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "sameSeedControl": {
+      "type": "object",
+      "required": [
+        "tts_engine",
+        "seed",
+        "additional_repetitions",
+        "passage_slot_per_locale",
+        "voices_per_locale",
+        "postprocessing_required",
+        "rationale"
+      ],
+      "properties": {
+        "tts_engine": { "$ref": "#/$defs/nonEmptyString" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "additional_repetitions": { "type": "integer", "minimum": 1 },
+        "passage_slot_per_locale": { "$ref": "#/$defs/nonEmptyString" },
+        "voices_per_locale": { "type": "integer", "minimum": 1 },
+        "postprocessing_required": { "const": false },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    },
+    "costPolicy": {
+      "type": "object",
+      "required": [
+        "require_dry_run_token_estimate",
+        "execute_in_complete_randomized_blocks",
+        "never_drop_failed_or_expensive_cells_after_observation",
+        "require_explicit_budget_approval_before_remote_execution",
+        "reference_two_request_cost_per_document_usd",
+        "projected_reference_cost_for_180_documents_usd",
+        "claim_limit"
+      ],
+      "properties": {
+        "require_dry_run_token_estimate": { "const": true },
+        "execute_in_complete_randomized_blocks": { "const": true },
+        "never_drop_failed_or_expensive_cells_after_observation": { "const": true },
+        "require_explicit_budget_approval_before_remote_execution": { "const": true },
+        "reference_two_request_cost_per_document_usd": { "type": "number", "minimum": 0 },
+        "projected_reference_cost_for_180_documents_usd": { "type": "number", "minimum": 0 },
+        "claim_limit": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "additionalProperties": false
+    }
+  }
+}
