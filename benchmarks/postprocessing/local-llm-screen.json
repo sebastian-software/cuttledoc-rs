@@ -57,6 +57,7 @@
     "requests": 720,
     "section_outputs": 4320
   },
+  "result_path": "benchmarks/postprocessing/local-llm-screen-results.json",
   "execution_policy": {
     "resume_valid_results": true,
     "load_each_model_once_per_batch": true,

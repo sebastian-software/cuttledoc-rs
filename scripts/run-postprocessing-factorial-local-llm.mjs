@@ -647,24 +647,38 @@ function aggregateObservations(observations, fields, requests) {
     ]));
     const accepted = group.filter((item) => item.post_wer !== null);
     const diagnostic = group.filter((item) => item.diagnostic_post_wer !== null);
-    const matchingRequests = requests.filter((request) => fields.every((field) =>
-      field === 'content_type' || request[field] === group[0][field]));
+    const requestKey = (item) =>
+      `${item.candidate}|${item.document_id}|${item.repetition}`;
+    const requestKeys = new Set(group.map(requestKey));
+    const acceptedRequestKeys = new Set(group.filter((item) =>
+      item.mechanically_accepted).map(requestKey));
+    const diagnosticRequestKeys = new Set(group.filter((item) =>
+      item.diagnostic_output_available).map(requestKey));
+    const requestByKey = new Map(requests.map((request) => [
+      requestKey(request),
+      request,
+    ]));
     return {
       ...identity,
-      request_count: fields.includes('content_type')
-        ? new Set(group.map((item) =>
-          `${item.candidate}|${item.document_id}|${item.repetition}`)).size
-        : matchingRequests.length,
-      accepted_request_count: fields.includes('content_type')
-        ? new Set(group.filter((item) => item.mechanically_accepted).map((item) =>
-          `${item.candidate}|${item.document_id}|${item.repetition}`)).size
-        : matchingRequests.filter((request) => request.mechanically_accepted).length,
+      request_count: requestKeys.size,
+      accepted_request_count: acceptedRequestKeys.size,
+      diagnostic_request_count: diagnosticRequestKeys.size,
+      invalid_request_count: requestKeys.size - acceptedRequestKeys.size,
+      token_limit_failure_count: [...requestKeys].filter((key) =>
+        requestByKey.get(key)?.reached_token_limit).length,
       section_count: group.length,
       accepted_section_count: accepted.length,
+      diagnostic_section_count: diagnostic.length,
       macro_mean_raw_wer: mean(group.map((item) => item.raw_wer)),
+      macro_mean_accepted_raw_wer: accepted.length === 0
+        ? null
+        : mean(accepted.map((item) => item.raw_wer)),
       macro_mean_post_wer: accepted.length === 0
         ? null
         : mean(accepted.map((item) => item.post_wer)),
+      macro_mean_diagnostic_raw_wer: diagnostic.length === 0
+        ? null
+        : mean(diagnostic.map((item) => item.raw_wer)),
       macro_mean_diagnostic_post_wer: diagnostic.length === 0
         ? null
         : mean(diagnostic.map((item) => item.diagnostic_post_wer)),

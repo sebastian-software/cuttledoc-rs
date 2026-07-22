@@ -346,3 +346,45 @@ cause of a failure, but it never contributes to accepted postprocessed WER.
 The same applies when a model changes every immutable hyphenated section id to
 the corresponding underscore form: exact one-to-one normalization may support
 a diagnostic quality calculation, but the request remains rejected.
+
+### Completed local results
+
+The Apple/Qwen local screen is complete: all 720 requests and 4,320 section
+observations are recorded in
+[`local-llm-screen-results.json`](../benchmarks/postprocessing/local-llm-screen-results.json).
+All 360 model/document repeat pairs produced byte-identical raw output. The
+table compares raw and postprocessed WER only on each candidate's diagnostically
+available matched subset; strict failures never become accepted outputs.
+
+| Candidate | Strictly valid | Diagnostic coverage | Matched raw → post WER | Relative error change | Improved / regressed section observations | Token caps | Disposition |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Gemma 4 E2B | 124/240 | 228/240 | 5.86% → 5.53% | 5.73% reduction | 300 / 80 | 0 | Only local survivor; contract and regression work still required |
+| Qwen 3.5 0.8B | 136/240 | 236/240 | 5.81% → 5.93% | 1.96% increase | 76 / 80 | 0 | Reject as general postprocessor |
+| SmolLM3 3B | 180/240 | 180/240 | 6.19% → 6.72% | 8.42% increase | 136 / 260 | 12 | Reject |
+
+The section counts retain both TTS and LLM repetitions and therefore are not
+independent sample counts. They show direction and repeat stability; source-
+grouped reporting remains the decision boundary.
+
+Gemma is the only candidate with a positive aggregate result, but it is not a
+product default. Only 51.7% of its responses obeyed the exact output contract;
+104 more could be inspected solely because every hyphenated section id had
+been changed to its underscore equivalent, and 12 could not be safely mapped.
+Across diagnostically available observations it still regressed 80 sections
+and introduced errors into 12 previously correct section observations.
+
+| Gemma locale | Strictly valid | Diagnostic coverage | Matched raw → post WER | Relative reduction |
+| --- | ---: | ---: | ---: | ---: |
+| German | 48/48 | 48/48 | 6.37% → 6.27% | 1.67% |
+| English | 16/48 | 48/48 | 4.51% → 4.46% | 1.05% |
+| Spanish | 24/48 | 48/48 | 4.80% → 4.05% | 15.52% |
+| French | 28/48 | 36/48 | 4.45% → 4.23% | 4.92% |
+| Portuguese | 8/48 | 48/48 | 8.83% → 8.30% | 6.05% |
+
+The accepted-only WER is not used to rank models because contract failures are
+input-dependent and would create survivorship bias. The next local prompt
+iteration should target Gemma only, remove the ambiguous example-id behavior,
+and test whether constrained or positional structured output reaches full
+contract compliance without changing the measured correction behavior. Even
+then, release acceptance still requires held-out human podcast or audiobook
+audio.
