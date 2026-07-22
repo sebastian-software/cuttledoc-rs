@@ -143,6 +143,7 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: defaultQwenRecoveryOutput,
     },
+    'slice-output': { type: 'string' },
     locale: { type: 'string' },
     limit: { type: 'string' },
     'qualification-only': { type: 'boolean', default: false },
@@ -159,6 +160,7 @@ if (![
   'run-qwen-recovery',
   'run-stt',
   'summarize-qualification',
+  'summarize-slice',
   'status',
   'self-test',
 ].includes(command)) {
@@ -166,7 +168,7 @@ if (![
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
       '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-qwen-recovery|' +
       'run-stt|' +
-      'summarize-qualification|status|self-test> [options]',
+      'summarize-qualification|summarize-slice|status|self-test> [options]',
   );
 }
 
@@ -196,6 +198,9 @@ const paths = {
   ),
   qwenRecoveryPlan: resolve(values['qwen-recovery-plan']),
   qwenRecoveryOutput: resolve(values['qwen-recovery-output']),
+  sliceOutput: values['slice-output']
+    ? resolve(values['slice-output'])
+    : null,
 };
 paths.state = join(paths.output, 'state.json');
 paths.lock = join(paths.output, '.run.lock');
@@ -245,6 +250,9 @@ if (command === 'self-test') {
     } else if (command === 'summarize-qualification') {
       const state = await initializeState();
       await summarizeQualification(state);
+    } else if (command === 'summarize-slice') {
+      const state = await initializeState();
+      await summarizeLocalSlice(state);
     }
   });
 }
@@ -1336,6 +1344,235 @@ async function summarizeQualification(state) {
     `${voices.length} voices, ${observations.length} STT observations, ` +
     `${report.disposition}\n`,
   );
+}
+
+async function summarizeLocalSlice(state) {
+  const engineIds = {
+    apple: 'apple-avspeechsynthesizer',
+    qwen: 'qwen3-tts-1.7b-voicedesign-mlx-audio',
+  };
+  const engineId = engineIds[values.engine];
+  if (!engineId) throw new Error('--engine must be apple or qwen');
+  const ledger = await readJson(paths.ledger);
+  const audioUnits = ledger.audio_units.filter((unit) =>
+    unit.kind === 'primary' && unit.tts_engine === engineId);
+  if (audioUnits.length !== 120) {
+    throw new Error(`${values.engine}: expected 120 primary audio units`);
+  }
+
+  const capturedAt = [];
+  const sourceRevisions = new Set();
+  const audioManifests = new Map();
+  for (const unit of audioUnits) {
+    const directory = join(paths.audio, unit.id);
+    if (!await validAudioArtifact(directory, unit)) {
+      throw new Error(`${unit.id}: missing or invalid slice audio`);
+    }
+    const manifest = await readJson(join(directory, 'manifest.json'));
+    audioManifests.set(unit.id, manifest);
+    capturedAt.push(manifest.captured_at);
+    sourceRevisions.add(manifest.source_revision);
+  }
+
+  const audioIds = new Set(audioUnits.map((unit) => unit.id));
+  const sttUnits = ledger.stt_units.filter((unit) =>
+    unit.kind === 'primary' && audioIds.has(unit.audio_unit_id));
+  if (sttUnits.length !== 360) {
+    throw new Error(`${values.engine}: expected 360 primary STT units`);
+  }
+  const sttModels = [...new Set(sttUnits.map((unit) => unit.stt_model))].sort();
+  if (sttModels.length !== 3) throw new Error('slice must contain three STT models');
+  const observations = [];
+  for (const unit of sttUnits) {
+    const directory = join(paths.stt, unit.id);
+    if (!await validSttArtifact(directory, unit)) {
+      throw new Error(`${unit.id}: missing or invalid slice transcript`);
+    }
+    const manifest = await readJson(join(directory, 'manifest.json'));
+    const audio = audioManifests.get(unit.audio_unit_id);
+    capturedAt.push(manifest.captured_at);
+    sourceRevisions.add(manifest.source_revision);
+    observations.push({
+      stt_unit_id: unit.id,
+      audio_unit_id: unit.audio_unit_id,
+      locale: unit.locale,
+      content_type: unit.content_type,
+      passage_slot_id: unit.passage_slot_id,
+      passage_id: audio.unit.passage_id,
+      voice_slot_id: audio.unit.voice_slot_id,
+      realization_id: audio.unit.realization_id,
+      generation_repeat: audio.unit.generation_repeat,
+      stt_model: unit.stt_model,
+      normalized_audio_sha256: manifest.source_audio.normalized_sha256,
+      transcript_sha256: manifest.transcript.sha256,
+      reference_word_count: manifest.reference.word_count,
+      transcript_word_count: manifest.transcript.word_count,
+      wer: manifest.quality.wer,
+      cer: manifest.quality.cer,
+      inference_ms: manifest.runtime.inference_ms,
+    });
+  }
+  if (sourceRevisions.size !== 1) {
+    throw new Error('slice artifacts span multiple source revisions');
+  }
+  observations.sort((left, right) =>
+    left.stt_unit_id.localeCompare(right.stt_unit_id));
+
+  const repeatGroups = new Map();
+  for (const unit of audioUnits) {
+    const key = [unit.passage_slot_id, unit.voice_slot_id].join('|');
+    if (!repeatGroups.has(key)) repeatGroups.set(key, []);
+    repeatGroups.get(key).push(unit);
+  }
+  let identicalAudioPairs = 0;
+  let maximumDurationDeltaMs = 0;
+  let identicalTranscriptPairs = 0;
+  let maximumWerDelta = 0;
+  for (const units of repeatGroups.values()) {
+    units.sort((left, right) =>
+      left.generation_repeat - right.generation_repeat);
+    if (units.length !== 2) throw new Error('slice repeat pair is incomplete');
+    const [firstAudio, secondAudio] = units.map((unit) =>
+      audioManifests.get(unit.id));
+    if (
+      firstAudio.normalized_audio.sha256 ===
+      secondAudio.normalized_audio.sha256
+    ) identicalAudioPairs += 1;
+    maximumDurationDeltaMs = Math.max(
+      maximumDurationDeltaMs,
+      Math.abs(
+        firstAudio.normalized_audio.duration_ms -
+        secondAudio.normalized_audio.duration_ms,
+      ),
+    );
+    for (const sttModel of sttModels) {
+      const first = observations.find((observation) =>
+        observation.audio_unit_id === units[0].id &&
+        observation.stt_model === sttModel);
+      const second = observations.find((observation) =>
+        observation.audio_unit_id === units[1].id &&
+        observation.stt_model === sttModel);
+      if (!first || !second) throw new Error('slice STT repeat pair is incomplete');
+      if (first.transcript_sha256 === second.transcript_sha256) {
+        identicalTranscriptPairs += 1;
+      }
+      maximumWerDelta = Math.max(
+        maximumWerDelta,
+        Math.abs(first.wer - second.wer),
+      );
+    }
+  }
+
+  const output = paths.sliceOutput ?? join(
+    repoRoot,
+    'benchmarks/postprocessing/slices',
+    `${values.engine}.${state.plan_revision}.json`,
+  );
+  const audioRecords = [...audioManifests.values()];
+  const report = {
+    schema_version: '1.0.0',
+    id: `${values.engine}-${state.plan_revision}-local-stt-slice`,
+    plan_id: state.plan_id,
+    plan_revision: state.plan_revision,
+    source_selection_revision: state.source_selection_revision,
+    evidence_source_revision: [...sourceRevisions][0],
+    evidence_captured_through: capturedAt.sort().at(-1),
+    slice: {
+      tts_engine: engineId,
+      locales: 5,
+      content_types: 3,
+      passages: 30,
+      voices: 10,
+      generation_repeats: 2,
+      stt_models: 3,
+    },
+    artifacts: {
+      audio_count: audioRecords.length,
+      stt_count: observations.length,
+      total_audio_duration_ms: audioRecords.reduce(
+        (sum, manifest) => sum + manifest.normalized_audio.duration_ms,
+        0,
+      ),
+      unique_normalized_audio_digests: new Set(audioRecords.map((manifest) =>
+        manifest.normalized_audio.sha256)).size,
+    },
+    aggregates: {
+      overall: aggregateSliceObservations(observations, []),
+      by_stt_model: aggregateSliceObservations(observations, ['stt_model']),
+      by_locale: aggregateSliceObservations(observations, ['locale']),
+      by_content_type: aggregateSliceObservations(
+        observations,
+        ['content_type'],
+      ),
+      by_locale_and_stt_model: aggregateSliceObservations(
+        observations,
+        ['locale', 'stt_model'],
+      ),
+      by_locale_content_and_stt_model: aggregateSliceObservations(
+        observations,
+        ['locale', 'content_type', 'stt_model'],
+      ),
+      by_voice_and_stt_model: aggregateSliceObservations(
+        observations,
+        ['voice_slot_id', 'stt_model'],
+      ),
+    },
+    repeat_stability: {
+      audio_pair_count: repeatGroups.size,
+      identical_normalized_audio_pairs: identicalAudioPairs,
+      maximum_audio_duration_delta_ms: maximumDurationDeltaMs,
+      stt_pair_count: repeatGroups.size * sttModels.length,
+      identical_transcript_pairs: identicalTranscriptPairs,
+      maximum_absolute_wer_delta: maximumWerDelta,
+    },
+    observations,
+    disposition: 'local-stt-slice-complete',
+    limitations: [
+      'Metrics describe synthetic clean speech, not human podcast or audiobook release quality.',
+      'Every WER is a complete TTS-to-STT channel observation, not an isolated STT score.',
+      'Means are macro averages over cells; language and content strata remain authoritative.',
+      'No LLM postprocessing is included in this local slice report.',
+    ],
+  };
+  await atomicJson(output, report);
+  process.stdout.write(
+    `Wrote ${relative(repoRoot, output)}: ${audioRecords.length} audio, ` +
+    `${observations.length} STT observations\n`,
+  );
+}
+
+function aggregateSliceObservations(observations, fields) {
+  const groups = new Map();
+  for (const observation of observations) {
+    const key = fields.map((field) => observation[field]).join('\u0000');
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(observation);
+  }
+  return [...groups].sort(([left], [right]) => left.localeCompare(right))
+    .map(([, group]) => {
+      const dimensions = Object.fromEntries(fields.map((field) => [
+        field,
+        group[0][field],
+      ]));
+      const wers = group.map((item) => item.wer);
+      return {
+        ...dimensions,
+        observation_count: group.length,
+        macro_mean_wer: mean(wers),
+        median_wer: median(wers),
+        minimum_wer: Math.min(...wers),
+        maximum_wer: Math.max(...wers),
+        macro_mean_cer: mean(group.map((item) => item.cer)),
+      };
+    });
+}
+
+function median(numbers) {
+  const sorted = [...numbers].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[middle - 1] + sorted[middle]) / 2
+    : sorted[middle];
 }
 
 function groupedQualificationMetrics(observations, field) {

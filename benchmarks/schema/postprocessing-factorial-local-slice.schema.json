@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-local-slice.schema.json",
+  "title": "Cuttledoc complete local TTS-to-STT factorial slice",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "evidence_source_revision",
+    "evidence_captured_through",
+    "slice",
+    "artifacts",
+    "aggregates",
+    "repeat_stability",
+    "observations",
+    "disposition",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "evidence_source_revision": { "$ref": "#/$defs/gitSha" },
+    "evidence_captured_through": { "type": "string", "format": "date-time" },
+    "slice": { "type": "object" },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "audio_count",
+        "stt_count",
+        "total_audio_duration_ms",
+        "unique_normalized_audio_digests"
+      ],
+      "properties": {
+        "audio_count": { "type": "integer", "minimum": 1 },
+        "stt_count": { "type": "integer", "minimum": 1 },
+        "total_audio_duration_ms": { "type": "number", "exclusiveMinimum": 0 },
+        "unique_normalized_audio_digests": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "aggregates": { "type": "object" },
+    "repeat_stability": {
+      "type": "object",
+      "required": [
+        "audio_pair_count",
+        "identical_normalized_audio_pairs",
+        "maximum_audio_duration_delta_ms",
+        "stt_pair_count",
+        "identical_transcript_pairs",
+        "maximum_absolute_wer_delta"
+      ],
+      "properties": {
+        "audio_pair_count": { "type": "integer", "minimum": 1 },
+        "identical_normalized_audio_pairs": { "type": "integer", "minimum": 0 },
+        "maximum_audio_duration_delta_ms": { "type": "number", "minimum": 0 },
+        "stt_pair_count": { "type": "integer", "minimum": 1 },
+        "identical_transcript_pairs": { "type": "integer", "minimum": 0 },
+        "maximum_absolute_wer_delta": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/observation" }
+    },
+    "disposition": { "const": "local-stt-slice-complete" },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "observation": {
+      "type": "object",
+      "required": [
+        "stt_unit_id",
+        "audio_unit_id",
+        "locale",
+        "content_type",
+        "passage_slot_id",
+        "passage_id",
+        "voice_slot_id",
+        "realization_id",
+        "generation_repeat",
+        "stt_model",
+        "normalized_audio_sha256",
+        "transcript_sha256",
+        "reference_word_count",
+        "transcript_word_count",
+        "wer",
+        "cer",
+        "inference_ms"
+      ],
+      "properties": {
+        "stt_unit_id": { "$ref": "#/$defs/nonEmptyString" },
+        "audio_unit_id": { "$ref": "#/$defs/nonEmptyString" },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "content_type": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "passage_id": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+        "realization_id": { "$ref": "#/$defs/nonEmptyString" },
+        "generation_repeat": { "type": "integer", "minimum": 1 },
+        "stt_model": { "$ref": "#/$defs/nonEmptyString" },
+        "normalized_audio_sha256": { "$ref": "#/$defs/sha256" },
+        "transcript_sha256": { "$ref": "#/$defs/sha256" },
+        "reference_word_count": { "type": "integer", "minimum": 1 },
+        "transcript_word_count": { "type": "integer", "minimum": 0 },
+        "wer": { "type": "number", "minimum": 0 },
+        "cer": { "type": "number", "minimum": 0 },
+        "inference_ms": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

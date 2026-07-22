@@ -259,6 +259,19 @@ installed locales are pinned in the plan; cross-region voices remain visible
 as such instead of being relabeled as `es-419`, `fr-FR`, or `pt-BR`. A host
 must expose those exact identifiers before the Apple slice can run.
 
+After all 120 audio and 360 STT artifacts for one engine are present, create a
+compact repository report while leaving raw PCM and transcripts ignored:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs summarize-slice \
+  --engine apple \
+  --output-dir artifacts/postprocessing-factorial-local-plan-6
+```
+
+The report retains every cell's digests and WER/CER, publishes language,
+content, voice, and recognizer strata, and separately measures whether the two
+generation repeats produced identical audio and transcripts.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only

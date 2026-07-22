@@ -4210,6 +4210,10 @@ const schemaPaths = [
     repoRoot,
     'benchmarks/schema/postprocessing-factorial-qwen-recovery.schema.json',
   ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-local-slice.schema.json',
+  ),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);
