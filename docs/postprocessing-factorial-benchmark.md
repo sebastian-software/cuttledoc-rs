@@ -343,3 +343,6 @@ remains the quality-reference runtime rather than a product dependency. The
 summary keeps strict contract compliance separate from diagnostic recovery:
 for example, JSON inside a prohibited Markdown fence can be inspected for the
 cause of a failure, but it never contributes to accepted postprocessed WER.
+The same applies when a model changes every immutable hyphenated section id to
+the corresponding underscore form: exact one-to-one normalization may support
+a diagnostic quality calculation, but the request remains rejected.

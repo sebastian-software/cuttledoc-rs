@@ -419,6 +419,7 @@ async function summarizeResults() {
           repetition,
           mechanically_accepted: strictValid,
           format_violation_with_recoverable_sections: formatViolation,
+          diagnostic_recovery_class: strictValid ? null : diagnostic.recovery,
           parser_error: result.output.parser.error,
           reached_token_limit: result.generation.reached_token_limit,
           raw_text_sha256: result.output.raw_text_sha256,
@@ -529,6 +530,12 @@ async function summarizeResults() {
         !request.mechanically_accepted).length,
       recoverable_markdown_or_format_violations: requests.filter((request) =>
         request.format_violation_with_recoverable_sections).length,
+      recoverable_markdown_fence_violations: requests.filter((request) =>
+        request.diagnostic_recovery_class?.includes('markdown-fence')).length,
+      recoverable_section_id_normalization_violations: requests.filter((request) =>
+        request.diagnostic_recovery_class?.includes(
+          'section-id-underscore-normalization',
+        )).length,
       token_limit_failures: requests.filter((request) =>
         request.reached_token_limit).length,
     },
@@ -581,10 +588,15 @@ async function summarizeResults() {
 function diagnosticSections(rawText, expectedIds) {
   const trimmed = rawText.trim();
   const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/iu);
-  const candidates = fenced ? [trimmed, fenced[1]] : [trimmed];
+  const candidates = fenced
+    ? [
+        { text: trimmed, recovery: null },
+        { text: fenced[1], recovery: 'markdown-fence' },
+      ]
+    : [{ text: trimmed, recovery: null }];
   for (const candidate of candidates) {
     try {
-      const value = JSON.parse(candidate);
+      const value = JSON.parse(candidate.text);
       if (!Array.isArray(value.sections)) continue;
       const ids = value.sections.map((section) => section?.id);
       if (
@@ -592,13 +604,33 @@ function diagnosticSections(rawText, expectedIds) {
         ids.every((id, index) => id === expectedIds[index]) &&
         value.sections.every((section) => typeof section.text === 'string')
       ) {
-        return { valid: true, sections: value.sections };
+        return {
+          valid: true,
+          sections: value.sections,
+          recovery: candidate.recovery,
+        };
+      }
+      const underscoreNormalized = ids.map((id) =>
+        typeof id === 'string' ? id.replaceAll('_', '-') : id);
+      if (
+        ids.length === expectedIds.length &&
+        underscoreNormalized.every((id, index) => id === expectedIds[index]) &&
+        value.sections.every((section) => typeof section.text === 'string')
+      ) {
+        return {
+          valid: true,
+          sections: value.sections,
+          recovery: [
+            candidate.recovery,
+            'section-id-underscore-normalization',
+          ].filter(Boolean).join('+'),
+        };
       }
     } catch {
       // Try the optional format-only recovery candidate.
     }
   }
-  return { valid: false, sections: [] };
+  return { valid: false, sections: [], recovery: null };
 }
 
 function aggregateObservations(observations, fields, requests) {
