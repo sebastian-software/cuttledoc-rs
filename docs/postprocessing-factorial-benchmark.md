@@ -306,3 +306,36 @@ that all STT engines must share. Qwen and Voxtral execution is enabled only
 when the exact model format pinned by the factorial plan is present; an older
 or differently quantized local snapshot is reported as unavailable rather
 than substituted silently.
+
+## Local LLM screen
+
+The three pinned MLX text-generation candidates are evaluated as a local
+development screen alongside, not in place of, the locked five-model hosted
+matrix. The local contract is recorded in
+[`local-llm-screen.json`](../benchmarks/postprocessing/local-llm-screen.json).
+It applies Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B to the 120 currently
+available Apple and Qwen six-section documents, twice each. That produces 720
+local requests while preserving the same hidden-reference and local-diff
+rules as the hosted comparison.
+
+Materialize the six-section documents from the digest-checked STT checkpoints:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs materialize
+node scripts/run-postprocessing-factorial-local-llm.mjs status
+```
+
+Run one resumable candidate or all three. The worker verifies the exact model
+snapshot before loading it once for the complete selected batch, retains every
+raw response, and rejects missing, reordered, or duplicate section ids:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs run \
+  --candidate qwen3.5-0.8b-4bit-mlx
+node scripts/run-postprocessing-factorial-local-llm.mjs run --candidate all
+```
+
+`--locale`, `--limit`, and `--repetitions` provide bounded diagnostic slices;
+they do not change the locked full-screen counts. Gemma remains
+evaluation-only pending its explicit product-rights disposition, and mlx-lm
+remains the quality-reference runtime rather than a product dependency.

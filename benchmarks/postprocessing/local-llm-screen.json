@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-local-llm-screen-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "purpose": "Screen the three pinned local MLX text-generation candidates against the same six-section documents used by the hosted factorial matrix.",
+  "scope": {
+    "document_status": "ready",
+    "tts_engines": [
+      "apple-avspeechsynthesizer",
+      "qwen3-tts-1.7b-voicedesign-mlx-audio"
+    ],
+    "document_count": 120,
+    "sections_per_document": 6,
+    "hidden_reference_visible_to_model": false
+  },
+  "candidates": [
+    {
+      "id": "gemma-4-e2b-it-4bit-mlx",
+      "role": "primary-quality-candidate",
+      "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/gemma-4-e2b-it-4bit-mlx.json",
+      "model_directory_name": "gemma-4-e2b-it-4bit-mlx",
+      "rights_disposition": "evaluation-only-pending-explicit-product-review"
+    },
+    {
+      "id": "qwen3.5-0.8b-4bit-mlx",
+      "role": "small-efficiency-challenger",
+      "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/qwen3.5-0.8b-4bit-mlx.json",
+      "model_directory_name": "qwen3.5-0.8b-4bit-mlx",
+      "rights_disposition": "Apache-2.0-candidate"
+    },
+    {
+      "id": "smollm3-3b-4bit-mlx",
+      "role": "multilingual-product-size-compromise",
+      "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/smollm3-3b-4bit-mlx.json",
+      "model_directory_name": "smollm3-3b-4bit-mlx",
+      "rights_disposition": "Apache-2.0-candidate"
+    }
+  ],
+  "generation": {
+    "runtime": "pinned mlx-lm reference over official Apple MLX",
+    "prompt_id": "conservative-sections-local-diff-v2",
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-sections-local-diff-v2.txt",
+    "prompt_sha256": "02865763287e92528f45785e2d93f4ef916a67968abb7378c87bb4443b9808c9",
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "repetitions": 2,
+    "chat_template_options": {
+      "enable_thinking": false
+    },
+    "output_contract": "bounded-transcript-sections-local-diff-v2"
+  },
+  "expected_counts": {
+    "documents": 120,
+    "document_model_pairs": 360,
+    "requests": 720,
+    "section_outputs": 4320
+  },
+  "execution_policy": {
+    "resume_valid_results": true,
+    "load_each_model_once_per_batch": true,
+    "retain_every_raw_response": true,
+    "reject_missing_reordered_or_duplicate_section_ids": true,
+    "derive_authoritative_diffs_locally": true
+  },
+  "claim_limit": "This local synthetic clean-speech screen can eliminate weak candidates and identify language-specific survivors. It cannot establish release quality on human podcasts or audiobooks, and mlx-lm remains a reference runtime rather than the accepted product boundary."
+}
