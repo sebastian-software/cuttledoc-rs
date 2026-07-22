@@ -67,6 +67,7 @@
       "rationale": "Screen a substantially larger open-weight model with hidden-reference context and the same external lexical audit used by the local matrix."
     },
     "gateway_request": {
+      "token_limit_field": "max_tokens",
       "response_format": {
         "type": "json_schema",
         "schema_id": "bounded-transcript-correction-v1",

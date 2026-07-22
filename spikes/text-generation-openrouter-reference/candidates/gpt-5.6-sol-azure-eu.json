@@ -29,7 +29,7 @@
       "reasoning",
       "include_reasoning",
       "seed",
-      "max_tokens",
+      "max_completion_tokens",
       "response_format",
       "structured_outputs",
       "reasoning_effort"
@@ -50,6 +50,7 @@
     }
   },
   "request_defaults": {
+    "token_limit_field": "max_completion_tokens",
     "temperature": null,
     "seed": 0,
     "reasoning": {

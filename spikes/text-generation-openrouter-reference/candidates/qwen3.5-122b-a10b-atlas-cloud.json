@@ -51,6 +51,7 @@
     }
   },
   "request_defaults": {
+    "token_limit_field": "max_tokens",
     "temperature": 0,
     "seed": 0,
     "reasoning": {

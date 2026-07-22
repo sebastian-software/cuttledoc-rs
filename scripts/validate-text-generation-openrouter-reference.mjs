@@ -216,7 +216,11 @@ function validateCandidateShape(candidate) {
   }
   const reasoningValid = defaults?.reasoning === null ||
     (defaults?.reasoning?.effort === 'none' && defaults.reasoning.exclude === true);
-  if (![0, null].includes(defaults?.temperature) ||
+  if (!['max_tokens', 'max_completion_tokens'].includes(
+    defaults?.token_limit_field,
+  ) ||
+      !gateway?.supported_parameters.includes(defaults.token_limit_field) ||
+      ![0, null].includes(defaults?.temperature) ||
       ![0, null].includes(defaults?.seed) || !reasoningValid ||
       defaults?.response_format?.type !== 'json_schema' ||
       defaults?.response_format?.schema_id !==
@@ -333,6 +337,8 @@ async function validateExperiment(experiment, path) {
         JSON.stringify(run.procedure?.generation) !==
           JSON.stringify(experiment.generation_contract) ||
         run.procedure?.evaluation_reference_visible_to_model !== false ||
+        run.procedure?.gateway_request?.token_limit_field !==
+          candidate.request_defaults.token_limit_field ||
         run.procedure?.gateway_request?.provider?.allow_fallbacks !== false ||
         run.procedure?.gateway_request?.provider?.data_collection !== 'deny' ||
         run.procedure?.gateway_request?.provider?.zdr !== true) {

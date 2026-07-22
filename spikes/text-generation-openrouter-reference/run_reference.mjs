@@ -313,7 +313,6 @@ async function runRequest(manifest, contract, prompt, apiKey) {
   const body = {
     model: manifest.model.requested_id,
     messages: [{ role: 'user', content: prompt }],
-    max_tokens: contract.max_tokens,
     response_format: {
       type: 'json_schema',
       json_schema: {
@@ -330,6 +329,7 @@ async function runRequest(manifest, contract, prompt, apiKey) {
       zdr: true,
     },
   };
+  body[request.token_limit_field] = contract.max_tokens;
   if (request.temperature !== null) body.temperature = request.temperature;
   if (request.seed !== null) body.seed = request.seed;
   if (request.reasoning !== null) body.reasoning = request.reasoning;
@@ -478,6 +478,7 @@ async function main() {
       experiment_id: experiment.id,
       generation: contract,
       gateway_request: {
+        token_limit_field: manifest.request_defaults.token_limit_field,
         response_format: manifest.request_defaults.response_format,
         temperature: manifest.request_defaults.temperature,
         seed: manifest.request_defaults.seed,
