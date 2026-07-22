@@ -29,6 +29,14 @@ const defaultTextDirectory =
   '/private/tmp/cuttledoc-synthetic-passages-4-verify';
 const defaultQwenModelDirectory =
   '/tmp/cuttledoc-qwen3-tts-1.7b-voicedesign-mlx-bf16';
+const defaultQwenPython = join(
+  repoRoot,
+  'spikes/qwen3-tts-mlx-reference/.venv/bin/python',
+);
+const defaultQwenManifest = join(
+  repoRoot,
+  'spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json',
+);
 const defaultVoxtralModelDirectory =
   '/tmp/cuttledoc-voxtral-tts-4b-mlx-bf16';
 const defaultWhisperModuleDirectory = '/Users/sebastian/Workspace/whisper-coreml';
@@ -45,6 +53,11 @@ const defaultQualificationOutput = join(
   repoRoot,
   'benchmarks/postprocessing/qualifications/' +
     'apple-avspeechsynthesizer.technical-a-1.json',
+);
+const defaultQwenQualificationOutput = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications/' +
+    'qwen3-tts-1.7b-voicedesign.technical-a-1.json',
 );
 
 const { positionals, values } = parseArgs({
@@ -71,6 +84,8 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: defaultQwenModelDirectory,
     },
+    'qwen-python': { type: 'string', default: defaultQwenPython },
+    'qwen-manifest': { type: 'string', default: defaultQwenManifest },
     'voxtral-model-dir': {
       type: 'string',
       default: defaultVoxtralModelDirectory,
@@ -80,6 +95,7 @@ const { positionals, values } = parseArgs({
       default: '/private/tmp/cuttledoc-factorial-apple-tts-build',
     },
     backend: { type: 'string', default: 'all' },
+    engine: { type: 'string', default: 'apple' },
     'whisper-module-dir': {
       type: 'string',
       default: defaultWhisperModuleDirectory,
@@ -121,6 +137,7 @@ if (![
   'init',
   'resolve-voices',
   'run-apple-tts',
+  'run-qwen-tts',
   'run-stt',
   'summarize-qualification',
   'status',
@@ -128,7 +145,7 @@ if (![
 ].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
-      '<init|resolve-voices|run-apple-tts|run-stt|' +
+      '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-stt|' +
       'summarize-qualification|status|self-test> [options]',
   );
 }
@@ -140,6 +157,8 @@ const paths = {
   ledger: resolve(values.ledger),
   selection: resolve(values.selection),
   qwenModel: resolve(values['qwen-model-dir']),
+  qwenPython: resolve(values['qwen-python']),
+  qwenManifest: resolve(values['qwen-manifest']),
   voxtralModel: resolve(values['voxtral-model-dir']),
   appleBuild: resolve(values['apple-build-dir']),
   whisperModule: resolve(values['whisper-module-dir']),
@@ -149,13 +168,20 @@ const paths = {
   parakeetVad: resolve(values['parakeet-vad-dir']),
   qwenAsrBinary: resolve(values['qwen-asr-binary']),
   qwenAsrModel: resolve(values['qwen-asr-model-dir']),
-  qualificationOutput: resolve(values['qualification-output']),
+  qualificationOutput: resolve(
+    values.engine === 'qwen' &&
+      values['qualification-output'] === defaultQualificationOutput
+      ? defaultQwenQualificationOutput
+      : values['qualification-output'],
+  ),
 };
 paths.state = join(paths.output, 'state.json');
 paths.lock = join(paths.output, '.run.lock');
 paths.audio = join(paths.output, 'audio');
 paths.stt = join(paths.output, 'stt');
 paths.appleInventory = join(paths.output, 'apple-voice-inventory.json');
+paths.qwenWorker = join(paths.output, 'qwen-worker');
+paths.qwenJobs = join(paths.output, 'qwen-jobs.json');
 
 if (command === 'self-test') {
   selfTest();
@@ -179,6 +205,11 @@ if (command === 'self-test') {
       await runAppleTts(state);
       await writeState(state);
       await printStatus(state);
+    } else if (command === 'run-qwen-tts') {
+      const state = await initializeState();
+      await runQwenTts(state);
+      await writeState(state);
+      await printStatus(state);
     } else if (command === 'run-stt') {
       const state = await initializeState();
       await runStt(state);
@@ -186,7 +217,7 @@ if (command === 'self-test') {
       await printStatus(state);
     } else if (command === 'summarize-qualification') {
       const state = await initializeState();
-      await summarizeAppleQualification(state);
+      await summarizeQualification(state);
     }
   });
 }
@@ -307,6 +338,8 @@ async function validateMaterializedPassages(plan, selection) {
 async function capabilities() {
   const [
     qwen,
+    qwenPython,
+    qwenManifest,
     voxtral,
     ffmpeg,
     xcrun,
@@ -320,6 +353,8 @@ async function capabilities() {
     qwenAsrModel,
   ] = await Promise.all([
     pathCapability(paths.qwenModel),
+    pathCapability(paths.qwenPython),
+    pathCapability(paths.qwenManifest),
     pathCapability(paths.voxtralModel),
     commandCapability('ffmpeg'),
     commandCapability('xcrun'),
@@ -339,7 +374,12 @@ async function capabilities() {
       rustc,
     },
     normalization: { ffmpeg },
-    qwen3_tts_bf16: qwen,
+    qwen3_tts_bf16: {
+      available: qwen.available && qwenPython.available && qwenManifest.available,
+      model: qwen,
+      python: qwenPython,
+      manifest: qwenManifest,
+    },
     voxtral_tts_bf16: voxtral,
     stt: {
       whisper: {
@@ -619,6 +659,195 @@ async function generateAppleAudio({
   }
 }
 
+async function runQwenTts(state) {
+  if (!state.capabilities.qwen3_tts_bf16.available) {
+    throw new Error('pinned Qwen3-TTS BF16 model or runtime is unavailable');
+  }
+  const [plan, ledger, selection] = await Promise.all([
+    readJson(paths.plan),
+    readJson(paths.ledger),
+    readJson(paths.selection),
+  ]);
+  const selectedPassages = selectedPassageMap(selection);
+  const voiceSlots = new Map(plan.voice_slots.map((slot) => [slot.id, slot]));
+  const limit = parseLimit(values.limit);
+  let units = ledger.audio_units.filter((unit) =>
+    unit.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio' &&
+    (!values.locale || unit.locale === values.locale));
+  if (values['qualification-only']) {
+    units = units.filter((unit) =>
+      unit.passage_slot_id.endsWith('technical-a') &&
+      unit.generation_repeat === 1);
+  }
+  if (limit !== null) units = units.slice(0, limit);
+
+  const jobs = [];
+  let skipped = 0;
+  for (const unit of units) {
+    const outputDirectory = join(paths.audio, unit.id);
+    if (!values.force && await validAudioArtifact(outputDirectory, unit)) {
+      skipped += 1;
+      continue;
+    }
+    const voice = voiceSlots.get(unit.voice_slot_id);
+    const selected = selectedPassages.get(unit.passage_id);
+    if (!voice?.selector || !Number.isInteger(voice.voice_identity_seed)) {
+      throw new Error(`${unit.id}: Qwen voice contract is incomplete`);
+    }
+    if (!selected) throw new Error(`${unit.id}: selected passage is missing`);
+    if (values.force) {
+      await Promise.all([
+        rm(outputDirectory, { recursive: true, force: true }),
+        rm(join(paths.qwenWorker, unit.id), { recursive: true, force: true }),
+      ]);
+    }
+    jobs.push({
+      id: unit.id,
+      locale: unit.locale,
+      language: qwenLanguage(unit.locale),
+      instruction: voice.selector,
+      seed: voice.voice_identity_seed,
+      text_path: join(paths.text, `${unit.passage_id}.txt`),
+      text_sha256: selected.passage.spoken_sha256,
+    });
+  }
+  if (jobs.length === 0) {
+    process.stdout.write(
+      `Qwen TTS completed 0, resumed ${skipped}, selected ${units.length}\n`,
+    );
+    return;
+  }
+
+  await atomicJson(paths.qwenJobs, { schema_version: '1.0.0', jobs });
+  commandOutput(paths.qwenPython, [
+    join(repoRoot, 'spikes/tts-calibration/run_qwen_voicedesign_batch.py'),
+    '--manifest', paths.qwenManifest,
+    '--model-dir', paths.qwenModel,
+    '--jobs', paths.qwenJobs,
+    '--output-dir', paths.qwenWorker,
+    '--source-revision', gitRevision(),
+  ], { maxBuffer: 64 * 1024 * 1024 });
+
+  let completed = 0;
+  for (const job of jobs) {
+    const unit = units.find((candidate) => candidate.id === job.id);
+    const voice = voiceSlots.get(unit.voice_slot_id);
+    await materializeQwenAudio({
+      job,
+      unit,
+      voice,
+      selected: selectedPassages.get(unit.passage_id),
+      state,
+    });
+    completed += 1;
+    process.stderr.write(
+      `qwen tts materialized: ${unit.id} ` +
+      `(${completed + skipped}/${units.length})\n`,
+    );
+    state.progress = await progress(ledger);
+    await writeState(state);
+  }
+  process.stdout.write(
+    `Qwen TTS completed ${completed}, resumed ${skipped}, ` +
+    `selected ${units.length}\n`,
+  );
+}
+
+async function materializeQwenAudio({ job, unit, voice, selected, state }) {
+  const workerDirectory = join(paths.qwenWorker, unit.id);
+  const workerResult = await readJson(join(workerDirectory, 'result.json'));
+  const raw = await readFile(join(workerDirectory, workerResult.audio.path));
+  if (
+    workerResult.job_id !== unit.id ||
+    workerResult.source_revision !== gitRevision() ||
+    workerResult.input.text_sha256 !== job.text_sha256 ||
+    workerResult.generation.instruction !== voice.selector ||
+    workerResult.generation.seed !== voice.voice_identity_seed ||
+    raw.length !== workerResult.audio.byte_count ||
+    sha256(raw) !== workerResult.audio.sha256
+  ) {
+    throw new Error(`${unit.id}: invalid Qwen worker checkpoint`);
+  }
+  const temporary = await mkdtemp(join(paths.output, '.audio-tmp-'));
+  const outputDirectory = join(paths.audio, unit.id);
+  try {
+    const rawPath = join(temporary, 'audio.f32le');
+    const normalizedPath = join(temporary, 'normalized-16k.f32le');
+    await writeFile(rawPath, raw);
+    commandOutput('ffmpeg', [
+      '-y', '-v', 'error',
+      '-f', 'f32le',
+      '-ar', String(workerResult.audio.sample_rate_hz),
+      '-ac', '1', '-i', rawPath,
+      '-ar', '16000', '-ac', '1', '-f', 'f32le', '-acodec', 'pcm_f32le',
+      normalizedPath,
+    ]);
+    const normalized = await readFile(normalizedPath);
+    const manifest = {
+      schema_version: '1.0.0',
+      id: unit.id,
+      plan_id: state.plan_id,
+      plan_revision: state.plan_revision,
+      source_selection_revision: state.source_selection_revision,
+      source_revision: gitRevision(),
+      captured_at: workerResult.captured_at,
+      unit,
+      voice: {
+        voice_slot_id: unit.voice_slot_id,
+        mode: 'description',
+        instruction: voice.selector,
+        identity_seed: voice.voice_identity_seed,
+        requested_locale: unit.locale,
+        language: job.language,
+      },
+      input: {
+        path: relative(repoRoot, job.text_path),
+        passage_id: unit.passage_id,
+        source_id: selected.source.id,
+        character_count: selected.passage.character_count,
+        text_sha256: selected.passage.spoken_sha256,
+        license: selected.source.license,
+      },
+      audio: workerResult.audio,
+      normalized_audio: {
+        path: 'normalized-16k.f32le',
+        sample_format: 'f32le',
+        sample_rate_hz: 16000,
+        channel_count: 1,
+        sample_count: normalized.length / 4,
+        byte_count: normalized.length,
+        duration_ms: normalized.length / 4 / 16,
+        sha256: sha256(normalized),
+      },
+      runtime_summary: {
+        adapter: 'pinned-mlx-audio-python-batch-reference',
+        generation: workerResult.generation,
+        runtime: workerResult.runtime,
+        termination: workerResult.termination,
+      },
+      disposition: 'generated-pending-stt-qualification',
+    };
+    await writeFile(join(temporary, 'manifest.json'), json(manifest));
+    await mkdir(dirname(outputDirectory), { recursive: true });
+    await rename(temporary, outputDirectory);
+  } catch (error) {
+    await rm(temporary, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+function qwenLanguage(locale) {
+  const languages = {
+    'de-DE': 'German',
+    'en-US': 'English',
+    'es-419': 'Spanish',
+    'fr-FR': 'French',
+    'pt-BR': 'Portuguese',
+  };
+  if (!languages[locale]) throw new Error(`${locale}: unsupported Qwen locale`);
+  return languages[locale];
+}
+
 async function runStt(state) {
   const ledger = await readJson(paths.ledger);
   const selection = await readJson(paths.selection);
@@ -693,14 +922,26 @@ async function runStt(state) {
   );
 }
 
-async function summarizeAppleQualification(state) {
+async function summarizeQualification(state) {
+  const engines = {
+    apple: {
+      id: 'apple-avspeechsynthesizer',
+      report_id: 'apple-avspeechsynthesizer-technical-a-qualification-1',
+    },
+    qwen: {
+      id: 'qwen3-tts-1.7b-voicedesign-mlx-audio',
+      report_id: 'qwen3-tts-1.7b-voicedesign-technical-a-qualification-1',
+    },
+  };
+  const engine = engines[values.engine];
+  if (!engine) throw new Error('--engine must be apple or qwen');
   const ledger = await readJson(paths.ledger);
   const qualificationAudioUnits = ledger.audio_units.filter((unit) =>
-    unit.tts_engine === 'apple-avspeechsynthesizer' &&
+    unit.tts_engine === engine.id &&
     unit.passage_slot_id.endsWith('technical-a') &&
     unit.generation_repeat === 1);
   if (qualificationAudioUnits.length !== 10) {
-    throw new Error('expected ten Apple qualification audio units');
+    throw new Error(`expected ten ${values.engine} qualification audio units`);
   }
 
   const audioById = new Map();
@@ -756,19 +997,25 @@ async function summarizeAppleQualification(state) {
         inference_ms: manifest.runtime.inference_ms,
       }));
     const bestWer = Math.min(...observations.map((item) => item.wer));
+    const reachedMaxTokens =
+      audio.runtime_summary.termination?.reached_max_tokens ?? false;
     const passes =
       audio.audio.non_finite_sample_count === 0 &&
       audio.audio.rms >= minimumMasterRms &&
       observations.length === 3 &&
-      bestWer <= maximumBestReceiverWer;
+      bestWer <= maximumBestReceiverWer &&
+      !reachedMaxTokens;
     return {
       voice_slot_id: unit.voice_slot_id,
       locale: unit.locale,
       passage_slot_id: unit.passage_slot_id,
       passage_id: unit.passage_id,
-      identifier: audio.voice.identifier,
-      resolved_locale: audio.voice.resolved_locale,
-      name: audio.voice.inventory.name,
+      identifier: audio.voice.identifier ?? unit.voice_slot_id,
+      resolved_locale:
+        audio.voice.resolved_locale ?? audio.voice.requested_locale,
+      name: audio.voice.inventory?.name ?? unit.voice_slot_id,
+      voice_description: audio.voice.instruction ?? null,
+      voice_identity_seed: audio.voice.identity_seed ?? null,
       audio_unit_id: unit.id,
       master_sha256: audio.audio.sha256,
       normalized_sha256: audio.normalized_audio.sha256,
@@ -776,6 +1023,7 @@ async function summarizeAppleQualification(state) {
       sample_rate_hz: audio.audio.sample_rate_hz,
       rms: audio.audio.rms,
       non_finite_sample_count: audio.audio.non_finite_sample_count,
+      generation_reached_max_tokens: reachedMaxTokens,
       best_wer: bestWer,
       worst_wer: Math.max(...observations.map((item) => item.wer)),
       observations,
@@ -788,14 +1036,14 @@ async function summarizeAppleQualification(state) {
   ));
   const report = {
     schema_version: '1.0.0',
-    id: 'apple-avspeechsynthesizer-technical-a-qualification-1',
+    id: engine.report_id,
     plan_id: state.plan_id,
     plan_revision: state.plan_revision,
     source_selection_revision: state.source_selection_revision,
     evidence_source_revision: [...sourceRevisions][0],
     evidence_captured_through: capturedAt.sort().at(-1),
     qualification_slice: {
-      tts_engine: 'apple-avspeechsynthesizer',
+      tts_engine: engine.id,
       passage_selector: '*-technical-a',
       generation_repeat: 1,
       voice_count: voices.length,
@@ -806,6 +1054,7 @@ async function summarizeAppleQualification(state) {
       purpose: 'catastrophic technical screen before factorial expansion',
       minimum_master_rms: minimumMasterRms,
       maximum_non_finite_samples: 0,
+      generation_must_finish_before_max_tokens: true,
       required_stt_models_per_voice: 3,
       maximum_best_receiver_wer: maximumBestReceiverWer,
       receiver_rule:
@@ -1500,7 +1749,8 @@ function selfTest() {
   if (
     errorRate(['one', 'two'], ['one', 'too']) !== 0.5 ||
     sttModelsForOption('all').size !== 3 ||
-    !sttModelsForOption('qwen3').has('qwen3-asr-0.6b-mlx-direct')
+    !sttModelsForOption('qwen3').has('qwen3-asr-0.6b-mlx-direct') ||
+    qwenLanguage('pt-BR') !== 'Portuguese'
   ) {
     throw new Error('self-test: STT selection or error rate failed');
   }

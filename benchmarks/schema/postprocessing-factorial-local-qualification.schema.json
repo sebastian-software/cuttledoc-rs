@@ -135,6 +135,8 @@
         "identifier",
         "resolved_locale",
         "name",
+        "voice_description",
+        "voice_identity_seed",
         "audio_unit_id",
         "master_sha256",
         "normalized_sha256",
@@ -142,6 +144,7 @@
         "sample_rate_hz",
         "rms",
         "non_finite_sample_count",
+        "generation_reached_max_tokens",
         "best_wer",
         "worst_wer",
         "observations",
@@ -155,6 +158,14 @@
         "identifier": { "$ref": "#/$defs/nonEmptyString" },
         "resolved_locale": { "$ref": "#/$defs/nonEmptyString" },
         "name": { "$ref": "#/$defs/nonEmptyString" },
+        "voice_description": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "voice_identity_seed": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
         "audio_unit_id": { "$ref": "#/$defs/nonEmptyString" },
         "master_sha256": { "$ref": "#/$defs/sha256" },
         "normalized_sha256": { "$ref": "#/$defs/sha256" },
@@ -162,6 +173,7 @@
         "sample_rate_hz": { "type": "integer", "minimum": 1 },
         "rms": { "type": "number", "minimum": 0 },
         "non_finite_sample_count": { "type": "integer", "minimum": 0 },
+        "generation_reached_max_tokens": { "type": "boolean" },
         "best_wer": { "type": "number", "minimum": 0 },
         "worst_wer": { "type": "number", "minimum": 0 },
         "observations": {

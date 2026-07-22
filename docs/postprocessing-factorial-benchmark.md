@@ -214,6 +214,24 @@ or unintelligible synthesis before expansion. It deliberately retains
 recognizer disagreement and does not turn a single synthetic passage into an
 engine ranking or a claim about human podcast and audiobook quality.
 
+The Qwen VoiceDesign qualification uses the same ten-cell slice. Its batch
+worker verifies the pinned BF16 snapshot once, loads the MLX model once, then
+checkpoints every voice independently before the shared normalization and STT
+stages:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs run-qwen-tts \
+  --qualification-only
+node scripts/run-postprocessing-factorial-local.mjs run-stt \
+  --qualification-only --backend all
+node scripts/run-postprocessing-factorial-local.mjs summarize-qualification \
+  --engine qwen
+```
+
+Qwen repeats reuse the voice slot's identity seed exactly. A generation that
+reaches the token ceiling is retained for diagnosis but fails the technical
+gate instead of being treated as a shorter successful utterance.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only
