@@ -91,7 +91,78 @@
         "maximum_wer": 0.21428571428571427,
         "mean_cer": 0.028536733454766244
       }
-    ]
+    ],
+    "passing_voices_only": {
+      "voice_count": 10,
+      "by_stt_model": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "observation_count": 10,
+          "mean_wer": 0.09265598662604113,
+          "minimum_wer": 0.01910828025477707,
+          "maximum_wer": 0.21428571428571427,
+          "mean_cer": 0.040628327980866186
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "observation_count": 10,
+          "mean_wer": 0.07213844227590174,
+          "minimum_wer": 0,
+          "maximum_wer": 0.1650485436893204,
+          "mean_cer": 0.017534678029554513
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "observation_count": 10,
+          "mean_wer": 0.04109341472057721,
+          "minimum_wer": 0,
+          "maximum_wer": 0.1262135922330097,
+          "mean_cer": 0.006887960132010788
+        }
+      ],
+      "by_locale": [
+        {
+          "locale": "de-DE",
+          "observation_count": 6,
+          "mean_wer": 0.1116504854368932,
+          "minimum_wer": 0.019417475728155338,
+          "maximum_wer": 0.1650485436893204,
+          "mean_cer": 0.038294797687861266
+        },
+        {
+          "locale": "en-US",
+          "observation_count": 6,
+          "mean_wer": 0.04415954415954416,
+          "minimum_wer": 0.02564102564102564,
+          "maximum_wer": 0.08547008547008547,
+          "mean_cer": 0.010242085661080074
+        },
+        {
+          "locale": "es-419",
+          "observation_count": 6,
+          "mean_wer": 0.024416135881104032,
+          "minimum_wer": 0,
+          "maximum_wer": 0.09554140127388536,
+          "mean_cer": 0.01888162672476398
+        },
+        {
+          "locale": "fr-FR",
+          "observation_count": 6,
+          "mean_wer": 0.05917874396135265,
+          "minimum_wer": 0.021739130434782608,
+          "maximum_wer": 0.14492753623188406,
+          "mean_cer": 0.012463033375580905
+        },
+        {
+          "locale": "pt-BR",
+          "observation_count": 6,
+          "mean_wer": 0.10374149659863946,
+          "minimum_wer": 0.04081632653061224,
+          "maximum_wer": 0.21428571428571427,
+          "mean_cer": 0.028536733454766244
+        }
+      ]
+    }
   },
   "voices": [
     {
@@ -580,6 +651,7 @@
     "This is one technical passage per voice, not the factorial benchmark.",
     "Synthetic clean speech cannot establish quality on human podcasts or audiobooks.",
     "WER measures the complete TTS-to-STT channel and is receiver-specific.",
+    "Overall aggregates retain failed generations; passing_voices_only excludes them.",
     "The technical gate does not replace optional perceptual listening review."
   ]
 }

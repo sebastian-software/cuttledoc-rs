@@ -49,7 +49,7 @@
     "policy": { "type": "object" },
     "aggregates": {
       "type": "object",
-      "required": ["by_stt_model", "by_locale"],
+      "required": ["by_stt_model", "by_locale", "passing_voices_only"],
       "properties": {
         "by_stt_model": {
           "type": "array",
@@ -58,6 +58,22 @@
         "by_locale": {
           "type": "array",
           "items": { "$ref": "#/$defs/aggregate" }
+        },
+        "passing_voices_only": {
+          "type": "object",
+          "required": ["voice_count", "by_stt_model", "by_locale"],
+          "properties": {
+            "voice_count": { "type": "integer", "minimum": 0 },
+            "by_stt_model": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/aggregate" }
+            },
+            "by_locale": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/aggregate" }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

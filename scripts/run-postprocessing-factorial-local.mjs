@@ -1032,8 +1032,15 @@ async function summarizeQualification(state) {
   }).sort((left, right) =>
     left.voice_slot_id.localeCompare(right.voice_slot_id));
   const observations = voices.flatMap((voice) => voice.observations.map(
-    (observation) => ({ ...observation, locale: voice.locale }),
+    (observation) => ({
+      ...observation,
+      locale: voice.locale,
+      voice_slot_id: voice.voice_slot_id,
+      technical_gate: voice.technical_gate,
+    }),
   ));
+  const passingObservations = observations.filter((observation) =>
+    observation.technical_gate === 'passed');
   const report = {
     schema_version: '1.0.0',
     id: engine.report_id,
@@ -1065,6 +1072,15 @@ async function summarizeQualification(state) {
     aggregates: {
       by_stt_model: groupedQualificationMetrics(observations, 'stt_model'),
       by_locale: groupedQualificationMetrics(observations, 'locale'),
+      passing_voices_only: {
+        voice_count: voices.filter((voice) =>
+          voice.technical_gate === 'passed').length,
+        by_stt_model: groupedQualificationMetrics(
+          passingObservations,
+          'stt_model',
+        ),
+        by_locale: groupedQualificationMetrics(passingObservations, 'locale'),
+      },
     },
     voices,
     disposition: voices.every((voice) => voice.technical_gate === 'passed')
@@ -1074,6 +1090,7 @@ async function summarizeQualification(state) {
       'This is one technical passage per voice, not the factorial benchmark.',
       'Synthetic clean speech cannot establish quality on human podcasts or audiobooks.',
       'WER measures the complete TTS-to-STT channel and is receiver-specific.',
+      'Overall aggregates retain failed generations; passing_voices_only excludes them.',
       'The technical gate does not replace optional perceptual listening review.',
     ],
   };

@@ -1,0 +1,657 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3-tts-1.7b-voicedesign-technical-a-qualification-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-3",
+  "source_selection_revision": "synthetic-roundtrip-passages-4",
+  "evidence_source_revision": "f20ca36711a63b884fd3d2d3edb4b2810ff44b75",
+  "evidence_captured_through": "2026-07-22T12:47:05.330Z",
+  "qualification_slice": {
+    "tts_engine": "qwen3-tts-1.7b-voicedesign-mlx-audio",
+    "passage_selector": "*-technical-a",
+    "generation_repeat": 1,
+    "voice_count": 10,
+    "audio_count": 10,
+    "stt_count": 30
+  },
+  "policy": {
+    "purpose": "catastrophic technical screen before factorial expansion",
+    "minimum_master_rms": 0.01,
+    "maximum_non_finite_samples": 0,
+    "generation_must_finish_before_max_tokens": true,
+    "required_stt_models_per_voice": 3,
+    "maximum_best_receiver_wer": 0.2,
+    "receiver_rule": "At least one locked STT receiver must meet the WER threshold; receiver disagreement is retained as evidence, not used to reject an otherwise intelligible voice."
+  },
+  "aggregates": {
+    "by_stt_model": [
+      {
+        "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+        "observation_count": 10,
+        "mean_wer": 0.19810119417942407,
+        "minimum_wer": 0.05128205128205128,
+        "maximum_wer": 0.5286624203821656,
+        "mean_cer": 0.1486095871567899
+      },
+      {
+        "stt_model": "qwen3-asr-0.6b-mlx-direct",
+        "observation_count": 10,
+        "mean_wer": 0.13708757117539264,
+        "minimum_wer": 0.01910828025477707,
+        "maximum_wer": 0.5222929936305732,
+        "mean_cer": 0.10170948732597374
+      },
+      {
+        "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+        "observation_count": 10,
+        "mean_wer": 0.21178675925170204,
+        "minimum_wer": 0,
+        "maximum_wer": 1.4077669902912622,
+        "mean_cer": 0.1346720051371403
+      }
+    ],
+    "by_locale": [
+      {
+        "locale": "de-DE",
+        "observation_count": 6,
+        "mean_wer": 0.42718446601941745,
+        "minimum_wer": 0.02912621359223301,
+        "maximum_wer": 1.4077669902912622,
+        "mean_cer": 0.3386319845857419
+      },
+      {
+        "locale": "en-US",
+        "observation_count": 6,
+        "mean_wer": 0.04985754985754986,
+        "minimum_wer": 0.02564102564102564,
+        "maximum_wer": 0.07692307692307693,
+        "mean_cer": 0.003957169459962756
+      },
+      {
+        "locale": "es-419",
+        "observation_count": 6,
+        "mean_wer": 0.27176220806794055,
+        "minimum_wer": 0,
+        "maximum_wer": 0.5286624203821656,
+        "mean_cer": 0.24364560639070443
+      },
+      {
+        "locale": "fr-FR",
+        "observation_count": 6,
+        "mean_wer": 0.07608695652173914,
+        "minimum_wer": 0.028985507246376812,
+        "maximum_wer": 0.2826086956521739,
+        "mean_cer": 0.028094634558512886
+      },
+      {
+        "locale": "pt-BR",
+        "observation_count": 6,
+        "mean_wer": 0.08673469387755102,
+        "minimum_wer": 0.04081632653061224,
+        "maximum_wer": 0.14285714285714285,
+        "mean_cer": 0.027322404371584702
+      }
+    ],
+    "passing_voices_only": {
+      "voice_count": 8,
+      "by_stt_model": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "observation_count": 8,
+          "mean_wer": 0.13178640862311136,
+          "minimum_wer": 0.05128205128205128,
+          "maximum_wer": 0.2826086956521739,
+          "mean_cer": 0.06978551146874988
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "observation_count": 8,
+          "mean_wer": 0.05388837374600171,
+          "minimum_wer": 0.01910828025477707,
+          "maximum_wer": 0.10204081632653061,
+          "mean_cer": 0.012922274800924293
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "observation_count": 8,
+          "mean_wer": 0.0298453778259905,
+          "minimum_wer": 0,
+          "maximum_wer": 0.05102040816326531,
+          "mean_cer": 0.006297853336684741
+        }
+      ],
+      "by_locale": [
+        {
+          "locale": "de-DE",
+          "observation_count": 3,
+          "mean_wer": 0.11326860841423947,
+          "minimum_wer": 0.02912621359223301,
+          "maximum_wer": 0.27184466019417475,
+          "mean_cer": 0.09826589595375723
+        },
+        {
+          "locale": "en-US",
+          "observation_count": 6,
+          "mean_wer": 0.04985754985754986,
+          "minimum_wer": 0.02564102564102564,
+          "maximum_wer": 0.07692307692307693,
+          "mean_cer": 0.003957169459962756
+        },
+        {
+          "locale": "es-419",
+          "observation_count": 3,
+          "mean_wer": 0.036093418259023353,
+          "minimum_wer": 0,
+          "maximum_wer": 0.08917197452229299,
+          "mean_cer": 0.020334059549745823
+        },
+        {
+          "locale": "fr-FR",
+          "observation_count": 6,
+          "mean_wer": 0.07608695652173914,
+          "minimum_wer": 0.028985507246376812,
+          "maximum_wer": 0.2826086956521739,
+          "mean_cer": 0.028094634558512886
+        },
+        {
+          "locale": "pt-BR",
+          "observation_count": 6,
+          "mean_wer": 0.08673469387755102,
+          "minimum_wer": 0.04081632653061224,
+          "maximum_wer": 0.14285714285714285,
+          "mean_cer": 0.027322404371584702
+        }
+      ]
+    }
+  },
+  "voices": [
+    {
+      "voice_slot_id": "qwen-de-clear",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "qwen-de-clear",
+      "resolved_locale": "de-DE",
+      "name": "qwen-de-clear",
+      "voice_description": "A clear, calm German-speaking voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "voice_identity_seed": 1,
+      "audio_unit_id": "audio--de-technical-a--qwen-de-clear--repeat-1",
+      "master_sha256": "96bf32b036dcae8c67de160d00dc480090dade77202e8124aaab97642fc8bb7c",
+      "normalized_sha256": "3a6441ea31adf05f1bde2d64d8513e700c6caf230cd1bc2c11a32d8480b8ce3a",
+      "duration_ms": 96000,
+      "sample_rate_hz": 24000,
+      "rms": 0.08850173714756882,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": true,
+      "best_wer": 0.39805825242718446,
+      "worst_wer": 1.4077669902912622,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "9d8095b7cc55820fa9f93b934ea276318d142b5835f5214fc3000b844b4ac9bf",
+          "transcript_word_count": 65,
+          "wer": 0.39805825242718446,
+          "cer": 0.4147398843930636,
+          "inference_ms": 774.2440830000014
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "de8b4a0ac32b448696c99ad2168d0a6f0019663aee5fa1a9dde2afc95baad564",
+          "transcript_word_count": 65,
+          "wer": 0.4174757281553398,
+          "cer": 0.40173410404624277,
+          "inference_ms": 1348.663833
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "bea306bbf77a243837af87f84e9436f07cf9d217a39a3790527cf5e0f7dec925",
+          "transcript_word_count": 209,
+          "wer": 1.4077669902912622,
+          "cer": 0.9205202312138728,
+          "inference_ms": 4265.439292000001
+        }
+      ],
+      "technical_gate": "failed"
+    },
+    {
+      "voice_slot_id": "qwen-de-warm",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "qwen-de-warm",
+      "resolved_locale": "de-DE",
+      "name": "qwen-de-warm",
+      "voice_description": "A warm, conversational German-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "voice_identity_seed": 0,
+      "audio_unit_id": "audio--de-technical-a--qwen-de-warm--repeat-1",
+      "master_sha256": "e8624c0cb5b31bfccafc04c60a8f84faa07501ac43aa40ac68c3de7f6ed79342",
+      "normalized_sha256": "7e2be19b4d3e462132a12f30973c5380bad1dfef742152c5a8ba1b9e7c2db350",
+      "duration_ms": 59120,
+      "sample_rate_hz": 24000,
+      "rms": 0.08479097523582485,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.02912621359223301,
+      "worst_wer": 0.27184466019417475,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "d7f241feb08944c3b3bc3f7ef9ea49b5f12c7adeaef1b367d60104453a490c74",
+          "transcript_word_count": 77,
+          "wer": 0.27184466019417475,
+          "cer": 0.2832369942196532,
+          "inference_ms": 755.3177079999987
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "ac8861e6c3221f24e708cdc71bbbfb4a195a5e4a6d5ef605565d05ab4798b122",
+          "transcript_word_count": 103,
+          "wer": 0.038834951456310676,
+          "cer": 0.010115606936416185,
+          "inference_ms": 1899.058875
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "ae9d85cf2178e1b216eb0f5df4a24720c085a697ba3e5ce50f9e4a82ad0c1fdd",
+          "transcript_word_count": 104,
+          "wer": 0.02912621359223301,
+          "cer": 0.001445086705202312,
+          "inference_ms": 2277.4589579999997
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-en-clear",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "qwen-en-clear",
+      "resolved_locale": "en-US",
+      "name": "qwen-en-clear",
+      "voice_description": "A clear, calm American English voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "voice_identity_seed": 1,
+      "audio_unit_id": "audio--en-technical-a--qwen-en-clear--repeat-1",
+      "master_sha256": "5729f826a6af4275d98c392d1d61d5dd961ba21f451db82f5c4e67720f0550f4",
+      "normalized_sha256": "0bce59abaf7465418e96a9f58f21068820fe21f0e6a0929feaf1d0df01bc1a2d",
+      "duration_ms": 62400,
+      "sample_rate_hz": 24000,
+      "rms": 0.06650339870789472,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.03418803418803419,
+      "worst_wer": 0.07692307692307693,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "43116507e74575d1f944cafd4472fc34ed776bcccf792dd4d93ae8d2b6fb2c24",
+          "transcript_word_count": 121,
+          "wer": 0.05128205128205128,
+          "cer": 0,
+          "inference_ms": 1064.395207999998
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "02f2a9c1f221a8594234ff4bdfa559f04d193122a9c3689c091adc76985feeac",
+          "transcript_word_count": 123,
+          "wer": 0.07692307692307693,
+          "cer": 0,
+          "inference_ms": 1467.471209
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "807adeb75d397d86e9d63fd448c1101ceadde8ef8a187a582df02d8586b40ba0",
+          "transcript_word_count": 118,
+          "wer": 0.03418803418803419,
+          "cer": 0.004189944134078212,
+          "inference_ms": 2236.445584000001
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-en-warm",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "qwen-en-warm",
+      "resolved_locale": "en-US",
+      "name": "qwen-en-warm",
+      "voice_description": "A warm, conversational American English voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "voice_identity_seed": 0,
+      "audio_unit_id": "audio--en-technical-a--qwen-en-warm--repeat-1",
+      "master_sha256": "959dd7f37a127775a33cc3a4b17fd0b4d2b6e0ad18372f2d19defadfececdb59",
+      "normalized_sha256": "5fb17bc91520ec7268fd4fbf9a9573416aa2a5b8509253cf6c5eaac80d99f382",
+      "duration_ms": 57040,
+      "sample_rate_hz": 24000,
+      "rms": 0.06548660924316299,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.02564102564102564,
+      "worst_wer": 0.07692307692307693,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "8f66ae3d85df9d9d2998c271b7c3e66bacb6c15114f562c1937066136bae94f9",
+          "transcript_word_count": 122,
+          "wer": 0.07692307692307693,
+          "cer": 0.013966480446927373,
+          "inference_ms": 958.4973329999993
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "5e99751316b032a16f8d31b215673261726cec6340501d79444a9ccfc388b751",
+          "transcript_word_count": 119,
+          "wer": 0.03418803418803419,
+          "cer": 0.00558659217877095,
+          "inference_ms": 1385.206458
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "0342bdec844438ae36cc7b9cfd94b0d51540f93fe19a989701f60847e84c9f3d",
+          "transcript_word_count": 119,
+          "wer": 0.02564102564102564,
+          "cer": 0,
+          "inference_ms": 2213.436250000006
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-es-clear",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "qwen-es-clear",
+      "resolved_locale": "es-419",
+      "name": "qwen-es-clear",
+      "voice_description": "A clear, calm Latin American Spanish voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "voice_identity_seed": 1,
+      "audio_unit_id": "audio--es-technical-a--qwen-es-clear--repeat-1",
+      "master_sha256": "6d84cfe335f7ed4df6dfe2e94029f8b509fd4554c06c7f24149bce4431ce8266",
+      "normalized_sha256": "88b980fafb1f9357ec11ddb1c42afd8cc428d29fe2c44b338eb94bd31ffc7cc2",
+      "duration_ms": 96000,
+      "sample_rate_hz": 24000,
+      "rms": 0.06926645062268863,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": true,
+      "best_wer": 0.4713375796178344,
+      "worst_wer": 0.5286624203821656,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "cc587c59dcf2555e630e7ac5de49a4d77f183fb3a973492b66b10f3e9b10cc7c",
+          "transcript_word_count": 78,
+          "wer": 0.5286624203821656,
+          "cer": 0.5130718954248366,
+          "inference_ms": 851.7992079999967
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "2221badd225ab4c32ff0ea9de6a292ad4bf04666fcd47e3a6be48c7cc5485015",
+          "transcript_word_count": 77,
+          "wer": 0.5222929936305732,
+          "cer": 0.5119825708061002,
+          "inference_ms": 1285.567125
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "bdd66a8be97fd9ab69e1a6050f0f7c2483859ad08d1b4d409f2046568d96d245",
+          "transcript_word_count": 153,
+          "wer": 0.4713375796178344,
+          "cer": 0.3758169934640523,
+          "inference_ms": 8016.754500000003
+        }
+      ],
+      "technical_gate": "failed"
+    },
+    {
+      "voice_slot_id": "qwen-es-warm",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "qwen-es-warm",
+      "resolved_locale": "es-419",
+      "name": "qwen-es-warm",
+      "voice_description": "A warm, conversational Latin American Spanish voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "voice_identity_seed": 0,
+      "audio_unit_id": "audio--es-technical-a--qwen-es-warm--repeat-1",
+      "master_sha256": "480dd0d256703a7f686813ff48d5eb94bc2cb48237e0d0afc84346e07545812e",
+      "normalized_sha256": "53fddb40dfd288938dc86c3d02af6507ef2946bcb5ab47c2a43101125b4066a9",
+      "duration_ms": 80320,
+      "sample_rate_hz": 24000,
+      "rms": 0.05165606796553344,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0,
+      "worst_wer": 0.08917197452229299,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "dbd53234e05753f9290f59febfc5206fd1f484019a0ae9fff060f18bb722d204",
+          "transcript_word_count": 155,
+          "wer": 0.08917197452229299,
+          "cer": 0.05228758169934641,
+          "inference_ms": 1409.2724579999995
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "23771e15d42f573b20805ea374d2ae3c7124b40ada9454c46196f984a56ba4bd",
+          "transcript_word_count": 157,
+          "wer": 0.01910828025477707,
+          "cer": 0.008714596949891068,
+          "inference_ms": 1947.568542
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "6f4d23ca1ff2ab9afedcba95f2bbf0689728fd4580baee4b217058d14e0fccda",
+          "transcript_word_count": 157,
+          "wer": 0,
+          "cer": 0,
+          "inference_ms": 3161.4251250000016
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-fr-clear",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "qwen-fr-clear",
+      "resolved_locale": "fr-FR",
+      "name": "qwen-fr-clear",
+      "voice_description": "A clear, calm French-speaking voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "voice_identity_seed": 1,
+      "audio_unit_id": "audio--fr-technical-a--qwen-fr-clear--repeat-1",
+      "master_sha256": "1e1bfacb1b369e43b2a8593b76b2efd89a460db0bbf6d6947c2f6c54434903d5",
+      "normalized_sha256": "96fcd000a3700bbeef0da78ce9bcead71f449dfaac503266de5a068f628249e1",
+      "duration_ms": 66400,
+      "sample_rate_hz": 24000,
+      "rms": 0.10286484173370143,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.028985507246376812,
+      "worst_wer": 0.057971014492753624,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "c9565d41a1d46274f66ffa14bf6dff6cd49a764f2c3f62e533d6e51c0df0dfc0",
+          "transcript_word_count": 137,
+          "wer": 0.057971014492753624,
+          "cer": 0.015209125475285171,
+          "inference_ms": 1071.1394159999982
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "29c8d400ca03100760dc80e5552176e58292abe1b82366e32de1cdcfd7d5fee1",
+          "transcript_word_count": 138,
+          "wer": 0.028985507246376812,
+          "cer": 0.0076045627376425855,
+          "inference_ms": 1873.98175
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "67bd41986d4076d6708a1637ae6f8b55532f5d6a4c4c8714da80aca09b3fda3b",
+          "transcript_word_count": 138,
+          "wer": 0.028985507246376812,
+          "cer": 0.005069708491761723,
+          "inference_ms": 2411.048708999995
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-fr-warm",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "qwen-fr-warm",
+      "resolved_locale": "fr-FR",
+      "name": "qwen-fr-warm",
+      "voice_description": "A warm, conversational French-speaking voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "voice_identity_seed": 0,
+      "audio_unit_id": "audio--fr-technical-a--qwen-fr-warm--repeat-1",
+      "master_sha256": "4fba4afcdc6514fd504749dced17490d4b61ddb57b1271a6e359abdedd655ded",
+      "normalized_sha256": "bbcf964423db663c6fc8be0b65aa09148ec661587a36e1575ea72ecbf5e9b760",
+      "duration_ms": 73120,
+      "sample_rate_hz": 24000,
+      "rms": 0.08119387112000552,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.028985507246376812,
+      "worst_wer": 0.2826086956521739,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "3c4607fd1112ecf56a23633f15b3c4fb362d3488d32d18593e7d9cb7060eeb05",
+          "transcript_word_count": 130,
+          "wer": 0.2826086956521739,
+          "cer": 0.12801013941698353,
+          "inference_ms": 1340.6524589999972
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "b9ca4ba2612969f79ddf805ebfc992cdc4842ab4ca1a655493772dbf930f6803",
+          "transcript_word_count": 138,
+          "wer": 0.028985507246376812,
+          "cer": 0.0076045627376425855,
+          "inference_ms": 1823.612292
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "90ce4578e357402b674a437cbeed7457f8959a35e4760ed6c5142441bbe79bc0",
+          "transcript_word_count": 138,
+          "wer": 0.028985507246376812,
+          "cer": 0.005069708491761723,
+          "inference_ms": 2459.328708000001
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-pt-clear",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "qwen-pt-clear",
+      "resolved_locale": "pt-BR",
+      "name": "qwen-pt-clear",
+      "voice_description": "A clear, calm Brazilian Portuguese voice with precise articulation, restrained expression, and steady audiobook narration.",
+      "voice_identity_seed": 1,
+      "audio_unit_id": "audio--pt-technical-a--qwen-pt-clear--repeat-1",
+      "master_sha256": "759fe5580edab347f0885b97a649a55fdfb361236806d00b8fc68bd4a988f771",
+      "normalized_sha256": "dea8fa30bb2a3cbec1971962ee3a5b77fecff24e4904fb6c133b57877dcd7a65",
+      "duration_ms": 51120,
+      "sample_rate_hz": 24000,
+      "rms": 0.07898684838999401,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.04081632653061224,
+      "worst_wer": 0.10204081632653061,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "ebd84b23525716e8210e0c6a0ca4308a7f52347705227fc6b45988afc2cd0bb5",
+          "transcript_word_count": 98,
+          "wer": 0.08163265306122448,
+          "cer": 0.0273224043715847,
+          "inference_ms": 682.315125000001
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "f15ac78856d3fddcdff38320ea4d8335d8d9e5945225b096add1608e7bbc7e72",
+          "transcript_word_count": 100,
+          "wer": 0.10204081632653061,
+          "cer": 0.03278688524590164,
+          "inference_ms": 1540.504875
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "2e38f3c4da581cf917f5f85c82229d324a64b71ac834a2ac3b526f2c1bd2f788",
+          "transcript_word_count": 100,
+          "wer": 0.04081632653061224,
+          "cer": 0.01639344262295082,
+          "inference_ms": 1664.3637909999961
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "qwen-pt-warm",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "qwen-pt-warm",
+      "resolved_locale": "pt-BR",
+      "name": "qwen-pt-warm",
+      "voice_description": "A warm, conversational Brazilian Portuguese voice with natural pacing, gentle energy, and polished podcast delivery.",
+      "voice_identity_seed": 0,
+      "audio_unit_id": "audio--pt-technical-a--qwen-pt-warm--repeat-1",
+      "master_sha256": "c8203d39d9a60287149160166cff7af2f7a85149e45f0b8a11f75fdebc179520",
+      "normalized_sha256": "6030cc848d492990db7398721f5aafc0bac65a947837b4e59eb886248b8a41e1",
+      "duration_ms": 49840,
+      "sample_rate_hz": 24000,
+      "rms": 0.04600669702651072,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.05102040816326531,
+      "worst_wer": 0.14285714285714285,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "1c4eb280062194314812f48d09f08d8306cafa85a1b111159413bafda7e23fb6",
+          "transcript_word_count": 102,
+          "wer": 0.14285714285714285,
+          "cer": 0.03825136612021858,
+          "inference_ms": 924.780583000007
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "c97ed38edf23997becb8882244b0cce524b2b921e6aeb26e6251808a779b03ab",
+          "transcript_word_count": 100,
+          "wer": 0.10204081632653061,
+          "cer": 0.030965391621129327,
+          "inference_ms": 1491.035458
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "167e9b9fd2121e927469e87656ddc5bac7dfc68b265cf1462c21b49f0b11bb9d",
+          "transcript_word_count": 100,
+          "wer": 0.05102040816326531,
+          "cer": 0.018214936247723135,
+          "inference_ms": 1649.289625000005
+        }
+      ],
+      "technical_gate": "passed"
+    }
+  ],
+  "disposition": "technical-gate-failed",
+  "limitations": [
+    "This is one technical passage per voice, not the factorial benchmark.",
+    "Synthetic clean speech cannot establish quality on human podcasts or audiobooks.",
+    "WER measures the complete TTS-to-STT channel and is receiver-specific.",
+    "Overall aggregates retain failed generations; passing_voices_only excludes them.",
+    "The technical gate does not replace optional perceptual listening review."
+  ]
+}
