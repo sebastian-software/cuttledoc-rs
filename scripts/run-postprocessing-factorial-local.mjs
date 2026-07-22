@@ -492,7 +492,9 @@ function resolvePinnedModelVoices(state, plan) {
   for (const resolution of state.voice_resolutions) {
     const slot = plan.voice_slots.find((item) => item.id === resolution.voice_slot_id);
     if (resolution.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio') {
-      resolution.status = qwenAvailable ? 'resolved-candidate' : 'model-missing';
+      resolution.status = qwenAvailable
+        ? (slot.status === 'qualified' ? 'qualified' : 'resolved-candidate')
+        : 'model-missing';
       resolution.evidence =
         'spikes/tts-calibration/qwen3-tts-1.7b-voicedesign-bf16.json';
       resolution.selector = slot.selector;
