@@ -66,6 +66,22 @@ function wordErrorRate(reference, hypothesis) {
   return referenceWords.length === 0 ? 0 : previous.at(-1) / referenceWords.length;
 }
 
+function sectionMicroWer(fixture, outputSections = null) {
+  if (!Array.isArray(fixture.sections)) {
+    return wordErrorRate(fixture.evaluation_reference, outputSections ?? fixture.transcript);
+  }
+  let referenceWordCount = 0;
+  let editDistance = 0;
+  for (const [index, section] of fixture.sections.entries()) {
+    const hypothesis = Array.isArray(outputSections)
+      ? outputSections[index]?.text ?? ''
+      : section.transcript;
+    referenceWordCount += normalizedWords(section.evaluation_reference).length;
+    editDistance += wordDiff(section.evaluation_reference, hypothesis).edit_distance;
+  }
+  return referenceWordCount === 0 ? 0 : editDistance / referenceWordCount;
+}
+
 function wordDiff(source, target) {
   const sourceWords = normalizedWords(source);
   const targetWords = normalizedWords(target);
@@ -167,26 +183,22 @@ function equalCounts(left, right) {
     [...left].every(([key, value]) => right.get(key) === value);
 }
 
-function invalidOutput(text, edits, error) {
+function invalidOutput(text, edits, error, sections = null) {
   return {
     text,
     reported_edits: edits,
+    sections,
     parser: { valid: false, error },
     audit: {
       lexical_edits_fully_reported: false,
       protected_spans_unchanged: false,
       reported_lexical_edit_count: null,
+      section_ids_preserved: null,
     },
   };
 }
 
-function parseOutput(rawText, fixture) {
-  let parsed;
-  try {
-    parsed = JSON.parse(rawText);
-  } catch (error) {
-    return invalidOutput('', null, error.message);
-  }
+function parseCorrectionObject(parsed, fixture) {
   if (parsed === null || Array.isArray(parsed) ||
       typeof parsed !== 'object' || typeof parsed.text !== 'string') {
     return invalidOutput('', null, 'output must be an object with a string text field');
@@ -219,13 +231,11 @@ function parseOutput(rawText, fixture) {
     normalizedWords(operation.input ?? ''),
     normalizedWords(operation.output ?? ''),
   ]));
-  const reportedPairs = pairCounts(parsed.edits
-    .map((edit) => [
-      normalizedWords(edit.original),
-      normalizedWords(edit.replacement),
-    ])
-    .filter(([original, replacement]) =>
-      JSON.stringify(original) !== JSON.stringify(replacement)));
+  const reportedPairs = pairCounts(parsed.edits.flatMap((edit) =>
+    wordDiff(edit.original, edit.replacement).operations.map((operation) => [
+      normalizedWords(operation.input ?? ''),
+      normalizedWords(operation.output ?? ''),
+    ])));
   const inputWords = normalizedWords(fixture.transcript);
   const outputWords = normalizedWords(parsed.text);
   const protectedSpansUnchanged = (fixture.protected_spans ?? []).every((span) => {
@@ -241,6 +251,83 @@ function parseOutput(rawText, fixture) {
       protected_spans_unchanged: protectedSpansUnchanged,
       reported_lexical_edit_count: [...reportedPairs.values()]
         .reduce((sum, value) => sum + value, 0),
+      section_ids_preserved: null,
+    },
+  };
+}
+
+function parseOutput(rawText, fixture, structuredOutputContract) {
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (error) {
+    return invalidOutput('', null, error.message);
+  }
+  if (structuredOutputContract !== 'bounded-transcript-sections-v1') {
+    return parseCorrectionObject(parsed, fixture);
+  }
+  if (parsed === null || Array.isArray(parsed) || typeof parsed !== 'object' ||
+      !Array.isArray(parsed.sections)) {
+    return invalidOutput('', null, 'output must contain a sections array');
+  }
+  const expectedIds = fixture.sections.map((section) => section.id);
+  const receivedIds = parsed.sections.map((section) => section?.id);
+  const idsPreserved = expectedIds.length === receivedIds.length &&
+    expectedIds.every((id, index) => id === receivedIds[index]);
+  if (!idsPreserved) {
+    return invalidOutput(
+      '',
+      null,
+      'output section ids and order must exactly match the input',
+      parsed.sections,
+    );
+  }
+
+  const sections = parsed.sections.map((section, index) => {
+    const corrected = parseCorrectionObject(section, fixture.sections[index]);
+    const inputWer = wordErrorRate(
+      fixture.sections[index].evaluation_reference,
+      fixture.sections[index].transcript,
+    );
+    const outputWer = wordErrorRate(
+      fixture.sections[index].evaluation_reference,
+      corrected.text,
+    );
+    return {
+      id: section.id,
+      ...corrected,
+      lexical_diff: wordDiff(fixture.sections[index].transcript, corrected.text),
+      diagnostic_wer: {
+        input: inputWer,
+        output: outputWer,
+        delta: outputWer - inputWer,
+      },
+    };
+  });
+  const invalid = sections.find((section) => !section.parser.valid);
+  if (invalid) {
+    return invalidOutput(
+      sections.map((section) => section.text).join('\n\n'),
+      sections.flatMap((section) => section.reported_edits ?? []),
+      `section ${invalid.id}: ${invalid.parser.error}`,
+      sections,
+    );
+  }
+  return {
+    text: sections.map((section) => section.text.trim()).join('\n\n'),
+    reported_edits: sections.flatMap((section) => section.reported_edits),
+    sections,
+    parser: { valid: true, error: null },
+    audit: {
+      lexical_edits_fully_reported: sections.every((section) =>
+        section.audit.lexical_edits_fully_reported),
+      protected_spans_unchanged: sections.every((section) =>
+        section.audit.protected_spans_unchanged),
+      reported_lexical_edit_count: sections.reduce(
+        (sum, section) => sum + section.audit.reported_lexical_edit_count,
+        0,
+      ),
+      section_ids_preserved: true,
     },
   };
 }
@@ -260,6 +347,11 @@ function renderPrompt(template, fixture, contract) {
     '{{protected_spans}}': fixture.protected_spans ?? [],
     '{{suspect_spans}}': fixture.suspect_spans ?? [],
     '{{transcript}}': fixture.transcript,
+    '{{sections}}': (fixture.sections ?? []).map((section) => ({
+      id: section.id,
+      transcript: section.transcript,
+      protected_spans: section.protected_spans ?? [],
+    })),
   };
   let rendered = template;
   for (const [marker, value] of Object.entries(replacements)) {
@@ -274,13 +366,33 @@ function renderPrompt(template, fixture, contract) {
   return rendered;
 }
 
-function correctionSchema(numericBounds) {
+function correctionSchema(numericBounds, structuredOutputContract) {
   const confidence = { type: 'number' };
   if (numericBounds) {
     confidence.minimum = 0;
     confidence.maximum = 1;
   }
-  return {
+  const edit = {
+    type: 'object',
+    additionalProperties: false,
+    required: ['original', 'replacement', 'class', 'reason', 'confidence'],
+    properties: {
+      original: { type: 'string' },
+      replacement: { type: 'string' },
+      class: {
+        type: 'string',
+        enum: [
+          'surface',
+          'word-boundary',
+          'contextual-misrecognition',
+          'asr-inflection',
+        ],
+      },
+      reason: { type: 'string' },
+      confidence,
+    },
+  };
+  const correction = {
     type: 'object',
     additionalProperties: false,
     required: ['text', 'edits'],
@@ -288,24 +400,26 @@ function correctionSchema(numericBounds) {
       text: { type: 'string' },
       edits: {
         type: 'array',
+        items: edit,
+      },
+    },
+  };
+  if (structuredOutputContract !== 'bounded-transcript-sections-v1') {
+    return correction;
+  }
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['sections'],
+    properties: {
+      sections: {
+        type: 'array',
         items: {
-          type: 'object',
-          additionalProperties: false,
-          required: ['original', 'replacement', 'class', 'reason', 'confidence'],
+          ...correction,
+          required: ['id', 'text', 'edits'],
           properties: {
-            original: { type: 'string' },
-            replacement: { type: 'string' },
-            class: {
-              type: 'string',
-              enum: [
-                'surface',
-                'word-boundary',
-                'contextual-misrecognition',
-                'asr-inflection',
-              ],
-            },
-            reason: { type: 'string' },
-            confidence,
+            id: { type: 'string' },
+            ...correction.properties,
           },
         },
       },
@@ -321,9 +435,12 @@ async function runRequest(manifest, contract, prompt, apiKey) {
     response_format: {
       type: 'json_schema',
       json_schema: {
-        name: 'bounded_transcript_correction_v1',
+        name: contract.structured_output_contract.replaceAll('-', '_'),
         strict: true,
-        schema: correctionSchema(request.json_schema_numeric_bounds),
+        schema: correctionSchema(
+          request.json_schema_numeric_bounds,
+          contract.structured_output_contract,
+        ),
       },
     },
     provider: {
@@ -436,7 +553,11 @@ async function main() {
   const renderedPrompt = renderPrompt(promptBytes.toString('utf8'), fixture, contract);
   const first = await runRequest(manifest, contract, renderedPrompt, apiKey);
   const repeat = await runRequest(manifest, contract, renderedPrompt, apiKey);
-  const parsed = parseOutput(first.text, fixture);
+  const parsed = parseOutput(
+    first.text,
+    fixture,
+    contract.structured_output_contract,
+  );
   const correctedText = parsed.text.trim();
   const lexicalDiff = wordDiff(fixture.transcript, correctedText);
   const nonempty = correctedText.length > 0;
@@ -477,6 +598,8 @@ async function main() {
       development_only: fixture.development_only,
       gold_status: fixture.gold_status,
       transcript_sha256: sha256(fixture.transcript),
+      section_count: fixture.sections?.length ?? null,
+      reference_word_count: normalizedWords(fixture.evaluation_reference).length,
       reference_visible_to_model: false,
     },
     procedure: {
@@ -486,7 +609,10 @@ async function main() {
         token_limit_field: manifest.request_defaults.token_limit_field,
         json_schema_numeric_bounds:
           manifest.request_defaults.json_schema_numeric_bounds,
-        response_format: manifest.request_defaults.response_format,
+        response_format: {
+          ...manifest.request_defaults.response_format,
+          schema_id: contract.structured_output_contract,
+        },
         temperature: manifest.request_defaults.temperature,
         seed: manifest.request_defaults.seed,
         reasoning: manifest.request_defaults.reasoning,
@@ -524,6 +650,10 @@ async function main() {
       raw_text: first.text,
       raw_text_sha256: sha256(first.text),
       reported_edits: parsed.reported_edits,
+      sections: parsed.sections?.map((section) => ({
+        ...section,
+        text_sha256: sha256(section.text),
+      })) ?? null,
       parser: parsed.parser,
       audit: parsed.audit,
       lexical_diff: lexicalDiff,
@@ -535,10 +665,24 @@ async function main() {
         quality_accepted: false,
       },
       diagnostic_wer: {
-        input: wordErrorRate(fixture.evaluation_reference, fixture.transcript),
-        output: wordErrorRate(fixture.evaluation_reference, correctedText),
+        input: sectionMicroWer(fixture),
+        output: Array.isArray(parsed.sections)
+          ? sectionMicroWer(fixture, parsed.sections)
+          : wordErrorRate(fixture.evaluation_reference, correctedText),
+        reference_word_count: normalizedWords(fixture.evaluation_reference).length,
+        section_count: fixture.sections?.length ?? 1,
+        section_outcomes: !Array.isArray(parsed.sections) ? null : {
+          improved: parsed.sections.filter((section) =>
+            section.diagnostic_wer.delta < 0).length,
+          unchanged: parsed.sections.filter((section) =>
+            section.diagnostic_wer.delta === 0).length,
+          regressed: parsed.sections.filter((section) =>
+            section.diagnostic_wer.delta > 0).length,
+        },
         reference_status: fixture.gold_status,
-        claim_limit: 'Development-only diagnostic against an unverified dataset transcript; not a quality-selection result.',
+        claim_limit: fixture.gold_status === 'synthetic-source-reference'
+          ? 'Development-only diagnostic against exact synthetic source text; it measures round-trip restoration and regressions, not held-out professional-audio quality.'
+          : 'Development-only diagnostic against an unverified dataset transcript; not a quality-selection result.',
       },
     },
     conclusion: {

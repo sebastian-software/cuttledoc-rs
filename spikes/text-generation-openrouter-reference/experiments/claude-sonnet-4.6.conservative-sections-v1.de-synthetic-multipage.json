@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "id": "claude-sonnet-4.6-openrouter.conservative-sections-v1.de-synthetic-multipage",
+  "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/claude-sonnet-4.6-bedrock-eu-west-1.json",
+  "generation_contract": {
+    "prompt_id": "conservative-sections-v1",
+    "policy_mode": "bounded-lexical",
+    "render_mode": "template",
+    "output_mode": "json-section-edits",
+    "structured_output_contract": "bounded-transcript-sections-v1",
+    "context_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "sections"
+    ],
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-sections-v1.txt",
+    "prompt_sha256": "1febeaca7c2a35e41ee4c8315a3ae3adf2c56c3511c26441e5c6165703adc421",
+    "max_tokens": 8192,
+    "timeout_ms": 300000,
+    "rationale": "Replace the one-word capability probe with an eight-section, eight-voice German development screen while preserving exact section-level audit boundaries."
+  },
+  "result_contract": {
+    "run_id": "phase7.claude-sonnet-4.6-openrouter-bedrock-eu-west-1.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1",
+    "purpose": "development-quality-screen",
+    "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-synthetic-multipage-whisper-1.json",
+    "result_path": "benchmarks/postprocessing/runs/phase7.claude-sonnet-4.6-openrouter-bedrock-eu-west-1.conservative-sections-v1.issue20-de-synthetic-multipage-whisper-1.json",
+    "result_required": false
+  }
+}

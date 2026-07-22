@@ -1,0 +1,364 @@
+{
+  "schema_version": "1.0.0",
+  "id": "issue20-de-synthetic-multipage-whisper-1",
+  "purpose": "development-prompt-probe",
+  "language": "German",
+  "locale": "de-DE",
+  "domain": "clean synthetic documentary prose and dialogue",
+  "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+  "selection_revision": "synthetic-roundtrip-passages-3",
+  "gold_status": "synthetic-source-reference",
+  "development_only": true,
+  "transcript": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf Intelligenz im Sinne der Nachbildung menschlichen Verhaltens beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds, ihm stehen beispielsweise traditionelle Logik und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden, schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.\n\nDer Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John Garty im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth-Summer-Research-Projekt Unartificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligenze Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren. Vielen Dank.\n\nKünstliche neuronale Netze, KNN, im Sinne von Warren Muguloch und Walter Pitts, 1943, Alain Thurings Überlegungen zur maschinellen Intelligenz, siehe auch Thuring Test, um 1950 und Frank Rosenblatt's Implementierungen des Perzeptrons ab 1957 waren Vorläufe zur Entwicklung der künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, UA-Mythen zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten Keywinter. Verbesserte Expertensysteme in den 1980er N, vor allem aufgrund erhöhter Rechenleistung und Verfahren zum Training mehrschichtiger Netze, UA-Paul-Verbus, heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten Keywinter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, UA-Deep-Lerninansätze mittels D-Ruhe für Schach, 1997, und Alpha-Go für Go, 2017, führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Lage-Language-Modus 2022.\n\nUm ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen. Dazu stellt ein Mensch per Terminal, Bildschirm und Tastatur oder auch Lautsprecher und Mikrofon beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Ruebener-Preis für den Turing-Test.\n\nEine Fragestellung der Key ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei, soweit möglich, formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die Key damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren, logische Programmierung, behilflich wären. Zwei Schwierigkeiten zeichneten sich ab. In vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten, maschinelles Lernen. Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der Key wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universelle Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.\n\nKünstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.\n\nDer Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Erstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skripturien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in eine Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.\n\nWas macht eine Aufnahme eigentlich leicht verständlich? Fragezeichen, fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Punkt Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Fragezeichen, nein. Der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt an das Punkt und wenn jemand beim Sprechen den Kopf bewegt, Fragezeichen, Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzielen. Punkt Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Punkt gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest. Vielen Dank.",
+  "evaluation_reference": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf „Intelligenz“ im Sinne der Nachbildung menschlichen Verhaltens beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds; ihm stehen beispielsweise traditionelle logik- und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden: schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.\n\nDer Begriff artificial intelligence (künstliche Intelligenz) wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt, ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs „Künstliche Intelligenz“ wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff „Intelligence Augmentation“ vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.\n\nKünstliche neuronale Netze (KNN) im Sinne von Warren McCulloch und Walter Pitts (1943), Alan Turings Überlegungen zur maschinellen Intelligenz (siehe auch Turing-Test) um 1950 und Frank Rosenblatts Implementierungen des Perzeptrons ab 1957 waren Vorläufer zur Entwicklung der Künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, u. a. Mycin zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten KI-Winter. Verbesserte Expertensysteme in den 1980ern, vor allem aufgrund erhöhter Rechenleistung, und Verfahren zum Training mehrschichtiger Netze (u. a. Paul Werbos), heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten KI-Winter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, u. a. Deep-Learning-Ansätze mittels Deep Blue für Schach (1997) und AlphaGo für Go (2017), führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Large Language Models 2022.\n\nUm ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen: Dazu stellt ein Mensch per Terminal (Bildschirm und Tastatur, oder auch Lautsprecher und Mikrofon) beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Loebner-Preis für den Turing-Test.\n\nEine Fragestellung der KI ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei – soweit möglich – formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die KI damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren (Logische Programmierung) behilflich wären. Zwei Schwierigkeiten zeichneten sich ab:\n\nIn vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten (maschinelles Lernen). Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der KI wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universale Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.\n\nKünstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass Künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.\n\nDer Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften (Manuskripte) hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse (Typendruck), der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.\n\n„Was macht eine Aufnahme eigentlich leicht verständlich?“, fragt Mara. „Vor allem Ruhe“, antwortet Jonas. „Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht.“ Mara rückt etwas näher an das Mikrofon. „Also genügt ein gutes Gerät?“ „Nein. Der Abstand ist genauso wichtig. Etwa fünfzehn Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders.“ „Und wenn jemand beim Sprechen den Kopf bewegt?“ Jonas lacht. „Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen.“ Mara macht eine kurze Pause. „Das klingt weniger technisch, als ich erwartet hatte.“ „Gute Technik fällt kaum auf“, sagt Jonas. „Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.“",
+  "error_profile": "This development round trip includes clean German system voices and may contain proper-name substitutions, English technical-term substitutions, spoken punctuation labels, abbreviation expansions, or end-of-passage hallucinations. These are possibilities, not proof that a span is wrong.",
+  "glossary": [],
+  "protected_spans": [],
+  "sections": [
+    {
+      "id": "synthetic-de-description",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "German compounds",
+        "English technical terms",
+        "parenthetical punctuation",
+        "long sentences"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.voice.compact.de-DE.Anna",
+        "name": "Anna",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 22050,
+        "raw_sample_count": 1659475,
+        "raw_sha256": "3189fbb45fee91093105e0f7f2c03c20e37c92f5efba73449d3da7ac51d3544b",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "22e02b57ad84c6474eaef8d1b8c6dd67ee350466f10c0438acd6617ee17101d5",
+        "duration_ms": 75259.6875
+      },
+      "transcript": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf Intelligenz im Sinne der Nachbildung menschlichen Verhaltens beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds, ihm stehen beispielsweise traditionelle Logik und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden, schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.",
+      "evaluation_reference": "Historisch ist der Begriff nicht einheitlich definiert, sondern kann sich einerseits auf „Intelligenz“ im Sinne der Nachbildung menschlichen Verhaltens beispielsweise bei der Bilderkennung oder der Interaktion in menschlicher Sprache beziehen, andererseits auf die Fähigkeit zu rationalem, logikbasiertem Schlussfolgern. In der öffentlichen Wahrnehmung werden häufig maschinelles Lernen und die auf diesem Prinzip aufbauenden Chatbots mit dem Begriff der künstlichen Intelligenz gleichgesetzt. Maschinelles Lernen ist jedoch nur eines von mehreren Teilgebieten des Felds; ihm stehen beispielsweise traditionelle logik- und regelbasierte Ansätze wie die der symbolischen künstlichen Intelligenz gegenüber, welche ergänzend auch in Chatbots zum Einsatz kommen. Im Laufe der Zeit haben sich innerhalb der KI-Forschung zahlreiche Teilgebiete und Methoden herausgebildet. Zudem wird unterschieden, welche Probleme mit den Methoden der KI gelöst werden sollen. Dabei werden zwei Bereiche unterschieden: schwache KI und starke KI. Die angewandte Informatik befasst sich damit, wie solche Systeme entwickelt und umgesetzt werden können. Beispiele dafür sind Multiagentensysteme, Expertensysteme, Transformer und serviceorientierte Architekturen.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 155,
+        "raw_word_edit_distance": 0,
+        "raw_wer": 0
+      }
+    },
+    {
+      "id": "synthetic-de-origin",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "proper names",
+        "English technical terms",
+        "numbers and dates",
+        "abbreviations"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Eddy",
+        "name": "Eddy",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 925140,
+        "raw_sha256": "c755177d0864a1f425ae55f0b3927c53200975a02cbf8bdfa98472f9c9165f6d",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "ccd9cc370d47106c75fc12ea40e5291409fdaf3f77c6a0af7b46192aa3b685cf",
+        "duration_ms": 57821.25
+      },
+      "transcript": "Der Begriff Artificial Intelligence, künstliche Intelligenz, wurde 1955 vom US-amerikanischen Informatiker John Garty im Rahmen eines Förderantrags an die Rockefeller Stiftung für das Dartmouth-Summer-Research-Projekt Unartificial Intelligence geprägt. Ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über circa acht Wochen mit der Thematik befasste. Die Wahl des Begriffs künstliche Intelligenz wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff Intelligenze Augmentation vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren. Vielen Dank.",
+      "evaluation_reference": "Der Begriff artificial intelligence (künstliche Intelligenz) wurde 1955 vom US-amerikanischen Informatiker John McCarthy im Rahmen eines Förderantrags an die Rockefeller-Stiftung für das Dartmouth Summer Research Project on Artificial Intelligence geprägt, ein Forschungsprojekt, bei dem sich im Sommer 1956 eine Gruppe von zehn Wissenschaftlern über ca. acht Wochen mit der Thematik befasste. Die Wahl des Begriffs „Künstliche Intelligenz“ wurde im Lauf der Zeit verschiedentlich diskutiert. Der Computerpionier Douglas Engelbart zog bereits 1962 den Begriff „Intelligence Augmentation“ vor. Seiner Ansicht nach sei das Ziel, durch geeignete Interaktionsparadigmen das Können und Verständnis des mit dem Computer interagierenden Menschen zu verstärken, anstatt lediglich menschliche Aufgaben zu automatisieren.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 105,
+        "raw_word_edit_distance": 8,
+        "raw_wer": 0.0761904761904762
+      }
+    },
+    {
+      "id": "synthetic-de-precursors",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "proper names",
+        "English technical terms",
+        "numbers and dates",
+        "abbreviations",
+        "long sentences"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Flo",
+        "name": "Flo",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 1458571,
+        "raw_sha256": "ef5f7115fac31fe7331fdc3cc8cf51659ea3c97cbd71e65650dd1779703ac963",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "12c0f53875770cf48057389c9fdb6c6877c734d866a0d1b2789d06019feb633e",
+        "duration_ms": 91160.6875
+      },
+      "transcript": "Künstliche neuronale Netze, KNN, im Sinne von Warren Muguloch und Walter Pitts, 1943, Alain Thurings Überlegungen zur maschinellen Intelligenz, siehe auch Thuring Test, um 1950 und Frank Rosenblatt's Implementierungen des Perzeptrons ab 1957 waren Vorläufe zur Entwicklung der künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, UA-Mythen zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten Keywinter. Verbesserte Expertensysteme in den 1980er N, vor allem aufgrund erhöhter Rechenleistung und Verfahren zum Training mehrschichtiger Netze, UA-Paul-Verbus, heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten Keywinter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, UA-Deep-Lerninansätze mittels D-Ruhe für Schach, 1997, und Alpha-Go für Go, 2017, führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Lage-Language-Modus 2022.",
+      "evaluation_reference": "Künstliche neuronale Netze (KNN) im Sinne von Warren McCulloch und Walter Pitts (1943), Alan Turings Überlegungen zur maschinellen Intelligenz (siehe auch Turing-Test) um 1950 und Frank Rosenblatts Implementierungen des Perzeptrons ab 1957 waren Vorläufer zur Entwicklung der Künstlichen Intelligenz. Die Hoffnungen von Expertensystemen, u. a. Mycin zur Diagnose und Therapie von Infektionskrankheiten ab Anfang der 1970er Jahre, erfüllten sich nicht und führten zum ersten KI-Winter. Verbesserte Expertensysteme in den 1980ern, vor allem aufgrund erhöhter Rechenleistung, und Verfahren zum Training mehrschichtiger Netze (u. a. Paul Werbos), heute als Backpropagation bekannt, förderten einen neuen Aufschwung in der Forschung an künstlichen neuronalen Netzen. Aber auch diese Erwartungen wurden verfehlt und führten ab Ende der 1980er zum zweiten KI-Winter durch ökonomische Blasen, da sich keine nachhaltigen Geschäftsmodelle erzielen ließen. Erfolge durch maschinelles Lernen, u. a. Deep-Learning-Ansätze mittels Deep Blue für Schach (1997) und AlphaGo für Go (2017), führten zu einer allmählichen Erholung und allgemein sichtbaren Erfolgen bis zum endgültigen Durchbruch der Large Language Models 2022.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 166,
+        "raw_word_edit_distance": 29,
+        "raw_wer": 0.1746987951807229
+      }
+    },
+    {
+      "id": "synthetic-de-turing-test",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "proper names",
+        "parenthetical punctuation",
+        "numbers and dates",
+        "long sentences"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Grandma",
+        "name": "Grandma",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 917480,
+        "raw_sha256": "ff77049c808105593475334947bb816d7c7d75853e92e7bed56f23357b2e637d",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "c2998c0f79c05967c9999611d4861bb6a18e5d0e9a60c026b5ae2a65e244a2a9",
+        "duration_ms": 57342.5
+      },
+      "transcript": "Um ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen. Dazu stellt ein Mensch per Terminal, Bildschirm und Tastatur oder auch Lautsprecher und Mikrofon beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Ruebener-Preis für den Turing-Test.",
+      "evaluation_reference": "Um ein Kriterium zu haben, wann eine Maschine eine dem Menschen gleichwertige Intelligenz simuliert, wurde von Alan Turing der nach ihm benannte Turing-Test vorgeschlagen: Dazu stellt ein Mensch per Terminal (Bildschirm und Tastatur, oder auch Lautsprecher und Mikrofon) beliebige Fragen, ohne dabei zu wissen, ob diese von einem anderen Menschen oder einer Maschine beantwortet werden. Der Fragesteller muss danach entscheiden, ob es sich beim Interviewpartner um eine Maschine oder einen Menschen handelte. Ist die Maschine nicht von einem Menschen zu unterscheiden, erfüllt sie laut Turing das Kriterium für Intelligenz. Ziel ist hier also ein phänomenologisch beobachtbares Verhalten, das nicht von dem eines Menschen unterscheidbar sein soll. Bisher konnte keine Maschine den Turing-Test zweifelsfrei bestehen. Seit 1991 existiert der Loebner-Preis für den Turing-Test.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 126,
+        "raw_word_edit_distance": 1,
+        "raw_wer": 0.007936507936507936
+      }
+    },
+    {
+      "id": "synthetic-de-methods",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "German compounds",
+        "abbreviations",
+        "parenthetical punctuation",
+        "long sentences"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Grandpa",
+        "name": "Grandpa",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 1147369,
+        "raw_sha256": "5ac36adf7ca38db56e480fad13848b87db813f84850547d6cf3634747f3858b5",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "8666feb92e066525bdb5801917838ac8839b80e2a795401c2658b2b84f5f4b59",
+        "duration_ms": 71710.5625
+      },
+      "transcript": "Eine Fragestellung der Key ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei, soweit möglich, formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die Key damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren, logische Programmierung, behilflich wären. Zwei Schwierigkeiten zeichneten sich ab. In vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten, maschinelles Lernen. Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der Key wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universelle Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.",
+      "evaluation_reference": "Eine Fragestellung der KI ist die Erstellung von Wissensrepräsentationen, die dann für automatisches logisches Schließen benutzt werden können. Menschliches Wissen wird dabei – soweit möglich – formalisiert, um es in eine maschinenlesbare Form zu bringen. Diesem Ziel haben sich die Entwickler diverser Ontologien verschrieben. Schon früh beschäftigte sich die KI damit, automatische Beweissysteme zu konstruieren, die Mathematikern und Informatikern beim Beweisen von Sätzen und beim Programmieren (Logische Programmierung) behilflich wären. Zwei Schwierigkeiten zeichneten sich ab:\n\nIn vielen Anwendungen geht es darum, aus einer Menge von Daten eine allgemeine Regel abzuleiten (maschinelles Lernen). Mathematisch führt dies zu einem Approximationsproblem. Im Kontext der KI wurden hierzu unter anderem künstliche neuronale Netze vorgeschlagen, die als universale Funktionsapproximatoren eingesetzt werden können, jedoch insbesondere bei vielen verdeckten Schichten schwer zu analysieren sind. Manchmal verwendet man deshalb alternative Verfahren, die mathematisch einfacher zu analysieren sind.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 137,
+        "raw_word_edit_distance": 4,
+        "raw_wer": 0.029197080291970802
+      }
+    },
+    {
+      "id": "synthetic-de-applications",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "source_title": "Künstliche Intelligenz",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268935951,
+      "phenomena": [
+        "German compounds",
+        "proper names",
+        "numbers and dates",
+        "long sentences"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Reed",
+        "name": "Reed",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 674957,
+        "raw_sha256": "f277873b15d1f66126559c9609857c0fd66a6b1d1266de7c42b95fc6d751d1fc",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "3caa198d2566cc0e5069fcc8b3a4cd1267721fd0394c944f85ab1c3b74af7b0e",
+        "duration_ms": 42184.8125
+      },
+      "transcript": "Künstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.",
+      "evaluation_reference": "Künstliche Intelligenz hat das Potenzial für eine Vielzahl von Verwendungen in Forschung, Wirtschaft und im Konsumbereich. Sie stellt zudem die zentrale Technologie der Industrie 5.0 dar. Noch im Jahr 2025 gab es Stimmen, die der Auffassung waren, dass Künstliche Intelligenz trotz ihres Nutzens in einzelnen Anwendungsbereichen der Gesellschaft insgesamt bislang keinen erkennbaren Beitrag zur Produktivitätssteigerung geleistet habe. Absehbar und teils realisiert waren zu diesem Zeitpunkt Nutzungen in den Bereichen Mobilität und Logistik, Landwirtschaft, Gesundheit und Optimierung der Energieeffizienz.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 79,
+        "raw_word_edit_distance": 0,
+        "raw_wer": 0
+      }
+    },
+    {
+      "id": "synthetic-de-native",
+      "source_id": "de-wikipedia-buchdruck-268791130",
+      "source_title": "Buchdruck",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": 268791130,
+      "phenomena": [
+        "native German factual prose",
+        "German compounds",
+        "proper names",
+        "numbers and dates",
+        "parenthetical punctuation"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Rocko",
+        "name": "Rocko",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 835279,
+        "raw_sha256": "169c328aa1e43410258cde027dd672416ae17cbbf2975aa6b0973d824a1e9b45",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "149242ec62d153751a140d4c84189d4b2f6d9ab8900ef3436aac944c7f3d30b4",
+        "duration_ms": 52204.9375
+      },
+      "transcript": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Erstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen Ebenenfläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften, Manuskripte hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skripturien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in eine Druckpresse, Typendruck, der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+      "evaluation_reference": "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellung von Büchern. Beim Buchdruck werden Schriften und Bilder in großer Anzahl auf Papier oder einer anderen ebenen Fläche reproduziert. Vor der Erfindung des Buchdrucks wurden Bücher als Handschriften (Manuskripte) hergestellt und kopiert. Im Mittelalter geschah dies fast ausschließlich in den Skriptorien der Klöster. In Ostasien gab es bereits im 8. Jahrhundert gedruckte Werke. Der moderne Buchdruck mit den auswechselbaren Lettern einer Satzschrift in einer Druckpresse (Typendruck), der die flexible, relativ kostengünstige und schnelle Erstellung größerer Auflagen ermöglichte, wurde in Europa um 1440 von Johannes Gutenberg erfunden. Der Buchdruck ist Teil der Verlagsherstellung.",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 104,
+        "raw_word_edit_distance": 5,
+        "raw_wer": 0.04807692307692308
+      }
+    },
+    {
+      "id": "synthetic-de-dialogue",
+      "source_id": "cuttledoc-authored-de-dialogue-1",
+      "source_title": "A quiet recording",
+      "source_license": "CC-BY-SA-4.0",
+      "source_revision": "51bb13dc91460c0d653d792042f8aa5b5b148fc9894e43a6c6d0e6cf23088203",
+      "phenomena": [
+        "conversational dialogue",
+        "question and answer turns",
+        "quoted speech",
+        "German compounds",
+        "spoken numbers"
+      ],
+      "voice": {
+        "runtime": "macOS AVFAudio AVSpeechSynthesizer",
+        "identifier": "com.apple.eloquence.de-DE.Sandy",
+        "name": "Sandy",
+        "locale": "de-DE",
+        "quality_raw_value": 1
+      },
+      "audio": {
+        "storage": "local-required",
+        "raw_format": "mono-f32le",
+        "raw_sample_rate_hz": 16000,
+        "raw_sample_count": 944106,
+        "raw_sha256": "0588351ee81d0631969a88ace19de97a85cb02f6822f41965c6ef7da5ac392cf",
+        "normalized_format": "mono-pcm16-wav",
+        "normalized_sample_rate_hz": 16000,
+        "normalized_sha256": "728b9f4768ae69ad6f0c383a40bbe3accc5b581b48bbaabedf6463554392580d",
+        "duration_ms": 59006.625
+      },
+      "transcript": "Was macht eine Aufnahme eigentlich leicht verständlich? Fragezeichen, fragt Mara. Vor allem Ruhe, antwortet Jonas. Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht. Punkt Mara rückt etwas näher an das Mikrofon. Also genügt ein gutes Gerät? Fragezeichen, nein. Der Abstand ist genauso wichtig. Etwa 15 Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt an das Punkt und wenn jemand beim Sprechen den Kopf bewegt, Fragezeichen, Jonas lacht. Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzielen. Punkt Mara macht eine kurze Pause. Das klingt weniger technisch, als ich erwartet hatte. Punkt gute Technik fällt kaum auf, sagt Jonas. Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest. Vielen Dank.",
+      "evaluation_reference": "„Was macht eine Aufnahme eigentlich leicht verständlich?“, fragt Mara. „Vor allem Ruhe“, antwortet Jonas. „Nicht völlige Stille, sondern eine ruhige Umgebung, in der die Stimme klar im Mittelpunkt steht.“ Mara rückt etwas näher an das Mikrofon. „Also genügt ein gutes Gerät?“ „Nein. Der Abstand ist genauso wichtig. Etwa fünfzehn Zentimeter sind ein brauchbarer Anfang, aber jede Stimme klingt anders.“ „Und wenn jemand beim Sprechen den Kopf bewegt?“ Jonas lacht. „Dann verändert sich die Lautstärke. Deshalb sollte man bequem sitzen, frei atmen und nicht jedes Wort erzwingen.“ Mara macht eine kurze Pause. „Das klingt weniger technisch, als ich erwartet hatte.“ „Gute Technik fällt kaum auf“, sagt Jonas. „Am Ende soll niemand über das Mikrofon nachdenken. Die Zuhörer sollen einfach verstehen, was du erzählen möchtest.“",
+      "protected_spans": [],
+      "diagnostics": {
+        "reference_word_count": 123,
+        "raw_word_edit_distance": 13,
+        "raw_wer": 0.10569105691056911
+      }
+    }
+  ],
+  "aggregate": {
+    "section_count": 8,
+    "distinct_voice_count": 8,
+    "reference_word_count": 995,
+    "raw_word_edit_distance": 60,
+    "raw_micro_wer": 0.06030150753768844,
+    "audio_duration_ms": 506691.0625
+  },
+  "inference_policy": {
+    "prompt_id": "conservative-sections-v1",
+    "reference_visible_to_model": false,
+    "lexical_changes_allowed": true,
+    "section_ids_and_order_must_match": true,
+    "allowed_edit_classes": [
+      "surface",
+      "word-boundary",
+      "contextual-misrecognition",
+      "asr-inflection"
+    ]
+  },
+  "provenance": {
+    "selection_manifest": "benchmarks/fixtures/synthetic-roundtrip-selection.json",
+    "materializer": "scripts/materialize-postprocessing-long-form-fixture.mjs",
+    "tts_boundary": "repository-owned Swift C ABI called from Rust",
+    "tts_generation": "Eight explicit installed Apple voice identifiers at default rate, pitch, and volume.",
+    "asr_runner": "scripts/run-legacy-asr-baseline.mjs",
+    "source_license": "CC-BY-SA-4.0",
+    "audio_storage": "The generated lossless audio remains local; exact raw and normalized digests bind every transcript to its input.",
+    "claim_limit": "Development-only synthetic round-trip evidence. The exact source text measures restoration and regressions, but does not replace held-out human-verified professional audio."
+  }
+}

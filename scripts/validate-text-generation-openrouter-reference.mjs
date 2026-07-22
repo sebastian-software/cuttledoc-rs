@@ -147,11 +147,12 @@ function externalAudit(fixture, text, edits) {
     normalizedWords(operation.output ?? ''),
   ]));
   const reported = Array.isArray(edits)
-    ? pairCounts(edits.map((edit) => [
-      normalizedWords(edit.original ?? ''),
-      normalizedWords(edit.replacement ?? ''),
-    ]).filter(([source, target]) =>
-      JSON.stringify(source) !== JSON.stringify(target)))
+    ? pairCounts(edits.flatMap((edit) =>
+      wordDiff(edit.original ?? '', edit.replacement ?? '').operations
+        .map((operation) => [
+          normalizedWords(operation.input ?? ''),
+          normalizedWords(operation.output ?? ''),
+        ])))
     : new Map();
   const inputWords = normalizedWords(fixture.transcript);
   const outputWords = normalizedWords(text);
@@ -239,6 +240,19 @@ function validateExperimentShape(experiment) {
   const errors = [];
   const contract = experiment.generation_contract;
   const result = experiment.result_contract;
+  const contractProfiles = {
+    'bounded-transcript-correction-v1': {
+      promptId: 'conservative-error-profile-v1',
+      outputMode: 'json-edits',
+      inputField: 'transcript',
+    },
+    'bounded-transcript-sections-v1': {
+      promptId: 'conservative-sections-v1',
+      outputMode: 'json-section-edits',
+      inputField: 'sections',
+    },
+  };
+  const profile = contractProfiles[contract?.structured_output_contract];
   if (experiment.schema_version !== '1.0.0' || !(experiment.id?.length > 0)) {
     errors.push('experiment identity is invalid');
   }
@@ -254,14 +268,12 @@ function validateExperimentShape(experiment) {
       errors.push(error.message);
     }
   }
-  if (contract?.prompt_id !== 'conservative-error-profile-v1' ||
+  if (profile === undefined || contract?.prompt_id !== profile.promptId ||
       contract?.policy_mode !== 'bounded-lexical' ||
       contract?.render_mode !== 'template' ||
-      contract?.output_mode !== 'json-edits' ||
-      contract?.structured_output_contract !==
-        'bounded-transcript-correction-v1' ||
+      contract?.output_mode !== profile?.outputMode ||
       !Array.isArray(contract?.context_fields) ||
-      !contract.context_fields.includes('transcript') ||
+      !contract.context_fields.includes(profile?.inputField) ||
       !digest.test(contract?.prompt_sha256 ?? '') ||
       !Number.isInteger(contract?.max_tokens) || contract.max_tokens <= 0 ||
       !Number.isInteger(contract?.timeout_ms) || contract.timeout_ms < 1000) {
@@ -303,6 +315,27 @@ async function validateExperiment(experiment, path) {
         experiment.generation_contract.prompt_id) {
     errors.push('candidate, prompt, or hidden-reference fixture is invalid');
   }
+  const sectioned = experiment.generation_contract.structured_output_contract ===
+    'bounded-transcript-sections-v1';
+  if (sectioned) {
+    const sections = fixture.sections;
+    const ids = sections?.map((section) => section.id) ?? [];
+    const references = sections?.map((section) =>
+      section.evaluation_reference).join('\n\n');
+    const transcripts = sections?.map((section) =>
+      section.transcript).join('\n\n');
+    if (!Array.isArray(sections) || sections.length < 2 ||
+        new Set(ids).size !== sections.length ||
+        sections.some((section) => !(section.id?.length > 0) ||
+          !(section.transcript?.length > 0) ||
+          !(section.evaluation_reference?.length > 0) ||
+          !Array.isArray(section.protected_spans)) ||
+        transcripts !== fixture.transcript ||
+        references !== fixture.evaluation_reference ||
+        fixture.inference_policy?.section_ids_and_order_must_match !== true) {
+      errors.push('sectioned fixture identity or combined text is invalid');
+    }
+  }
 
   let run;
   try {
@@ -342,6 +375,8 @@ async function validateExperiment(experiment, path) {
           candidate.request_defaults.token_limit_field ||
         run.procedure?.gateway_request?.json_schema_numeric_bounds !==
           candidate.request_defaults.json_schema_numeric_bounds ||
+        run.procedure?.gateway_request?.response_format?.schema_id !==
+          experiment.generation_contract.structured_output_contract ||
         run.procedure?.gateway_request?.provider?.allow_fallbacks !== false ||
         run.procedure?.gateway_request?.provider?.data_collection !== 'deny' ||
         run.procedure?.gateway_request?.provider?.zdr !== true) {
@@ -382,6 +417,77 @@ async function validateExperiment(experiment, path) {
     const rawText = run.output?.raw_text ?? '';
     const parsedOutputValid = run.output?.parser?.valid === true;
     const external = externalAudit(fixture, outputText, run.output?.reported_edits);
+    let sectionAudit = null;
+    if (sectioned && Array.isArray(run.output?.sections)) {
+      const outputSections = run.output.sections;
+      const idsPreserved = outputSections.length === fixture.sections.length &&
+        outputSections.every((section, index) =>
+          section.id === fixture.sections[index].id);
+      const sectionRecords = idsPreserved
+        ? outputSections.map((section, index) => {
+          const fixtureSection = fixture.sections[index];
+          const audited = externalAudit(
+            fixtureSection,
+            section.text ?? '',
+            section.reported_edits,
+          );
+          const inputDiff = wordDiff(
+            fixtureSection.evaluation_reference,
+            fixtureSection.transcript,
+          );
+          const outputDiff = wordDiff(
+            fixtureSection.evaluation_reference,
+            section.text ?? '',
+          );
+          const denominator = normalizedWords(
+            fixtureSection.evaluation_reference,
+          ).length;
+          const inputWer = denominator === 0
+            ? 0
+            : inputDiff.edit_distance / denominator;
+          const outputWer = denominator === 0
+            ? 0
+            : outputDiff.edit_distance / denominator;
+          const storedWer = section.diagnostic_wer;
+          const recordValid = sha256(section.text ?? '') === section.text_sha256 &&
+            section.parser?.valid === true &&
+            section.audit?.lexical_edits_fully_reported ===
+              audited.lexicalEditsFullyReported &&
+            section.audit?.protected_spans_unchanged ===
+              audited.protectedSpansUnchanged &&
+            section.audit?.reported_lexical_edit_count ===
+              audited.reportedLexicalEditCount &&
+            JSON.stringify(section.lexical_diff) ===
+              JSON.stringify(audited.diff) &&
+            storedWer?.input === inputWer &&
+            storedWer?.output === outputWer &&
+            storedWer?.delta === outputWer - inputWer;
+          return { audited, recordValid };
+        })
+        : [];
+      sectionAudit = {
+        idsPreserved,
+        recordsValid: idsPreserved && sectionRecords.every((item) =>
+          item.recordValid),
+        lexicalEditsFullyReported: idsPreserved && sectionRecords.every((item) =>
+          item.audited.lexicalEditsFullyReported),
+        protectedSpansUnchanged: idsPreserved && sectionRecords.every((item) =>
+          item.audited.protectedSpansUnchanged),
+        reportedLexicalEditCount: idsPreserved
+          ? sectionRecords.reduce((sum, item) =>
+            sum + item.audited.reportedLexicalEditCount, 0)
+          : null,
+        reconstructedText: idsPreserved
+          ? outputSections.map((section) => section.text.trim()).join('\n\n')
+          : null,
+      };
+      if (!sectionAudit.recordsValid ||
+          sectionAudit.reconstructedText !== outputText) {
+        errors.push('section-level output audit is invalid');
+      }
+    } else if (sectioned) {
+      errors.push('sectioned result requires section-level output records');
+    }
     const audit = parsedOutputValid
       ? external
       : {
@@ -390,9 +496,17 @@ async function validateExperiment(experiment, path) {
         protectedSpansUnchanged: false,
         reportedLexicalEditCount: null,
       };
+    if (sectionAudit !== null) {
+      audit.lexicalEditsFullyReported =
+        sectionAudit.lexicalEditsFullyReported;
+      audit.protectedSpansUnchanged = sectionAudit.protectedSpansUnchanged;
+      audit.reportedLexicalEditCount =
+        sectionAudit.reportedLexicalEditCount;
+    }
     const expectedAccepted = outputText.length > 0 &&
       parsedOutputValid &&
-      audit.lexicalEditsFullyReported && audit.protectedSpansUnchanged;
+      audit.lexicalEditsFullyReported && audit.protectedSpansUnchanged &&
+      (!sectioned || sectionAudit?.idsPreserved === true);
     if (sha256(outputText) !== run.output?.text_sha256 ||
         sha256(rawText) !== run.output?.raw_text_sha256 ||
         run.output?.audit?.lexical_edits_fully_reported !==
@@ -401,6 +515,7 @@ async function validateExperiment(experiment, path) {
           audit.protectedSpansUnchanged ||
         run.output?.audit?.reported_lexical_edit_count !==
           audit.reportedLexicalEditCount ||
+        (sectioned && run.output?.audit?.section_ids_preserved !== true) ||
         JSON.stringify(run.output?.lexical_diff) !== JSON.stringify(audit.diff) ||
         run.output?.gates?.policy_mode !== 'bounded-lexical' ||
         run.output?.gates?.accepted !== expectedAccepted ||

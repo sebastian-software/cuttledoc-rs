@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "revision": "postprocessing-prompts-1",
-  "evidence_date": "2026-07-20",
+  "revision": "postprocessing-prompts-2",
+  "evidence_date": "2026-07-22",
   "split_policy": {
     "grouping_unit": "complete source work or episode",
     "development": "prompt authoring, error-profile derivation, and threshold tuning",
@@ -79,6 +79,36 @@
         "edits do not overlap",
         "protected spans are unchanged",
         "numbers, dates, units, names, terms, and negations change only when explicitly permitted"
+      ]
+    },
+    {
+      "id": "conservative-sections-v1",
+      "path": "benchmarks/postprocessing/prompts/conservative-sections-v1.txt",
+      "sha256": "1febeaca7c2a35e41ee4c8315a3ae3adf2c56c3511c26441e5c6165703adc421",
+      "source": "repository-authored multi-section extension of conservative-error-profile-v1",
+      "mode": "bounded-lexical",
+      "output_contract": "JSON object with one complete corrected text and exhaustive lexical edits per immutable section id",
+      "allowed_edit_classes": [
+        "surface",
+        "word-boundary",
+        "contextual-misrecognition",
+        "asr-inflection"
+      ],
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "sections"
+      ],
+      "mechanical_gates": [
+        "valid JSON object",
+        "section ids and order exactly match the input",
+        "every lexical diff is reported in its own section",
+        "protected spans are unchanged",
+        "numbers, dates, units, names, terms, and negations change only when overwhelmingly supported"
       ]
     },
     {
