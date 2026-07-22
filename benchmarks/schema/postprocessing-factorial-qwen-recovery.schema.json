@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cuttledoc.dev/schemas/postprocessing-factorial-qwen-recovery.schema.json",
+  "title": "Cuttledoc Qwen VoiceDesign recovery result",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "recovery_plan_id",
+    "plan_id",
+    "plan_revision",
+    "source_selection_revision",
+    "source_revision",
+    "captured_through",
+    "selection_policy",
+    "candidates",
+    "selections",
+    "disposition",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/nonEmptyString" },
+    "recovery_plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_id": { "$ref": "#/$defs/nonEmptyString" },
+    "plan_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_selection_revision": { "$ref": "#/$defs/nonEmptyString" },
+    "source_revision": { "$ref": "#/$defs/gitSha" },
+    "captured_through": { "type": "string", "format": "date-time" },
+    "selection_policy": { "type": "object" },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "voice_slot_id",
+          "locale",
+          "passage_id",
+          "instruction",
+          "identity_seed",
+          "audio_sha256",
+          "duration_ms",
+          "reached_max_tokens",
+          "transcript_sha256",
+          "wer",
+          "cer",
+          "technical_gate"
+        ],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonEmptyString" },
+          "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+          "locale": { "$ref": "#/$defs/nonEmptyString" },
+          "passage_id": { "$ref": "#/$defs/nonEmptyString" },
+          "instruction": { "$ref": "#/$defs/nonEmptyString" },
+          "identity_seed": { "type": "integer", "minimum": 0 },
+          "audio_sha256": { "$ref": "#/$defs/sha256" },
+          "duration_ms": { "type": "number", "exclusiveMinimum": 0 },
+          "reached_max_tokens": { "type": "boolean" },
+          "transcript_sha256": { "$ref": "#/$defs/sha256" },
+          "wer": { "type": "number", "minimum": 0 },
+          "cer": { "type": "number", "minimum": 0 },
+          "technical_gate": { "enum": ["passed", "failed"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "selections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "voice_slot_id",
+          "previous_identity_seed",
+          "selected_identity_seed",
+          "candidate_id"
+        ],
+        "properties": {
+          "voice_slot_id": { "$ref": "#/$defs/nonEmptyString" },
+          "previous_identity_seed": { "type": "integer", "minimum": 0 },
+          "selected_identity_seed": { "type": "integer", "minimum": 0 },
+          "candidate_id": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "disposition": {
+      "enum": ["recovery-candidates-selected", "recovery-incomplete"]
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+  }
+}

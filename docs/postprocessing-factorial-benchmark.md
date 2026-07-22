@@ -232,6 +232,19 @@ Qwen repeats reuse the voice slot's identity seed exactly. A generation that
 reaches the token ceiling is retained for diagnosis but fails the technical
 gate instead of being treated as a shorter successful utterance.
 
+If a pinned Qwen identity fails that gate, the recovery plan tests the next
+three seeds without changing its description. It selects the first seed that
+finishes and stays below the direct-Qwen receiver threshold, rather than
+choosing the lowest WER after observing all candidates:
+
+```sh
+node scripts/run-postprocessing-factorial-local.mjs run-qwen-recovery
+```
+
+The recovery result is only a proposal for a factorial-plan revision. The
+selected identities still have to rerun the complete three-receiver
+qualification under that new revision before the full slice can expand.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only

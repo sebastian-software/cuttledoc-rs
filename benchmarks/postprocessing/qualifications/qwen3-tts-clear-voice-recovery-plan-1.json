@@ -1,0 +1,32 @@
+{
+  "$schema": "../../schema/postprocessing-factorial-qwen-recovery-plan.schema.json",
+  "schema_version": "1.0.0",
+  "id": "qwen3-tts-clear-voice-recovery-plan-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-3",
+  "source_selection_revision": "synthetic-roundtrip-passages-4",
+  "base_qualification": {
+    "path": "benchmarks/postprocessing/qualifications/qwen3-tts-1.7b-voicedesign.technical-a-1.json",
+    "sha256": "cca418e23a50625c10ce0be04411e29dd1c3e8c5579cb91ca03018353abb8363",
+    "failed_voice_slots": [
+      "qwen-de-clear",
+      "qwen-es-clear"
+    ]
+  },
+  "candidate_identity_seeds": [2, 3, 4],
+  "selection_policy": {
+    "generation_must_finish_before_max_tokens": true,
+    "maximum_qwen_direct_wer": 0.2,
+    "rule": "Select the first passing seed in ascending candidate order; do not optimize the seed on the lowest observed WER."
+  },
+  "targets": [
+    {
+      "voice_slot_id": "qwen-de-clear",
+      "passage_id": "synthetic-de-origin"
+    },
+    {
+      "voice_slot_id": "qwen-es-clear",
+      "passage_id": "synthetic-es-technical"
+    }
+  ]
+}

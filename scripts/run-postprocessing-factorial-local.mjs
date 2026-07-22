@@ -59,6 +59,16 @@ const defaultQwenQualificationOutput = join(
   'benchmarks/postprocessing/qualifications/' +
     'qwen3-tts-1.7b-voicedesign.technical-a-1.json',
 );
+const defaultQwenRecoveryPlan = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications/' +
+    'qwen3-tts-clear-voice-recovery-plan-1.json',
+);
+const defaultQwenRecoveryOutput = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications/' +
+    'qwen3-tts-clear-voice-recovery-1.json',
+);
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -125,6 +135,14 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: defaultQualificationOutput,
     },
+    'qwen-recovery-plan': {
+      type: 'string',
+      default: defaultQwenRecoveryPlan,
+    },
+    'qwen-recovery-output': {
+      type: 'string',
+      default: defaultQwenRecoveryOutput,
+    },
     locale: { type: 'string' },
     limit: { type: 'string' },
     'qualification-only': { type: 'boolean', default: false },
@@ -138,6 +156,7 @@ if (![
   'resolve-voices',
   'run-apple-tts',
   'run-qwen-tts',
+  'run-qwen-recovery',
   'run-stt',
   'summarize-qualification',
   'status',
@@ -145,7 +164,8 @@ if (![
 ].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
-      '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-stt|' +
+      '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-qwen-recovery|' +
+      'run-stt|' +
       'summarize-qualification|status|self-test> [options]',
   );
 }
@@ -174,6 +194,8 @@ const paths = {
       ? defaultQwenQualificationOutput
       : values['qualification-output'],
   ),
+  qwenRecoveryPlan: resolve(values['qwen-recovery-plan']),
+  qwenRecoveryOutput: resolve(values['qwen-recovery-output']),
 };
 paths.state = join(paths.output, 'state.json');
 paths.lock = join(paths.output, '.run.lock');
@@ -182,6 +204,8 @@ paths.stt = join(paths.output, 'stt');
 paths.appleInventory = join(paths.output, 'apple-voice-inventory.json');
 paths.qwenWorker = join(paths.output, 'qwen-worker');
 paths.qwenJobs = join(paths.output, 'qwen-jobs.json');
+paths.qwenRecoveryWorker = join(paths.output, 'qwen-recovery-worker');
+paths.qwenRecoveryJobs = join(paths.output, 'qwen-recovery-jobs.json');
 
 if (command === 'self-test') {
   selfTest();
@@ -210,6 +234,9 @@ if (command === 'self-test') {
       await runQwenTts(state);
       await writeState(state);
       await printStatus(state);
+    } else if (command === 'run-qwen-recovery') {
+      const state = await initializeState();
+      await runQwenRecovery(state);
     } else if (command === 'run-stt') {
       const state = await initializeState();
       await runStt(state);
@@ -848,6 +875,196 @@ function qwenLanguage(locale) {
   return languages[locale];
 }
 
+async function runQwenRecovery(state) {
+  if (!state.capabilities.qwen3_tts_bf16.available) {
+    throw new Error('pinned Qwen3-TTS BF16 model or runtime is unavailable');
+  }
+  if (!state.capabilities.stt.qwen3_mlx_direct.available) {
+    throw new Error('direct Qwen3-ASR receiver is unavailable');
+  }
+  const [recoveryPlan, plan, selection] = await Promise.all([
+    readJson(paths.qwenRecoveryPlan),
+    readJson(paths.plan),
+    readJson(paths.selection),
+  ]);
+  if (
+    recoveryPlan.plan_id !== state.plan_id ||
+    recoveryPlan.plan_revision !== state.plan_revision ||
+    recoveryPlan.source_selection_revision !== state.source_selection_revision
+  ) {
+    throw new Error('Qwen recovery plan differs from the active factorial inputs');
+  }
+  const basePath = join(repoRoot, recoveryPlan.base_qualification.path);
+  const baseBytes = await readFile(basePath);
+  if (sha256(baseBytes) !== recoveryPlan.base_qualification.sha256) {
+    throw new Error('Qwen base qualification digest differs from recovery plan');
+  }
+  const base = JSON.parse(baseBytes.toString('utf8'));
+  const failedSlots = base.voices
+    .filter((voice) => voice.technical_gate === 'failed')
+    .map((voice) => voice.voice_slot_id)
+    .sort();
+  if (
+    json(failedSlots) !==
+    json([...recoveryPlan.base_qualification.failed_voice_slots].sort())
+  ) {
+    throw new Error('Qwen recovery targets differ from failed qualification slots');
+  }
+
+  const selectedPassages = selectedPassageMap(selection);
+  const voiceSlots = new Map(plan.voice_slots.map((slot) => [slot.id, slot]));
+  const jobs = [];
+  const contextByJob = new Map();
+  const seeds = [...recoveryPlan.candidate_identity_seeds].sort(
+    (left, right) => left - right,
+  );
+  for (const target of recoveryPlan.targets) {
+    const voice = voiceSlots.get(target.voice_slot_id);
+    const selected = selectedPassages.get(target.passage_id);
+    if (
+      !voice ||
+      voice.tts_engine !== 'qwen3-tts-1.7b-voicedesign-mlx-audio' ||
+      !voice.selector ||
+      !Number.isInteger(voice.voice_identity_seed)
+    ) {
+      throw new Error(`${target.voice_slot_id}: invalid recovery voice slot`);
+    }
+    if (!selected || selected.source.locale !== voice.locale) {
+      throw new Error(`${target.voice_slot_id}: invalid recovery passage`);
+    }
+    for (const seed of seeds) {
+      const id = `qwen-recovery--${target.voice_slot_id}--seed-${seed}`;
+      jobs.push({
+        id,
+        locale: voice.locale,
+        language: qwenLanguage(voice.locale),
+        instruction: voice.selector,
+        seed,
+        text_path: join(paths.text, `${target.passage_id}.txt`),
+        text_sha256: selected.passage.spoken_sha256,
+      });
+      contextByJob.set(id, { target, voice, selected });
+      if (values.force) {
+        await rm(join(paths.qwenRecoveryWorker, id), {
+          recursive: true,
+          force: true,
+        });
+      }
+    }
+  }
+  await atomicJson(paths.qwenRecoveryJobs, {
+    schema_version: '1.0.0',
+    jobs,
+  });
+  commandOutput(paths.qwenPython, [
+    join(repoRoot, 'spikes/tts-calibration/run_qwen_voicedesign_batch.py'),
+    '--manifest', paths.qwenManifest,
+    '--model-dir', paths.qwenModel,
+    '--jobs', paths.qwenRecoveryJobs,
+    '--output-dir', paths.qwenRecoveryWorker,
+    '--source-revision', gitRevision(),
+  ], { maxBuffer: 64 * 1024 * 1024 });
+
+  const candidates = [];
+  const capturedAt = [];
+  for (const job of jobs) {
+    const context = contextByJob.get(job.id);
+    const directory = join(paths.qwenRecoveryWorker, job.id);
+    const result = await readJson(join(directory, 'result.json'));
+    const rawPath = join(directory, result.audio.path);
+    const raw = await readFile(rawPath);
+    if (
+      result.source_revision !== gitRevision() ||
+      result.job_id !== job.id ||
+      result.input.text_sha256 !== job.text_sha256 ||
+      raw.length !== result.audio.byte_count ||
+      sha256(raw) !== result.audio.sha256
+    ) {
+      throw new Error(`${job.id}: invalid recovery worker result`);
+    }
+    const normalizedPath = join(directory, 'normalized-16k.f32le');
+    commandOutput('ffmpeg', [
+      '-y', '-v', 'error',
+      '-f', 'f32le', '-ar', String(result.audio.sample_rate_hz),
+      '-ac', '1', '-i', rawPath,
+      '-ar', '16000', '-ac', '1', '-f', 'f32le', '-acodec', 'pcm_f32le',
+      normalizedPath,
+    ]);
+    const asr = runQwenAsrPath(normalizedPath, job.locale);
+    const reference = (await readFile(job.text_path, 'utf8')).trim();
+    const transcript = asr.text.trim();
+    const wer = errorRate(words(reference), words(transcript));
+    const cer = errorRate(characters(reference), characters(transcript));
+    const passes =
+      !result.termination.reached_max_tokens &&
+      wer <= recoveryPlan.selection_policy.maximum_qwen_direct_wer;
+    candidates.push({
+      id: job.id,
+      voice_slot_id: context.voice.id,
+      locale: context.voice.locale,
+      passage_id: context.target.passage_id,
+      instruction: context.voice.selector,
+      identity_seed: job.seed,
+      audio_sha256: result.audio.sha256,
+      duration_ms: result.audio.duration_ms,
+      reached_max_tokens: result.termination.reached_max_tokens,
+      transcript_sha256: sha256(Buffer.from(`${transcript}\n`)),
+      wer,
+      cer,
+      technical_gate: passes ? 'passed' : 'failed',
+    });
+    capturedAt.push(result.captured_at);
+    process.stderr.write(
+      `qwen recovery: ${job.id} ${passes ? 'passed' : 'failed'} ` +
+      `(WER ${wer.toFixed(4)})\n`,
+    );
+  }
+
+  const selections = [];
+  for (const target of recoveryPlan.targets) {
+    const voice = voiceSlots.get(target.voice_slot_id);
+    const selectedCandidate = candidates.find((candidate) =>
+      candidate.voice_slot_id === target.voice_slot_id &&
+      candidate.technical_gate === 'passed');
+    if (selectedCandidate) {
+      selections.push({
+        voice_slot_id: target.voice_slot_id,
+        previous_identity_seed: voice.voice_identity_seed,
+        selected_identity_seed: selectedCandidate.identity_seed,
+        candidate_id: selectedCandidate.id,
+      });
+    }
+  }
+  const complete = selections.length === recoveryPlan.targets.length;
+  const report = {
+    schema_version: '1.0.0',
+    id: 'qwen3-tts-clear-voice-recovery-1',
+    recovery_plan_id: recoveryPlan.id,
+    plan_id: state.plan_id,
+    plan_revision: state.plan_revision,
+    source_selection_revision: state.source_selection_revision,
+    source_revision: gitRevision(),
+    captured_through: capturedAt.sort().at(-1),
+    selection_policy: recoveryPlan.selection_policy,
+    candidates,
+    selections,
+    disposition: complete
+      ? 'recovery-candidates-selected'
+      : 'recovery-incomplete',
+    limitations: [
+      'Recovery changes only the failed voice identity seed, not the description.',
+      'Candidate selection uses one pinned passage and the direct Qwen receiver.',
+      'The first passing seed is selected; WER is a gate, not an optimization target.',
+      'Selected identities must rerun the three-receiver qualification after plan revision.',
+    ],
+  };
+  await atomicJson(paths.qwenRecoveryOutput, report);
+  process.stdout.write(
+    `Wrote ${relative(repoRoot, paths.qwenRecoveryOutput)}: ` +
+    `${selections.length}/${recoveryPlan.targets.length} replacements selected\n`,
+  );
+}
+
 async function runStt(state) {
   const ledger = await readJson(paths.ledger);
   const selection = await readJson(paths.selection);
@@ -1209,12 +1426,16 @@ async function transcribeLegacy(engine, backend, samples) {
 }
 
 function runQwenAsr(context, unit) {
+  return runQwenAsrPath(context.normalizedPath, unit.locale);
+}
+
+function runQwenAsrPath(normalizedPath, locale) {
   const libraryDirectory = dirname(paths.qwenAsrBinary);
   const native = JSON.parse(commandOutput(paths.qwenAsrBinary, [
     'transcribe',
     paths.qwenAsrModel,
-    context.normalizedPath,
-    unit.locale.slice(0, 2),
+    normalizedPath,
+    locale.slice(0, 2),
     'gpu',
   ], {
     env: { ...process.env, DYLD_LIBRARY_PATH: libraryDirectory },
@@ -1224,7 +1445,7 @@ function runQwenAsr(context, unit) {
     text: native.text.trim(),
     runtime: {
       backend: 'qwen3-asr-0.6b-mlx-direct',
-      requested_language: unit.locale.slice(0, 2),
+      requested_language: locale.slice(0, 2),
       inference_ms: native.elapsed_ms,
       peak_memory_bytes: native.peak_memory_bytes,
       prompt_tokens: native.prompt_length,

@@ -4202,6 +4202,14 @@ const schemaPaths = [
     repoRoot,
     'benchmarks/schema/postprocessing-factorial-local-qualification.schema.json',
   ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-qwen-recovery-plan.schema.json',
+  ),
+  join(
+    repoRoot,
+    'benchmarks/schema/postprocessing-factorial-qwen-recovery.schema.json',
+  ),
 ];
 for (const path of schemaPaths) {
   const schema = await readJson(path);
