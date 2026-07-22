@@ -253,6 +253,12 @@ revision 5 consequently marks every Qwen slot qualified and makes all 120
 Qwen audio cells ready; Apple host voices and the exact Voxtral BF16 artifact
 remain separate execution gates.
 
+Plan revision 6 also promotes the ten Apple voices that passed the local
+three-receiver screen. Their exact AVSpeechSynthesizer identifiers and actual
+installed locales are pinned in the plan; cross-region voices remain visible
+as such instead of being relabeled as `es-419`, `fr-FR`, or `pt-BR`. A host
+must expose those exact identifiers before the Apple slice can run.
+
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
 that all STT engines must share. Qwen and Voxtral execution is enabled only

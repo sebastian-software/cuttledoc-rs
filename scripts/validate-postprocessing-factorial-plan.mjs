@@ -158,9 +158,12 @@ async function validatePlan(plan, selection, promptManifest) {
       `${voice.id}: Voxtral voice must use a preset without identity seed`);
     }
     if (voice.tts_engine === 'apple-avspeechsynthesizer') {
-      addError(errors, voice.selector === null &&
-        voice.voice_identity_seed === null,
-      `${voice.id}: Apple voice must resolve from the host inventory`);
+      addError(errors,
+        voice.voice_identity_seed === null &&
+        (voice.status === 'qualified'
+          ? typeof voice.selector === 'string'
+          : voice.selector === null),
+      `${voice.id}: Apple voice must be pinned when qualified`);
     }
   }
   for (const locale of expectedLocales) {

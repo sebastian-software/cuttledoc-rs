@@ -444,18 +444,35 @@ async function resolveVoices(state) {
       env: appleEnvironment(),
     });
     const inventory = JSON.parse(output.trim());
-    const selected = pickAppleVoices(locale, inventory.voices);
-    inventories.push({ ...inventory, selected });
     const slots = state.voice_resolutions
       .filter((item) =>
         item.tts_engine === 'apple-avspeechsynthesizer' &&
         item.locale === locale)
       .sort((left, right) => left.voice_slot_id.localeCompare(right.voice_slot_id));
     if (slots.length !== 2) throw new Error(`${locale}: expected two Apple slots`);
+    const automatic = pickAppleVoices(locale, inventory.voices);
+    const selected = slots.map((slot, index) => {
+      const planned = plan.voice_slots.find((item) =>
+        item.id === slot.voice_slot_id);
+      const candidate = planned.selector
+        ? inventory.voices.find((voice) => voice.identifier === planned.selector)
+        : automatic[index];
+      if (!candidate) {
+        throw new Error(
+          `${slot.voice_slot_id}: pinned Apple voice is not installed`,
+        );
+      }
+      return candidate;
+    });
+    inventories.push({ ...inventory, selected });
     for (let index = 0; index < slots.length; index += 1) {
+      const planned = plan.voice_slots.find((item) =>
+        item.id === slots[index].voice_slot_id);
       slots[index].selector = selected[index].identifier;
       slots[index].voice_locale = selected[index].language;
-      slots[index].status = 'resolved-candidate';
+      slots[index].status = planned.status === 'qualified'
+        ? 'qualified'
+        : 'resolved-candidate';
       slots[index].evidence = relative(paths.output, paths.appleInventory);
       slots[index].inventory = selected[index];
     }
