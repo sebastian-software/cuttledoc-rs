@@ -41,6 +41,14 @@ package to the caller-selected local output directory. Reviewed fixtures may
 additionally enter `benchmarks/assets` with an explicit per-asset license and
 attribution package.
 
+The downstream transcript-correction study expands this calibration corpus to
+two independent passages per language and content type and locks the TTS ×
+voice × generation × STT × LLM repetitions in the
+[`factorial postprocessing benchmark`](postprocessing-factorial-benchmark.md).
+Its missing passage and voice qualifications are explicit execution blockers;
+the current 22-passage calibration set is not silently treated as the complete
+factorial corpus.
+
 ```sh
 node scripts/materialize-synthetic-roundtrip.mjs \
   --output-dir /absolute/path/to/cuttledoc-synthetic-roundtrip

@@ -65,6 +65,16 @@ contract smoke test.
 The full methodology, per-error interpretation, and decision boundary are in
 [`postprocessing-long-form-evaluation.md`](../../docs/postprocessing-long-form-evaluation.md).
 
+The next screen uses the implemented `bounded-transcript-sections-local-diff-v2`
+contract and the
+[`factorial benchmark`](../../docs/postprocessing-factorial-benchmark.md). The
+model returns only immutable section ids and corrected text. The repository,
+not the model, derives the authoritative lexical diff and protected-span audit.
+The locked design has five languages, two independent passages for each of
+three content types, three TTS engines, two voices per engine, two primary
+generations, three STT engines, five LLMs, and two hosted repeats. Corpus and
+voice gates block remote execution until every planned cell is ready.
+
 Every request disables provider fallback, requires all requested parameters,
 and denies data collection. All candidates require a zero-data-retention route
 except the single consumed Qwen3.7 Max exception described below. The gateway

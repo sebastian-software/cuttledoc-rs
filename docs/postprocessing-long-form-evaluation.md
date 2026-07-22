@@ -145,15 +145,15 @@ informative than the one-word probe, but it does not select a product model:
 - the texts and error profile are development-exposed; and
 - no result covers held-out professional podcast or audiobook audio.
 
-The next prompt iteration should separate correction quality from audit
-metadata. Cuttledoc can derive the authoritative lexical diff locally from the
-input and corrected text; model-supplied reasons and confidence should remain
-advisory rather than make an otherwise strong correction unusable. The next
-development comparison should therefore keep immutable section ids and
-protected-content gates, remove the exhaustive model-authored edit-ledger
-requirement, and explicitly forbid unsupported changes to numbers, dates,
-names, and technical terms. Only a frozen survivor should proceed to held-out
-human-verified German professional audio.
+The follow-up prompt now separates correction quality from audit metadata.
+Cuttledoc derives the authoritative lexical diff locally from the input and
+corrected text; the model returns no edit ledger, reasons, or confidence
+scores. The implemented contract keeps immutable section ids and
+protected-content gates and explicitly forbids unsupported changes to numbers,
+dates, names, and technical terms. It is used by the
+[`factorial transcript-postprocessing benchmark`](postprocessing-factorial-benchmark.md).
+Only a frozen survivor should proceed to held-out human-verified professional
+audio.
 
 The fixture is
 [`issue20-de-synthetic-multipage-whisper-1.json`](../benchmarks/postprocessing/fixtures/issue20-de-synthetic-multipage-whisper-1.json),
