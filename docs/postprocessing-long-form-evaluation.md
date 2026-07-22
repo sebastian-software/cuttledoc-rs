@@ -1,6 +1,6 @@
 # Long-form transcript postprocessing screen
 
-**Status:** German multi-page development screen complete for eight hosted
+**Status:** German multi-page development screen complete for nine hosted
 models; the pinned Mistral endpoint remains temporarily blocked.
 
 **Evidence date:** 2026-07-22.
@@ -41,13 +41,14 @@ requests per run.
 | Gemini 3.6 Flash / Google Vertex Global | Failed: one unreported lexical change | 9 | 0.90% | 85.0% | 6 / 1 / 1 | $0.0716760 |
 | Kimi K3 / Moonshot AI INT4 | Passed | 23 | 2.31% | 61.7% | 6 / 2 / 0 | $0.1387416 |
 | GPT-5.6 Luna / Azure EU | Failed: all six lexical changes unreported | 54 | 5.43% | 10.0% | 1 / 7 / 0 | $0.0294822 |
+| GPT-5.6 Terra / Azure EU | Failed: one redundant overlapping ledger entry | 20 | 2.01% | 66.7% | 6 / 2 / 0 | $0.1135068 |
 | Claude Sonnet 5 / Azure US East 2 | Passed | 28 | 2.81% | 53.3% | 5 / 3 / 0 | $0.1449660 |
 | Qwen3.7 Max / Alibaba, consumed non-ZDR exception | Failed: four repeated edit occurrences not enumerated | 15 | 1.51% | 75.0% | 6 / 2 / 0 | $0.044950625 |
 | Mistral Small 3.2 24B / Parasail BF16 | Blocked: upstream HTTP 429 twice | — | — | — | — | not recorded |
 
-Gemini was the only one of the eight complete long-form results whose two raw
-responses were identical. The recorded cost of the eight complete two-request
-results is $0.852958325. Requests from the blocked Mistral attempts, an
+Gemini was the only one of the nine complete long-form results whose two raw
+responses were identical. The recorded cost of the nine complete two-request
+results is $0.966465125. Requests from the blocked Mistral attempts, an
 abandoned historical Qwen invocation, and Sonnet 5's initial token-limit
 failure have no complete response record and are intentionally excluded rather
 than estimated.
@@ -94,15 +95,20 @@ a modest improvement over the historical Sonnet 4.6 result's 31. Sonnet 5 is
 now the active Anthropic control; Sonnet 4.6 remains in the table solely as
 historical evidence, not because the old model is still preferred.
 
-GPT-5.6 Luna is not an upgrade over GPT-5.6 Sol for this task under the pinned
-no-reasoning tuple. It made only six lexical changes, reported none of them, and
-reduced the error count from 60 to 54. The family name is therefore not a
-quality ordering: Sol remains the much stronger observed GPT-5.6 control on
-this fixture. Sonnet 5 initially consumed the full 8,192-token completion
-budget without emitting content; explicit low reasoning produced the complete
-record above. Client-observed request durations ranged from about 0.7 seconds
-for Gemini and Luna to roughly 10.2 seconds for Kimi, but these remote gateway
-measurements are not comparable to local runtime latency.
+The three GPT-5.6 tiers form the expected quality ordering under the identical
+Azure EU no-reasoning tuple. Sol remains the ceiling at five errors, balanced
+Terra leaves 20, and cost-efficient Luna leaves 54. Terra improves six sections
+without a regression and is slightly more accurate than Kimi K3. Its mechanical
+failure is bookkeeping rather than a hidden output change: the final spoken
+`Punkt` deletion is reported once on its own and again in the overlapping
+`Punkt gute` to `Gute` edit. The ledger therefore counts 51 changes for a
+locally derived 50-change output diff.
+
+Sonnet 5 initially consumed the full 8,192-token completion budget without
+emitting content; explicit low reasoning produced the complete record above.
+Client-observed request durations ranged from about 0.4 seconds for Terra to
+roughly 10.2 seconds for Kimi, but these remote gateway measurements are not
+comparable to local runtime latency.
 
 Qwen3.7 Max is the third-best text restorer in the complete matrix at 15 errors,
 behind GPT-5.6 Sol and Gemini. It improved six sections without a regression.

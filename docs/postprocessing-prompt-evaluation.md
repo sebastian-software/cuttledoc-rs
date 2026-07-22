@@ -187,9 +187,11 @@ Sol reaches 0.50% diagnostic micro-WER with no section regression but omits one
 edit-ledger entry; Qwen reaches 2.51% but makes two unsupported factual changes
 in an already exact section. The current-model expansion adds Gemini 3.6 Flash
 at 0.90% with one factual regression, contract-passing Kimi K3 at 2.31%,
-contract-passing Claude Sonnet 5 at 2.81%, and GPT-5.6 Luna at 5.43%. Claude
-Sonnet 4.6 remains a historical 3.12% control; Sonnet 5 is the active Anthropic
-candidate. Qwen3.7 Max reaches 1.51% with no section regression under a
+contract-passing Claude Sonnet 5 at 2.81%, GPT-5.6 Terra at 2.01%, and GPT-5.6
+Luna at 5.43%. Terra has no section regression and fails only because one
+overlapping edit is reported twice. Claude Sonnet 4.6 remains a historical
+3.12% control; Sonnet 5 is the active Anthropic candidate. Qwen3.7 Max reaches
+1.51% with no section regression under a
 consumed one-execution non-ZDR exception, but fails the exhaustive ledger gate
 because four repeated correction occurrences are not listed separately. These
 results supersede the single-word fixture for development-quality reasoning,

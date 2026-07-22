@@ -114,10 +114,12 @@ gateway schema also makes this a hosted product-capability result rather than a
 directly identical replay of the prompt-only local MLX attempts.
 
 The subsequent long-form screen retains those records as historical controls
-and adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Luna, and Claude Sonnet 5. Sonnet 5,
-not 4.6, is the active Anthropic comparison. Kimi and Sonnet 5 pass the complete
-contract without a section regression; Gemini is more accurate but makes one
-unsupported factual correction, and Luna barely improves the transcript.
+and adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Terra, GPT-5.6 Luna, and Claude
+Sonnet 5. Sonnet 5, not 4.6, is the active Anthropic comparison. Kimi and Sonnet
+5 pass the complete contract without a section regression; Gemini is more
+accurate but makes one unsupported factual correction. Terra lands between Sol
+and Luna at 2.01% without a regression, while Luna barely improves the
+transcript.
 Qwen3.7 Max reaches 1.51% without a section regression under an explicitly
 authorized, consumed one-execution non-ZDR exception; its ledger omits four
 repeated correction occurrences.

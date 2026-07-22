@@ -76,12 +76,13 @@ an inexpensive development ceiling; it provides no MLX/Core ML latency,
 memory, energy, packaging, or model-size evidence and still cannot select
 quality from one inspected, unverified fixture.
 
-The later multi-page screen adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Luna, and
-Claude Sonnet 5. Sonnet 5 replaces 4.6 as the active Anthropic control; the old
-result remains only for reproducibility. Kimi and Sonnet 5 pass the full
-bounded contract without a section regression. Gemini reaches 0.90% diagnostic
-WER but changes a correct `Industrie 5.0` to `Industrie 4.0`; Luna improves only
-one section. Qwen3.7 Max reaches 1.51% without a section regression under an
+The later multi-page screen adds Gemini 3.6 Flash, Kimi K3, GPT-5.6 Terra,
+GPT-5.6 Luna, and Claude Sonnet 5. Sonnet 5 replaces 4.6 as the active Anthropic
+control; the old result remains only for reproducibility. Kimi and Sonnet 5
+pass the full bounded contract without a section regression. Gemini reaches
+0.90% diagnostic WER but changes a correct `Industrie 5.0` to `Industrie 4.0`;
+Terra reaches 2.01% without a regression, while Luna improves only one section.
+Qwen3.7 Max reaches 1.51% without a section regression under an
 explicitly authorized and consumed one-execution non-ZDR exception. These
 remote results refine the quality shortlist and still provide no local-runtime
 evidence.

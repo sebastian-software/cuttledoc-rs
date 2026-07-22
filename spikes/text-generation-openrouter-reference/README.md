@@ -36,6 +36,7 @@ the reproducible historical records:
 | Fast frontier candidate | Gemini 3.6 Flash | Google Vertex Global | ZDR; explicit low reasoning required |
 | Frontier candidate | Kimi K3 | Moonshot AI INT4 | ZDR |
 | GPT family control | GPT-5.6 Luna | Azure EU | ZDR |
+| Balanced GPT family control | GPT-5.6 Terra | Azure EU | ZDR |
 | Current Anthropic control | Claude Sonnet 5 | Azure US East 2 | ZDR; replaces Sonnet 4.6 as the active control |
 | Frontier candidate | Qwen3.7 Max | Alibaba | Completed under an explicitly authorized and consumed one-execution non-ZDR exception |
 
@@ -56,6 +57,7 @@ contract smoke test.
 | Gemini 3.6 Flash | Failed; one output change missing from its edit ledger, one regressed section | 0.90% | 6 / 1 / 1 | $0.0716760 |
 | Kimi K3 | Passed | 2.31% | 6 / 2 / 0 | $0.1387416 |
 | GPT-5.6 Luna | Failed; all six output changes missing from its edit ledger | 5.43% | 1 / 7 / 0 | $0.0294822 |
+| GPT-5.6 Terra | Failed; one redundant overlapping edit-ledger entry | 2.01% | 6 / 2 / 0 | $0.1135068 |
 | Claude Sonnet 5 | Passed | 2.81% | 5 / 3 / 0 | $0.1449660 |
 | Qwen3.7 Max | Failed; four repeated correction occurrences not enumerated separately | 1.51% | 6 / 2 / 0 | $0.044950625 |
 | Mistral Small 3.2 24B | Blocked twice by pinned Parasail endpoint HTTP 429 | — | — | not recorded |
