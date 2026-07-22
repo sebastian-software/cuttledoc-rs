@@ -14,6 +14,20 @@ constant while varying four model/provider tuples:
 | Frontier ceiling | GPT-5.6 Sol | Azure EU |
 | Second frontier-family ceiling | Claude Sonnet 4.6 | Bedrock EU West 1 |
 
+The 2026-07-22 development screen produced:
+
+| Candidate | Mechanical result | Repeat | Two-request cost |
+| --- | --- | --- | ---: |
+| Qwen 3.5 122B-A10B | Accepted; corrected `schautete` to `schauderte` | Different | $0.0040482 |
+| Mistral Small 3.2 24B | Rejected; reported `schaute` but did not apply it | Identical | $0.00017774 |
+| GPT-5.6 Sol | Accepted; corrected `schautete` to `schauderte` | Different | $0.0346610 |
+| Claude Sonnet 4.6 | Accepted; made only the target correction | Identical | $0.0124542 |
+
+These are contract and capability observations on one inspected development
+fixture, not a quality ranking. The three accepted outputs match its unverified
+dataset reference, but only independent human gold can label edits beneficial
+and estimate regression rates.
+
 Every request disables provider fallback, requires all requested parameters,
 denies data collection, and requires a zero-data-retention route. The gateway
 also enforces a strict JSON Schema. This is a pragmatic hosted-product

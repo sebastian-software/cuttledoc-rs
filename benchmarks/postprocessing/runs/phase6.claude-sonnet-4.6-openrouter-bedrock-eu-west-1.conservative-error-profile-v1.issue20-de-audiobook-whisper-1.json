@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "phase6.claude-sonnet-4.6-openrouter-bedrock-eu-west-1.conservative-error-profile-v1.issue20-de-audiobook-whisper-1",
+  "captured_at": "2026-07-22T07:18:26.820Z",
+  "source_revision": "366ad1adb528a9d1749ed8d3899d3464c115e022",
+  "purpose": "development-quality-screen",
+  "candidate": {
+    "task": "text-generation",
+    "manifest_id": "claude-sonnet-4.6-openrouter-bedrock-eu-west-1",
+    "role": "frontier-quality-control",
+    "model": {
+      "requested_id": "anthropic/claude-sonnet-4.6",
+      "allowed_response_ids": [
+        "anthropic/claude-sonnet-4.6",
+        "anthropic/claude-4.6-sonnet-20260217"
+      ],
+      "upstream_identity": "Anthropic Claude Sonnet 4.6",
+      "provider_model_identity": "anthropic/claude-4.6-sonnet-20260217",
+      "release": "2026-02-17",
+      "weights": "proprietary",
+      "license": "Hosted commercial service",
+      "context_tokens": 1000000,
+      "identity_limit": "The model and serving implementation are proprietary; the API identity is the strongest artifact boundary available to this probe."
+    },
+    "gateway": {
+      "name": "OpenRouter",
+      "requested_model": "anthropic/claude-sonnet-4.6",
+      "provider_slug": "amazon-bedrock/eu-west-1",
+      "provider_name": "Amazon Bedrock",
+      "served_model": "anthropic/claude-sonnet-4.6",
+      "served_provider": "Amazon Bedrock"
+    }
+  },
+  "fixture": {
+    "id": "issue20-de-audiobook-whisper-conservative",
+    "language": "German",
+    "locale": "de-DE",
+    "domain": "professionally narrated audiobook",
+    "asr_backend": "whisper-large-v3-turbo-coreml-whispercpp",
+    "development_only": true,
+    "gold_status": "dataset-transcript-unverified",
+    "transcript_sha256": "2228008474bd2932cd5675cbe2be4e4eb6d7a8f53b4e5962f7e7e0c06134fa8a",
+    "reference_visible_to_model": false
+  },
+  "procedure": {
+    "experiment_id": "claude-sonnet-4.6-openrouter.conservative-error-profile-v1.de-audiobook",
+    "generation": {
+      "prompt_id": "conservative-error-profile-v1",
+      "policy_mode": "bounded-lexical",
+      "render_mode": "template",
+      "output_mode": "json-edits",
+      "structured_output_contract": "bounded-transcript-correction-v1",
+      "context_fields": [
+        "language",
+        "locale",
+        "domain",
+        "backend",
+        "error_profile",
+        "glossary",
+        "protected_spans",
+        "transcript"
+      ],
+      "prompt_path": "benchmarks/postprocessing/prompts/conservative-error-profile-v1.txt",
+      "prompt_sha256": "d0476e1c51755f1af5d422ce9c9c2a068b7f32be4d7cb3bf0d0b1ee7ca560e85",
+      "max_tokens": 1024,
+      "timeout_ms": 180000,
+      "rationale": "Measure a second frontier-family ceiling for the bounded correction task without treating a paid API as the product runtime."
+    },
+    "gateway_request": {
+      "token_limit_field": "max_tokens",
+      "json_schema_numeric_bounds": false,
+      "response_format": {
+        "type": "json_schema",
+        "schema_id": "bounded-transcript-correction-v1",
+        "strict": true
+      },
+      "temperature": 0,
+      "seed": null,
+      "reasoning": null,
+      "provider": {
+        "only": [
+          "amazon-bedrock/eu-west-1"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true,
+        "data_collection": "deny",
+        "zdr": true
+      }
+    },
+    "complete_generation_repetitions": 2,
+    "prompt_visible_fields": [
+      "language",
+      "locale",
+      "domain",
+      "backend",
+      "error_profile",
+      "glossary",
+      "protected_spans",
+      "transcript"
+    ],
+    "evaluation_reference_visible_to_model": false,
+    "execution_boundary": "Remote OpenRouter API; no local model-runtime claim"
+  },
+  "measurements": {
+    "requests": [
+      {
+        "response_id": "gen-1784704698-MIGQu00Y1rtT3GIp1oIi",
+        "served_model": "anthropic/claude-sonnet-4.6",
+        "served_provider": "Amazon Bedrock",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 4429.149208000001,
+        "usage": {
+          "prompt_tokens": 1092,
+          "completion_tokens": 159,
+          "total_tokens": 1251,
+          "cost_usd": 0.0062271,
+          "is_byok": false
+        }
+      },
+      {
+        "response_id": "gen-1784704703-01DMKN8e87T6xKDAvmNE",
+        "served_model": "anthropic/claude-sonnet-4.6",
+        "served_provider": "Amazon Bedrock",
+        "finish_reason": "stop",
+        "client_observed_complete_ms": 1129.4559579999996,
+        "usage": {
+          "prompt_tokens": 1092,
+          "completion_tokens": 159,
+          "total_tokens": 1251,
+          "cost_usd": 0.0062271,
+          "is_byok": false
+        }
+      }
+    ],
+    "aggregate": {
+      "total_cost_usd": 0.0124542,
+      "total_prompt_tokens": 2184,
+      "total_completion_tokens": 318
+    },
+    "deterministic_repeat": {
+      "text_identical": true,
+      "requirement": "observation-only; remote repeat equality is not an acceptance gate"
+    },
+    "latency_claim_limit": "Client-observed request duration includes gateway, queue, provider, and network time and is not comparable to local MLX measurements."
+  },
+  "output": {
+    "text": "wie aber kam sie hier auf meinen tisch und warum schauderte ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches",
+    "text_sha256": "62bef586f9e2a4395535f462696dfedde261dbf3aad3b7a6519988fcdee63ca3",
+    "raw_text": "{\"text\":\"wie aber kam sie hier auf meinen tisch und warum schauderte ich wenn ich sie ansah diese fragen wollten sich in keiner weise beantworten lassen meine blicke fielen schließlich auf den unterstrichenen satz eines offen vor mir liegenden buches\",\"edits\":[{\"original\":\"schautete\",\"replacement\":\"schauderte\",\"class\":\"contextual-misrecognition\",\"reason\":\"'schautete' is not a German word; 'schauderte' (shuddered) fits the context of an unsettling question and matches the dropped-final-consonant error pattern noted in the dev profile\",\"confidence\":0.92}]}",
+    "raw_text_sha256": "ac34f4d6e906739a8b2733c4cdd67a8860d4b50ee62daa5c960011f4aca5a073",
+    "reported_edits": [
+      {
+        "original": "schautete",
+        "replacement": "schauderte",
+        "class": "contextual-misrecognition",
+        "reason": "'schautete' is not a German word; 'schauderte' (shuddered) fits the context of an unsettling question and matches the dropped-final-consonant error pattern noted in the dev profile",
+        "confidence": 0.92
+      }
+    ],
+    "parser": {
+      "valid": true,
+      "error": null
+    },
+    "audit": {
+      "lexical_edits_fully_reported": true,
+      "protected_spans_unchanged": true,
+      "reported_lexical_edit_count": 1
+    },
+    "lexical_diff": {
+      "input_word_count": 39,
+      "output_word_count": 39,
+      "edit_distance": 1,
+      "operations": [
+        {
+          "type": "replace",
+          "input_index": 10,
+          "output_index": 10,
+          "input": "schautete",
+          "output": "schauderte"
+        }
+      ]
+    },
+    "gates": {
+      "policy_mode": "bounded-lexical",
+      "nonempty": true,
+      "case_and_punctuation_insensitive_lexical_invariant": false,
+      "accepted": true,
+      "quality_accepted": false
+    },
+    "diagnostic_wer": {
+      "input": 0.02564102564102564,
+      "output": 0,
+      "reference_status": "dataset-transcript-unverified",
+      "claim_limit": "Development-only diagnostic against an unverified dataset transcript; not a quality-selection result."
+    }
+  },
+  "conclusion": {
+    "remote_reference_executed": true,
+    "development_output_contract_accepted": true,
+    "model_quality_selected": false,
+    "product_runtime_accepted": false,
+    "claim_limit": "This run screens one development fixture and API contract. Human-verified target-domain audio remains required for model selection."
+  }
+}

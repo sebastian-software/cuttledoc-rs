@@ -119,3 +119,14 @@ edit. All candidates executed and repeated deterministically, but none showed a
 verified quality gain. This confirms the decision to defer model-specific Core
 ML and owned-MLX product work until human-verified held-out evidence identifies
 a survivor.
+
+The subsequent hosted capability screen reinforces rather than changes this
+decision. Under provider-pinned, no-fallback ZDR routes and a strict gateway
+JSON Schema, Qwen 3.5 122B-A10B, GPT-5.6 Sol, and Claude Sonnet 4.6 each made
+the one hidden reference-matching correction and passed the repository-owned
+lexical audit. Mistral Small 3.2 24B reported an edit without applying it, and
+the audit rejected the contradiction. These controls show that stronger models
+can execute the task and that gateway structure is not a safety boundary. They
+remain development-only remote quality ceilings: one inspected, unverified
+fixture cannot select a model, and remote execution supplies no evidence for
+the official-MLX versus Core ML product-runtime decision.

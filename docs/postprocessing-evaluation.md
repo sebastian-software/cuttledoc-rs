@@ -3,7 +3,7 @@
 **Status:** historical evidence imported; model-first Cuttledoc 3 bakeoff in
 progress under issue #20.
 
-**Evidence date:** 2026-07-21.
+**Evidence date:** 2026-07-22.
 
 The Cuttledoc 2 correction path used a constrained transcript-proofreading
 prompt and local Ollama models. The CLI default was **Gemma 3n E4B**
@@ -66,12 +66,14 @@ Unicode letters and must recompute every score from the retained raw text.
 
 ## Cuttledoc 3 decision
 
-Postprocessing remains a first-class experiment under the local
-text-generation runtime work. Gemma 4 E2B is the primary quality candidate,
-Qwen 3.5 0.8B is the small efficiency challenger, and SmolLM3 3B is the
-multilingual product-size compromise. Gemma 3n E4B remains a historical Ollama
-control rather than defining the new embedded runtime. It is a separate,
-optional stage:
+Postprocessing remains a first-class experiment under the text-generation
+runtime work. Gemma 4 E2B is the initial embedded-size quality candidate, Qwen
+3.5 0.8B is the small efficiency challenger, and SmolLM3 3B is the multilingual
+product-size compromise. A hosted Qwen 3.5 122B-A10B candidate plus GPT and
+Claude frontier controls now bound the quality that substantially stronger
+models can provide. Gemma 3n E4B remains a historical Ollama control rather
+than defining the new embedded runtime. Enhancement is a separate, optional
+stage:
 
 1. preserve the raw ASR transcript;
 2. correct a copy with the exact model, quantization, prompt, and decoding
@@ -100,6 +102,16 @@ no-op but made one harmful edit under the surface-only prompt. These runs prove
 the candidates and external gates execute; the single unverified fixture cannot
 select a model. The selection gate remains human-verified, source-grouped German
 podcast and audiobook data.
+
+The hosted capability screen then ran the same hidden-reference conservative
+fixture through provider-pinned, no-fallback ZDR routes. Qwen 3.5 122B-A10B,
+GPT-5.6 Sol, and Claude Sonnet 4.6 each made the single reference-matching
+lexical correction and passed the external audit. Mistral Small 3.2 24B
+reported an edit it did not apply and was rejected. This is evidence that model
+capability matters and that the conservative prompt can produce a useful edit;
+it is not a quality ranking or a reason to ship a hosted provider. The strict
+gateway schema also makes this a hosted product-capability result rather than a
+directly identical replay of the prompt-only local MLX attempts.
 
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus

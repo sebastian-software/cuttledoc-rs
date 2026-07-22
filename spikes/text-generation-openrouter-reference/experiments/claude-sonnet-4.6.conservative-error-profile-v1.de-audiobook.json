@@ -29,6 +29,6 @@
     "purpose": "development-quality-screen",
     "fixture_path": "benchmarks/postprocessing/fixtures/issue20-de-audiobook-whisper-conservative.json",
     "result_path": "benchmarks/postprocessing/runs/phase6.claude-sonnet-4.6-openrouter-bedrock-eu-west-1.conservative-error-profile-v1.issue20-de-audiobook-whisper-1.json",
-    "result_required": false
+    "result_required": true
   }
 }

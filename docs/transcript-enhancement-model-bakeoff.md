@@ -2,7 +2,7 @@
 
 **Status:** in progress under issue #20.
 
-**Plan date:** 2026-07-21.
+**Evidence date:** 2026-07-22.
 
 ## Development-matrix outcome
 
@@ -31,11 +31,44 @@ It is not evidence that all three models are equally weak. A one-error fixture
 cannot measure edit precision or distinguish a deliberately conservative model
 from a model that cannot correct useful errors.
 
-Stage B is now the selection gate. Before any Core ML conversion or owned MLX
+## Hosted capability ceiling
+
+A separate OpenRouter screen held the same conservative prompt, hidden-reference
+fixture, external parser, lexical audit, and protected-span gate constant while
+testing substantially stronger models. Routes were pinned with provider
+fallback disabled, parameter support required, data collection denied, and
+zero-data retention required.
+
+| Candidate | Pinned ZDR route | External outcome | Two-request repeat | Recorded cost |
+| --- | --- | --- | --- | ---: |
+| Qwen 3.5 122B-A10B | AtlasCloud FP8 | Applied and reported the single hidden target correction `schautete` → `schauderte`; audit passed | Different complete JSON responses | $0.0040482 |
+| Mistral Small 3.2 24B | Parasail BF16 | Reported `schautete` → `schaute` but left the output text unchanged; audit rejected the contradiction | Identical | $0.00017774 |
+| GPT-5.6 Sol | Azure EU | Applied and reported `schautete` → `schauderte`; audit passed | Different complete JSON responses | $0.0346610 |
+| Claude Sonnet 4.6 | Bedrock EU West 1 | Applied and reported only `schautete` → `schauderte`; audit passed | Identical | $0.0124542 |
+
+The four final records cost $0.05134114 in total. Qwen and GPT also restored
+punctuation and capitalization; Claude made only the lexical correction.
+Mistral demonstrates that gateway-enforced JSON shape does not guarantee
+cross-field consistency, so the repository-owned audit remains necessary.
+
+This screen proves that the conservative task is executable by more capable
+models and makes Qwen 3.5 122B-A10B a serious open-weight quality reference.
+It does **not** select a model: the one disagreement and its unverified dataset
+reference were already inspected during development. GPT and Claude are
+frontier ceilings, not embedded-runtime candidates, and Qwen 122B is not a
+product-size recommendation. The strict gateway JSON Schema also gives hosted
+models a capability unavailable to the prompt-only local MLX runs; Bedrock's
+schema subset required the repository parser, rather than the gateway, to
+enforce the numeric confidence range.
+
+Stage B remains the selection gate. Before any Core ML conversion or owned MLX
 product adapter is justified, build a small source-grouped set of
 human-verified German podcast and audiobook transcripts, run identical raw ASR
-outputs through the frozen candidates, and measure beneficial and harmful edits
-per source. Runtime work resumes only for a quality survivor.
+outputs through the frozen local candidates plus the hosted Qwen/frontier
+ceilings, and measure beneficial and harmful edits per source. The hosted
+controls answer whether the prompt and available context leave useful quality
+on the table; they do not compete on local latency. Runtime work resumes only
+for a quality survivor that has a plausible product representation.
 
 ## Question
 

@@ -67,7 +67,7 @@ Exit criteria:
 
 ### Current Phase 0 status
 
-Evidence snapshot: 2026-07-21.
+Evidence snapshot: 2026-07-22.
 
 | Workstream | State | Remaining gate |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ Evidence snapshot: 2026-07-21.
 | Synthetic TTS roundtrip (#13) | In progress | Apple, Qwen3-TTS, and Voxtral TTS now have real German PCM evidence; Qwen and Voxtral each completed the four-ASR content matrix, and Voxtral includes a +12 dB level control. Listening, generation variance, English cells, and provider controls remain. |
 | Thin Node/npm boundary (#9) | Complete | Node 22/24 CI builds, packs, compiler-free installs, and tests the same macOS arm64 tarball through ESM and CommonJS, including streaming fields, background work, progress, errors, cancellation, and missing-artifact diagnostics. |
 | Local text-generation runtime (#7) | Complete | The pinned Qwen3 0.6B MLX reference proves load, deterministic streaming, cancellation, and external lexical rejection. It is explicitly a runtime/negative control, not quality selection. |
-| Transcript-enhancement model/runtime bakeoff (#20) | In progress | The pinned three-model, three-prompt German development matrix is complete and selects no quality winner: Gemma failed the strict structured-output contract, Qwen made unaudited harmful rewrites, and SmolLM3's valid structured result was a no-op. Acquire human-verified German professional-audio gold before porting any survivor through repository-owned official MLX and Core ML paths. |
+| Transcript-enhancement model/runtime bakeoff (#20) | In progress | The embedded-size MLX matrix selects no quality winner. A separate pinned OpenRouter ceiling shows that Qwen 3.5 122B-A10B, GPT-5.6 Sol, and Claude Sonnet 4.6 can make the hidden reference-matching edit while Mistral's inconsistent edit/text pair is externally rejected. These remain development-only hosted controls; acquire human-verified German professional-audio gold before selecting a model or porting a plausible survivor through official MLX and Core ML. |
 
 The open issue list is a work queue, not a second architecture plan. Completed
 foundation issues should close with links to their evidence. Productization
@@ -196,11 +196,14 @@ Evaluate independently:
 Gate:
 
 - Issue #7 proves the runtime and safety-gate foundation. Issue #20 selects the
-  model before the embedded runtime: compare Gemma 4 E2B, Qwen 3.5 0.8B, and
-  SmolLM3 3B through one reference layer, then port only the quality survivor
-  through both official MLX and Core ML. Keep OpenAI and Ollama independently
-  implementable behind the runtime-neutral text-generation contract and retain
-  llama.cpp/GGUF as the cross-platform fallback.
+  model before the embedded runtime: the first embedded-size reference matrix
+  found no winner, while hosted Qwen/frontier controls prove the task is
+  executable by stronger models. Run both classes on human-verified German
+  professional audio, then port only a quality survivor with a plausible local
+  representation through official MLX and Core ML. Keep remote and Ollama
+  providers independently implementable behind the runtime-neutral
+  text-generation contract and retain llama.cpp/GGUF as the cross-platform
+  fallback.
 - Keep enhancement only where measured transcript quality, install size, and operational complexity justify it.
 - Do not select an immature runtime merely because its model experiment succeeds.
 - Preserve raw transcription as a complete product regardless of this decision.
@@ -312,12 +315,13 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    retain the 80 ms backpressure stress gate, and add long-audio cache/memory
    coverage. ADR-0012 completed the C/MPS comparison and rejects both the
    reference runtime's unbounded queue and the pure-C path as product boundaries.
-4. Continue #20 with human-verified German professional-audio gold. The pinned
-   Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B development matrix is complete
-   and selects no quality winner. Use identical real raw ASR outputs for the
-   frozen held-out surface and bounded lexical comparison; only then port a
-   survivor through official MLX and Core ML. Keep corrected text separate from
-   raw ASR ranking and reject critical semantic regressions.
+4. Continue #20 with human-verified German professional-audio gold. Run the
+   embedded-size candidates and the pinned hosted Qwen/GPT/Claude ceilings on
+   identical real raw ASR outputs. Use the remote controls to measure available
+   quality, not local latency; freeze the held-out surface and bounded lexical
+   comparison before selecting or porting a survivor through official MLX and
+   Core ML. Keep corrected text separate from raw ASR ranking and reject
+   critical semantic regressions.
 5. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 6. Finish #9 with Node 22 plus packed-artifact CI gates.

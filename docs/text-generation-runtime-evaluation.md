@@ -3,7 +3,7 @@
 **Status:** issue #7 runtime probe complete; model-first quality and runtime
 bakeoff continues in issue #20.
 
-**Evidence date:** 2026-07-21.
+**Evidence date:** 2026-07-22.
 
 ## Outcome
 
@@ -21,7 +21,8 @@ The practical decision is therefore:
 3. allow OpenAI and Ollama adapters to be implemented independently behind
    that contract;
 4. compare Gemma 4 E2B, Qwen 3.5 0.8B, and SmolLM3 3B through one pinned
-   reference layer before product-runtime work;
+   local reference layer, then use larger hosted open-weight and frontier
+   controls to establish whether model capability is the limiting variable;
 5. carry only the quality survivor or survivors through both a narrow
    repository-owned adapter over official MLX and a pinned Core ML conversion;
    and
@@ -54,6 +55,25 @@ correction quality. Consequently neither an owned official-MLX adapter nor a
 Core ML conversion has been started for these models. The next justified step
 is held-out human-verified German professional audio, not premature runtime
 porting.
+
+## Hosted quality-ceiling result
+
+The separate
+[`OpenRouter quality reference`](../spikes/text-generation-openrouter-reference/README.md)
+ran Qwen 3.5 122B-A10B, Mistral Small 3.2 24B, GPT-5.6 Sol, and Claude Sonnet
+4.6 against the same hidden-reference German development fixture. Qwen, GPT,
+and Claude each applied and reported the one reference-matching lexical
+correction; Mistral reported a different edit but failed to apply it to its
+text, so the external audit rejected the result. Claude produced the narrowest
+accepted response and the only identical accepted repeat.
+
+These are remote quality controls, not Apple-local runtime measurements.
+Provider fallbacks were disabled and ZDR routes were pinned, but hosted model
+artifacts remain opaque and client-observed request time includes the gateway,
+network, queue, and provider. The $0.05134114 recorded final matrix establishes
+an inexpensive development ceiling; it provides no MLX/Core ML latency,
+memory, energy, packaging, or model-size evidence and still cannot select
+quality from one inspected, unverified fixture.
 
 ## Candidate review
 

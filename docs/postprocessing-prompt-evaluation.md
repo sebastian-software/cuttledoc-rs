@@ -3,7 +3,7 @@
 **Status:** prompt candidates and evaluation contract defined; first embedded
 runtime probe complete; model-first bakeoff in progress under issue #20.
 
-**Evidence date:** 2026-07-21.
+**Evidence date:** 2026-07-22.
 
 Prompt behavior is part of the correction candidate. A result is identified by
 the complete tuple:
@@ -162,3 +162,19 @@ invariant. SmolLM3 was the only candidate to satisfy the conservative
 structured contract, but it returned a no-op and therefore demonstrated no
 quality gain. No prompt/model tuple advances until the same controls run on
 human-verified German professional-audio references.
+
+A later hosted capability screen isolates the missing model-capability variable.
+With strict gateway JSON shape plus the same repository-owned lexical audit,
+Qwen 3.5 122B-A10B, GPT-5.6 Sol, and Claude Sonnet 4.6 all corrected the hidden
+`schautete` disagreement to the dataset reference `schauderte`. Mistral Small
+3.2 24B returned valid JSON but reported an edit that its output text did not
+contain, and the external audit rejected it. This confirms that neither prompt
+instructions nor structured-output enforcement replace cross-field policy
+checks.
+
+The hosted success does not freeze `conservative-error-profile-v1`. The fixture
+and its unverified reference are development-exposed, and the gateway schema is
+a capability the local prompt-only runs did not receive. Human-verified German
+professional-audio sources must establish beneficial-edit precision, harmful
+edit rate, presentation gain, and per-source regressions before this prompt or
+any model advances.
