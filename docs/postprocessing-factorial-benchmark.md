@@ -1,7 +1,6 @@
 # Factorial transcript-postprocessing benchmark
 
-**Status:** design locked; native-language review and voice qualification block
-execution.
+**Status:** design locked; voice qualification blocks execution.
 
 **Evidence date:** 2026-07-22.
 
@@ -107,17 +106,13 @@ The primary matrix cannot start until all of the following are true:
 
 1. All 30 passage slots remain materialized, revision- and digest-pinned,
    rights-reviewed, and appropriate for their declared content type.
-2. Non-German and non-English source text and voice output have native-language
-   review. Spanish `es-ES` and Portuguese `pt-PT` Voxtral presets remain
-   regional proxies for the `es-419` and `pt-BR` text cells unless native review
-   accepts that limitation.
-3. Every Apple host voice identifier is resolved and every Qwen/Voxtral voice
+2. Every Apple host voice identifier is resolved and every Qwen/Voxtral voice
    slot passes calibration and listening review.
-4. Each generated master is retained losslessly, digest-pinned, and normalized
+3. Each generated master is retained losslessly, digest-pinned, and normalized
    once. All three STT models receive exactly the same normalized PCM.
-5. All raw STT transcripts and LLM responses have durable paths before remote
+4. All raw STT transcripts and LLM responses have durable paths before remote
    execution begins.
-6. A dry-run token and cost estimate based on the completed multilingual
+5. A dry-run token and cost estimate based on the completed multilingual
    documents is reviewed and an explicit budget is approved.
 
 The current selection contains 35 passages from 21 pinned sources. Thirty
@@ -127,8 +122,14 @@ cell now has two independently digest-pinned texts. German and English use two
 technical passages already in the calibration corpus, while the second factual
 passages come from different article sections and the second dialogues are new
 repository sources. The Spanish, French, and Portuguese candidates are
-materialized but remain blocked until native-language review accepts the text,
-regional variety, and dialogue idiom.
+accepted for the baseline without a mandatory native-language review. If an
+execution exposes wording, regional-variety, or dialogue-idiom problems, a
+future corpus revision can correct them without invalidating the pinned
+baseline results.
+
+Spanish `es-ES` and Portuguese `pt-PT` Voxtral presets remain explicitly
+labeled regional proxies for the `es-419` and `pt-BR` text cells. This limits
+how broadly their results may be generalized, but does not block execution.
 
 ## Remote execution and cost boundary
 

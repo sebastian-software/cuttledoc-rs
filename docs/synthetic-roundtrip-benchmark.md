@@ -45,8 +45,9 @@ The downstream transcript-correction study expands this calibration corpus to
 two independent passages per language and content type and locks the TTS ×
 voice × generation × STT × LLM repetitions in the
 [`factorial postprocessing benchmark`](postprocessing-factorial-benchmark.md).
-Its native-language and voice qualifications are explicit execution blockers;
-materialized text is not silently treated as reviewed speech.
+Its voice qualifications remain explicit execution blockers. Native-language
+review is optional follow-up validation rather than a prerequisite for the
+initial baseline.
 
 ```sh
 node scripts/materialize-synthetic-roundtrip.mjs \
@@ -78,8 +79,8 @@ The technical and native-factual cells use exact, digest-pinned Wikipedia
 revisions. The dialogues are repository-authored and idiomatically adapted
 around two recording scenarios; they are comparable in intent but are not
 claimed to have identical linguistic difficulty. The Spanish, French, and
-Portuguese text and regional varieties still require native-language review
-before matrix execution.
+Portuguese text is accepted for the initial baseline; later language review may
+produce a new pinned corpus revision if concrete issues are found.
 
 The Spanish and Portuguese source editions provide practical clean-speech
 controls, not universal regional coverage. In particular, an `es-419` result

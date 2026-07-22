@@ -59,8 +59,8 @@ async function validatePlan(plan, selection, promptManifest) {
   addError(errors, plan.schema_version === '1.0.0',
     'schema_version must be 1.0.0');
   addError(errors, plan.status ===
-    'design-locked-native-review-and-voice-qualification-required',
-  'status must retain native-review and voice-qualification gates');
+    'design-locked-voice-qualification-required',
+  'status must retain the voice-qualification gate');
   addError(errors, /^\d{4}-\d{2}-\d{2}$/.test(plan.evidence_date ?? ''),
     'evidence_date must be an ISO date');
   addError(errors, plan.source_selection.path ===
@@ -116,10 +116,7 @@ async function validatePlan(plan, selection, promptManifest) {
     } else {
       errors.push(`${slot.id}: invalid passage status`);
     }
-    const expectedLanguageReview = ['de-DE', 'en-US'].includes(slot.locale)
-      ? 'not-required'
-      : 'native-review-required';
-    addError(errors, slot.language_review_status === expectedLanguageReview,
+    addError(errors, slot.language_review_status === 'not-required',
       `${slot.id}: language review status differs from the execution policy`);
   }
   const materializedCount = passageSlots.filter((slot) =>
@@ -271,7 +268,7 @@ async function validatePlan(plan, selection, promptManifest) {
     'require_provider_pin',
     'require_no_fallback',
     'require_zdr',
-    'native_review_required_for_non_german_and_non_english_passages',
+    'native_language_review_is_optional_follow_up',
   ]) {
     addError(errors, execution[field] === true,
       `execution_policy.${field} must remain true`);

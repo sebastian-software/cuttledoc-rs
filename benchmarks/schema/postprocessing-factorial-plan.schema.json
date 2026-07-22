@@ -31,6 +31,7 @@
       "enum": [
         "design-locked-corpus-expansion-required",
         "design-locked-native-review-and-voice-qualification-required",
+        "design-locked-voice-qualification-required",
         "ready-for-dry-run",
         "ready-for-execution",
         "complete"
@@ -183,7 +184,7 @@
         "require_provider_pin",
         "require_no_fallback",
         "require_zdr",
-        "native_review_required_for_non_german_and_non_english_passages",
+        "native_language_review_is_optional_follow_up",
         "reporting",
         "quality_metrics",
         "cost_policy"
@@ -201,7 +202,7 @@
         "require_provider_pin": { "const": true },
         "require_no_fallback": { "const": true },
         "require_zdr": { "const": true },
-        "native_review_required_for_non_german_and_non_english_passages": { "const": true },
+        "native_language_review_is_optional_follow_up": { "const": true },
         "reporting": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
         "quality_metrics": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
         "cost_policy": { "$ref": "#/$defs/costPolicy" }
