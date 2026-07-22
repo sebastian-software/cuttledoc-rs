@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "id": "qwen3.5-122b-a10b-openrouter-alibaba",
+  "task": "text-generation",
+  "candidate_role": "large-open-weight-quality-candidate",
+  "model": {
+    "requested_id": "qwen/qwen3.5-122b-a10b",
+    "allowed_response_ids": [
+      "qwen/qwen3.5-122b-a10b",
+      "qwen/qwen3.5-122b-a10b-20260224"
+    ],
+    "upstream_identity": "Qwen/Qwen3.5-122B-A10B",
+    "provider_model_identity": "qwen/qwen3.5-122b-a10b-20260224",
+    "release": "2026-02-24",
+    "weights": "open",
+    "license": "Apache-2.0",
+    "context_tokens": 262144,
+    "identity_limit": "OpenRouter and Alibaba expose the named upstream model, but the hosted artifact and serving implementation are opaque to this repository."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "alibaba",
+    "provider_name": "Alibaba",
+    "endpoint_tag": "alibaba",
+    "endpoint_identity": "Alibaba | qwen/qwen3.5-122b-a10b-20260224",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "temperature",
+      "top_p",
+      "seed",
+      "response_format",
+      "structured_outputs"
+    ],
+    "request_policy": {
+      "only": [
+        "alibaba"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.00000026",
+      "completion": "0.00000208",
+      "discount": "0.35"
+    }
+  },
+  "request_defaults": {
+    "temperature": 0,
+    "seed": 0,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote development-quality reference only; provider latency and hosted quantization are not local-runtime evidence."
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "id": "claude-sonnet-4.6-openrouter-anthropic",
+  "task": "text-generation",
+  "candidate_role": "frontier-quality-control",
+  "model": {
+    "requested_id": "anthropic/claude-sonnet-4.6",
+    "allowed_response_ids": [
+      "anthropic/claude-sonnet-4.6",
+      "anthropic/claude-4.6-sonnet-20260217"
+    ],
+    "upstream_identity": "Anthropic Claude Sonnet 4.6",
+    "provider_model_identity": "anthropic/claude-4.6-sonnet-20260217",
+    "release": "2026-02-17",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1000000,
+    "identity_limit": "The model and serving implementation are proprietary; the API identity is the strongest artifact boundary available to this probe."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "anthropic",
+    "provider_name": "Anthropic",
+    "endpoint_tag": "anthropic",
+    "endpoint_identity": "Anthropic | anthropic/claude-4.6-sonnet-20260217",
+    "supported_parameters": [
+      "max_tokens",
+      "temperature",
+      "reasoning",
+      "include_reasoning",
+      "structured_outputs",
+      "response_format",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "anthropic"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.000003",
+      "completion": "0.000015",
+      "input_cache_read": "0.0000003"
+    }
+  },
+  "request_defaults": {
+    "temperature": 0,
+    "seed": null,
+    "reasoning": null,
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote frontier quality control only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+}

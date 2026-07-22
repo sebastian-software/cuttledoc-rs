@@ -21,7 +21,9 @@ on:
       - "scripts/validate-text-generation-mlx-reference.mjs"
       - "scripts/validate-text-generation-model-manifests.mjs"
       - "scripts/validate-text-generation-experiments.mjs"
+      - "scripts/validate-text-generation-openrouter-reference.mjs"
       - "spikes/text-generation-mlx-reference/**"
+      - "spikes/text-generation-openrouter-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
@@ -46,7 +48,9 @@ on:
       - "scripts/validate-text-generation-mlx-reference.mjs"
       - "scripts/validate-text-generation-model-manifests.mjs"
       - "scripts/validate-text-generation-experiments.mjs"
+      - "scripts/validate-text-generation-openrouter-reference.mjs"
       - "spikes/text-generation-mlx-reference/**"
+      - "spikes/text-generation-openrouter-reference/**"
       - "spikes/tts-calibration/**"
       - ".gitattributes"
       - ".github/workflows/benchmark-data.yml"
@@ -71,6 +75,10 @@ jobs:
           python -m py_compile spikes/text-generation-mlx-reference/run_reference.py
           bash -n scripts/fetch-text-generation-mlx-model.sh
           bash -n scripts/run-text-generation-mlx-reference.sh
+      - name: Validate pinned OpenRouter text-generation reference
+        run: |
+          node scripts/validate-text-generation-openrouter-reference.mjs --self-test
+          node --check spikes/text-generation-openrouter-reference/run_reference.mjs
       - name: Check TTS calibration runners
         run: |
           node --check scripts/archive-qwen-tts-calibration.mjs
