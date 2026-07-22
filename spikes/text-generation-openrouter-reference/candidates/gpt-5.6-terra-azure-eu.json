@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "id": "gpt-5.6-terra-openrouter-azure-eu",
+  "task": "text-generation",
+  "candidate_role": "frontier-quality-control",
+  "model": {
+    "requested_id": "openai/gpt-5.6-terra",
+    "allowed_response_ids": [
+      "openai/gpt-5.6-terra",
+      "openai/gpt-5.6-terra-20260709"
+    ],
+    "upstream_identity": "OpenAI GPT-5.6 Terra",
+    "provider_model_identity": "openai/gpt-5.6-terra-20260709",
+    "release": "2026-07-09",
+    "weights": "proprietary",
+    "license": "Hosted commercial service",
+    "context_tokens": 1050000,
+    "identity_limit": "The model and serving implementation are proprietary; the dated Azure API identity is the strongest artifact boundary available to this probe."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-22",
+    "provider_slug": "azure/eu",
+    "provider_name": "Azure",
+    "endpoint_tag": "azure/eu",
+    "endpoint_identity": "Azure EU | openai/gpt-5.6-terra-20260709",
+    "supported_parameters": [
+      "max_completion_tokens",
+      "reasoning",
+      "include_reasoning",
+      "seed",
+      "response_format",
+      "structured_outputs",
+      "tools",
+      "tool_choice",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "azure/eu"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.00000275",
+      "completion": "0.0000165",
+      "input_cache_read": "0.000000275",
+      "input_cache_write": "0.0000034375"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_completion_tokens",
+    "json_schema_numeric_bounds": true,
+    "temperature": null,
+    "seed": 0,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote balanced-tier GPT-5.6 quality control only; it is not an embedded-runtime candidate or evidence that a paid API should become the product default."
+}
