@@ -80,7 +80,7 @@ Evidence snapshot: 2026-07-23.
 | Mandatory ASR benchmark (#4) | Complete | Ten multilingual fixtures select Apple SpeechTranscriber as the first vertical-slice backend and Whisper large-v3-turbo as an opt-in fallback. Energy, clean-host cold start, and statistical scale remain release-threshold follow-ups. |
 | Exploratory ASR sweep (#12) | Complete | Qwen3-ASR advanced to the owned adapter in #17. The later Voxtral Realtime refresh replaces its stale vLLM-only blocker with pinned Apple-local MLX measurements and a bounded repository-owned live session; held-out, long-audio, and product-integration gates remain. |
 | Direct Qwen3-ASR over official MLX (#17) | Complete | The owned adapter reaches exact fixed-fixture parity, completes the 15-fixture multilingual audiobook pilot, and proves reusable Rust lifecycle plus stable invalid, busy, and cancelled states. Held-out target-domain data, common-engine integration, and release pruning are follow-ups. |
-| Held-out target-domain corpus (#18) | In progress | Three CC-BY-4.0 German podcast episodes are accepted, imported, and frozen as three exact ten-minute validation/test passages with five speakers and digest-pinned original, publisher-draft, and normalized-PCM artifacts. Plan revision 3 makes the validation passage the non-release-blocking #20 transcript-enhancement selection control, adds direct Voxtral to the five-backend order, and provides a deterministic exact-audio review bundle while keeping both test episodes closed. Independent human validation gold and identical Apple/Whisper/Qwen/Parakeet/Voxtral drafts remain; audiobook and additional-language acquisition stay paused. |
+| Held-out target-domain corpus (#18) | In progress | Three CC-BY-4.0 German podcast episodes are frozen as exact ten-minute validation/test passages with five speakers and digest-pinned source, publisher-draft, and PCM artifacts. The validation review bundle and five complete-coverage, unscored Apple/Whisper/Qwen/Parakeet/Voxtral drafts are committed; Qwen uses 20 digest-pinned 30 s chunks, while Voxtral uses ten fresh-process 60 s chunks after an aborted whole-passage diagnostic exposed an approximately 50 GB practical working set. Both test episodes remain closed. Independent human validation gold is the remaining #20 gate; audiobook and additional-language acquisition stay paused. |
 | Voxtral Realtime live streaming (#19) | Complete | The repository-owned official-MLX session retains incremental mel, causal-convolution, 32-layer encoder, downsampler, 26-layer decoder, token, and text state behind the bounded Rust/C ABI. Real-time 480/2,400 ms runs reproduce the pinned 177-token streaming text exactly with append-only deltas; a ten-run DE/EN/ES/FR/PT control preserves language/delay cells and confirms 320 ms input as the stable path. The pure-C/MPS control proves a tiny binary but a larger BF16 model/working set, missing lifecycle semantics, and an ADR-0005 failure; ADR-0012 selects the owned official-MLX boundary. Held-out data moves to #18; common-engine, long-audio, and clean-host delivery are focused productization follow-ups. |
 | Synthetic TTS roundtrip (#13) | In progress | The required Apple, Qwen VoiceDesign, and Voxtral BF16 factorial slices are complete: 370 digest-pinned audio artifacts, 1,110 three-receiver transcripts, and 180 six-section LLM documents across DE/EN/ES/FR/PT. Voxtral passed all ten technical voice gates, completed 120 primary documents without a retry or token cap, and produced 10/10 identical same-seed audio plus 30/30 identical transcript controls. Hosted TTS ceilings and held-out human professional audio remain optional comparison/final-quality work. |
 | Thin Node/npm boundary (#9) | Complete | Node 22/24 CI builds, packs, compiler-free installs, and tests the same macOS arm64 tarball through ESM and CommonJS, including streaming fields, background work, progress, errors, cancellation, and missing-artifact diagnostics. |
@@ -303,13 +303,13 @@ Performance comparisons must use the same machines, fixtures, model versions, an
 
 ## Immediate next actions
 
-1. Acquire source-grouped, held-out professional-podcast and independent
-   audiobook gold data, German first; expand the short-read variance set
-   without mixing inspected development sources into validation or test.
-2. Run Apple SpeechTranscriber, Whisper large-v3-turbo, direct Qwen3-ASR,
-   Parakeet, and Voxtral Realtime on identical language/domain cells. Retain
-   raw output, surface scores, semantic-severity review, and backend-specific
-   error profiles.
+1. Complete independent human review of the exact German podcast validation
+   passage and promote only that digest-pinned transcript to gold. Keep both
+   test episodes closed while the validation configuration is still changing.
+2. Score the five committed Apple SpeechTranscriber, Whisper large-v3-turbo,
+   direct Qwen3-ASR, Parakeet, and Voxtral Realtime drafts against that gold.
+   Retain raw output, surface scores, semantic-severity review, and
+   backend-specific error profiles.
 3. Carry the now streaming-parity-proven official-MLX Voxtral adapter into the
    held-out and common-engine gates. Keep 320 ms as the measured default,
    retain the 80 ms backpressure stress gate, and add long-audio cache/memory

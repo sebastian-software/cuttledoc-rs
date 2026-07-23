@@ -1,7 +1,8 @@
 # Target-domain gold review
 
-**Status:** German podcast review inputs are materialized; independent gold
-review is the next transcript-enhancement selection gate.
+**Status:** German podcast review inputs and five complete-coverage ASR drafts
+are materialized; independent gold review is the next transcript-enhancement
+selection gate.
 
 **Evidence date:** 2026-07-23.
 
@@ -66,6 +67,15 @@ attribution, and output name are pinned in
    It does not replace the separate long-form memory gate for the stateful
    product streaming session. A record is `complete` only when all five
    backends satisfy their coverage condition.
+
+   The committed validation record is
+   [`result.json`](../benchmarks/raw/phase5.target-domain-asr-drafts.de-podcast-validation-1/result.json).
+   It preserves 1,268 Apple words, 1,268 Whisper words, 1,280 Qwen words,
+   1,264 Parakeet words, and 1,252 Voxtral words. These counts show that no
+   obvious token-cap truncation remains; they do not measure correctness or
+   imply a backend order. Every WER, CER, and semantic-error field remains
+   null. The bounded Voxtral pass reports a maximum per-process active MLX
+   allocation of 5,340,947,636 bytes.
 
 4. Prepare one JSON transcript per passage using
    [`target-domain-transcript.schema.json`](../benchmarks/schema/target-domain-transcript.schema.json).

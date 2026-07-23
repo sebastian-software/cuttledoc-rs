@@ -559,6 +559,250 @@ function validateTargetDomainCorpus(corpus, plan, rightsReviews) {
   return errors;
 }
 
+function validateTargetDomainAsrDrafts(
+  record,
+  plan,
+  corpus,
+  runnerSha256,
+  planSha256,
+  corpusSha256,
+) {
+  const errors = [];
+  const expectedBackends = plan.candidate_backends;
+  const sourceCell = corpus.cells.find(
+    (cell) => cell.id === plan.decision_scope.current_required_cell,
+  );
+  const sourceGroup = sourceCell?.source_groups.find(
+    (group) => group.split === 'validation',
+  );
+  if (!sourceGroup) {
+    return ['required validation source group is absent from the corpus'];
+  }
+
+  if (record.schema_version !== schemaVersion ||
+      record.id !== `target-domain-asr-drafts--${sourceGroup.id}--1` ||
+      record.status !== 'complete' ||
+      !/^[0-9a-f]{40}$/.test(record.source_revision ?? '') ||
+      record.runner_sha256 !== runnerSha256) {
+    errors.push('identity, completion status, source revision, or runner digest is invalid');
+  }
+  if (record.plan?.revision !== plan.revision ||
+      record.plan?.sha256 !== planSha256 ||
+      record.corpus?.revision !== corpus.revision ||
+      record.corpus?.sha256 !== corpusSha256) {
+    errors.push('plan or corpus provenance differs from the committed inputs');
+  }
+  if (Number.isNaN(Date.parse(record.captured_at ?? '')) ||
+      Number.isNaN(Date.parse(record.evidence_captured_through ?? ''))) {
+    errors.push('capture timestamps must be valid ISO timestamps');
+  }
+
+  const expectedSourceRange = {
+    start_ms: sourceGroup.selection.start_ms,
+    end_ms: sourceGroup.selection.end_ms,
+    duration_ms: sourceGroup.selection.duration_ms,
+  };
+  if (record.source_group?.id !== sourceGroup.id ||
+      record.source_group?.cell_id !== sourceCell.id ||
+      record.source_group?.split !== 'validation' ||
+      record.source_group?.locale !== sourceGroup.locale ||
+      record.source_group?.domain !== sourceGroup.domain ||
+      JSON.stringify(record.source_group?.source_range) !==
+        JSON.stringify(expectedSourceRange) ||
+      JSON.stringify(record.source_group?.speakers) !==
+        JSON.stringify(sourceGroup.speakers) ||
+      JSON.stringify(record.source_group?.attribution) !==
+        JSON.stringify(sourceGroup.attribution)) {
+    errors.push('source-group identity differs from the frozen validation passage');
+  }
+  if (record.audio?.artifact_name !==
+        sourceGroup.normalized_audio.artifact_name ||
+      record.audio?.availability !== 'local-required' ||
+      record.audio?.local_path !== null ||
+      record.audio?.sha256 !== sourceGroup.normalized_audio.sha256 ||
+      record.audio?.bytes !== sourceGroup.normalized_audio.bytes ||
+      record.audio?.sample_count !== sourceGroup.normalized_audio.sample_count ||
+      record.audio?.sample_rate_hz !== 16_000 ||
+      record.audio?.channels !== 1 ||
+      record.audio?.sample_format !== 'float32le') {
+    errors.push('audio identity, digest, shape, or local-only policy is invalid');
+  }
+  if (record.host?.architecture !== 'arm64' ||
+      !Number.isInteger(record.host?.memory_bytes) ||
+      record.host.memory_bytes <= 0 ||
+      !(record.host?.chip?.length > 0) ||
+      !(record.host?.os?.length > 0)) {
+    errors.push('host metadata is incomplete');
+  }
+  if (!arrayEquals(record.procedure?.backend_order ?? [], expectedBackends) ||
+      record.procedure?.repetitions !== 1 ||
+      !(record.procedure?.gold_policy?.includes('No ASR output is gold')) ||
+      !arrayEquals(record.missing_backends ?? [], []) ||
+      !record.claim_limit?.includes('Human gold is pending')) {
+    errors.push('procedure, missing-backend list, or claim limit is invalid');
+  }
+
+  const results = record.results ?? [];
+  if (!arrayEquals(
+    results.map((result) => result.backend?.id),
+    expectedBackends,
+  )) {
+    errors.push('results must contain the five frozen backends in order');
+    return errors;
+  }
+  const durationMs = sourceGroup.selection.duration_ms;
+  for (const result of results) {
+    const id = result.backend.id;
+    const transcript = result.transcript;
+    if (!(result.backend?.model?.length > 0) ||
+        !(result.backend?.runtime?.length > 0) ||
+        !(result.backend?.boundary?.length > 0) ||
+        Number.isNaN(Date.parse(result.captured_at ?? ''))) {
+      errors.push(`${id}: backend or capture metadata is incomplete`);
+    }
+    if (!(transcript?.text?.trim().length > 0) ||
+        transcript.sha256 !== sha256(transcript.text) ||
+        transcript.word_count !== targetDomainWordCount(transcript.text) ||
+        transcript.segment_count !== transcript.segments?.length ||
+        transcript.segment_count <= 0) {
+      errors.push(`${id}: transcript text, digest, word count, or segments are invalid`);
+    }
+    for (const segment of transcript?.segments ?? []) {
+      if (!Number.isFinite(segment.start_ms) ||
+          !Number.isFinite(segment.end_ms) ||
+          segment.start_ms < 0 ||
+          segment.end_ms < segment.start_ms ||
+          segment.end_ms > durationMs + 2_000 ||
+          typeof segment.text !== 'string') {
+        errors.push(`${id}: transcript segment is invalid`);
+        break;
+      }
+    }
+    if (result.quality?.status !== 'unscored-human-gold-pending' ||
+        result.quality?.wer !== null ||
+        result.quality?.cer !== null ||
+        result.quality?.semantic_errors !== null) {
+      errors.push(`${id}: quality must remain unscored while human gold is pending`);
+    }
+    if (result.coverage?.status !== 'complete' ||
+        result.coverage?.expected_duration_ms !== durationMs ||
+        result.coverage?.incomplete_reason !== null) {
+      errors.push(`${id}: complete audio coverage is not proven`);
+    }
+    if (!(result.timing?.backend_ms > 0) ||
+        !(result.timing?.wall_ms > 0) ||
+        Math.min(
+          Math.abs(
+            result.timing.real_time_factor -
+            result.timing.backend_ms / durationMs,
+          ),
+          Math.abs(
+            result.timing.real_time_factor -
+            result.timing.wall_ms / durationMs,
+          ),
+        ) > 1e-12) {
+      errors.push(`${id}: timing or real-time factor is invalid`);
+    }
+  }
+
+  for (const id of [
+    'apple-speechtranscriber',
+    'whisper-large-v3-turbo-coreml-whispercpp',
+    'parakeet-tdt-0.6b-v3-coreml',
+  ]) {
+    const result = results.find((candidate) => candidate.backend.id === id);
+    if (result.coverage?.method !== 'final-segment-timestamp' ||
+        result.coverage?.final_segment_end_ms <
+          durationMs - result.coverage?.tolerance_ms ||
+        result.coverage?.processed_duration_ms !==
+          result.coverage?.final_segment_end_ms) {
+      errors.push(`${id}: final timestamp does not prove passage coverage`);
+    }
+  }
+
+  const chunkContracts = new Map([
+    ['qwen3-asr-0.6b-mlx-direct', {
+      chunkMs: 30_000,
+      chunkCount: 20,
+      maxTokens: null,
+      finishReasons: new Set(['eos']),
+      aggregateFinishReason: 'all_chunks_eos',
+    }],
+    ['voxtral-realtime-4b-mlx-direct-2400ms', {
+      chunkMs: 60_000,
+      chunkCount: 10,
+      maxTokens: 2_048,
+      finishReasons: new Set(['audio_end', 'eos']),
+      aggregateFinishReason: 'all_chunks_completed',
+    }],
+  ]);
+  for (const [id, contract] of chunkContracts) {
+    const result = results.find((candidate) => candidate.backend.id === id);
+    const generation = result.generation;
+    const chunks = generation?.chunks ?? [];
+    const tokenCount = chunks.reduce(
+      (total, chunk) => total + (chunk.token_count ?? 0),
+      0,
+    );
+    if (result.coverage?.method !== 'deterministic-fixed-nonoverlap-chunks' ||
+        result.coverage?.processed_duration_ms !== durationMs ||
+        generation?.method !== 'fixed-nonoverlap-v1' ||
+        generation?.chunk_ms !== contract.chunkMs ||
+        generation?.chunk_count !== contract.chunkCount ||
+        generation?.overlap_ms !== 0 ||
+        generation?.finish_reason !== contract.aggregateFinishReason ||
+        !arrayEquals(generation?.truncated_chunks ?? [], []) ||
+        generation?.token_count !== tokenCount ||
+        (generation?.max_tokens_per_chunk ?? null) !== contract.maxTokens ||
+        chunks.length !== contract.chunkCount) {
+      errors.push(`${id}: deterministic chunk contract is invalid`);
+      continue;
+    }
+    for (const [index, chunk] of chunks.entries()) {
+      const segment = result.transcript.segments[index];
+      const expectedStart = index * contract.chunkMs;
+      const expectedEnd = Math.min(expectedStart + contract.chunkMs, durationMs);
+      if (chunk.index !== index ||
+          chunk.start_ms !== expectedStart ||
+          chunk.end_ms !== expectedEnd ||
+          !/^[0-9a-f]{64}$/.test(chunk.audio_sha256 ?? '') ||
+          chunk.transcript_sha256 !== sha256(segment.text) ||
+          !Number.isInteger(chunk.token_count) ||
+          chunk.token_count <= 0 ||
+          !contract.finishReasons.has(chunk.finish_reason) ||
+          !(chunk.backend_ms > 0) ||
+          !(chunk.wall_ms > 0) ||
+          segment.start_ms !== chunk.start_ms ||
+          segment.end_ms !== chunk.end_ms) {
+        errors.push(`${id}: chunk ${index} is invalid or differs from its segment`);
+      }
+    }
+  }
+  const voxtral = results.find(
+    (result) =>
+      result.backend.id === 'voxtral-realtime-4b-mlx-direct-2400ms',
+  );
+  if (voxtral.resources?.process_isolation !== 'fresh-process-per-chunk' ||
+      !(voxtral.resources?.mlx_peak_memory_bytes > 0) ||
+      voxtral.resources.mlx_peak_memory_bytes >= 8 * 1024 ** 3) {
+    errors.push('Voxtral draft generation must retain bounded per-process MLX memory');
+  }
+  return errors;
+}
+
+function sha256(value) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function targetDomainWordCount(text) {
+  return text
+    .toLocaleLowerCase('de-DE')
+    .replace(/[^\p{L}\p{N}\s]/gu, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .length;
+}
+
 function validateSyntheticRoundtripPlan(plan) {
   const errors = [];
   const uniqueStrings = (value) => (
@@ -4317,6 +4561,14 @@ const targetDomainCorpusPath = join(
   repoRoot,
   'benchmarks/fixtures/target-domain-corpus.json',
 );
+const targetDomainAsrDraftsPath = join(
+  repoRoot,
+  'benchmarks/raw/phase5.target-domain-asr-drafts.de-podcast-validation-1/result.json',
+);
+const targetDomainAsrRunnerPath = join(
+  repoRoot,
+  'scripts/run-target-domain-asr.mjs',
+);
 const syntheticRoundtripPlanPath = join(
   repoRoot,
   'benchmarks/fixtures/synthetic-roundtrip-plan.json',
@@ -4454,6 +4706,7 @@ const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/target-domain-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-corpus.schema.json'),
   join(repoRoot, 'benchmarks/schema/target-domain-transcript.schema.json'),
+  join(repoRoot, 'benchmarks/schema/target-domain-asr-drafts.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-plan.schema.json'),
   join(repoRoot, 'benchmarks/schema/synthetic-roundtrip-selection.schema.json'),
   join(repoRoot, 'benchmarks/schema/tts-run.schema.json'),
@@ -4528,6 +4781,14 @@ const manifestValidation = validateManifest(manifest);
 const sourceCandidates = await readJson(sourceCandidatesPath);
 const targetDomainPlan = await readJson(targetDomainPlanPath);
 const targetDomainCorpus = await readJson(targetDomainCorpusPath);
+const targetDomainAsrDrafts = await readJson(targetDomainAsrDraftsPath);
+const targetDomainAsrRunnerSha256 = sha256(
+  await readFile(targetDomainAsrRunnerPath),
+);
+const targetDomainPlanSha256 = sha256(await readFile(targetDomainPlanPath));
+const targetDomainCorpusSha256 = sha256(
+  await readFile(targetDomainCorpusPath),
+);
 const syntheticRoundtripPlan = await readJson(syntheticRoundtripPlanPath);
 const syntheticRoundtripSelection = await readJson(
   syntheticRoundtripSelectionPath,
@@ -4642,6 +4903,16 @@ failures.push(
     targetDomainPlan,
     sourceRightsReviews,
   ).map((error) => `${targetDomainCorpusPath}: ${error}`),
+);
+failures.push(
+  ...validateTargetDomainAsrDrafts(
+    targetDomainAsrDrafts,
+    targetDomainPlan,
+    targetDomainCorpus,
+    targetDomainAsrRunnerSha256,
+    targetDomainPlanSha256,
+    targetDomainCorpusSha256,
+  ).map((error) => `${targetDomainAsrDraftsPath}: ${error}`),
 );
 failures.push(
   ...validateSyntheticRoundtripPlan(syntheticRoundtripPlan).map(
@@ -5021,6 +5292,23 @@ if (process.argv.includes('--self-test')) {
   ).length === 0) {
     failures.push('validator self-test failed to reject target-domain PCM drift');
   }
+  const invalidTargetDomainAsrDrafts = structuredClone(
+    targetDomainAsrDrafts,
+  );
+  invalidTargetDomainAsrDrafts.results[2].generation.chunks[0]
+    .finish_reason = 'length';
+  if (validateTargetDomainAsrDrafts(
+    invalidTargetDomainAsrDrafts,
+    targetDomainPlan,
+    targetDomainCorpus,
+    targetDomainAsrRunnerSha256,
+    targetDomainPlanSha256,
+    targetDomainCorpusSha256,
+  ).length === 0) {
+    failures.push(
+      'validator self-test failed to reject truncated held-out ASR drafts',
+    );
+  }
   const invalidSyntheticRoundtripPlan = structuredClone(
     syntheticRoundtripPlan,
   );
@@ -5301,6 +5589,7 @@ console.log(
   `${sourceCandidates.sources.length} source candidate(s), ` +
   `${targetDomainPlan.cells.length} target-domain cell(s), ` +
   `${targetDomainCorpus.cells.length} selected target-domain corpus cell(s), ` +
+  `${targetDomainAsrDrafts.results.length} held-out validation ASR draft(s), ` +
   `${syntheticRoundtripPlan.tts_candidates.length} synthetic TTS candidate(s), ` +
   `${syntheticRoundtripSelection.sources.flatMap((source) => source.passages).length} synthetic passage selector(s), ` +
   `3 measured TTS diagnostics, TTS calibrations validated separately, ` +

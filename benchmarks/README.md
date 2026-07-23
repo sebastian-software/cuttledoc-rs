@@ -139,6 +139,12 @@ token-capped result is retained as a diagnostic but cannot make the record
 `complete`. The runner refuses test sources by default and refuses to write
 explicitly opened test drafts into committed benchmark evidence.
 
+The first complete validation record is
+[`phase5.target-domain-asr-drafts.de-podcast-validation-1/result.json`](raw/phase5.target-domain-asr-drafts.de-podcast-validation-1/result.json).
+Its five transcript digests and coverage proofs are validated against the
+current runner, corpus, and plan. It deliberately contains no WER, CER,
+semantic-error score, or backend recommendation.
+
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 under issue #13. It keeps German primary and reports `de-DE`, `en-US`,
