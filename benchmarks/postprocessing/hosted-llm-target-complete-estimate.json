@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-1-cost-estimate-1",
+  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-1",
+  "plan_sha256": "1ba5db3af2e611083e0cfbcc2fbe99bee8e073bc441faa715652a5b10f132840",
+  "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-1",
+  "screen_sha256": "91bcb41c7cdc6fc42859471bc4107c7f0db9e3e5615f2544fb0f64ea53816b05",
+  "captured_at": "2026-07-23T15:26:46.116Z",
+  "method": {
+    "hard_input_envelope": "One input token per rendered Unicode code point.",
+    "likely_input_estimate": "One input token per four rendered Unicode code points.",
+    "hard_output_envelope": "Every request consumes the configured completion-token maximum.",
+    "likely_output_estimate": "One output token per three Unicode code points in the raw target JSON.",
+    "limitation": "Only provider-reported usage and cost are authoritative after execution."
+  },
+  "scope": {
+    "documents": 10,
+    "targets_per_document": 6,
+    "requests_per_candidate_per_repeat": 60,
+    "candidates": 5,
+    "maximum_repeats": 2
+  },
+  "rendered_inputs": {
+    "minimum_code_points": 7951,
+    "maximum_code_points": 8634,
+    "mean_code_points": 8369.7,
+    "total_code_points_per_candidate_repeat": 502182
+  },
+  "candidates": [
+    {
+      "candidate": "gpt-5.6-sol-openrouter-azure-eu",
+      "requested_model": "openai/gpt-5.6-sol",
+      "provider_slug": "azure/eu",
+      "pricing_snapshot_usd_per_token": {
+        "prompt": "0.0000055",
+        "completion": "0.000033"
+      },
+      "requests_per_repeat": 60,
+      "rendered_prompt_code_points_per_repeat": 502182,
+      "likely_input_tokens_per_repeat": 125546,
+      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "likely_output_tokens_per_repeat": 19022,
+      "likely_cost_per_repeat_usd": 1.318229,
+      "conservative_planning_envelope_per_repeat_usd": 4.282641,
+      "recommended_runner_budget_per_repeat_usd": 4.29
+    },
+    {
+      "candidate": "gemini-3.6-flash-openrouter-google-vertex-global",
+      "requested_model": "google/gemini-3.6-flash",
+      "provider_slug": "google-vertex/global",
+      "pricing_snapshot_usd_per_token": {
+        "prompt": "0.0000015",
+        "completion": "0.0000075"
+      },
+      "requests_per_repeat": 60,
+      "rendered_prompt_code_points_per_repeat": 502182,
+      "likely_input_tokens_per_repeat": 125546,
+      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "likely_output_tokens_per_repeat": 19022,
+      "likely_cost_per_repeat_usd": 0.33098400000000006,
+      "conservative_planning_envelope_per_repeat_usd": 1.098873,
+      "recommended_runner_budget_per_repeat_usd": 1.1
+    },
+    {
+      "candidate": "gpt-5.6-terra-openrouter-azure-eu",
+      "requested_model": "openai/gpt-5.6-terra",
+      "provider_slug": "azure/eu",
+      "pricing_snapshot_usd_per_token": {
+        "prompt": "0.00000275",
+        "completion": "0.0000165"
+      },
+      "requests_per_repeat": 60,
+      "rendered_prompt_code_points_per_repeat": 502182,
+      "likely_input_tokens_per_repeat": 125546,
+      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "likely_output_tokens_per_repeat": 19022,
+      "likely_cost_per_repeat_usd": 0.6591145,
+      "conservative_planning_envelope_per_repeat_usd": 2.1413205,
+      "recommended_runner_budget_per_repeat_usd": 2.15
+    },
+    {
+      "candidate": "kimi-k3-openrouter-moonshot-int4",
+      "requested_model": "moonshotai/kimi-k3",
+      "provider_slug": "moonshotai/int4",
+      "pricing_snapshot_usd_per_token": {
+        "prompt": "0.000003",
+        "completion": "0.000015"
+      },
+      "requests_per_repeat": 60,
+      "rendered_prompt_code_points_per_repeat": 502182,
+      "likely_input_tokens_per_repeat": 125546,
+      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "likely_output_tokens_per_repeat": 19022,
+      "likely_cost_per_repeat_usd": 0.6619680000000001,
+      "conservative_planning_envelope_per_repeat_usd": 2.197746,
+      "recommended_runner_budget_per_repeat_usd": 2.2
+    },
+    {
+      "candidate": "claude-sonnet-5-openrouter-azure-us-east-2",
+      "requested_model": "anthropic/claude-sonnet-5",
+      "provider_slug": "azure/us-east-2",
+      "pricing_snapshot_usd_per_token": {
+        "prompt": "0.000002",
+        "completion": "0.00001"
+      },
+      "requests_per_repeat": 60,
+      "rendered_prompt_code_points_per_repeat": 502182,
+      "likely_input_tokens_per_repeat": 125546,
+      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "likely_output_tokens_per_repeat": 19022,
+      "likely_cost_per_repeat_usd": 0.44131200000000004,
+      "conservative_planning_envelope_per_repeat_usd": 1.4651640000000001,
+      "recommended_runner_budget_per_repeat_usd": 1.47
+    }
+  ],
+  "aggregate": {
+    "likely_cost_repeat_1_all_candidates_usd": 3.4116074999999997,
+    "conservative_planning_envelope_repeat_1_all_candidates_usd": 11.1857445,
+    "conservative_planning_envelope_two_repeats_all_candidates_usd": 22.371489,
+    "recommended_runner_budget_repeat_1_all_candidates_usd": 11.210000000000003,
+    "recommended_runner_budget_two_repeats_all_candidates_usd": 22.420000000000005
+  },
+  "authorization_boundary": "The estimate does not authorize requests. The runner additionally requires an explicit per-invocation USD budget."
+}

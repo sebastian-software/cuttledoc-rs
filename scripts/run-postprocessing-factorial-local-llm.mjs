@@ -479,6 +479,12 @@ async function summarizeResults() {
           complete_generation_ms: result.measurements.complete_generation_ms,
           generation_tokens_per_second:
             result.measurements.generation_tokens_per_second,
+          cost_usd: result.measurements.cost_usd ?? null,
+          pricing_estimated_cost_usd:
+            result.measurements.pricing_estimated_cost_usd ?? null,
+          response_id: result.response?.id ?? null,
+          served_model: result.response?.served_model ?? null,
+          served_provider: result.response?.served_provider ?? null,
         });
         const observationIndices = targetIndex === null
           ? Array.from(
@@ -603,6 +609,27 @@ async function summarizeResults() {
         request.transport_envelope === 'markdown-json-fence').length,
       token_limit_failures: requests.filter((request) =>
         request.reached_token_limit).length,
+    },
+    cost: {
+      provider_reported_total_usd: requests.every((request) =>
+        request.cost_usd === null || Number.isFinite(request.cost_usd))
+        ? requests.reduce(
+          (total, request) => total + (request.cost_usd ?? 0),
+          0,
+        )
+        : null,
+      pricing_estimated_total_usd: requests.every((request) =>
+        request.pricing_estimated_cost_usd === null ||
+        Number.isFinite(request.pricing_estimated_cost_usd))
+        ? requests.reduce(
+          (total, request) =>
+            total + (request.pricing_estimated_cost_usd ?? 0),
+          0,
+        )
+        : null,
+      limitation:
+        'Provider-reported request cost is authoritative when present; ' +
+        'the pricing estimate is a fallback derived from recorded token use.',
     },
     repeat_stability: {
       expected_pairs: expectedRepeatPairs(screen),
@@ -1466,6 +1493,7 @@ async function selfTest() {
     'benchmarks/postprocessing/local-llm-gemma-contract-screen.json',
     'benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json',
     'benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json',
+    'benchmarks/postprocessing/hosted-llm-target-complete-screen.json',
   ]) {
     await validatePlan(ledger, await readJson(join(repoRoot, screenPath)));
   }

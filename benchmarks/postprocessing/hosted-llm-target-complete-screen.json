@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-hosted-target-complete-preflight-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "purpose": "Preflight the five pinned hosted quality ceilings on the same frozen 60-target challenge set that rejected the local Gemma candidate.",
+  "scope": {
+    "document_statuses": [
+      "ready",
+      "blocked"
+    ],
+    "tts_engines": [
+      "apple-avspeechsynthesizer",
+      "qwen3-tts-1.7b-voicedesign-mlx-audio",
+      "voxtral-tts-4b-bf16-mlx-audio"
+    ],
+    "document_ids": [
+      "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp"
+    ],
+    "document_count": 10,
+    "sections_per_document": 6,
+    "request_mode": "single-target-section",
+    "hidden_reference_visible_to_model": false,
+    "qualification_reports": [
+      {
+        "tts_engine": "voxtral-tts-4b-bf16-mlx-audio",
+        "path": "benchmarks/postprocessing/qualifications/voxtral-tts-4b-bf16.technical-a-1.json",
+        "sha256": "934783817093e344136037238b9fae41197f9436f8f167d88f748833eb58ff4f",
+        "required_disposition": "technical-gate-passed"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "id": "gpt-5.6-sol-openrouter-azure-eu",
+      "role": "frontier-quality-control",
+      "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-sol-azure-eu.json",
+      "model_manifest_sha256": "3eddc2282a8687fbce857bb3ebec43feaa0b49ba5848fa2af3f128610b69a1f3"
+    },
+    {
+      "id": "gemini-3.6-flash-openrouter-google-vertex-global",
+      "role": "fast-frontier-quality-candidate",
+      "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/gemini-3.6-flash-google-vertex-global.json",
+      "model_manifest_sha256": "1cae5e4c7576506451689613002262356d334dab5ca26d3835e6981c0bb500c4"
+    },
+    {
+      "id": "gpt-5.6-terra-openrouter-azure-eu",
+      "role": "balanced-frontier-quality-control",
+      "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/gpt-5.6-terra-azure-eu.json",
+      "model_manifest_sha256": "6e4f5df59c5b0cd8eb2693988626d49164ab5dbe00d8922ed0f55749e2c38020"
+    },
+    {
+      "id": "kimi-k3-openrouter-moonshot-int4",
+      "role": "frontier-quality-candidate",
+      "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/kimi-k3-moonshot-int4.json",
+      "model_manifest_sha256": "9c4d068082aeba466581910890c9d1d8ddf82b248250d34af01ce7943f84d1a6"
+    },
+    {
+      "id": "claude-sonnet-5-openrouter-azure-us-east-2",
+      "role": "current-frontier-quality-control",
+      "model_manifest_path": "spikes/text-generation-openrouter-reference/candidates/claude-sonnet-5-azure-us-east-2.json",
+      "model_manifest_sha256": "2d2246480f76e757b077aa16340cffb2c6863743b3809b928f99a408bbc979bc"
+    }
+  ],
+  "generation": {
+    "runtime": "OpenRouter with a pinned model/provider tuple and provider fallback disabled",
+    "prompt_id": "conservative-target-complete-v5",
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-target-complete-v5.txt",
+    "prompt_sha256": "bb135e4a70be705daf94e25a96ac6170916e397fdd2b7751f4fbdd87e1730585",
+    "max_tokens": 768,
+    "timeout_ms": 300000,
+    "repetitions": 2,
+    "output_contract": "bounded-transcript-target-complete-v5",
+    "structured_output": {
+      "type": "json_schema",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "expected_counts": {
+    "documents": 10,
+    "document_model_pairs": 50,
+    "target_model_pairs": 300,
+    "requests": 600,
+    "section_outputs": 600
+  },
+  "result_path": "benchmarks/postprocessing/hosted-llm-target-complete-results.json",
+  "execution_policy": {
+    "resume_valid_results": true,
+    "retain_every_raw_response": true,
+    "map_target_position_to_immutable_section_id_locally": true,
+    "derive_authoritative_diffs_locally": true,
+    "context_is_read_only": true,
+    "provider_fallback": false,
+    "data_collection": "deny",
+    "zdr_required": true,
+    "automatic_request_retry": false
+  },
+  "claim_limit": "This deliberately challenging synthetic development slice can reject unsafe hosted candidates but cannot estimate release quality, select a product threshold, or replace held-out human podcast and audiobook evidence."
+}

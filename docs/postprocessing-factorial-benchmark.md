@@ -581,5 +581,60 @@ should next be used as a cheap preflight for a materially stronger local model
 or the already pinned hosted ceilings; only a contract-and-quality survivor
 should reach held-out professional audio.
 
+## Hosted challenge preflight
+
+The hosted preflight reuses the exact ten documents and 60 single-target
+requests from the complete-text Gemma challenge. It does not reopen corpus,
+TTS, STT, prompt, or target selection. The five candidates are GPT-5.6 Sol,
+Gemini 3.6 Flash, GPT-5.6 Terra, Kimi K3, and Claude Sonnet 5. Every request
+uses its manifest-pinned provider, disables fallback, requires supported
+parameters, denies data collection, and requires ZDR. The consumed Qwen3.7 Max
+non-ZDR exception is neither needed nor reused.
+
+Execution is deliberately staged:
+
+1. Run repeat one for all five candidates, up to 60 requests each.
+2. Stop a candidate as soon as its acceptance minimum becomes unreachable or
+   the first token cap, gross edit above 30%, or correct-input regression makes
+   promotion impossible.
+3. Apply the complete first-repeat gates, including per-locale macro WER and
+   section improvement/regression balance.
+4. Run repeat two only for first-repeat survivors.
+5. Treat byte-identical hosted repeats as an observation, not a requirement;
+   both repeats must still pass the contract and quality gates.
+
+The conservative cost envelope counts every rendered Unicode code point as an
+input token and assumes every response consumes all 768 configured completion
+tokens. On the materialized slice it is `$11.19` for repeat one across all five
+models and `$22.38` if every model survives into repeat two. The more realistic
+pre-run estimate for repeat one is `$3.42`. Actual provider-reported request
+cost remains authoritative. The runner refuses to start without an explicit
+per-invocation USD budget and never retries a paid request automatically.
+
+Prepare and validate the run without a network request:
+
+```sh
+node scripts/run-postprocessing-factorial-hosted-llm.mjs estimate
+node scripts/run-postprocessing-factorial-hosted-llm.mjs self-test
+```
+
+After committing the plan so evidence can name its exact source revision, run
+one bounded stage and create the resumable partial decision:
+
+```sh
+node --env-file=.env.local \
+  scripts/run-postprocessing-factorial-hosted-llm.mjs run \
+  --repetition 1 \
+  --candidate gemini-3.6-flash-openrouter-google-vertex-global \
+  --budget-usd 1.10
+node scripts/run-postprocessing-factorial-hosted-llm.mjs summarize
+```
+
+The machine-readable
+[screen](../benchmarks/postprocessing/hosted-llm-target-complete-screen.json),
+[staged plan](../benchmarks/postprocessing/hosted-llm-target-complete-plan.json),
+and [cost estimate](../benchmarks/postprocessing/hosted-llm-target-complete-estimate.json)
+freeze this boundary before the first paid request.
+
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.

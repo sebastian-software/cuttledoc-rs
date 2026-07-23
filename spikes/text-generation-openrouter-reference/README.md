@@ -130,3 +130,15 @@ node scripts/validate-text-generation-openrouter-reference.mjs --self-test
 
 Neither the key nor authorization headers may appear in a manifest or result;
 the validator rejects common secret fields and OpenRouter key prefixes.
+
+## Factorial challenge preflight
+
+The one-fixture reference runner above remains the contract and provider-pin
+probe. The resumable multilingual batch is implemented separately in
+`scripts/run-postprocessing-factorial-hosted-llm.mjs`. It reuses the frozen
+ten-document/60-target complete-text challenge, requires a precomputed cost
+estimate and explicit USD budget, performs no automatic paid retry, and writes
+raw responses only under ignored `artifacts/`. Its checked-in summary and
+decision retain response ids, served model/provider identities, token use,
+cost, contract results, and section-level quality evidence without retaining
+the API key.
