@@ -59,5 +59,6 @@
     "section_regressions_must_not_exceed_improvements": true
   },
   "decision_rule": "Promote a variant to the 180-document factorial screen only if every gate passes. If neither passes, retain raw ASR output and continue with stronger local or hosted candidates rather than weakening the gates.",
+  "early_stop_rule": "Stop a variant once mechanically accepted requests plus every missing request cannot reach the frozen minimum. The missing tail is then mathematically unable to change the promotion decision.",
   "claim_limit": "This is a deliberately selected development challenge set. It can reject unsafe prompt and contract variants but cannot estimate release quality, select a safety threshold, or replace held-out human podcast and audiobook evidence."
 }

@@ -515,12 +515,13 @@ bare JSON or exactly one such fence as a transport envelope. Text outside that
 envelope and every semantic contract violation remain strict failures; this
 does not relax patch or quality gates.
 
-Each variant runs 60 target sections twice for 120 requests. Promotion to the
+Each variant plans 60 target sections twice for 120 requests. Promotion to the
 180-document screen requires at least 118 mechanically valid requests, no token
 cap, byte-identical repeat pairs, no accepted edit above a 30% normalized word
 edit rate, no locale-level macro-WER regression, no newly damaged correct
-input, and no more regressed than improved section observations. Failure does
-not justify weakening a gate.
+input, and no more regressed than improved section observations. A variant
+stops early once its accepted count plus every missing request cannot reach the
+minimum. Failure does not justify weakening a gate.
 
 Run and summarize the complete-text variant:
 
@@ -547,6 +548,38 @@ node scripts/run-postprocessing-factorial-local-llm.mjs summarize \
   --results-subdir llm-gemma-target-patches-results \
   --summary-output benchmarks/postprocessing/local-llm-gemma-target-patches-results.json
 ```
+
+Create the combined, digest-pinned early-stop decision:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs summarize-ab
+```
+
+The comparison is complete by irreversible early rejection, although its two
+variant reports intentionally remain partial:
+
+| Variant | Captured | Strictly valid | Best possible final valid count | Repeat evidence | Observed strict-or-raw macro WER | Disposition |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Single-target complete text | 31/120 | 25/31 | 114/120 | 15/15 pairs byte-identical | 11.17% → 11.17% (+0.03%) | Reject |
+| Single-target bounded patches | 6/120 | 1/6 | 115/120 | No complete pair before stop | 17.21% → 16.96% (-1.41%) | Reject |
+
+The minimum is 118 valid requests, so neither missing tail can reverse the
+decision. Complete text eliminated gross cross-section copying in the captured
+slice and produced no edit above 30%, but six deterministic dialogue responses
+were malformed or added a prohibited `position` field. It also produced two
+improved and two regressed observations, with a small German aggregate
+regression. Bounded patches failed five of its first six requests through
+no-op patches, excessive patch counts, or otherwise nonconforming patch lists;
+the one valid patch improved its target.
+
+The machine-readable evidence is split into the
+[complete-text report](../benchmarks/postprocessing/local-llm-gemma-target-complete-results.json),
+[bounded-patch report](../benchmarks/postprocessing/local-llm-gemma-target-patches-results.json),
+and [combined decision](../benchmarks/postprocessing/local-llm-gemma-target-ab-results.json).
+Gemma 4 E2B is not promoted to another full screen. The frozen challenge slice
+should next be used as a cheap preflight for a materially stronger local model
+or the already pinned hosted ceilings; only a contract-and-quality survivor
+should reach held-out professional audio.
 
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.

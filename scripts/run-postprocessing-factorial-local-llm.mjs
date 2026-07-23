@@ -55,15 +55,36 @@ const { positionals, values } = parseArgs({
       default: 'llm-local-results',
     },
     'allow-partial': { type: 'boolean', default: false },
+    'ab-plan': {
+      type: 'string',
+      default: join(
+        repoRoot,
+        'benchmarks/postprocessing/local-llm-gemma-target-ab-plan.json',
+      ),
+    },
+    'ab-summary-output': {
+      type: 'string',
+      default: join(
+        repoRoot,
+        'benchmarks/postprocessing/local-llm-gemma-target-ab-results.json',
+      ),
+    },
     force: { type: 'boolean', default: false },
   },
 });
 
 const command = positionals[0];
-if (!['materialize', 'run', 'summarize', 'status', 'self-test'].includes(command)) {
+if (![
+  'materialize',
+  'run',
+  'summarize',
+  'summarize-ab',
+  'status',
+  'self-test',
+].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local-llm.mjs ' +
-    '<materialize|run|summarize|status|self-test> [options]',
+    '<materialize|run|summarize|summarize-ab|status|self-test> [options]',
   );
 }
 
@@ -92,6 +113,8 @@ if (command === 'self-test') {
   await printStatus();
 } else if (command === 'summarize') {
   await summarizeResults();
+} else if (command === 'summarize-ab') {
+  await summarizeAbResults();
 } else {
   await printStatus();
 }
@@ -633,6 +656,211 @@ async function summarizeResults() {
   );
 }
 
+async function summarizeAbResults() {
+  const [ledger, planBytes] = await Promise.all([
+    readJson(paths.ledger),
+    readFile(resolve(values['ab-plan'])),
+  ]);
+  const plan = JSON.parse(planBytes);
+  await validateTargetAbPlan(ledger);
+  const gates = plan.promotion_gates;
+  const variants = [];
+  const evidenceSourceRevisions = new Set();
+  for (const variant of plan.variants) {
+    const [screen, reportBytes] = await Promise.all([
+      readJson(join(repoRoot, variant.screen_path)),
+      readFile(join(repoRoot, variant.summary_path)),
+    ]);
+    const report = JSON.parse(reportBytes);
+    validateSummaryReport(report, screen);
+    for (const revision of report.evidence_source_revisions) {
+      evidenceSourceRevisions.add(revision);
+    }
+    const accepted = report.contract_compliance.mechanically_accepted_requests;
+    const missing = report.scope.missing_requests;
+    const maximumPossibleAccepted = accepted + missing;
+    const nonIdenticalPairs =
+      report.repeat_stability.complete_pairs -
+      report.repeat_stability.byte_identical_raw_output_pairs;
+    const grossAcceptedEdits = report.observations.filter((observation) =>
+      observation.mechanically_accepted &&
+      observation.input_output_word_edit_rate > 0.3).length;
+    const candidateAggregate = report.aggregates.by_candidate[0];
+    const localeQuality = effectiveQualityByLocale(report.observations);
+    const localeRegressions = localeQuality.filter((entry) =>
+      entry.macro_mean_strict_or_raw_wer >
+        entry.macro_mean_raw_wer + 1e-12).length;
+    const parserErrors = new Map();
+    for (const request of report.requests) {
+      if (request.mechanically_accepted) continue;
+      const error = request.parser_error ?? 'token-limit-or-unknown';
+      parserErrors.set(error, (parserErrors.get(error) ?? 0) + 1);
+    }
+    const mechanicalIrreversible =
+      maximumPossibleAccepted <
+      gates.mechanically_accepted_requests_minimum;
+    variants.push({
+      id: variant.id,
+      screen_id: screen.id,
+      report_path: variant.summary_path,
+      report_sha256: sha256(reportBytes),
+      execution_status: report.status,
+      progress: {
+        expected_requests: report.scope.expected_requests,
+        completed_requests: report.scope.completed_requests,
+        missing_requests: missing,
+        mechanically_accepted_requests: accepted,
+        invalid_requests: report.contract_compliance.invalid_requests,
+        maximum_possible_mechanically_accepted_requests:
+          maximumPossibleAccepted,
+      },
+      observed_contract: {
+        markdown_json_transport_envelopes:
+          report.contract_compliance.markdown_json_transport_envelopes,
+        token_limit_failures:
+          report.contract_compliance.token_limit_failures,
+        complete_repeat_pairs: report.repeat_stability.complete_pairs,
+        byte_identical_repeat_pairs:
+          report.repeat_stability.byte_identical_raw_output_pairs,
+        non_identical_repeat_pairs: nonIdenticalPairs,
+        parser_errors: [...parserErrors.entries()].map(([error, count]) => ({
+          error,
+          count,
+        })).sort((left, right) => left.error.localeCompare(right.error)),
+      },
+      observed_quality: {
+        overall: effectiveQuality(report.observations),
+        by_locale: localeQuality,
+        accepted_sections_above_30_percent_input_output_word_edit_rate:
+          grossAcceptedEdits,
+        improved_section_count: candidateAggregate.improved_section_count,
+        regressed_section_count: candidateAggregate.regressed_section_count,
+        changed_correct_input_to_error_count:
+          candidateAggregate.changed_correct_input_to_error_count,
+      },
+      gate_evaluation: {
+        mechanically_accepted_requests: {
+          required_minimum:
+            gates.mechanically_accepted_requests_minimum,
+          observed: accepted,
+          maximum_possible: maximumPossibleAccepted,
+          irreversible_failure: mechanicalIrreversible,
+        },
+        token_limit_failures: {
+          allowed_maximum: gates.token_limit_failures_maximum,
+          observed: report.contract_compliance.token_limit_failures,
+        },
+        non_identical_repeat_pairs: {
+          allowed_maximum: gates.non_identical_repeat_pairs_maximum,
+          observed: nonIdenticalPairs,
+          incomplete_pairs:
+            report.repeat_stability.expected_pairs -
+            report.repeat_stability.complete_pairs,
+        },
+        gross_edit_sections: {
+          allowed_maximum:
+            gates
+              .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum,
+          observed: grossAcceptedEdits,
+        },
+        locale_macro_wer_regressions: {
+          allowed_maximum: gates.locale_macro_wer_regressions_maximum,
+          observed: localeRegressions,
+          captured_locales: localeQuality.length,
+        },
+        changed_correct_input_to_error: {
+          allowed_maximum: gates.changed_correct_input_to_error_maximum,
+          observed: candidateAggregate.changed_correct_input_to_error_count,
+        },
+        section_balance: {
+          requirement:
+            'regressed section observations must not exceed improved observations',
+          improved: candidateAggregate.improved_section_count,
+          regressed: candidateAggregate.regressed_section_count,
+          currently_passes:
+            candidateAggregate.regressed_section_count <=
+            candidateAggregate.improved_section_count,
+        },
+      },
+      disposition: mechanicalIrreversible
+        ? 'early-rejected-mechanical-gate'
+        : report.status === 'complete'
+          ? 'evaluate-all-promotion-gates'
+          : 'continue',
+    });
+  }
+  const report = {
+    schema_version: '1.0.0',
+    id: `${plan.id}-results-1`,
+    plan_id: plan.plan_id,
+    plan_revision: plan.plan_revision,
+    ab_plan_id: plan.id,
+    ab_plan_sha256: sha256(planBytes),
+    evidence_source_revisions: [...evidenceSourceRevisions].sort(),
+    status: variants.every((variant) =>
+      variant.disposition === 'early-rejected-mechanical-gate')
+      ? 'complete-early-rejection'
+      : 'partial',
+    variants,
+    decision: {
+      promoted_variant: null,
+      disposition: variants.every((variant) =>
+        variant.disposition === 'early-rejected-mechanical-gate')
+        ? 'reject-both-local-gemma-contracts'
+        : 'continue-required',
+      rationale:
+        'A variant is stopped once its accepted count plus every missing ' +
+        'request cannot reach the frozen minimum. Missing requests therefore ' +
+        'cannot reverse the recorded early rejection.',
+    },
+    limitations: [
+      plan.claim_limit,
+      'Observed quality metrics cover captured requests only; they support diagnostics but are not completion estimates.',
+      'The early-rejection decision depends only on the irreversible mechanical-count bound, not on extrapolated quality.',
+    ],
+  };
+  if (
+    report.status !== 'complete-early-rejection' ||
+    report.variants.length !== 2 ||
+    report.variants.some((variant) =>
+      variant.disposition !== 'early-rejected-mechanical-gate')
+  ) {
+    throw new Error('Gemma target A/B comparison has no final early-stop decision');
+  }
+  const output = resolve(values['ab-summary-output']);
+  await atomicJson(output, report);
+  process.stdout.write(
+    `Wrote ${relative(repoRoot, output)}: both variants early-rejected\n`,
+  );
+}
+
+function effectiveQuality(observations) {
+  const raw = observations.map((observation) => observation.raw_wer);
+  const strictOrRaw = observations.map((observation) =>
+    observation.mechanically_accepted && observation.post_wer !== null
+      ? observation.post_wer
+      : observation.raw_wer);
+  return {
+    section_observations: observations.length,
+    macro_mean_raw_wer: mean(raw),
+    macro_mean_strict_or_raw_wer: mean(strictOrRaw),
+    relative_error_change:
+      mean(raw) === 0 ? null : (mean(strictOrRaw) - mean(raw)) / mean(raw),
+  };
+}
+
+function effectiveQualityByLocale(observations) {
+  const groups = new Map();
+  for (const observation of observations) {
+    if (!groups.has(observation.locale)) groups.set(observation.locale, []);
+    groups.get(observation.locale).push(observation);
+  }
+  return [...groups.entries()].map(([locale, group]) => ({
+    locale,
+    ...effectiveQuality(group),
+  })).sort((left, right) => left.locale.localeCompare(right.locale));
+}
+
 function diagnosticSections(rawText, expectedIds) {
   const trimmed = rawText.trim();
   const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/iu);
@@ -757,19 +985,29 @@ function validateSummaryReport(report, screen) {
   ) {
     errors.push('report identity differs from the screen');
   }
+  const expectedSectionsPerRequest =
+    screen.scope.request_mode === 'single-target-section'
+      ? 1
+      : screen.scope.sections_per_document;
+  const complete = report.status === 'complete';
   if (
-    report.status !== 'complete' ||
+    !['complete', 'partial'].includes(report.status) ||
     report.scope.expected_documents !== screen.expected_counts.documents ||
     report.scope.expected_requests !== screen.expected_counts.requests ||
-    report.scope.completed_requests !== screen.expected_counts.requests ||
-    report.scope.missing_requests !== 0 ||
-    report.scope.section_observations !==
-      screen.expected_counts.section_outputs ||
-    report.requests.length !== screen.expected_counts.requests ||
-    report.observations.length !== screen.expected_counts.section_outputs ||
-    report.missing.length !== 0
+    report.scope.completed_requests !== report.requests.length ||
+    report.scope.missing_requests !== report.missing.length ||
+    report.scope.completed_requests + report.scope.missing_requests !==
+      screen.expected_counts.requests ||
+    report.scope.section_observations !== report.observations.length ||
+    report.observations.length !==
+      report.requests.length * expectedSectionsPerRequest ||
+    complete !== (report.missing.length === 0) ||
+    (
+      complete &&
+      report.observations.length !== screen.expected_counts.section_outputs
+    )
   ) {
-    errors.push('complete report counts differ from the screen');
+    errors.push('report counts differ from the screen and captured evidence');
   }
   const acceptedRequests = report.requests.filter((request) =>
     request.mechanically_accepted).length;
@@ -780,8 +1018,11 @@ function validateSummaryReport(report, screen) {
       report.requests.length - acceptedRequests ||
     report.repeat_stability.expected_pairs !==
       expectedRepeatPairs(screen) ||
-    report.repeat_stability.complete_pairs !==
-      expectedRepeatPairs(screen)
+    report.repeat_stability.complete_pairs > expectedRepeatPairs(screen) ||
+    (
+      complete &&
+      report.repeat_stability.complete_pairs !== expectedRepeatPairs(screen)
+    )
   ) {
     errors.push('contract or repeat counts differ from request evidence');
   }
@@ -1240,5 +1481,43 @@ async function selfTest() {
     )),
     contractScreen,
   );
+  for (const [screenPath, reportPath] of [
+    [
+      'benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json',
+      'benchmarks/postprocessing/local-llm-gemma-target-complete-results.json',
+    ],
+    [
+      'benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json',
+      'benchmarks/postprocessing/local-llm-gemma-target-patches-results.json',
+    ],
+  ]) {
+    validateSummaryReport(
+      await readJson(join(repoRoot, reportPath)),
+      await readJson(join(repoRoot, screenPath)),
+    );
+  }
+  const abResults = await readJson(join(
+    repoRoot,
+    'benchmarks/postprocessing/local-llm-gemma-target-ab-results.json',
+  ));
+  if (
+    abResults.status !== 'complete-early-rejection' ||
+    abResults.decision.disposition !== 'reject-both-local-gemma-contracts' ||
+    abResults.ab_plan_sha256 !== sha256(await readFile(join(
+      repoRoot,
+      'benchmarks/postprocessing/local-llm-gemma-target-ab-plan.json',
+    ))) ||
+    abResults.variants.length !== 2 ||
+    abResults.variants.some((variant) =>
+      variant.disposition !== 'early-rejected-mechanical-gate')
+  ) {
+    throw new Error('local Gemma target A/B results differ from the decision');
+  }
+  for (const variant of abResults.variants) {
+    const bytes = await readFile(join(repoRoot, variant.report_path));
+    if (sha256(bytes) !== variant.report_sha256) {
+      throw new Error(`${variant.id}: A/B result digest drift`);
+    }
+  }
   process.stdout.write('factorial local LLM runner: self-test passed\n');
 }

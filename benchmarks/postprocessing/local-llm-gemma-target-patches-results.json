@@ -1,0 +1,1373 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-local-gemma-target-patches-screen-2-results-1",
+  "screen_id": "postprocessing-factorial-local-gemma-target-patches-screen-2",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "evidence_source_revisions": [
+    "cb43ab44db1e3ab6940fff9989d7371d137cf6ae"
+  ],
+  "evidence_captured_through": "2026-07-23T14:41:47.782931Z",
+  "status": "partial",
+  "scope": {
+    "expected_documents": 10,
+    "candidates": 1,
+    "repetitions": 2,
+    "expected_requests": 120,
+    "completed_requests": 6,
+    "missing_requests": 114,
+    "section_observations": 6
+  },
+  "contract_compliance": {
+    "mechanically_accepted_requests": 1,
+    "invalid_requests": 5,
+    "recoverable_markdown_or_format_violations": 0,
+    "recoverable_markdown_fence_violations": 0,
+    "recoverable_section_id_normalization_violations": 0,
+    "markdown_json_transport_envelopes": 6,
+    "token_limit_failures": 0
+  },
+  "repeat_stability": {
+    "expected_pairs": 60,
+    "complete_pairs": 0,
+    "byte_identical_raw_output_pairs": 0
+  },
+  "exploratory_safety_gate_sensitivity": {
+    "policy": "Use postprocessed text only for a strictly valid request whose normalized input-to-output word edit rate is at or below the threshold; otherwise retain the raw section.",
+    "selection_status": "exploratory-development-sensitivity-only",
+    "thresholds": [
+      {
+        "maximum_input_output_word_edit_rate": 0.02,
+        "overall": {
+          "section_count": 6,
+          "postprocessed_section_count": 0,
+          "raw_fallback_section_count": 6,
+          "micro_raw_wer": 0.17786561264822134,
+          "micro_gated_wer": 0.17786561264822134,
+          "relative_error_change": 0,
+          "applied_improvement_count": 0,
+          "applied_regression_count": 0,
+          "applied_correct_input_to_error_count": 0
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_count": 6,
+            "postprocessed_section_count": 0,
+            "raw_fallback_section_count": 6,
+            "micro_raw_wer": 0.17786561264822134,
+            "micro_gated_wer": 0.17786561264822134,
+            "relative_error_change": 0,
+            "applied_improvement_count": 0,
+            "applied_regression_count": 0,
+            "applied_correct_input_to_error_count": 0
+          }
+        ]
+      },
+      {
+        "maximum_input_output_word_edit_rate": 0.05,
+        "overall": {
+          "section_count": 6,
+          "postprocessed_section_count": 1,
+          "raw_fallback_section_count": 5,
+          "micro_raw_wer": 0.17786561264822134,
+          "micro_gated_wer": 0.17523056653491437,
+          "relative_error_change": -0.014814814814814815,
+          "applied_improvement_count": 1,
+          "applied_regression_count": 0,
+          "applied_correct_input_to_error_count": 0
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_count": 6,
+            "postprocessed_section_count": 1,
+            "raw_fallback_section_count": 5,
+            "micro_raw_wer": 0.17786561264822134,
+            "micro_gated_wer": 0.17523056653491437,
+            "relative_error_change": -0.014814814814814815,
+            "applied_improvement_count": 1,
+            "applied_regression_count": 0,
+            "applied_correct_input_to_error_count": 0
+          }
+        ]
+      },
+      {
+        "maximum_input_output_word_edit_rate": 0.1,
+        "overall": {
+          "section_count": 6,
+          "postprocessed_section_count": 1,
+          "raw_fallback_section_count": 5,
+          "micro_raw_wer": 0.17786561264822134,
+          "micro_gated_wer": 0.17523056653491437,
+          "relative_error_change": -0.014814814814814815,
+          "applied_improvement_count": 1,
+          "applied_regression_count": 0,
+          "applied_correct_input_to_error_count": 0
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_count": 6,
+            "postprocessed_section_count": 1,
+            "raw_fallback_section_count": 5,
+            "micro_raw_wer": 0.17786561264822134,
+            "micro_gated_wer": 0.17523056653491437,
+            "relative_error_change": -0.014814814814814815,
+            "applied_improvement_count": 1,
+            "applied_regression_count": 0,
+            "applied_correct_input_to_error_count": 0
+          }
+        ]
+      },
+      {
+        "maximum_input_output_word_edit_rate": 0.2,
+        "overall": {
+          "section_count": 6,
+          "postprocessed_section_count": 1,
+          "raw_fallback_section_count": 5,
+          "micro_raw_wer": 0.17786561264822134,
+          "micro_gated_wer": 0.17523056653491437,
+          "relative_error_change": -0.014814814814814815,
+          "applied_improvement_count": 1,
+          "applied_regression_count": 0,
+          "applied_correct_input_to_error_count": 0
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_count": 6,
+            "postprocessed_section_count": 1,
+            "raw_fallback_section_count": 5,
+            "micro_raw_wer": 0.17786561264822134,
+            "micro_gated_wer": 0.17523056653491437,
+            "relative_error_change": -0.014814814814814815,
+            "applied_improvement_count": 1,
+            "applied_regression_count": 0,
+            "applied_correct_input_to_error_count": 0
+          }
+        ]
+      },
+      {
+        "maximum_input_output_word_edit_rate": 0.3,
+        "overall": {
+          "section_count": 6,
+          "postprocessed_section_count": 1,
+          "raw_fallback_section_count": 5,
+          "micro_raw_wer": 0.17786561264822134,
+          "micro_gated_wer": 0.17523056653491437,
+          "relative_error_change": -0.014814814814814815,
+          "applied_improvement_count": 1,
+          "applied_regression_count": 0,
+          "applied_correct_input_to_error_count": 0
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_count": 6,
+            "postprocessed_section_count": 1,
+            "raw_fallback_section_count": 5,
+            "micro_raw_wer": 0.17786561264822134,
+            "micro_gated_wer": 0.17523056653491437,
+            "relative_error_change": -0.014814814814814815,
+            "applied_improvement_count": 1,
+            "applied_regression_count": 0,
+            "applied_correct_input_to_error_count": 0
+          }
+        ]
+      }
+    ]
+  },
+  "aggregates": {
+    "by_candidate": [
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "request_count": 6,
+        "accepted_request_count": 1,
+        "diagnostic_request_count": 1,
+        "invalid_request_count": 5,
+        "token_limit_failure_count": 0,
+        "section_count": 6,
+        "accepted_section_count": 1,
+        "diagnostic_section_count": 1,
+        "macro_mean_raw_wer": 0.17207125462603678,
+        "macro_mean_accepted_raw_wer": 0.1386861313868613,
+        "macro_mean_post_wer": 0.12408759124087591,
+        "macro_mean_diagnostic_raw_wer": 0.1386861313868613,
+        "macro_mean_diagnostic_post_wer": 0.12408759124087591,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      }
+    ],
+    "by_candidate_and_locale": [
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "locale": "de-DE",
+        "request_count": 6,
+        "accepted_request_count": 1,
+        "diagnostic_request_count": 1,
+        "invalid_request_count": 5,
+        "token_limit_failure_count": 0,
+        "section_count": 6,
+        "accepted_section_count": 1,
+        "diagnostic_section_count": 1,
+        "macro_mean_raw_wer": 0.17207125462603678,
+        "macro_mean_accepted_raw_wer": 0.1386861313868613,
+        "macro_mean_post_wer": 0.12408759124087591,
+        "macro_mean_diagnostic_raw_wer": 0.1386861313868613,
+        "macro_mean_diagnostic_post_wer": 0.12408759124087591,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      }
+    ],
+    "by_candidate_and_stt_model": [
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "stt_model": "qwen3-asr-0.6b-mlx-direct",
+        "request_count": 6,
+        "accepted_request_count": 1,
+        "diagnostic_request_count": 1,
+        "invalid_request_count": 5,
+        "token_limit_failure_count": 0,
+        "section_count": 6,
+        "accepted_section_count": 1,
+        "diagnostic_section_count": 1,
+        "macro_mean_raw_wer": 0.17207125462603678,
+        "macro_mean_accepted_raw_wer": 0.1386861313868613,
+        "macro_mean_post_wer": 0.12408759124087591,
+        "macro_mean_diagnostic_raw_wer": 0.1386861313868613,
+        "macro_mean_diagnostic_post_wer": 0.12408759124087591,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      }
+    ],
+    "by_candidate_and_tts_engine": [
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "tts_engine": "apple-avspeechsynthesizer",
+        "request_count": 6,
+        "accepted_request_count": 1,
+        "diagnostic_request_count": 1,
+        "invalid_request_count": 5,
+        "token_limit_failure_count": 0,
+        "section_count": 6,
+        "accepted_section_count": 1,
+        "diagnostic_section_count": 1,
+        "macro_mean_raw_wer": 0.17207125462603678,
+        "macro_mean_accepted_raw_wer": 0.1386861313868613,
+        "macro_mean_post_wer": 0.12408759124087591,
+        "macro_mean_diagnostic_raw_wer": 0.1386861313868613,
+        "macro_mean_diagnostic_post_wer": 0.12408759124087591,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      }
+    ],
+    "by_candidate_and_content_type": [
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "content_type": "dialogue",
+        "request_count": 2,
+        "accepted_request_count": 0,
+        "diagnostic_request_count": 0,
+        "invalid_request_count": 2,
+        "token_limit_failure_count": 0,
+        "section_count": 2,
+        "accepted_section_count": 0,
+        "diagnostic_section_count": 0,
+        "macro_mean_raw_wer": 0.1514370777510592,
+        "macro_mean_accepted_raw_wer": null,
+        "macro_mean_post_wer": null,
+        "macro_mean_diagnostic_raw_wer": null,
+        "macro_mean_diagnostic_post_wer": null,
+        "improved_section_count": 0,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      },
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "content_type": "native-factual",
+        "request_count": 2,
+        "accepted_request_count": 0,
+        "diagnostic_request_count": 0,
+        "invalid_request_count": 2,
+        "token_limit_failure_count": 0,
+        "section_count": 2,
+        "accepted_section_count": 0,
+        "diagnostic_section_count": 0,
+        "macro_mean_raw_wer": 0.20971933471933474,
+        "macro_mean_accepted_raw_wer": null,
+        "macro_mean_post_wer": null,
+        "macro_mean_diagnostic_raw_wer": null,
+        "macro_mean_diagnostic_post_wer": null,
+        "improved_section_count": 0,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      },
+      {
+        "candidate": "gemma-4-e2b-it-4bit-mlx",
+        "content_type": "technical",
+        "request_count": 2,
+        "accepted_request_count": 1,
+        "diagnostic_request_count": 1,
+        "invalid_request_count": 1,
+        "token_limit_failure_count": 0,
+        "section_count": 2,
+        "accepted_section_count": 1,
+        "diagnostic_section_count": 1,
+        "macro_mean_raw_wer": 0.15505735140771637,
+        "macro_mean_accepted_raw_wer": 0.1386861313868613,
+        "macro_mean_post_wer": 0.12408759124087591,
+        "macro_mean_diagnostic_raw_wer": 0.1386861313868613,
+        "macro_mean_diagnostic_post_wer": 0.12408759124087591,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0,
+        "exact_text_unchanged_section_count": 0,
+        "presentation_only_change_count": 0
+      }
+    ]
+  },
+  "requests": [
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 0,
+      "target_section_id": "de-technical-a",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": false,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": "Every patch must contain distinct old and new strings",
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "19e5fb5c668183204ccbdbbabd89758aa12bd23d220ac117f11431b8e7d2939b",
+      "prompt_tokens": 1968,
+      "generation_tokens": 171,
+      "complete_generation_ms": 2353.222458,
+      "generation_tokens_per_second": 105.5419854636867
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 1,
+      "target_section_id": "de-technical-b",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": true,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": null,
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "72c611eec7c1dd37890a0034fa55fbcb5e8fe20ca9d188c17302e1ddb715221e",
+      "prompt_tokens": 1968,
+      "generation_tokens": 165,
+      "complete_generation_ms": 2211.801,
+      "generation_tokens_per_second": 105.43741826747595
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 2,
+      "target_section_id": "de-native-a",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": false,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": "Every patch must contain distinct old and new strings",
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "71712dd8f71612b4d99192906e9d1f8db7b4122fc31ab8bf2a9290cb2e18cb96",
+      "prompt_tokens": 1968,
+      "generation_tokens": 491,
+      "complete_generation_ms": 5338.478166,
+      "generation_tokens_per_second": 104.64619143282656
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 3,
+      "target_section_id": "de-native-b",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": false,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": "Patch count exceeds the configured maximum",
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "fc27fd55799c8f80fe227b232e28160ab86289e088a87858855ec47f968aff15",
+      "prompt_tokens": 1968,
+      "generation_tokens": 332,
+      "complete_generation_ms": 3827.251375,
+      "generation_tokens_per_second": 104.74730204154447
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 4,
+      "target_section_id": "de-dialogue-a",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": false,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": "Patch count exceeds the configured maximum",
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "08bb7a4fef33a49cb58b4af2d2c7f94f2ed3aaf450f623baad66a70bc5a2d0ae",
+      "prompt_tokens": 1968,
+      "generation_tokens": 904,
+      "complete_generation_ms": 9321.884333,
+      "generation_tokens_per_second": 104.24454917950389
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 5,
+      "target_section_id": "de-dialogue-b",
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "repetition": 1,
+      "mechanically_accepted": false,
+      "format_violation_with_recoverable_sections": false,
+      "diagnostic_recovery_class": null,
+      "parser_error": "Every patch must contain distinct old and new strings",
+      "transport_envelope": "markdown-json-fence",
+      "reached_token_limit": false,
+      "raw_text_sha256": "3baa03bbf98741975208e1fac53ca88e44a991ba6acc990ff389b7b66f2801ad",
+      "prompt_tokens": 1968,
+      "generation_tokens": 279,
+      "complete_generation_ms": 3295.487041,
+      "generation_tokens_per_second": 105.10742172867647
+    }
+  ],
+  "observations": [
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 0,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-technical-a",
+      "content_type": "technical",
+      "passage_id": "synthetic-de-origin",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "mechanically_accepted": false,
+      "diagnostic_output_available": false,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 105,
+      "input_word_count": 103,
+      "raw_word_edit_distance": 18,
+      "raw_wer": 0.17142857142857143,
+      "post_word_edit_distance": null,
+      "post_wer": null,
+      "diagnostic_post_wer": null,
+      "input_output_word_edit_distance": null,
+      "input_output_word_edit_rate": null,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": false,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 1,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-technical-b",
+      "content_type": "technical",
+      "passage_id": "synthetic-de-methods",
+      "source_id": "de-wikipedia-kuenstliche-intelligenz-268935951",
+      "mechanically_accepted": true,
+      "diagnostic_output_available": true,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 137,
+      "input_word_count": 128,
+      "raw_word_edit_distance": 19,
+      "raw_wer": 0.1386861313868613,
+      "post_word_edit_distance": 17,
+      "post_wer": 0.12408759124087591,
+      "diagnostic_post_wer": 0.12408759124087591,
+      "input_output_word_edit_distance": 4,
+      "input_output_word_edit_rate": 0.03125,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": true,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 2,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-native-a",
+      "content_type": "native-factual",
+      "passage_id": "synthetic-de-native",
+      "source_id": "de-wikipedia-buchdruck-268791130",
+      "mechanically_accepted": false,
+      "diagnostic_output_available": false,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 104,
+      "input_word_count": 103,
+      "raw_word_edit_distance": 12,
+      "raw_wer": 0.11538461538461539,
+      "post_word_edit_distance": null,
+      "post_wer": null,
+      "diagnostic_post_wer": null,
+      "input_output_word_edit_distance": null,
+      "input_output_word_edit_rate": null,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": false,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 3,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-native-b",
+      "content_type": "native-factual",
+      "passage_id": "synthetic-de-native-2",
+      "source_id": "de-wikipedia-buchdruck-268791130",
+      "mechanically_accepted": false,
+      "diagnostic_output_available": false,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 148,
+      "input_word_count": 118,
+      "raw_word_edit_distance": 45,
+      "raw_wer": 0.30405405405405406,
+      "post_word_edit_distance": null,
+      "post_wer": null,
+      "diagnostic_post_wer": null,
+      "input_output_word_edit_distance": null,
+      "input_output_word_edit_rate": null,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": false,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 4,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-dialogue-a",
+      "content_type": "dialogue",
+      "passage_id": "synthetic-de-dialogue",
+      "source_id": "cuttledoc-authored-de-dialogue-1",
+      "mechanically_accepted": false,
+      "diagnostic_output_available": false,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 123,
+      "input_word_count": 131,
+      "raw_word_edit_distance": 13,
+      "raw_wer": 0.10569105691056911,
+      "post_word_edit_distance": null,
+      "post_wer": null,
+      "diagnostic_post_wer": null,
+      "input_output_word_edit_distance": null,
+      "input_output_word_edit_rate": null,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": false,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 5,
+      "repetition": 1,
+      "locale": "de-DE",
+      "tts_engine": "apple-avspeechsynthesizer",
+      "voice_slot_id": "apple-de-b",
+      "realization_id": "repeat-1",
+      "stt_model": "qwen3-asr-0.6b-mlx-direct",
+      "section_id": "de-dialogue-b",
+      "content_type": "dialogue",
+      "passage_id": "synthetic-de-dialogue-2",
+      "source_id": "cuttledoc-authored-de-dialogue-2",
+      "mechanically_accepted": false,
+      "diagnostic_output_available": false,
+      "format_violation_with_recoverable_sections": false,
+      "reference_word_count": 142,
+      "input_word_count": 146,
+      "raw_word_edit_distance": 28,
+      "raw_wer": 0.19718309859154928,
+      "post_word_edit_distance": null,
+      "post_wer": null,
+      "diagnostic_post_wer": null,
+      "input_output_word_edit_distance": null,
+      "input_output_word_edit_rate": null,
+      "exact_text_unchanged": false,
+      "presentation_only_change": false,
+      "improved": false,
+      "regressed": false,
+      "changed_correct_input_to_error": false
+    }
+  ],
+  "missing": [
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--apple-de-b--repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--de-DE--voxtral-de-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--qwen-en-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--en-US--voxtral-en-female--seed-1-repeat-1--qwen3-asr-0.6b-mlx-direct",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--qwen-es-clear--repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--es-419--voxtral-es-male--seed-0-repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--apple-fr-b--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--fr-FR--voxtral-fr-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+      "target_index": 5,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 0,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 1,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 2,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 3,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 4,
+      "repetition": 2
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 1
+    },
+    {
+      "candidate": "gemma-4-e2b-it-4bit-mlx",
+      "document_id": "document--pt-BR--voxtral-pt-female--seed-1-repeat-1--whisper-large-v3-turbo-coreml-whispercpp",
+      "target_index": 5,
+      "repetition": 2
+    }
+  ],
+  "limitations": [
+    "This deliberately challenging synthetic development slice compares prompt and output-contract behavior only. It is selected from prior observed failures, is not held out, and cannot establish product quality or tune a release safety threshold.",
+    "Strict contract failures are excluded from canonical postprocessed WER.",
+    "Diagnostic WER for structurally recoverable fenced JSON remains noncompliant evidence and is never promoted to an accepted result.",
+    "The edit-rate safety-gate sweep is evaluated on the same synthetic development observations and must not be treated as a selected product threshold.",
+    "Synthetic references can identify restoration and regressions but do not replace held-out human-verified professional audio."
+  ]
+}

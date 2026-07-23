@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-local-gemma-target-ab-plan-2-results-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "ab_plan_id": "postprocessing-factorial-local-gemma-target-ab-plan-2",
+  "ab_plan_sha256": "a8c7c4a2b034456316ceac71bc25bc3159ce5bc8c5ad754f06ad17e06e9cc8a8",
+  "evidence_source_revisions": [
+    "cb43ab44db1e3ab6940fff9989d7371d137cf6ae"
+  ],
+  "status": "complete-early-rejection",
+  "variants": [
+    {
+      "id": "single-target-complete-text",
+      "screen_id": "postprocessing-factorial-local-gemma-target-complete-screen-2",
+      "report_path": "benchmarks/postprocessing/local-llm-gemma-target-complete-results.json",
+      "report_sha256": "08cf780f8e90003af97bec08d8eccbe0c5cd4ac807e3d13bf1d7e38f50ff97b1",
+      "execution_status": "partial",
+      "progress": {
+        "expected_requests": 120,
+        "completed_requests": 31,
+        "missing_requests": 89,
+        "mechanically_accepted_requests": 25,
+        "invalid_requests": 6,
+        "maximum_possible_mechanically_accepted_requests": 114
+      },
+      "observed_contract": {
+        "markdown_json_transport_envelopes": 31,
+        "token_limit_failures": 0,
+        "complete_repeat_pairs": 15,
+        "byte_identical_repeat_pairs": 15,
+        "non_identical_repeat_pairs": 0,
+        "parser_errors": [
+          {
+            "error": "Extra data: line 4 column 1 (char 901)",
+            "count": 2
+          },
+          {
+            "error": "Extra data: line 4 column 1 (char 964)",
+            "count": 2
+          },
+          {
+            "error": "Output must contain exactly one non-empty text field",
+            "count": 2
+          }
+        ]
+      },
+      "observed_quality": {
+        "overall": {
+          "section_observations": 31,
+          "macro_mean_raw_wer": 0.11170802545117414,
+          "macro_mean_strict_or_raw_wer": 0.11174302631028614,
+          "relative_error_change": 0.0003133244811250868
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_observations": 24,
+            "macro_mean_raw_wer": 0.13910778442345403,
+            "macro_mean_strict_or_raw_wer": 0.1391529938664737,
+            "relative_error_change": 0.00032499578084031755
+          },
+          {
+            "locale": "en-US",
+            "section_observations": 7,
+            "macro_mean_raw_wer": 0.017765994689071613,
+            "macro_mean_strict_or_raw_wer": 0.017765994689071613,
+            "relative_error_change": 0
+          }
+        ],
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "improved_section_count": 2,
+        "regressed_section_count": 2,
+        "changed_correct_input_to_error_count": 0
+      },
+      "gate_evaluation": {
+        "mechanically_accepted_requests": {
+          "required_minimum": 118,
+          "observed": 25,
+          "maximum_possible": 114,
+          "irreversible_failure": true
+        },
+        "token_limit_failures": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "non_identical_repeat_pairs": {
+          "allowed_maximum": 0,
+          "observed": 0,
+          "incomplete_pairs": 45
+        },
+        "gross_edit_sections": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "locale_macro_wer_regressions": {
+          "allowed_maximum": 0,
+          "observed": 1,
+          "captured_locales": 2
+        },
+        "changed_correct_input_to_error": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "section_balance": {
+          "requirement": "regressed section observations must not exceed improved observations",
+          "improved": 2,
+          "regressed": 2,
+          "currently_passes": true
+        }
+      },
+      "disposition": "early-rejected-mechanical-gate"
+    },
+    {
+      "id": "single-target-bounded-patches",
+      "screen_id": "postprocessing-factorial-local-gemma-target-patches-screen-2",
+      "report_path": "benchmarks/postprocessing/local-llm-gemma-target-patches-results.json",
+      "report_sha256": "83d0a16c6896a4574c3a46fe243342c04101d8cc68c902a3b3f39ff9da1b6fd3",
+      "execution_status": "partial",
+      "progress": {
+        "expected_requests": 120,
+        "completed_requests": 6,
+        "missing_requests": 114,
+        "mechanically_accepted_requests": 1,
+        "invalid_requests": 5,
+        "maximum_possible_mechanically_accepted_requests": 115
+      },
+      "observed_contract": {
+        "markdown_json_transport_envelopes": 6,
+        "token_limit_failures": 0,
+        "complete_repeat_pairs": 0,
+        "byte_identical_repeat_pairs": 0,
+        "non_identical_repeat_pairs": 0,
+        "parser_errors": [
+          {
+            "error": "Every patch must contain distinct old and new strings",
+            "count": 3
+          },
+          {
+            "error": "Patch count exceeds the configured maximum",
+            "count": 2
+          }
+        ]
+      },
+      "observed_quality": {
+        "overall": {
+          "section_observations": 6,
+          "macro_mean_raw_wer": 0.17207125462603678,
+          "macro_mean_strict_or_raw_wer": 0.1696381646017059,
+          "relative_error_change": -0.014140014435407834
+        },
+        "by_locale": [
+          {
+            "locale": "de-DE",
+            "section_observations": 6,
+            "macro_mean_raw_wer": 0.17207125462603678,
+            "macro_mean_strict_or_raw_wer": 0.1696381646017059,
+            "relative_error_change": -0.014140014435407834
+          }
+        ],
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "improved_section_count": 1,
+        "regressed_section_count": 0,
+        "changed_correct_input_to_error_count": 0
+      },
+      "gate_evaluation": {
+        "mechanically_accepted_requests": {
+          "required_minimum": 118,
+          "observed": 1,
+          "maximum_possible": 115,
+          "irreversible_failure": true
+        },
+        "token_limit_failures": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "non_identical_repeat_pairs": {
+          "allowed_maximum": 0,
+          "observed": 0,
+          "incomplete_pairs": 60
+        },
+        "gross_edit_sections": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "locale_macro_wer_regressions": {
+          "allowed_maximum": 0,
+          "observed": 0,
+          "captured_locales": 1
+        },
+        "changed_correct_input_to_error": {
+          "allowed_maximum": 0,
+          "observed": 0
+        },
+        "section_balance": {
+          "requirement": "regressed section observations must not exceed improved observations",
+          "improved": 1,
+          "regressed": 0,
+          "currently_passes": true
+        }
+      },
+      "disposition": "early-rejected-mechanical-gate"
+    }
+  ],
+  "decision": {
+    "promoted_variant": null,
+    "disposition": "reject-both-local-gemma-contracts",
+    "rationale": "A variant is stopped once its accepted count plus every missing request cannot reach the frozen minimum. Missing requests therefore cannot reverse the recorded early rejection."
+  },
+  "limitations": [
+    "This is a deliberately selected development challenge set. It can reject unsafe prompt and contract variants but cannot estimate release quality, select a safety threshold, or replace held-out human podcast and audiobook evidence.",
+    "Observed quality metrics cover captured requests only; they support diagnostics but are not completion estimates.",
+    "The early-rejection decision depends only on the irreversible mechanical-count bound, not on extrapolated quality."
+  ]
+}
