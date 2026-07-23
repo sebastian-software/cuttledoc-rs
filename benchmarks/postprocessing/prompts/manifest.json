@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "revision": "postprocessing-prompts-5",
+  "revision": "postprocessing-prompts-6",
   "evidence_date": "2026-07-23",
   "split_policy": {
     "grouping_unit": "complete source work or episode",
@@ -173,12 +173,12 @@
       ]
     },
     {
-      "id": "conservative-target-complete-v4",
-      "path": "benchmarks/postprocessing/prompts/conservative-target-complete-v4.txt",
-      "sha256": "d3a9cdb87bbba04308f32dcd3fe167abde6fa73670e659f743311d89b38211d1",
+      "id": "conservative-target-complete-v5",
+      "path": "benchmarks/postprocessing/prompts/conservative-target-complete-v5.txt",
+      "sha256": "bb135e4a70be705daf94e25a96ac6170916e397fdd2b7751f4fbdd87e1730585",
       "source": "repository-authored single-target response to observed Gemma cross-section replacement",
       "mode": "bounded-lexical",
-      "output_contract": "JSON object with one complete corrected target transcript; target position is mapped to the immutable section id locally",
+      "output_contract": "bare JSON or one isolated json fence with one complete corrected target transcript; target position is mapped to the immutable section id locally",
       "allowed_edit_classes": [
         "surface",
         "word-boundary",
@@ -196,6 +196,7 @@
         "context_sections"
       ],
       "mechanical_gates": [
+        "bare JSON or exactly one isolated json fence",
         "valid JSON object with exactly one non-empty text field",
         "only the selected target position receives output",
         "target position is mapped to the immutable section id locally",
@@ -204,12 +205,12 @@
       ]
     },
     {
-      "id": "conservative-target-patches-v4",
-      "path": "benchmarks/postprocessing/prompts/conservative-target-patches-v4.txt",
-      "sha256": "3721e3892a948f7d31acb638eb977af1f98ce71bd35ad159d5a24ef89cf3822a",
+      "id": "conservative-target-patches-v5",
+      "path": "benchmarks/postprocessing/prompts/conservative-target-patches-v5.txt",
+      "sha256": "5f850e017122d8f7ee1701e5fa3178a506ad128ccfc2f9441c51480c3b62dbb6",
       "source": "repository-authored exact-patch response to observed Gemma cross-section replacement",
       "mode": "bounded-lexical",
-      "output_contract": "JSON object with bounded exact old/new patches applied locally to one target transcript",
+      "output_contract": "bare JSON or one isolated json fence with bounded exact old/new patches applied locally to one target transcript",
       "allowed_edit_classes": [
         "surface",
         "word-boundary",
@@ -227,6 +228,7 @@
         "context_sections"
       ],
       "mechanical_gates": [
+        "bare JSON or exactly one isolated json fence",
         "valid JSON object with exactly one patches array",
         "at most eight exact old/new patches",
         "every old span occurs exactly once in the target",

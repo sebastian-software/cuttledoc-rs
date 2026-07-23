@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-local-gemma-target-ab-plan-1",
+  "id": "postprocessing-factorial-local-gemma-target-ab-plan-2",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
   "plan_revision": "postprocessing-factorial-plan-6",
   "purpose": "Compare two contracts that make cross-section replacement structurally impossible or locally detectable before another full Gemma screen.",
@@ -43,6 +43,11 @@
     "requests_per_variant": 120,
     "section_observations_per_variant": 120,
     "randomness": "temperature zero and seed zero; repeated output remains an explicit determinism check"
+  },
+  "transport_contract_amendment": {
+    "trigger": "The committed six-target pilot for each variant returned a single, otherwise isolated Markdown json fence in 12/12 responses.",
+    "decision": "Revision 2 accepts either bare JSON or exactly one json code fence with no surrounding text. This changes only deterministic transport decoding; all complete-text, exact-patch, edit-rate, and quality gates remain unchanged.",
+    "non_relaxation": "Patch duplicates, no-op patches, extra fields, excessive patch counts, malformed JSON, and any text outside the one allowed envelope remain strict failures."
   },
   "promotion_gates": {
     "mechanically_accepted_requests_minimum": 118,

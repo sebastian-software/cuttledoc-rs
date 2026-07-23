@@ -509,6 +509,12 @@ providing the other five passages as explicitly read-only context:
 - `single-target-bounded-patches` returns at most eight exact, unique,
   non-overlapping target-only old/new patches within fixed character budgets.
 
+The first committed six-target pilot for each variant returned an isolated
+Markdown `json` fence in all 12 responses. Screen revision 2 therefore accepts
+bare JSON or exactly one such fence as a transport envelope. Text outside that
+envelope and every semantic contract violation remain strict failures; this
+does not relax patch or quality gates.
+
 Each variant runs 60 target sections twice for 120 requests. Promotion to the
 180-document screen requires at least 118 mechanically valid requests, no token
 cap, byte-identical repeat pairs, no accepted edit above a 30% normalized word

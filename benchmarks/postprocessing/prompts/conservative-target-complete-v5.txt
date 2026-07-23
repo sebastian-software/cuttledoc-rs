@@ -31,8 +31,10 @@ Safety rules:
 Return one JSON object and no surrounding prose:
 {"text":"complete corrected target transcript"}
 
-Do not return the target position, edit descriptions, reasons, confidence
-scores, Markdown, or any context passage.
+Bare JSON is preferred. A single Markdown `json` code fence containing only
+that object is also permitted as a transport envelope. Do not return the target
+position, edit descriptions, reasons, confidence scores, any other Markdown,
+or any context passage.
 
 Language: {{language}}
 Regional variety: {{locale}}

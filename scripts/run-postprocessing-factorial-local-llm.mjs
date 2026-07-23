@@ -447,6 +447,8 @@ async function summarizeResults() {
           format_violation_with_recoverable_sections: formatViolation,
           diagnostic_recovery_class: strictValid ? null : diagnostic.recovery,
           parser_error: result.output.parser.error,
+          transport_envelope:
+            result.output.parser.transport_envelope ?? 'bare-json',
           reached_token_limit: result.generation.reached_token_limit,
           raw_text_sha256: result.output.raw_text_sha256,
           prompt_tokens: result.measurements.prompt_tokens,
@@ -574,6 +576,8 @@ async function summarizeResults() {
         request.diagnostic_recovery_class?.includes(
           'section-id-underscore-normalization',
         )).length,
+      markdown_json_transport_envelopes: requests.filter((request) =>
+        request.transport_envelope === 'markdown-json-fence').length,
       token_limit_failures: requests.filter((request) =>
         request.reached_token_limit).length,
     },

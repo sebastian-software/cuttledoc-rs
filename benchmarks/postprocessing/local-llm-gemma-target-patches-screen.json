@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-local-gemma-target-patches-screen-1",
+  "id": "postprocessing-factorial-local-gemma-target-patches-screen-2",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
   "plan_revision": "postprocessing-factorial-plan-6",
   "purpose": "Test exact bounded patches for one target section at a time while retaining the other five passages as explicitly read-only context.",
@@ -50,9 +50,9 @@
   ],
   "generation": {
     "runtime": "pinned mlx-lm reference over official Apple MLX",
-    "prompt_id": "conservative-target-patches-v4",
-    "prompt_path": "benchmarks/postprocessing/prompts/conservative-target-patches-v4.txt",
-    "prompt_sha256": "3721e3892a948f7d31acb638eb977af1f98ce71bd35ad159d5a24ef89cf3822a",
+    "prompt_id": "conservative-target-patches-v5",
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-target-patches-v5.txt",
+    "prompt_sha256": "5f850e017122d8f7ee1701e5fa3178a506ad128ccfc2f9441c51480c3b62dbb6",
     "seed": 0,
     "temperature": 0.0,
     "max_tokens": 1536,
@@ -60,7 +60,7 @@
     "chat_template_options": {
       "enable_thinking": false
     },
-    "output_contract": "bounded-transcript-target-patches-v4",
+    "output_contract": "bounded-transcript-target-patches-v5",
     "patch_limits": {
       "maximum_patches": 8,
       "maximum_source_characters_per_patch": 160,

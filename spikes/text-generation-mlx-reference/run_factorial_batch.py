@@ -154,13 +154,26 @@ def parse_sections(
     generation: dict,
     target_index: int | None,
 ) -> dict:
+    payload = raw_text.strip()
+    transport_envelope = "bare-json"
+    if payload.startswith("```json\n") and payload.endswith("\n```"):
+        payload = payload[len("```json\n") : -len("\n```")]
+        transport_envelope = "markdown-json-fence"
     try:
-        value = json.loads(raw_text)
+        value = json.loads(payload)
     except json.JSONDecodeError as error:
-        return {"valid": False, "error": str(error), "sections": []}
+        return {
+            "valid": False,
+            "error": str(error),
+            "sections": [],
+            "transport_envelope": transport_envelope,
+        }
     expected_ids = [section["id"] for section in input_sections]
     output_contract = generation["output_contract"]
-    if output_contract == "bounded-transcript-target-complete-v4":
+    if output_contract in {
+        "bounded-transcript-target-complete-v4",
+        "bounded-transcript-target-complete-v5",
+    }:
         if (
             target_index is None
             or not isinstance(value, dict)
@@ -180,8 +193,12 @@ def parse_sections(
                 {"id": expected_ids[target_index], "text": value["text"]}
             ],
             "patches": None,
+            "transport_envelope": transport_envelope,
         }
-    if output_contract == "bounded-transcript-target-patches-v4":
+    if output_contract in {
+        "bounded-transcript-target-patches-v4",
+        "bounded-transcript-target-patches-v5",
+    }:
         if (
             target_index is None
             or not isinstance(value, dict)
@@ -266,6 +283,7 @@ def parse_sections(
                 {"id": expected_ids[target_index], "text": "".join(pieces)}
             ],
             "patches": patches,
+            "transport_envelope": transport_envelope,
         }
     sections = value.get("sections") if isinstance(value, dict) else None
     if not isinstance(sections, list):
@@ -523,7 +541,23 @@ def main() -> None:
                     generation_result["text"].encode("utf-8")
                 ),
                 "token_ids": generation_result["token_ids"],
-                "parser": {"valid": parsed["valid"], "error": parsed["error"]},
+                "parser": {
+                    "valid": parsed["valid"],
+                    "error": parsed["error"],
+                    "transport_envelope": parsed.get(
+                        "transport_envelope",
+                        (
+                            "markdown-json-fence"
+                            if generation_result["text"].strip().startswith(
+                                "```json\n"
+                            )
+                            and generation_result["text"].strip().endswith(
+                                "\n```"
+                            )
+                            else "bare-json"
+                        ),
+                    ),
+                },
                 "sections": parsed["sections"],
                 "patches": parsed.get("patches"),
                 "mechanically_accepted": parsed["valid"] and not reached_limit,
