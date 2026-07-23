@@ -14,6 +14,7 @@ on:
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
+      - "scripts/fetch-voxtral-tts-mlx-bf16-model.sh"
       - "scripts/run-qwen3-tts-voicedesign-calibration.sh"
       - "scripts/run-tts-calibration-asr.mjs"
       - "scripts/validate-benchmark-data.mjs"
@@ -45,6 +46,7 @@ on:
       - "scripts/encode-benchmark-opus.mjs"
       - "scripts/capture-huggingface-model-metadata.mjs"
       - "scripts/fetch-tts-calibration-model.sh"
+      - "scripts/fetch-voxtral-tts-mlx-bf16-model.sh"
       - "scripts/run-qwen3-tts-voicedesign-calibration.sh"
       - "scripts/run-tts-calibration-asr.mjs"
       - "scripts/validate-benchmark-data.mjs"
@@ -98,7 +100,9 @@ jobs:
           node --check scripts/archive-qwen-tts-calibration.mjs
           node --check scripts/run-tts-calibration-asr.mjs
           python -m py_compile spikes/tts-calibration/run_qwen_voicedesign.py
+          python -m py_compile spikes/tts-calibration/run_voxtral_batch.py
           bash -n scripts/run-qwen3-tts-voicedesign-calibration.sh
+          bash -n scripts/fetch-voxtral-tts-mlx-bf16-model.sh
       - name: Validate committed Opus fixture and codec control
         run: node scripts/validate-opus-codec-control.mjs --self-test
       - name: Verify rights-gated local source import

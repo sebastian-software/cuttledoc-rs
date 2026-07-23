@@ -39,6 +39,14 @@ const defaultQwenManifest = join(
 );
 const defaultVoxtralModelDirectory =
   '/tmp/cuttledoc-voxtral-tts-4b-mlx-bf16';
+const defaultVoxtralPython = join(
+  repoRoot,
+  'spikes/voxtral-tts-mlx-reference/.venv/bin/python',
+);
+const defaultVoxtralManifest = join(
+  repoRoot,
+  'spikes/tts-calibration/voxtral-tts-4b-mlx-bf16.json',
+);
 const defaultWhisperModuleDirectory = '/Users/sebastian/Workspace/whisper-coreml';
 const defaultWhisperModelDirectory =
   '/Users/sebastian/.cache/whisper-coreml/models';
@@ -69,7 +77,13 @@ const defaultQwenRecoveryOutput = join(
   'benchmarks/postprocessing/qualifications/' +
     'qwen3-tts-clear-voice-recovery-1.json',
 );
+const defaultVoxtralQualificationOutput = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications/' +
+    'voxtral-tts-4b-bf16.technical-a-1.json',
+);
 const qwenChunkingRevision = 'sentence-aware-adaptive-v2';
+const voxtralChunkingRevision = 'sentence-aware-adaptive-v1';
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -100,6 +114,11 @@ const { positionals, values } = parseArgs({
     'voxtral-model-dir': {
       type: 'string',
       default: defaultVoxtralModelDirectory,
+    },
+    'voxtral-python': { type: 'string', default: defaultVoxtralPython },
+    'voxtral-manifest': {
+      type: 'string',
+      default: defaultVoxtralManifest,
     },
     'apple-build-dir': {
       type: 'string',
@@ -158,6 +177,7 @@ if (![
   'resolve-voices',
   'run-apple-tts',
   'run-qwen-tts',
+  'run-voxtral-tts',
   'run-qwen-recovery',
   'run-stt',
   'summarize-qualification',
@@ -167,7 +187,8 @@ if (![
 ].includes(command)) {
   throw new Error(
     'usage: node scripts/run-postprocessing-factorial-local.mjs ' +
-      '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-qwen-recovery|' +
+      '<init|resolve-voices|run-apple-tts|run-qwen-tts|run-voxtral-tts|' +
+      'run-qwen-recovery|' +
       'run-stt|' +
       'summarize-qualification|summarize-slice|status|self-test> [options]',
   );
@@ -183,6 +204,8 @@ const paths = {
   qwenPython: resolve(values['qwen-python']),
   qwenManifest: resolve(values['qwen-manifest']),
   voxtralModel: resolve(values['voxtral-model-dir']),
+  voxtralPython: resolve(values['voxtral-python']),
+  voxtralManifest: resolve(values['voxtral-manifest']),
   appleBuild: resolve(values['apple-build-dir']),
   whisperModule: resolve(values['whisper-module-dir']),
   whisperModel: resolve(values['whisper-model-dir']),
@@ -192,10 +215,13 @@ const paths = {
   qwenAsrBinary: resolve(values['qwen-asr-binary']),
   qwenAsrModel: resolve(values['qwen-asr-model-dir']),
   qualificationOutput: resolve(
-    values.engine === 'qwen' &&
-      values['qualification-output'] === defaultQualificationOutput
-      ? defaultQwenQualificationOutput
-      : values['qualification-output'],
+    values['qualification-output'] !== defaultQualificationOutput
+      ? values['qualification-output']
+      : values.engine === 'qwen'
+        ? defaultQwenQualificationOutput
+        : values.engine === 'voxtral'
+          ? defaultVoxtralQualificationOutput
+          : defaultQualificationOutput,
   ),
   qwenRecoveryPlan: resolve(values['qwen-recovery-plan']),
   qwenRecoveryOutput: resolve(values['qwen-recovery-output']),
@@ -212,6 +238,8 @@ paths.qwenWorker = join(paths.output, 'qwen-worker');
 paths.qwenJobs = join(paths.output, 'qwen-jobs.json');
 paths.qwenRecoveryWorker = join(paths.output, 'qwen-recovery-worker');
 paths.qwenRecoveryJobs = join(paths.output, 'qwen-recovery-jobs.json');
+paths.voxtralWorker = join(paths.output, 'voxtral-worker');
+paths.voxtralJobs = join(paths.output, 'voxtral-jobs.json');
 
 if (command === 'self-test') {
   selfTest();
@@ -238,6 +266,11 @@ if (command === 'self-test') {
     } else if (command === 'run-qwen-tts') {
       const state = await initializeState();
       await runQwenTts(state);
+      await writeState(state);
+      await printStatus(state);
+    } else if (command === 'run-voxtral-tts') {
+      const state = await initializeState();
+      await runVoxtralTts(state);
       await writeState(state);
       await printStatus(state);
     } else if (command === 'run-qwen-recovery') {
@@ -377,6 +410,8 @@ async function capabilities() {
     qwenPython,
     qwenManifest,
     voxtral,
+    voxtralPython,
+    voxtralManifest,
     ffmpeg,
     xcrun,
     rustc,
@@ -392,6 +427,8 @@ async function capabilities() {
     pathCapability(paths.qwenPython),
     pathCapability(paths.qwenManifest),
     pathCapability(paths.voxtralModel),
+    pathCapability(paths.voxtralPython),
+    pathCapability(paths.voxtralManifest),
     commandCapability('ffmpeg'),
     commandCapability('xcrun'),
     commandCapability('rustc'),
@@ -416,7 +453,15 @@ async function capabilities() {
       python: qwenPython,
       manifest: qwenManifest,
     },
-    voxtral_tts_bf16: voxtral,
+    voxtral_tts_bf16: {
+      available:
+        voxtral.available &&
+        voxtralPython.available &&
+        voxtralManifest.available,
+      model: voxtral,
+      python: voxtralPython,
+      manifest: voxtralManifest,
+    },
     stt: {
       whisper: {
         available: whisperModule.available && whisperModel.available,
@@ -576,9 +621,7 @@ async function runAppleTts(state) {
     unit.tts_engine === 'apple-avspeechsynthesizer' &&
     (!values.locale || unit.locale === values.locale));
   if (values['qualification-only']) {
-    units = units.filter((unit) =>
-      unit.passage_slot_id.endsWith('technical-a') &&
-      unit.generation_repeat === 1);
+    units = units.filter(isQualificationAudioUnit);
   }
   if (limit !== null) units = units.slice(0, limit);
   let completed = 0;
@@ -730,9 +773,7 @@ async function runQwenTts(state) {
     unit.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio' &&
     (!values.locale || unit.locale === values.locale));
   if (values['qualification-only']) {
-    units = units.filter((unit) =>
-      unit.passage_slot_id.endsWith('technical-a') &&
-      unit.generation_repeat === 1);
+    units = units.filter(isQualificationAudioUnit);
   }
   if (limit !== null) units = units.slice(0, limit);
 
@@ -895,6 +936,191 @@ async function materializeQwenAudio({ job, unit, voice, selected, state }) {
   }
 }
 
+async function runVoxtralTts(state) {
+  if (!state.capabilities.voxtral_tts_bf16.available) {
+    throw new Error('pinned Voxtral TTS BF16 model or runtime is unavailable');
+  }
+  const [plan, ledger, selection] = await Promise.all([
+    readJson(paths.plan),
+    readJson(paths.ledger),
+    readJson(paths.selection),
+  ]);
+  const selectedPassages = selectedPassageMap(selection);
+  const voiceSlots = new Map(plan.voice_slots.map((slot) => [slot.id, slot]));
+  const limit = parseLimit(values.limit);
+  let units = ledger.audio_units.filter((unit) =>
+    unit.tts_engine === 'voxtral-tts-4b-bf16-mlx-audio' &&
+    (!values.locale || unit.locale === values.locale));
+  if (values['qualification-only']) {
+    units = units.filter(isQualificationAudioUnit);
+  }
+  if (limit !== null) units = units.slice(0, limit);
+
+  const jobs = [];
+  let skipped = 0;
+  for (const unit of units) {
+    const outputDirectory = join(paths.audio, unit.id);
+    if (!values.force && await validAudioArtifact(outputDirectory, unit)) {
+      skipped += 1;
+      continue;
+    }
+    const voice = voiceSlots.get(unit.voice_slot_id);
+    const selected = selectedPassages.get(unit.passage_id);
+    if (!voice?.selector || !Number.isInteger(unit.generation_seed)) {
+      throw new Error(`${unit.id}: Voxtral voice contract is incomplete`);
+    }
+    if (!selected) throw new Error(`${unit.id}: selected passage is missing`);
+    await rm(outputDirectory, { recursive: true, force: true });
+    if (values.force) {
+      await rm(join(paths.voxtralWorker, unit.id), {
+        recursive: true,
+        force: true,
+      });
+    }
+    jobs.push({
+      id: unit.id,
+      locale: unit.locale,
+      voice: voice.selector,
+      seed: unit.generation_seed,
+      text_path: join(paths.text, `${unit.passage_id}.txt`),
+      text_sha256: selected.passage.spoken_sha256,
+    });
+  }
+  if (jobs.length === 0) {
+    process.stdout.write(
+      `Voxtral TTS completed 0, resumed ${skipped}, ` +
+      `selected ${units.length}\n`,
+    );
+    return;
+  }
+
+  await atomicJson(paths.voxtralJobs, { schema_version: '1.0.0', jobs });
+  commandOutput(paths.voxtralPython, [
+    join(repoRoot, 'spikes/tts-calibration/run_voxtral_batch.py'),
+    '--manifest', paths.voxtralManifest,
+    '--model-dir', paths.voxtralModel,
+    '--jobs', paths.voxtralJobs,
+    '--output-dir', paths.voxtralWorker,
+    '--source-revision', gitRevision(),
+  ], { maxBuffer: 64 * 1024 * 1024 });
+
+  let completed = 0;
+  for (const job of jobs) {
+    const unit = units.find((candidate) => candidate.id === job.id);
+    const voice = voiceSlots.get(unit.voice_slot_id);
+    await materializeVoxtralAudio({
+      job,
+      unit,
+      voice,
+      selected: selectedPassages.get(unit.passage_id),
+      state,
+    });
+    completed += 1;
+    process.stderr.write(
+      `voxtral tts materialized: ${unit.id} ` +
+      `(${completed + skipped}/${units.length})\n`,
+    );
+    state.progress = await progress(ledger);
+    await writeState(state);
+  }
+  process.stdout.write(
+    `Voxtral TTS completed ${completed}, resumed ${skipped}, ` +
+    `selected ${units.length}\n`,
+  );
+}
+
+async function materializeVoxtralAudio({
+  job,
+  unit,
+  voice,
+  selected,
+  state,
+}) {
+  const workerDirectory = join(paths.voxtralWorker, unit.id);
+  const workerResult = await readJson(join(workerDirectory, 'result.json'));
+  const raw = await readFile(join(workerDirectory, workerResult.audio.path));
+  if (
+    workerResult.job_id !== unit.id ||
+    workerResult.source_revision !== gitRevision() ||
+    workerResult.input.text_sha256 !== job.text_sha256 ||
+    workerResult.generation.voice !== voice.selector ||
+    workerResult.generation.seed !== unit.generation_seed ||
+    workerResult.generation.chunking?.revision !== voxtralChunkingRevision ||
+    workerResult.termination.completed_all_chunks !== true ||
+    workerResult.termination.reached_max_tokens !== false ||
+    raw.length !== workerResult.audio.byte_count ||
+    sha256(raw) !== workerResult.audio.sha256
+  ) {
+    throw new Error(`${unit.id}: invalid Voxtral worker checkpoint`);
+  }
+  const temporary = await mkdtemp(join(paths.output, '.audio-tmp-'));
+  const outputDirectory = join(paths.audio, unit.id);
+  try {
+    const rawPath = join(temporary, 'audio.f32le');
+    const normalizedPath = join(temporary, 'normalized-16k.f32le');
+    await writeFile(rawPath, raw);
+    commandOutput('ffmpeg', [
+      '-y', '-v', 'error',
+      '-f', 'f32le',
+      '-ar', String(workerResult.audio.sample_rate_hz),
+      '-ac', '1', '-i', rawPath,
+      '-ar', '16000', '-ac', '1', '-f', 'f32le', '-acodec', 'pcm_f32le',
+      normalizedPath,
+    ]);
+    const normalized = await readFile(normalizedPath);
+    const manifest = {
+      schema_version: '1.0.0',
+      id: unit.id,
+      plan_id: state.plan_id,
+      plan_revision: state.plan_revision,
+      source_selection_revision: state.source_selection_revision,
+      source_revision: gitRevision(),
+      captured_at: workerResult.captured_at,
+      unit,
+      voice: {
+        voice_slot_id: unit.voice_slot_id,
+        mode: 'preset',
+        identifier: voice.selector,
+        requested_locale: unit.locale,
+        resolved_locale: voice.voice_locale,
+        generation_seed: unit.generation_seed,
+      },
+      input: {
+        path: relative(repoRoot, job.text_path),
+        passage_id: unit.passage_id,
+        source_id: selected.source.id,
+        character_count: selected.passage.character_count,
+        text_sha256: selected.passage.spoken_sha256,
+        license: selected.source.license,
+      },
+      audio: workerResult.audio,
+      normalized_audio: {
+        path: 'normalized-16k.f32le',
+        sample_format: 'f32le',
+        sample_rate_hz: 16000,
+        channel_count: 1,
+        sample_count: normalized.length / 4,
+        byte_count: normalized.length,
+        duration_ms: normalized.length / 4 / 16,
+        sha256: sha256(normalized),
+      },
+      runtime_summary: {
+        adapter: 'pinned-mlx-audio-python-batch-reference',
+        generation: workerResult.generation,
+        runtime: workerResult.runtime,
+        termination: workerResult.termination,
+      },
+      disposition: 'generated-pending-stt-qualification',
+    };
+    await writeFile(join(temporary, 'manifest.json'), json(manifest));
+    await mkdir(dirname(outputDirectory), { recursive: true });
+    await rename(temporary, outputDirectory);
+  } catch (error) {
+    await rm(temporary, { recursive: true, force: true });
+    throw error;
+  }
+}
+
 function qwenLanguage(locale) {
   const languages = {
     'de-DE': 'German',
@@ -905,6 +1131,18 @@ function qwenLanguage(locale) {
   };
   if (!languages[locale]) throw new Error(`${locale}: unsupported Qwen locale`);
   return languages[locale];
+}
+
+function isQualificationAudioUnit(unit) {
+  if (
+    unit.kind !== 'primary' ||
+    !unit.passage_slot_id.endsWith('technical-a') ||
+    unit.generation_repeat !== 1
+  ) {
+    return false;
+  }
+  return unit.tts_engine !== 'voxtral-tts-4b-bf16-mlx-audio' ||
+    unit.generation_seed === 0;
 }
 
 async function runQwenRecovery(state) {
@@ -1109,10 +1347,9 @@ async function runStt(state) {
     if (!requestedModels.has(unit.stt_model)) continue;
     const audioUnit = audioUnits.get(unit.audio_unit_id);
     if (!audioUnit || (values.locale && unit.locale !== values.locale)) continue;
-    if (values['qualification-only'] && !(
-      audioUnit.passage_slot_id.endsWith('technical-a') &&
-      audioUnit.generation_repeat === 1
-    )) continue;
+    if (values['qualification-only'] && !isQualificationAudioUnit(audioUnit)) {
+      continue;
+    }
     const audioDirectory = join(paths.audio, unit.audio_unit_id);
     if (!await validAudioArtifact(audioDirectory, audioUnit)) continue;
     units.push(unit);
@@ -1179,14 +1416,17 @@ async function summarizeQualification(state) {
       id: 'qwen3-tts-1.7b-voicedesign-mlx-audio',
       report_id: 'qwen3-tts-1.7b-voicedesign-technical-a-qualification-1',
     },
+    voxtral: {
+      id: 'voxtral-tts-4b-bf16-mlx-audio',
+      report_id: 'voxtral-tts-4b-bf16-technical-a-qualification-1',
+    },
   };
   const engine = engines[values.engine];
-  if (!engine) throw new Error('--engine must be apple or qwen');
+  if (!engine) throw new Error('--engine must be apple, qwen, or voxtral');
   const ledger = await readJson(paths.ledger);
   const qualificationAudioUnits = ledger.audio_units.filter((unit) =>
     unit.tts_engine === engine.id &&
-    unit.passage_slot_id.endsWith('technical-a') &&
-    unit.generation_repeat === 1);
+    isQualificationAudioUnit(unit));
   if (qualificationAudioUnits.length !== 10) {
     throw new Error(`expected ten ${values.engine} qualification audio units`);
   }
@@ -1208,7 +1448,7 @@ async function summarizeQualification(state) {
   const expectedSttUnits = ledger.stt_units.filter((unit) =>
     audioById.has(unit.audio_unit_id));
   if (expectedSttUnits.length !== 30) {
-    throw new Error('expected thirty Apple qualification STT units');
+    throw new Error('expected thirty qualification STT units');
   }
   const sttByAudio = new Map();
   for (const unit of expectedSttUnits) {
@@ -1353,9 +1593,12 @@ async function summarizeLocalSlice(state) {
   const engineIds = {
     apple: 'apple-avspeechsynthesizer',
     qwen: 'qwen3-tts-1.7b-voicedesign-mlx-audio',
+    voxtral: 'voxtral-tts-4b-bf16-mlx-audio',
   };
   const engineId = engineIds[values.engine];
-  if (!engineId) throw new Error('--engine must be apple or qwen');
+  if (!engineId) {
+    throw new Error('--engine must be apple, qwen, or voxtral');
+  }
   const ledger = await readJson(paths.ledger);
   const audioUnits = ledger.audio_units.filter((unit) =>
     unit.kind === 'primary' && unit.tts_engine === engineId);
@@ -1395,25 +1638,50 @@ async function summarizeLocalSlice(state) {
     const audio = audioManifests.get(unit.audio_unit_id);
     capturedAt.push(manifest.captured_at);
     sourceRevisions.add(manifest.source_revision);
-    observations.push({
-      stt_unit_id: unit.id,
-      audio_unit_id: unit.audio_unit_id,
-      locale: unit.locale,
-      content_type: unit.content_type,
-      passage_slot_id: unit.passage_slot_id,
-      passage_id: audio.unit.passage_id,
-      voice_slot_id: audio.unit.voice_slot_id,
-      realization_id: audio.unit.realization_id,
-      generation_repeat: audio.unit.generation_repeat,
-      stt_model: unit.stt_model,
-      normalized_audio_sha256: manifest.source_audio.normalized_sha256,
-      transcript_sha256: manifest.transcript.sha256,
-      reference_word_count: manifest.reference.word_count,
-      transcript_word_count: manifest.transcript.word_count,
-      wer: manifest.quality.wer,
-      cer: manifest.quality.cer,
-      inference_ms: manifest.runtime.inference_ms,
-    });
+    observations.push(sliceObservation(unit, manifest, audio));
+  }
+
+  let stabilityAudioUnits = audioUnits;
+  const stabilityAudioManifests = new Map(audioManifests);
+  const stabilityObservations = [...observations];
+  if (engineId === 'voxtral-tts-4b-bf16-mlx-audio') {
+    const controlAudioUnits = ledger.audio_units.filter((unit) =>
+      unit.tts_engine === engineId &&
+      unit.kind === 'same-seed-reproducibility-control');
+    if (controlAudioUnits.length !== 10) {
+      throw new Error('voxtral: expected ten same-seed audio controls');
+    }
+    for (const unit of controlAudioUnits) {
+      const directory = join(paths.audio, unit.id);
+      if (!await validAudioArtifact(directory, unit)) {
+        throw new Error(`${unit.id}: missing or invalid control audio`);
+      }
+      const manifest = await readJson(join(directory, 'manifest.json'));
+      stabilityAudioManifests.set(unit.id, manifest);
+      capturedAt.push(manifest.captured_at);
+      sourceRevisions.add(manifest.source_revision);
+    }
+    const controlIds = new Set(controlAudioUnits.map((unit) => unit.id));
+    const controlSttUnits = ledger.stt_units.filter((unit) =>
+      controlIds.has(unit.audio_unit_id));
+    if (controlSttUnits.length !== 30) {
+      throw new Error('voxtral: expected thirty same-seed STT controls');
+    }
+    for (const unit of controlSttUnits) {
+      const directory = join(paths.stt, unit.id);
+      if (!await validSttArtifact(directory, unit)) {
+        throw new Error(`${unit.id}: missing or invalid control transcript`);
+      }
+      const manifest = await readJson(join(directory, 'manifest.json'));
+      const audio = stabilityAudioManifests.get(unit.audio_unit_id);
+      stabilityObservations.push(sliceObservation(unit, manifest, audio));
+      capturedAt.push(manifest.captured_at);
+      sourceRevisions.add(manifest.source_revision);
+    }
+    const seedZeroPrimaryUnits = audioUnits.filter((unit) =>
+      unit.passage_slot_id.endsWith('technical-a') &&
+      unit.generation_seed === 0);
+    stabilityAudioUnits = [...seedZeroPrimaryUnits, ...controlAudioUnits];
   }
   if (sourceRevisions.size !== 1) {
     throw new Error('slice artifacts span multiple source revisions');
@@ -1422,7 +1690,7 @@ async function summarizeLocalSlice(state) {
     left.stt_unit_id.localeCompare(right.stt_unit_id));
 
   const repeatGroups = new Map();
-  for (const unit of audioUnits) {
+  for (const unit of stabilityAudioUnits) {
     const key = [unit.passage_slot_id, unit.voice_slot_id].join('|');
     if (!repeatGroups.has(key)) repeatGroups.set(key, []);
     repeatGroups.get(key).push(unit);
@@ -1436,7 +1704,7 @@ async function summarizeLocalSlice(state) {
       left.generation_repeat - right.generation_repeat);
     if (units.length !== 2) throw new Error('slice repeat pair is incomplete');
     const [firstAudio, secondAudio] = units.map((unit) =>
-      audioManifests.get(unit.id));
+      stabilityAudioManifests.get(unit.id));
     if (
       firstAudio.normalized_audio.sha256 ===
       secondAudio.normalized_audio.sha256
@@ -1449,10 +1717,10 @@ async function summarizeLocalSlice(state) {
       ),
     );
     for (const sttModel of sttModels) {
-      const first = observations.find((observation) =>
+      const first = stabilityObservations.find((observation) =>
         observation.audio_unit_id === units[0].id &&
         observation.stt_model === sttModel);
-      const second = observations.find((observation) =>
+      const second = stabilityObservations.find((observation) =>
         observation.audio_unit_id === units[1].id &&
         observation.stt_model === sttModel);
       if (!first || !second) throw new Error('slice STT repeat pair is incomplete');
@@ -1549,8 +1817,30 @@ async function summarizeLocalSlice(state) {
   );
 }
 
+function sliceObservation(unit, manifest, audio) {
+  return {
+    stt_unit_id: unit.id,
+    audio_unit_id: unit.audio_unit_id,
+    locale: unit.locale,
+    content_type: unit.content_type,
+    passage_slot_id: unit.passage_slot_id,
+    passage_id: audio.unit.passage_id,
+    voice_slot_id: audio.unit.voice_slot_id,
+    realization_id: audio.unit.realization_id,
+    generation_repeat: audio.unit.generation_repeat,
+    stt_model: unit.stt_model,
+    normalized_audio_sha256: manifest.source_audio.normalized_sha256,
+    transcript_sha256: manifest.transcript.sha256,
+    reference_word_count: manifest.reference.word_count,
+    transcript_word_count: manifest.transcript.word_count,
+    wer: manifest.quality.wer,
+    cer: manifest.quality.cer,
+    inference_ms: manifest.runtime.inference_ms,
+  };
+}
+
 function localGenerationDiagnostics(engineId, audioRecords) {
-  if (engineId !== 'qwen3-tts-1.7b-voicedesign-mlx-audio') {
+  if (engineId === 'apple-avspeechsynthesizer') {
     return {
       mode: 'engine-native-single-pass',
       policy_revision: 'avspeechsynthesizer-native',
@@ -1566,7 +1856,7 @@ function localGenerationDiagnostics(engineId, audioRecords) {
   const pauses = new Set(audioRecords.map((manifest) =>
     manifest.runtime_summary.generation.chunking.inter_chunk_silence_ms));
   if (policies.size !== 1 || tokenLimits.size !== 1 || pauses.size !== 1) {
-    throw new Error('Qwen slice spans multiple chunking policies');
+    throw new Error('model TTS slice spans multiple chunking policies');
   }
   const terminations = audioRecords.map((manifest) =>
     manifest.runtime_summary.termination);
@@ -1970,11 +2260,15 @@ async function validAudioArtifact(directory, unit) {
       manifest.id !== unit.id ||
       manifest.plan_revision !== (await readJson(paths.plan)).revision
     ) return false;
+    const expectedChunkingRevision = {
+      'qwen3-tts-1.7b-voicedesign-mlx-audio': qwenChunkingRevision,
+      'voxtral-tts-4b-bf16-mlx-audio': voxtralChunkingRevision,
+    }[unit.tts_engine];
     if (
-      unit.tts_engine === 'qwen3-tts-1.7b-voicedesign-mlx-audio' &&
+      expectedChunkingRevision &&
       (
         manifest.runtime_summary?.generation?.chunking?.revision !==
-          qwenChunkingRevision ||
+          expectedChunkingRevision ||
         manifest.runtime_summary?.termination?.completed_all_chunks !== true ||
         manifest.runtime_summary?.termination?.reached_max_tokens !== false
       )
@@ -2315,6 +2609,27 @@ function selfTest() {
     qwenLanguage('pt-BR') !== 'Portuguese'
   ) {
     throw new Error('self-test: STT selection or error rate failed');
+  }
+  const voxtralQualification = {
+    kind: 'primary',
+    passage_slot_id: 'de-technical-a',
+    generation_repeat: 1,
+    generation_seed: 0,
+    tts_engine: 'voxtral-tts-4b-bf16-mlx-audio',
+  };
+  if (
+    !isQualificationAudioUnit(voxtralQualification) ||
+    isQualificationAudioUnit({
+      ...voxtralQualification,
+      generation_seed: 1,
+    }) ||
+    isQualificationAudioUnit({
+      ...voxtralQualification,
+      kind: 'same-seed-reproducibility-control',
+      generation_repeat: 2,
+    })
+  ) {
+    throw new Error('self-test: Voxtral qualification selection failed');
   }
   process.stdout.write('factorial local runner: self-test passed\n');
 }

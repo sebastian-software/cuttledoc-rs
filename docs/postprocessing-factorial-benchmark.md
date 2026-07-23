@@ -264,6 +264,28 @@ installed locales are pinned in the plan; cross-region voices remain visible
 as such instead of being relabeled as `es-419`, `fr-FR`, or `pt-BR`. A host
 must expose those exact identifiers before the Apple slice can run.
 
+The Voxtral path verifies the complete 8.04 GB BF16 snapshot against the
+repository manifest before one model load serves a resumable batch. Each
+passage uses deterministic sentence-aware chunks, resets its generation seed
+per chunk, and fails closed if adaptive splitting cannot avoid the 1,200-token
+ceiling. Seed 0 on the first technical passage forms the ten-voice
+qualification slice; seed 1 remains a distinct primary realization rather
+than being mistaken for a repeat.
+
+```sh
+bash scripts/fetch-voxtral-tts-mlx-bf16-model.sh \
+  /tmp/cuttledoc-voxtral-tts-4b-mlx-bf16
+node scripts/run-postprocessing-factorial-local.mjs run-voxtral-tts \
+  --qualification-only \
+  --output-dir artifacts/postprocessing-factorial-local-plan-6
+node scripts/run-postprocessing-factorial-local.mjs run-stt \
+  --qualification-only --backend all \
+  --output-dir artifacts/postprocessing-factorial-local-plan-6
+node scripts/run-postprocessing-factorial-local.mjs summarize-qualification \
+  --engine voxtral \
+  --output-dir artifacts/postprocessing-factorial-local-plan-6
+```
+
 After all 120 audio and 360 STT artifacts for one engine are present, create a
 compact repository report while leaving raw PCM and transcripts ignored:
 
