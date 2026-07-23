@@ -131,10 +131,13 @@ The runner verifies the normalized digest before every staged run and writes no
 WER or semantic score while human gold is pending. It records coverage
 independently from backend completion: timestamped backends must reach the end
 of the passage, Qwen processes digest-pinned 30-second chunks without hiding
-its boundary limitation, and Voxtral must finish before its 8,192-token safety
-budget. A token-capped result is retained as a diagnostic but cannot make the
-record `complete`. The runner refuses test sources by default and refuses to
-write explicitly opened test drafts into committed benchmark evidence.
+its boundary limitation, and Voxtral uses digest-pinned 60-second chunks with a
+fresh process and a 2,048-token safety budget per chunk. The latter bounds this
+draft-generation pass after a whole-passage run showed unacceptable working-set
+growth; the stateful product stream retains a separate long-form memory gate. A
+token-capped result is retained as a diagnostic but cannot make the record
+`complete`. The runner refuses test sources by default and refuses to write
+explicitly opened test drafts into committed benchmark evidence.
 
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)

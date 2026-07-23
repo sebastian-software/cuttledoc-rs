@@ -89,7 +89,8 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: '/private/tmp/cuttledoc-voxtral-realtime-4b-mlx-4bit',
     },
-    'voxtral-max-tokens': { type: 'string', default: '8192' },
+    'voxtral-chunk-ms': { type: 'string', default: '60000' },
+    'voxtral-max-tokens': { type: 'string', default: '2048' },
   },
 });
 
@@ -657,25 +658,73 @@ async function runQwen({ sourceGroup, audioPath, durationMs }) {
 }
 
 async function runVoxtral({ audioPath, durationMs }) {
+  const chunkMs = Number.parseInt(values['voxtral-chunk-ms'], 10);
+  if (!Number.isInteger(chunkMs) || chunkMs < 10_000 || chunkMs > 120_000) {
+    throw new Error('--voxtral-chunk-ms must be 10000..120000');
+  }
   const maxTokens = Number.parseInt(values['voxtral-max-tokens'], 10);
-  if (!Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > 8192) {
-    throw new Error('--voxtral-max-tokens must be 1..8192');
+  if (!Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > 4096) {
+    throw new Error('--voxtral-max-tokens must be 1..4096');
   }
   const manifest = JSON.parse(await readFile(
     join(repoRoot, 'spikes/voxtral-realtime-mlx-direct/model-manifest.json'),
   ));
-  const timed = timedCommand(resolve(values['voxtral-binary']), [
-    'transcribe',
-    resolve(values['voxtral-model-dir']),
-    audioPath,
-    '2400',
-    String(maxTokens),
-    'gpu',
-  ]);
-  const native = JSON.parse(timed.stdout);
-  if (!(native.generation?.text?.trim().length > 0)) {
-    throw new Error('Voxtral Realtime returned no text');
+  const audioBytes = await readFile(audioPath);
+  const bytesPerMillisecond = 16_000 * 4 / 1_000;
+  const chunkCount = Math.ceil(durationMs / chunkMs);
+  const temporaryDirectory = await mkdtemp(
+    join(tmpdir(), 'cuttledoc-target-voxtral-'),
+  );
+  const chunks = [];
+  try {
+    for (let index = 0; index < chunkCount; index += 1) {
+      const startMs = index * chunkMs;
+      const endMs = Math.min(startMs + chunkMs, durationMs);
+      const startByte = startMs * bytesPerMillisecond;
+      const endByte = endMs * bytesPerMillisecond;
+      const chunkBytes = audioBytes.subarray(startByte, endByte);
+      const chunkPath = join(
+        temporaryDirectory,
+        `chunk-${String(index).padStart(3, '0')}.f32le`,
+      );
+      await writeFile(chunkPath, chunkBytes);
+      process.stderr.write(
+        `target-domain ASR: Voxtral chunk ${index + 1}/${chunkCount}\n`,
+      );
+      const timed = timedCommand(resolve(values['voxtral-binary']), [
+        'transcribe',
+        resolve(values['voxtral-model-dir']),
+        chunkPath,
+        '2400',
+        String(maxTokens),
+        'gpu',
+      ]);
+      const native = JSON.parse(timed.stdout);
+      if (!(native.generation?.text?.trim().length > 0)) {
+        throw new Error(`Voxtral Realtime returned no text for chunk ${index}`);
+      }
+      chunks.push({
+        index,
+        start_ms: startMs,
+        end_ms: endMs,
+        audio_sha256: digest(chunkBytes),
+        transcript_sha256: digest(Buffer.from(native.generation.text)),
+        text: native.generation.text,
+        token_count: native.generation.token_count,
+        finish_reason: native.generation.finish_reason,
+        backend_ms: native.elapsed_ms,
+        wall_ms: timed.wallMs,
+        mlx_peak_memory_bytes: native.peak_memory_bytes,
+      });
+    }
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
   }
+  const truncatedChunks = chunks
+    .filter((chunk) => chunk.finish_reason === 'max_tokens')
+    .map((chunk) => chunk.index);
+  const text = chunks.map((chunk) => chunk.text.trim()).join('\n');
+  const backendMs = sum(chunks.map((chunk) => chunk.backend_ms));
   return resultRecord({
     id: 'voxtral-realtime-4b-mlx-direct-2400ms',
     capturedAt: new Date().toISOString(),
@@ -686,42 +735,62 @@ async function runVoxtral({ audioPath, durationMs }) {
       `${manifest.official_runtime.version}@` +
       `${manifest.official_runtime.revision}`,
     boundary: manifest.official_runtime.boundary,
-    text: native.generation.text,
-    segments: [],
+    text,
+    segments: chunks.map((chunk) => ({
+      start_ms: chunk.start_ms,
+      end_ms: chunk.end_ms,
+      text: chunk.text,
+      confidence: null,
+    })),
     coverage: {
-      status:
-        native.generation.finish_reason === 'max_tokens'
-          ? 'incomplete'
-          : 'complete',
-      method: 'offline-streaming-audio-end',
+      status: truncatedChunks.length === 0 ? 'complete' : 'incomplete',
+      method: 'deterministic-fixed-nonoverlap-chunks',
       expected_duration_ms: durationMs,
       processed_duration_ms:
-        native.generation.finish_reason === 'max_tokens' ? null : durationMs,
+        sum(chunks.map((chunk) => chunk.end_ms - chunk.start_ms)),
       tolerance_ms: 0,
-      incomplete_reason:
-        native.generation.finish_reason === 'max_tokens'
-          ? `generation stopped at the ${maxTokens}-token safety limit`
-          : null,
+      incomplete_reason: truncatedChunks.length === 0
+        ? null
+        : `generation limit reached in chunks: ${truncatedChunks.join(', ')}`,
     },
     timing: {
-      wall_ms: timed.wallMs,
-      backend_ms: native.elapsed_ms,
-      real_time_factor: native.elapsed_ms / durationMs,
+      wall_ms: sum(chunks.map((chunk) => chunk.wall_ms)),
+      backend_ms: backendMs,
+      real_time_factor: backendMs / durationMs,
     },
     resources: {
-      mlx_peak_memory_bytes: native.peak_memory_bytes,
+      mlx_peak_memory_bytes: Math.max(
+        ...chunks.map((chunk) => chunk.mlx_peak_memory_bytes),
+      ),
+      process_isolation: 'fresh-process-per-chunk',
     },
     streaming: {
-      update_count: 1,
-      final_update_count: 1,
+      update_count: chunks.length,
+      final_update_count: chunks.length,
       volatile_update_count: 0,
       revoke_count: 0,
     },
     generation: {
-      token_count: native.generation.token_count,
-      finish_reason: native.generation.finish_reason,
-      transcription_delay_ms: native.transcription_delay_ms,
-      max_tokens: maxTokens,
+      method: 'fixed-nonoverlap-v1',
+      chunk_ms: chunkMs,
+      chunk_count: chunks.length,
+      overlap_ms: 0,
+      merge: 'concatenate-in-source-order',
+      token_count: sum(chunks.map((chunk) => chunk.token_count)),
+      finish_reason:
+        truncatedChunks.length === 0 ? 'all_chunks_completed' : 'chunk_limit',
+      truncated_chunks: truncatedChunks,
+      transcription_delay_ms: 2_400,
+      max_tokens_per_chunk: maxTokens,
+      limitation:
+        'The draft runner bounds memory by restarting the offline adapter for ' +
+        'each chunk. It does not prove long-form memory behavior of the ' +
+        'stateful product streaming session, and boundary words require review.',
+      chunks: chunks.map(({
+        text: _text,
+        mlx_peak_memory_bytes: _peakMemory,
+        ...chunk
+      }) => chunk),
     },
   });
 }

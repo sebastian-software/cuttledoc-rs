@@ -58,10 +58,14 @@ attribution, and output name are pinned in
    timestamp. The direct Qwen adapter uses deterministic 30-second,
    non-overlapping chunks because its repository boundary intentionally limits
    one generation to 256 tokens. The record exposes the boundary-split
-   limitation and every chunk digest. Direct Voxtral receives an 8,192-token
-   safety budget and must reach `audio_end` or EOS; hitting `max_tokens` leaves
-   that draft incomplete. A record is `complete` only when all five backends
-   satisfy their coverage condition.
+   limitation and every chunk digest. Direct Voxtral uses digest-pinned
+   60-second chunks, a fresh process per chunk, and a 2,048-token per-chunk
+   safety budget; hitting `max_tokens` leaves that draft incomplete. This
+   bounds draft-generation memory after an aborted whole-passage diagnostic
+   reached approximately 50 GB of observed process/unified-memory working set.
+   It does not replace the separate long-form memory gate for the stateful
+   product streaming session. A record is `complete` only when all five
+   backends satisfy their coverage condition.
 
 4. Prepare one JSON transcript per passage using
    [`target-domain-transcript.schema.json`](../benchmarks/schema/target-domain-transcript.schema.json).
