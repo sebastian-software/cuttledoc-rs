@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "revision": "target-domain-corpus-de-podcast-1",
-  "evidence_date": "2026-07-21",
-  "plan_revision": "target-domain-held-out-2",
+  "revision": "target-domain-corpus-de-podcast-2",
+  "evidence_date": "2026-07-23",
+  "plan_revision": "target-domain-held-out-3",
   "purpose": "held-out",
   "normalization": {
     "sample_rate_hz": 16000,

@@ -203,15 +203,16 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
     errors.push('purpose must be held-out');
   }
   const decisionScope = plan.decision_scope;
-  if (decisionScope?.role !== 'optional-real-world-control' ||
+  if (decisionScope?.role !== 'transcript-enhancement-selection-control' ||
       decisionScope?.release_blocking !== false ||
       decisionScope?.backend_selection_blocking !== false ||
+      decisionScope?.transcript_enhancement_selection_blocking !== true ||
       decisionScope?.current_required_cell !== 'de-DE/podcast' ||
       decisionScope?.primary_comparison_plan_revision !==
         'synthetic-roundtrip-pilot-6' ||
       decisionScope?.numeric_quality_claims_require_human_gold !== true ||
       !(decisionScope?.reason?.length > 0)) {
-    errors.push('decision_scope must keep the corpus an optional German podcast control');
+    errors.push('decision_scope must keep the corpus as the non-release-blocking German transcript-enhancement selection control');
   }
   if (!Array.isArray(decisionScope?.paused_work) ||
       decisionScope.paused_work.length === 0 ||
@@ -225,9 +226,10 @@ function validateTargetDomainPlan(plan, sourceCandidates) {
     'whisper-large-v3-turbo-coreml-whispercpp',
     'qwen3-asr-0.6b-mlx-direct',
     'parakeet-tdt-0.6b-v3-coreml',
+    'voxtral-realtime-4b-mlx-direct-2400ms',
   ];
   if (!arrayEquals(plan.candidate_backends ?? [], requiredBackends)) {
-    errors.push('candidate_backends must contain the four frozen candidates in execution order');
+    errors.push('candidate_backends must contain the five frozen candidates in execution order');
   }
 
   const sources = new Map(

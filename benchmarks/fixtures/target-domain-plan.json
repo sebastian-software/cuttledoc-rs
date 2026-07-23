@@ -1,22 +1,22 @@
 {
   "schema_version": "1.0.0",
-  "revision": "target-domain-held-out-2",
-  "evidence_date": "2026-07-21",
+  "revision": "target-domain-held-out-3",
+  "evidence_date": "2026-07-23",
   "tracking_issue": "https://github.com/sebastian-software/cuttledoc-rs/issues/18",
   "purpose": "held-out",
   "decision_scope": {
-    "role": "optional-real-world-control",
+    "role": "transcript-enhancement-selection-control",
     "release_blocking": false,
     "backend_selection_blocking": false,
+    "transcript_enhancement_selection_blocking": true,
     "current_required_cell": "de-DE/podcast",
     "primary_comparison_plan_revision": "synthetic-roundtrip-pilot-6",
     "numeric_quality_claims_require_human_gold": true,
     "paused_work": [
-      "mandatory-independent-human-gold",
       "German-audiobook-acquisition",
       "additional-language-domain-cells"
     ],
-    "reason": "The product optimizes clean produced speech and keeps multiple ASR engines selectable. Synthetic multi-voice evidence is the reproducible primary comparison; this corpus is a long-form reality check, not a universal ranking gate."
+    "reason": "Synthetic multi-voice evidence remains the reproducible primary ASR comparison, but issue #20 now requires this source-grouped human-verified German podcast control before a transcript-enhancement model can be selected. It does not reopen the ASR backend decision or make optional enhancement release-blocking."
   },
   "priority_order": [
     "de-DE/podcast",
@@ -34,7 +34,8 @@
     "apple-speechtranscriber",
     "whisper-large-v3-turbo-coreml-whispercpp",
     "qwen3-asr-0.6b-mlx-direct",
-    "parakeet-tdt-0.6b-v3-coreml"
+    "parakeet-tdt-0.6b-v3-coreml",
+    "voxtral-realtime-4b-mlx-direct-2400ms"
   ],
   "excluded_development_sources": [
     "fleurs",

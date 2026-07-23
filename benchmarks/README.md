@@ -108,6 +108,18 @@ node scripts/materialize-target-domain-corpus.mjs \
   --output-dir /absolute/path/to/cuttledoc-target-domain/normalized
 ```
 
+Prepare the validation review bundle without opening either frozen test source:
+
+```sh
+node scripts/prepare-target-domain-review.mjs prepare
+```
+
+The bundle contains a deterministic float-WAV playback wrapper over the exact
+normalized PCM, the digest-verified publisher draft as a non-gold aid, and a
+machine-readable review manifest. Test material requires an explicit
+`--split test --allow-test` invocation after the validation configuration is
+frozen.
+
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 under issue #13. It keeps German primary and reports `de-DE`, `en-US`,

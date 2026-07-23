@@ -44,6 +44,7 @@
         "role",
         "release_blocking",
         "backend_selection_blocking",
+        "transcript_enhancement_selection_blocking",
         "current_required_cell",
         "primary_comparison_plan_revision",
         "numeric_quality_claims_require_human_gold",
@@ -52,13 +53,16 @@
       ],
       "properties": {
         "role": {
-          "const": "optional-real-world-control"
+          "const": "transcript-enhancement-selection-control"
         },
         "release_blocking": {
           "const": false
         },
         "backend_selection_blocking": {
           "const": false
+        },
+        "transcript_enhancement_selection_blocking": {
+          "const": true
         },
         "current_required_cell": {
           "const": "de-DE/podcast"
@@ -90,7 +94,7 @@
     },
     "candidate_backends": {
       "type": "array",
-      "minItems": 4,
+      "minItems": 5,
       "uniqueItems": true,
       "items": {
         "type": "string",
