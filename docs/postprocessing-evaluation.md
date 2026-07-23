@@ -124,6 +124,15 @@ Qwen3.7 Max reaches 1.51% without a section regression under an explicitly
 authorized, consumed one-execution non-ZDR exception; its ledger omits four
 repeated correction occurrences.
 
+The later five-language hosted challenge preflight uses 60 frozen
+single-target requests per repeat rather than one German long-form document.
+Gemini 3.6 Flash, Kimi K3, and GPT-5.6 Terra pass both repeats; GPT-5.6 Sol and
+Claude Sonnet 5 stop on correct-input semantic regressions. A separate review
+of every WER regression ranks the next held-out evaluation Gemini, then Kimi,
+then Terra, while explicitly retaining date, clause-reconstruction, and
+technical-term risks. The full protocol and evidence are in the
+[`factorial benchmark`](postprocessing-factorial-benchmark.md).
+
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus
 their source-grouped development/validation/test discipline are defined in

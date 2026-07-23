@@ -644,29 +644,68 @@ The machine-readable
 and [cost estimate](../benchmarks/postprocessing/hosted-llm-target-complete-estimate.json)
 freeze this boundary before the first paid request.
 
-Repeat one completes with 291 quality requests:
+The staged preflight terminates with 479 quality requests. The 121 unissued
+requests are intentional tails after Sol and Claude became ineligible; they are
+not transport or contract failures. All 479 completed requests satisfy the
+mechanical response contract.
 
-| Candidate | Repeat-one progress | Contract | Improved / regressed | Cost | Disposition |
+| Candidate | Completed | Contract | Improved / regressed | Cost | Final disposition |
 | --- | ---: | ---: | ---: | ---: | --- |
 | GPT-5.6 Sol | 51/60 | 51/51 valid | 30 / 5 | `$0.866140` | Rejected after changing a correct English present-tense statement into past tense |
-| Gemini 3.6 Flash | 60/60 | 60/60 valid | 40 / 1 | `$0.517721` | Advance to repeat two |
-| GPT-5.6 Terra | 60/60 | 60/60 valid | 32 / 5 | `$0.509520` | Advance to repeat two |
-| Claude Sonnet 5 | 60/60 | 60/60 valid | 40 / 2 | `$0.716432` | Advance to repeat two |
-| Kimi K3 | 60/60 | 60/60 valid | 35 / 3 | `$0.603317` | Advance to repeat two |
+| Gemini 3.6 Flash | 120/120 | 120/120 valid | 79 / 2 | `$0.977504` | Promoted from the development preflight |
+| GPT-5.6 Terra | 120/120 | 120/120 valid | 68 / 11 | `$1.018991` | Promoted from the development preflight |
+| Kimi K3 | 120/120 | 120/120 valid | 65 / 6 | `$1.025975` | Promoted from the development preflight |
+| Claude Sonnet 5 | 68/120 | 68/68 valid | 44 / 3 | `$0.817426` | Rejected after changing Portuguese `organização matemática` to `organização anatômica` in an otherwise exact target |
 
-All four survivors improve all five locale macro-WER values and have no
-gross edit, token cap, or correct-input regression. Sol also improved every
-captured locale aggregate, but its single unsupported edit on an already exact
-English target triggers the intentionally stricter safety gate.
+Gemini, Terra, and Kimi pass every precommitted gate in both repeats, improve
+all five locale macro-WER values, and have no gross edit, token cap, or
+correct-input regression. Their combined relative error reductions are:
+
+| Candidate | DE | EN | ES | FR | PT | Byte-identical repeat pairs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Gemini 3.6 Flash | 41.7% | 13.5% | 21.9% | 39.2% | 43.7% | 30/60 |
+| GPT-5.6 Terra | 35.3% | 12.0% | 16.5% | 29.5% | 24.8% | 24/60 |
+| Kimi K3 | 25.6% | 16.4% | 16.4% | 17.5% | 25.9% | 30/60 |
+
+The formal
+[decision](../benchmarks/postprocessing/hosted-llm-target-complete-decision.json)
+therefore retains all three as development survivors. This is not a product
+selection.
 
 Claude and Kimi exposed explicit upstream HTTP 429 responses. Plan revision 3
 allows at most five server-directed deferrals per logical request only when the
 429 arrives before any response id, content, usage, or charge. This is not an
 automatic paid retry: successful, ambiguous, disconnected, timed-out, or
 malformed requests are never replayed, and provider fallback remains disabled.
-Kimi required five such unbilled deferrals across its 60 successful requests.
-Repeat-one quality requests cost `$3.213130` in total, plus the separately
-excluded `$0.008559` token-cap calibration.
+The final request records capture seven such unbilled Kimi deferrals. The 479
+quality requests cost `$4.706035` in total, plus the separately excluded
+`$0.008559` token-cap calibration.
+
+### Semantic regression audit
+
+WER alone does not distinguish a punctuation repair from a changed date or
+technical term. A separate
+[semantic review](../benchmarks/postprocessing/hosted-llm-target-complete-semantic-review.json)
+therefore inspects all 27 numerically regressed observations across 20 unique
+candidate/document/target cases. It remains post-hoc and does not rewrite the
+precommitted decision.
+
+The review changes the operational order, not the formal survivor set:
+
+1. **Gemini 3.6 Flash** is the primary hosted quality ceiling because it has
+   the best aggregate reduction and the narrowest regression surface. Its one
+   repeated Spanish case still matters: it repairs a garbled discourse marker
+   but silently changes the synthesized year 1981 to the more plausible 1980.
+2. **Kimi K3** is the second ceiling. Several WER regressions are
+   meaning-preserving, but one Spanish passage has unstable clause
+   reconstruction and the same date-fidelity risk.
+3. **GPT-5.6 Terra** remains a formal survivor but ranks third because it
+   changes a German technical term, performs an unsupported English tense
+   rewrite, and has the widest regression surface.
+
+No candidate is product-selected. The next gate must use identical held-out
+professional-audio ASR outputs and score dates, numbers, names, negation, and
+technical terms separately from punctuation, casing, and aggregate WER.
 
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.

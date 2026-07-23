@@ -85,7 +85,7 @@ Evidence snapshot: 2026-07-23.
 | Synthetic TTS roundtrip (#13) | In progress | The required Apple, Qwen VoiceDesign, and Voxtral BF16 factorial slices are complete: 370 digest-pinned audio artifacts, 1,110 three-receiver transcripts, and 180 six-section LLM documents across DE/EN/ES/FR/PT. Voxtral passed all ten technical voice gates, completed 120 primary documents without a retry or token cap, and produced 10/10 identical same-seed audio plus 30/30 identical transcript controls. Hosted TTS ceilings and held-out human professional audio remain optional comparison/final-quality work. |
 | Thin Node/npm boundary (#9) | Complete | Node 22/24 CI builds, packs, compiler-free installs, and tests the same macOS arm64 tarball through ESM and CommonJS, including streaming fields, background work, progress, errors, cancellation, and missing-artifact diagnostics. |
 | Local text-generation runtime (#7) | Complete | The pinned Qwen3 0.6B MLX reference proves load, deterministic streaming, cancellation, and external lexical rejection. It is explicitly a runtime/negative control, not quality selection. |
-| Transcript-enhancement model/runtime bakeoff (#20) | In progress | Hosted repeat one is complete by gate decision: Gemini 3.6 Flash, GPT-5.6 Terra, Kimi K3, and Claude Sonnet 5 pass 60/60 contract calls and every language macro gate; GPT-5.6 Sol stops at 51/60 after an unsupported edit to an already correct English sentence. The 291 quality requests cost `$3.2131299`, plus the separately documented `$0.008559` cap calibration. Kimi required five explicitly unbilled 429 deferrals; successful or ambiguous paid calls were never retried. Only the four survivors receive repeat two. |
+| Transcript-enhancement model/runtime bakeoff (#20) | In progress | The hosted challenge preflight is complete with 479/479 valid responses and `$4.7060354` provider-reported quality-request cost, plus the separately documented `$0.008559` cap calibration. Gemini 3.6 Flash, Kimi K3, and GPT-5.6 Terra pass both repeats and every language macro gate; GPT-5.6 Sol and Claude Sonnet 5 stop on correct-input semantic regressions. A post-hoc review of all 27 WER regressions retains the formal survivors but orders the next held-out screen Gemini → Kimi → Terra. None is product-selected; fact-bearing-token safety on human-verified professional audio remains the gate. |
 
 The open issue list is a work queue, not a second architecture plan. Completed
 foundation issues should close with links to their evidence. Productization
@@ -315,15 +315,15 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    retain the 80 ms backpressure stress gate, and add long-audio cache/memory
    coverage. ADR-0012 completed the C/MPS comparison and rejects both the
    reference runtime's unbounded queue and the pure-C path as product boundaries.
-4. Continue #20 by applying the frozen ten-document/60-target challenge screen
-   to a materially stronger local model or the pinned hosted Qwen/GPT/Claude
-   ceilings. Do not spend a full matrix on Gemma 4 E2B: both its complete-text
-   and bounded-patch contracts are irreversibly rejected. Only a challenge-set
-   contract-and-quality survivor should run on identical human-verified
-   professional-audio raw ASR outputs, German first. Use remote controls to
-   measure available quality, not local latency; keep corrected text separate
-   from raw ASR ranking and reject critical semantic regressions before
-   selecting or porting a survivor through official MLX and Core ML.
+4. Continue #20 with the completed hosted challenge survivors in semantic-risk
+   order: Gemini 3.6 Flash, Kimi K3, then GPT-5.6 Terra. Run them on identical
+   human-verified professional-audio raw ASR outputs, German first, and score
+   names, numbers, dates, negation, and technical terms separately from
+   punctuation, casing, and aggregate WER. Do not spend a full matrix on Gemma
+   4 E2B: both its complete-text and bounded-patch contracts are irreversibly
+   rejected. Use remote controls to measure available quality, not local
+   latency; keep corrected text separate from raw ASR ranking and port only a
+   held-out semantic-safety survivor through official MLX and Core ML.
 5. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 6. Finish #9 with Node 22 plus packed-artifact CI gates.
