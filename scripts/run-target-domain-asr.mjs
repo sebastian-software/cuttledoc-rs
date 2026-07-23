@@ -5,12 +5,14 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import {
   mkdir,
+  mkdtemp,
   readFile,
   rename,
+  rm,
   stat,
   writeFile,
 } from 'node:fs/promises';
-import { cpus, totalmem } from 'node:os';
+import { cpus, tmpdir, totalmem } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -76,6 +78,7 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: '/private/tmp/cuttledoc-qwen3-asr/model',
     },
+    'qwen-chunk-ms': { type: 'string', default: '30000' },
     'voxtral-binary': {
       type: 'string',
       default:
@@ -86,7 +89,7 @@ const { positionals, values } = parseArgs({
       type: 'string',
       default: '/private/tmp/cuttledoc-voxtral-realtime-4b-mlx-4bit',
     },
-    'voxtral-max-tokens': { type: 'string', default: '4096' },
+    'voxtral-max-tokens': { type: 'string', default: '8192' },
   },
 });
 
@@ -170,7 +173,6 @@ async function run() {
     manifest,
     cell,
     sourceGroup,
-    audioPath,
     provenance,
   });
   validateResume(record, {
@@ -211,6 +213,9 @@ async function run() {
       status: record.status,
       completed_backends: record.results.map((result) => result.backend.id),
       missing_backends: record.missing_backends,
+      incomplete_coverage_backends: record.results
+        .filter((result) => result.coverage?.status !== 'complete')
+        .map((result) => result.backend.id),
     }, null, 2)}\n`,
   );
 }
@@ -220,7 +225,6 @@ function newRecord({
   manifest,
   cell,
   sourceGroup,
-  audioPath,
   provenance,
 }) {
   return {
@@ -256,7 +260,8 @@ function newRecord({
     },
     audio: {
       artifact_name: sourceGroup.normalized_audio.artifact_name,
-      local_path: audioPath,
+      availability: 'local-required',
+      local_path: null,
       sha256: sourceGroup.normalized_audio.sha256,
       bytes: sourceGroup.normalized_audio.bytes,
       sample_count: sourceGroup.normalized_audio.sample_count,
@@ -316,8 +321,11 @@ function validateResume(record, {
   for (const result of record.results) {
     if (!/^[0-9a-f]{64}$/.test(result.transcript?.sha256 ?? '') ||
         digest(Buffer.from(result.transcript?.text ?? '')) !==
-          result.transcript.sha256) {
-      throw new Error(`${result.backend?.id}: transcript digest mismatch`);
+          result.transcript.sha256 ||
+        !['complete', 'incomplete'].includes(result.coverage?.status)) {
+      throw new Error(
+        `${result.backend?.id}: transcript digest or coverage mismatch`,
+      );
     }
   }
 }
@@ -397,6 +405,8 @@ function runApple({ sourceGroup, audioPath, durationMs }) {
     .map((line) => JSON.parse(line.slice('UPDATE '.length)));
   const finalUpdates = updates.filter((update) => update.stability === 'final');
   const text = finalUpdates.map((update) => update.text).join('');
+  const segments = finalUpdates.flatMap((update) =>
+    (update.segments ?? []).map(normalizeAppleSegment));
   if (text.trim().length === 0) {
     throw new Error('Apple SpeechTranscriber returned no final text');
   }
@@ -410,8 +420,8 @@ function runApple({ sourceGroup, audioPath, durationMs }) {
       'macOS SpeechAnalyzer through the repository-owned Swift C ABI',
     boundary: 'repository-owned Swift task ABI called from Rust',
     text,
-    segments: finalUpdates.flatMap((update) =>
-      (update.segments ?? []).map(normalizeAppleSegment)),
+    segments,
+    coverage: timestampCoverage(segments, durationMs),
     timing: {
       wall_ms: timed.wallMs,
       backend_ms: summary.elapsed_ms,
@@ -482,6 +492,8 @@ async function runLegacy(name, {
   if (!(native?.text?.trim().length > 0)) {
     throw new Error(`${name} returned no text`);
   }
+  const segments = (native.segments ?? []).map((segment) =>
+    normalizeLegacySegment(segment, durationMs));
   return resultRecord({
     id: name === 'whisper'
       ? 'whisper-large-v3-turbo-coreml-whispercpp'
@@ -490,11 +502,13 @@ async function runLegacy(name, {
     model: name === 'whisper'
       ? 'whisper large-v3-turbo Core ML encoder plus whisper.cpp decoder'
       : 'FluidInference parakeet-tdt-0.6b-v3 Core ML plus Silero VAD',
-    runtime: `${moduleDirectory}@${version}`,
+    runtime:
+      `${name === 'whisper' ? 'whisper-coreml' : 'parakeet-coreml'} ` +
+      `Node adapter @${version}`,
     boundary: 'existing legacy Core ML Node adapter in a normal host process',
     text: native.text,
-    segments: (native.segments ?? []).map((segment) =>
-      normalizeLegacySegment(segment, durationMs)),
+    segments,
+    coverage: timestampCoverage(segments, durationMs),
     timing: {
       wall_ms: inferenceMs,
       load_ms: loadMs,
@@ -515,20 +529,69 @@ async function runLegacy(name, {
 }
 
 async function runQwen({ sourceGroup, audioPath, durationMs }) {
+  const chunkMs = Number.parseInt(values['qwen-chunk-ms'], 10);
+  if (!Number.isInteger(chunkMs) || chunkMs < 5_000 || chunkMs > 60_000) {
+    throw new Error('--qwen-chunk-ms must be 5000..60000');
+  }
   const manifest = JSON.parse(await readFile(
     join(repoRoot, 'spikes/qwen3-mlx-direct/model-manifest.json'),
   ));
-  const timed = timedCommand(resolve(values['qwen-binary']), [
-    'transcribe',
-    resolve(values['qwen-model-dir']),
-    audioPath,
-    sourceGroup.locale.slice(0, 2),
-    'gpu',
-  ]);
-  const native = JSON.parse(timed.stdout);
-  if (!(native.text?.trim().length > 0)) {
-    throw new Error('Qwen3-ASR returned no text');
+  const audioBytes = await readFile(audioPath);
+  const bytesPerMillisecond = 16_000 * 4 / 1_000;
+  const chunkCount = Math.ceil(durationMs / chunkMs);
+  const temporaryDirectory = await mkdtemp(
+    join(tmpdir(), 'cuttledoc-target-qwen-'),
+  );
+  const chunks = [];
+  try {
+    for (let index = 0; index < chunkCount; index += 1) {
+      const startMs = index * chunkMs;
+      const endMs = Math.min(startMs + chunkMs, durationMs);
+      const startByte = startMs * bytesPerMillisecond;
+      const endByte = endMs * bytesPerMillisecond;
+      const chunkBytes = audioBytes.subarray(startByte, endByte);
+      const chunkPath = join(
+        temporaryDirectory,
+        `chunk-${String(index).padStart(3, '0')}.f32le`,
+      );
+      await writeFile(chunkPath, chunkBytes);
+      process.stderr.write(
+        `target-domain ASR: Qwen chunk ${index + 1}/${chunkCount}\n`,
+      );
+      const timed = timedCommand(resolve(values['qwen-binary']), [
+        'transcribe',
+        resolve(values['qwen-model-dir']),
+        chunkPath,
+        sourceGroup.locale.slice(0, 2),
+        'gpu',
+      ]);
+      const native = JSON.parse(timed.stdout);
+      if (!(native.text?.trim().length > 0)) {
+        throw new Error(`Qwen3-ASR returned no text for chunk ${index}`);
+      }
+      chunks.push({
+        index,
+        start_ms: startMs,
+        end_ms: endMs,
+        audio_sha256: digest(chunkBytes),
+        transcript_sha256: digest(Buffer.from(native.text)),
+        text: native.text,
+        token_count: native.generation_tokens,
+        finish_reason: native.finish_reason,
+        stop_token: native.stop_token,
+        backend_ms: native.elapsed_ms,
+        wall_ms: timed.wallMs,
+        mlx_peak_memory_bytes: native.peak_memory_bytes,
+      });
+    }
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
   }
+  const truncatedChunks = chunks
+    .filter((chunk) => chunk.finish_reason === 'length')
+    .map((chunk) => chunk.index);
+  const text = chunks.map((chunk) => chunk.text.trim()).join('\n');
+  const backendMs = sum(chunks.map((chunk) => chunk.backend_ms));
   return resultRecord({
     id: 'qwen3-asr-0.6b-mlx-direct',
     capturedAt: new Date().toISOString(),
@@ -537,26 +600,58 @@ async function runQwen({ sourceGroup, audioPath, durationMs }) {
     runtime:
       'repository-owned Qwen3-ASR adapter over official MLX 0.32.0',
     boundary: 'repository-owned C++ task ABI over official MLX',
-    text: native.text,
-    segments: [],
+    text,
+    segments: chunks.map((chunk) => ({
+      start_ms: chunk.start_ms,
+      end_ms: chunk.end_ms,
+      text: chunk.text,
+      confidence: null,
+    })),
+    coverage: {
+      status: truncatedChunks.length === 0 ? 'complete' : 'incomplete',
+      method: 'deterministic-fixed-nonoverlap-chunks',
+      expected_duration_ms: durationMs,
+      processed_duration_ms:
+        sum(chunks.map((chunk) => chunk.end_ms - chunk.start_ms)),
+      tolerance_ms: 0,
+      incomplete_reason: truncatedChunks.length === 0
+        ? null
+        : `generation limit reached in chunks: ${truncatedChunks.join(', ')}`,
+    },
     timing: {
-      wall_ms: timed.wallMs,
-      backend_ms: native.elapsed_ms,
-      real_time_factor: native.elapsed_ms / durationMs,
+      wall_ms: sum(chunks.map((chunk) => chunk.wall_ms)),
+      backend_ms: backendMs,
+      real_time_factor: backendMs / durationMs,
     },
     resources: {
-      mlx_peak_memory_bytes: native.peak_memory_bytes,
+      mlx_peak_memory_bytes: Math.max(
+        ...chunks.map((chunk) => chunk.mlx_peak_memory_bytes),
+      ),
     },
     streaming: {
-      update_count: 1,
-      final_update_count: 1,
+      update_count: chunks.length,
+      final_update_count: chunks.length,
       volatile_update_count: 0,
       revoke_count: 0,
     },
     generation: {
-      token_count: native.generation_tokens,
-      finish_reason: native.finish_reason,
-      stop_token: native.stop_token,
+      method: 'fixed-nonoverlap-v1',
+      chunk_ms: chunkMs,
+      chunk_count: chunks.length,
+      overlap_ms: 0,
+      merge: 'concatenate-in-source-order',
+      token_count: sum(chunks.map((chunk) => chunk.token_count)),
+      finish_reason:
+        truncatedChunks.length === 0 ? 'all_chunks_eos' : 'chunk_length',
+      truncated_chunks: truncatedChunks,
+      limitation:
+        'Words crossing a fixed chunk boundary can be split or omitted; the ' +
+        'complete transcript still requires independent human review.',
+      chunks: chunks.map(({
+        text: _text,
+        mlx_peak_memory_bytes: _peakMemory,
+        ...chunk
+      }) => chunk),
     },
   });
 }
@@ -593,6 +688,21 @@ async function runVoxtral({ audioPath, durationMs }) {
     boundary: manifest.official_runtime.boundary,
     text: native.generation.text,
     segments: [],
+    coverage: {
+      status:
+        native.generation.finish_reason === 'max_tokens'
+          ? 'incomplete'
+          : 'complete',
+      method: 'offline-streaming-audio-end',
+      expected_duration_ms: durationMs,
+      processed_duration_ms:
+        native.generation.finish_reason === 'max_tokens' ? null : durationMs,
+      tolerance_ms: 0,
+      incomplete_reason:
+        native.generation.finish_reason === 'max_tokens'
+          ? `generation stopped at the ${maxTokens}-token safety limit`
+          : null,
+    },
     timing: {
       wall_ms: timed.wallMs,
       backend_ms: native.elapsed_ms,
@@ -628,6 +738,7 @@ function resultRecord({
   resources,
   streaming,
   generation,
+  coverage,
 }) {
   return {
     captured_at: capturedAt,
@@ -642,6 +753,7 @@ function resultRecord({
     timing,
     resources,
     streaming,
+    coverage,
     ...(generation ? { generation } : {}),
     quality: {
       status: 'unscored-human-gold-pending',
@@ -678,6 +790,32 @@ function normalizeLegacySegment(segment, durationMs) {
   };
 }
 
+function timestampCoverage(segments, durationMs) {
+  const finalSegmentEndMs = maximumSegmentEnd(segments);
+  const toleranceMs = 2_000;
+  const complete =
+    finalSegmentEndMs !== null &&
+    finalSegmentEndMs >= durationMs - toleranceMs;
+  return {
+    status: complete ? 'complete' : 'incomplete',
+    method: 'final-segment-timestamp',
+    expected_duration_ms: durationMs,
+    processed_duration_ms: finalSegmentEndMs,
+    final_segment_end_ms: finalSegmentEndMs,
+    tolerance_ms: toleranceMs,
+    incomplete_reason: complete
+      ? null
+      : 'no final segment reaches the end-of-audio tolerance',
+  };
+}
+
+function maximumSegmentEnd(segments) {
+  const ends = segments
+    .map((segment) => segment.end_ms)
+    .filter((end) => Number.isFinite(end));
+  return ends.length === 0 ? null : Math.max(...ends);
+}
+
 function verifyAudio(sourceGroup, bytes) {
   if (bytes.length !== sourceGroup.normalized_audio.bytes ||
       digest(bytes) !== sourceGroup.normalized_audio.sha256 ||
@@ -690,7 +828,15 @@ function verifyAudio(sourceGroup, bytes) {
 function updateStatus(record, expectedBackends) {
   const completed = new Set(record.results.map((result) => result.backend.id));
   record.missing_backends = expectedBackends.filter((id) => !completed.has(id));
-  record.status = record.missing_backends.length === 0 ? 'complete' : 'partial';
+  if (record.missing_backends.length > 0) {
+    record.status = 'partial';
+  } else if (
+    record.results.every((result) => result.coverage?.status === 'complete')
+  ) {
+    record.status = 'complete';
+  } else {
+    record.status = 'complete-with-incomplete-drafts';
+  }
   record.evidence_captured_through =
     record.results.at(-1)?.captured_at ?? null;
 }
@@ -797,6 +943,10 @@ function words(text) {
     .filter(Boolean);
 }
 
+function sum(numbers) {
+  return numbers.reduce((total, number) => total + number, 0);
+}
+
 function digest(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
 }
@@ -834,6 +984,33 @@ async function runSelfTest() {
   updateStatus(record, plan.candidate_backends);
   if (record.status !== 'partial' || record.missing_backends.length !== 4) {
     throw new Error('resume status self-test failed');
+  }
+  const incompleteRecord = {
+    results: plan.candidate_backends.map((id) => ({
+      backend: { id },
+      captured_at: 'now',
+      coverage: {
+        status: id === plan.candidate_backends[2]
+          ? 'incomplete'
+          : 'complete',
+      },
+    })),
+  };
+  updateStatus(incompleteRecord, plan.candidate_backends);
+  if (incompleteRecord.status !== 'complete-with-incomplete-drafts' ||
+      incompleteRecord.missing_backends.length !== 0) {
+    throw new Error('incomplete coverage status self-test failed');
+  }
+  const completeRecord = {
+    results: plan.candidate_backends.map((id) => ({
+      backend: { id },
+      captured_at: 'now',
+      coverage: { status: 'complete' },
+    })),
+  };
+  updateStatus(completeRecord, plan.candidate_backends);
+  if (completeRecord.status !== 'complete') {
+    throw new Error('complete coverage status self-test failed');
   }
   let rejected = false;
   try {

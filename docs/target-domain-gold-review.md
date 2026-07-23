@@ -46,12 +46,22 @@ attribution, and output name are pinned in
    and `--allow-test`.
 3. Generate the five validation ASR drafts against the identical PCM. The
    resumable runner checkpoints each completed backend and records no quality
-   score while human gold is pending:
+   score while human gold is pending. It treats backend presence and complete
+   audio coverage as separate conditions:
 
    ```sh
    node scripts/run-target-domain-asr.mjs run \
      --output artifacts/target-domain/review/validation-asr-drafts.json
    ```
+
+   Apple, Whisper, and Parakeet prove coverage from their final segment
+   timestamp. The direct Qwen adapter uses deterministic 30-second,
+   non-overlapping chunks because its repository boundary intentionally limits
+   one generation to 256 tokens. The record exposes the boundary-split
+   limitation and every chunk digest. Direct Voxtral receives an 8,192-token
+   safety budget and must reach `audio_end` or EOS; hitting `max_tokens` leaves
+   that draft incomplete. A record is `complete` only when all five backends
+   satisfy their coverage condition.
 
 4. Prepare one JSON transcript per passage using
    [`target-domain-transcript.schema.json`](../benchmarks/schema/target-domain-transcript.schema.json).
