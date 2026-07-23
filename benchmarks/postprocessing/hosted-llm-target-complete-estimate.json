@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-hosted-target-complete-plan-2-cost-estimate-1",
-  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-2",
-  "plan_sha256": "e6124ec3e79c0375e93b0b24365c8150c2aa1b0a3b16518b6e7f7254e91cc0fd",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-3-cost-estimate-1",
+  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-3",
+  "plan_sha256": "72fbb7a1266456910455d2a4685fe8eb5fb952845eabcf7061113568e87bbd4e",
   "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-2",
-  "screen_sha256": "b4db256f44b0382cbfffa09f9e667e6bb4801000199d7c6469b77479b193e93d",
-  "captured_at": "2026-07-23T15:31:42.982Z",
+  "screen_sha256": "53350b17b8638dd269842ad1bf8cae4a707f16474452ce6ea58a5581316ae0c1",
+  "captured_at": "2026-07-23T15:57:11.133Z",
   "method": {
     "hard_input_envelope": "One input token per rendered Unicode code point.",
     "likely_input_estimate": "One input token per four rendered Unicode code points.",

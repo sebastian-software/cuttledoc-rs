@@ -485,6 +485,8 @@ async function summarizeResults() {
           response_id: result.response?.id ?? null,
           served_model: result.response?.served_model ?? null,
           served_provider: result.response?.served_provider ?? null,
+          rate_limit_deferrals_before_response:
+            result.response?.rate_limit_deferrals_before_response ?? [],
         });
         const observationIndices = targetIndex === null
           ? Array.from(

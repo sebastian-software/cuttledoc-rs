@@ -644,5 +644,26 @@ The machine-readable
 and [cost estimate](../benchmarks/postprocessing/hosted-llm-target-complete-estimate.json)
 freeze this boundary before the first paid request.
 
+The first committed execution checkpoint contains 235 quality requests:
+
+| Candidate | Repeat-one progress | Contract | Improved / regressed | Cost | Disposition |
+| --- | ---: | ---: | ---: | ---: | --- |
+| GPT-5.6 Sol | 51/60 | 51/51 valid | 30 / 5 | `$0.866140` | Rejected after changing a correct English present-tense statement into past tense |
+| Gemini 3.6 Flash | 60/60 | 60/60 valid | 40 / 1 | `$0.517721` | Advance to repeat two |
+| GPT-5.6 Terra | 60/60 | 60/60 valid | 32 / 5 | `$0.509520` | Advance to repeat two |
+| Claude Sonnet 5 | 60/60 | 60/60 valid | 40 / 2 | `$0.716432` | Advance to repeat two |
+| Kimi K3 | 4/60 | 4/4 valid | Pending complete repeat | `$0.043447` | Continue repeat one after provider cooldown |
+
+Every complete survivor improves all five locale macro-WER values and has no
+gross edit, token cap, or correct-input regression. Sol also improved every
+captured locale aggregate, but its single unsupported edit on an already exact
+English target triggers the intentionally stricter safety gate.
+
+Claude and Kimi exposed explicit upstream HTTP 429 responses. Plan revision 3
+allows at most five server-directed deferrals per logical request only when the
+429 arrives before any response id, content, usage, or charge. This is not an
+automatic paid retry: successful, ambiguous, disconnected, timed-out, or
+malformed requests are never replayed, and provider fallback remains disabled.
+
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.

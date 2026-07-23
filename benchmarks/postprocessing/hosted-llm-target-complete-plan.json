@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-hosted-target-complete-plan-2",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-3",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
   "plan_revision": "postprocessing-factorial-plan-6",
   "screen_path": "benchmarks/postprocessing/hosted-llm-target-complete-screen.json",
@@ -85,13 +85,19 @@
     "zdr_required": true,
     "non_zdr_exception_required": false
   },
+  "transport_amendment": {
+    "trigger": "The pinned Claude and Kimi endpoints returned explicit upstream HTTP 429 responses during repeat one.",
+    "decision": "A logical request may honor the server Retry-After value and defer at most five times only when OpenRouter returns HTTP 429 before any model response id, content, usage, or charge exists.",
+    "non_relaxation": "No successful, charged, timed-out, disconnected, malformed, or otherwise ambiguous request is retried automatically. Provider fallback remains disabled and rate-limit events remain availability evidence rather than model-quality failures."
+  },
   "cost_policy": {
     "currency": "USD",
     "estimate_path": "benchmarks/postprocessing/hosted-llm-target-complete-estimate.json",
     "calibration_path": "benchmarks/postprocessing/hosted-llm-target-complete-calibration.json",
     "estimate_required_before_execution": true,
     "runner_budget_required": true,
-    "automatic_request_retry": false,
+    "automatic_paid_or_ambiguous_request_retry": false,
+    "maximum_explicit_unbilled_429_deferrals_per_logical_request": 5,
     "maximum_configured_completion_tokens_per_request": 2048,
     "conservative_input_accounting": "Count each rendered Unicode code point as one input token for the hard planning envelope; this deliberately overstates normal tokenizer usage."
   },

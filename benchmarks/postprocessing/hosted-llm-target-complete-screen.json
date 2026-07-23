@@ -114,7 +114,8 @@
     "provider_fallback": false,
     "data_collection": "deny",
     "zdr_required": true,
-    "automatic_request_retry": false
+    "automatic_paid_or_ambiguous_request_retry": false,
+    "maximum_explicit_unbilled_429_deferrals_per_logical_request": 5
   },
   "claim_limit": "This deliberately challenging synthetic development slice can reject unsafe hosted candidates but cannot estimate release quality, select a product threshold, or replace held-out human podcast and audiobook evidence."
 }

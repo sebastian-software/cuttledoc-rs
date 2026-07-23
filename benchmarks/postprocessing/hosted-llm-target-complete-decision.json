@@ -1,0 +1,713 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-3-decision-1",
+  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-3",
+  "plan_sha256": "72fbb7a1266456910455d2a4685fe8eb5fb952845eabcf7061113568e87bbd4e",
+  "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-2",
+  "summary_path": "benchmarks/postprocessing/hosted-llm-target-complete-results.json",
+  "summary_sha256": "38f8f7c54b8f085b0dbbf04d3788ffad0ae000e532b4962175ed3d1a6a409091",
+  "captured_at": "2026-07-23T15:57:11.784Z",
+  "status": "repeat-1-in-progress",
+  "candidates": [
+    {
+      "candidate": "gpt-5.6-sol-openrouter-azure-eu",
+      "disposition": "reject",
+      "rationale": "A previously correct target gained a word error.",
+      "repeats": [
+        {
+          "repetition": 1,
+          "completed_requests": 51,
+          "mechanically_accepted_requests": 51,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 1,
+          "improved_sections": 30,
+          "regressed_sections": 5,
+          "locale_quality": [
+            {
+              "locale": "de-DE",
+              "observations": 9,
+              "macro_mean_raw_wer": 0.14544555098839507,
+              "macro_mean_strict_or_raw_wer": 0.08737826792255377,
+              "relative_error_change": -0.39923725869397286,
+              "regressed": false
+            },
+            {
+              "locale": "en-US",
+              "observations": 10,
+              "macro_mean_raw_wer": 0.035802094992513654,
+              "macro_mean_strict_or_raw_wer": 0.029104785631039198,
+              "relative_error_change": -0.1870647335826266,
+              "regressed": false
+            },
+            {
+              "locale": "es-419",
+              "observations": 11,
+              "macro_mean_raw_wer": 0.04165659300084243,
+              "macro_mean_strict_or_raw_wer": 0.029447172707985046,
+              "relative_error_change": -0.29309694848569273,
+              "regressed": false
+            },
+            {
+              "locale": "fr-FR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.04857978699475532,
+              "macro_mean_strict_or_raw_wer": 0.03321387128167177,
+              "relative_error_change": -0.31630265720890166,
+              "regressed": false
+            },
+            {
+              "locale": "pt-BR",
+              "observations": 9,
+              "macro_mean_raw_wer": 0.07478984341729439,
+              "macro_mean_strict_or_raw_wer": 0.03388231231368486,
+              "relative_error_change": -0.5469663958963454,
+              "regressed": false
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "completed_requests": 0,
+          "mechanically_accepted_requests": 0,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 0,
+          "regressed_sections": 0,
+          "locale_quality": []
+        }
+      ],
+      "combined": {
+        "completed_requests": 51,
+        "mechanically_accepted_requests": 51,
+        "invalid_requests": 0,
+        "token_limit_failures": 0,
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "locale_macro_wer_regressions": 0,
+        "changed_correct_input_to_error": 1,
+        "improved_sections": 30,
+        "regressed_sections": 5,
+        "locale_quality": [
+          {
+            "locale": "de-DE",
+            "observations": 9,
+            "macro_mean_raw_wer": 0.14544555098839507,
+            "macro_mean_strict_or_raw_wer": 0.08737826792255377,
+            "relative_error_change": -0.39923725869397286,
+            "regressed": false
+          },
+          {
+            "locale": "en-US",
+            "observations": 10,
+            "macro_mean_raw_wer": 0.035802094992513654,
+            "macro_mean_strict_or_raw_wer": 0.029104785631039198,
+            "relative_error_change": -0.1870647335826266,
+            "regressed": false
+          },
+          {
+            "locale": "es-419",
+            "observations": 11,
+            "macro_mean_raw_wer": 0.04165659300084243,
+            "macro_mean_strict_or_raw_wer": 0.029447172707985046,
+            "relative_error_change": -0.29309694848569273,
+            "regressed": false
+          },
+          {
+            "locale": "fr-FR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.04857978699475532,
+            "macro_mean_strict_or_raw_wer": 0.03321387128167177,
+            "relative_error_change": -0.31630265720890166,
+            "regressed": false
+          },
+          {
+            "locale": "pt-BR",
+            "observations": 9,
+            "macro_mean_raw_wer": 0.07478984341729439,
+            "macro_mean_strict_or_raw_wer": 0.03388231231368486,
+            "relative_error_change": -0.5469663958963454,
+            "regressed": false
+          }
+        ]
+      },
+      "repeat_stability": {
+        "complete_pairs": 0,
+        "byte_identical_raw_output_pairs": 0,
+        "non_identical_raw_output_pairs": 0,
+        "requirement": "observation-only-for-remote-services"
+      },
+      "observed": {
+        "total_cost_usd": 0.8661399999999999,
+        "served_models": [
+          "openai/gpt-5.6-sol"
+        ],
+        "served_providers": [
+          "Azure"
+        ],
+        "explicit_unbilled_429_deferrals": 0
+      }
+    },
+    {
+      "candidate": "gemini-3.6-flash-openrouter-google-vertex-global",
+      "disposition": "advance-to-repeat-2",
+      "rationale": "Repeat 1 passed every precommitted gate.",
+      "repeats": [
+        {
+          "repetition": 1,
+          "completed_requests": 60,
+          "mechanically_accepted_requests": 60,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 40,
+          "regressed_sections": 1,
+          "locale_quality": [
+            {
+              "locale": "de-DE",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.13910778442345406,
+              "macro_mean_strict_or_raw_wer": 0.08667673140842495,
+              "relative_error_change": -0.3769095542160691,
+              "regressed": false
+            },
+            {
+              "locale": "en-US",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.03375245807780697,
+              "macro_mean_strict_or_raw_wer": 0.029379836397492975,
+              "relative_error_change": -0.12954972554099975,
+              "regressed": false
+            },
+            {
+              "locale": "es-419",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.039326762762187745,
+              "macro_mean_strict_or_raw_wer": 0.03125390632011418,
+              "relative_error_change": -0.2052764040328162,
+              "regressed": false
+            },
+            {
+              "locale": "fr-FR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.04857978699475532,
+              "macro_mean_strict_or_raw_wer": 0.03008637773107811,
+              "relative_error_change": -0.38068115172414735,
+              "regressed": false
+            },
+            {
+              "locale": "pt-BR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.06710500679074409,
+              "macro_mean_strict_or_raw_wer": 0.03846253501773245,
+              "relative_error_change": -0.42683062177951153,
+              "regressed": false
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "completed_requests": 0,
+          "mechanically_accepted_requests": 0,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 0,
+          "regressed_sections": 0,
+          "locale_quality": []
+        }
+      ],
+      "combined": {
+        "completed_requests": 60,
+        "mechanically_accepted_requests": 60,
+        "invalid_requests": 0,
+        "token_limit_failures": 0,
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "locale_macro_wer_regressions": 0,
+        "changed_correct_input_to_error": 0,
+        "improved_sections": 40,
+        "regressed_sections": 1,
+        "locale_quality": [
+          {
+            "locale": "de-DE",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.13910778442345406,
+            "macro_mean_strict_or_raw_wer": 0.08667673140842495,
+            "relative_error_change": -0.3769095542160691,
+            "regressed": false
+          },
+          {
+            "locale": "en-US",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.03375245807780697,
+            "macro_mean_strict_or_raw_wer": 0.029379836397492975,
+            "relative_error_change": -0.12954972554099975,
+            "regressed": false
+          },
+          {
+            "locale": "es-419",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.039326762762187745,
+            "macro_mean_strict_or_raw_wer": 0.03125390632011418,
+            "relative_error_change": -0.2052764040328162,
+            "regressed": false
+          },
+          {
+            "locale": "fr-FR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.04857978699475532,
+            "macro_mean_strict_or_raw_wer": 0.03008637773107811,
+            "relative_error_change": -0.38068115172414735,
+            "regressed": false
+          },
+          {
+            "locale": "pt-BR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.06710500679074409,
+            "macro_mean_strict_or_raw_wer": 0.03846253501773245,
+            "relative_error_change": -0.42683062177951153,
+            "regressed": false
+          }
+        ]
+      },
+      "repeat_stability": {
+        "complete_pairs": 0,
+        "byte_identical_raw_output_pairs": 0,
+        "non_identical_raw_output_pairs": 0,
+        "requirement": "observation-only-for-remote-services"
+      },
+      "observed": {
+        "total_cost_usd": 0.5177205,
+        "served_models": [
+          "google/gemini-3.6-flash"
+        ],
+        "served_providers": [
+          "Google"
+        ],
+        "explicit_unbilled_429_deferrals": 0
+      }
+    },
+    {
+      "candidate": "gpt-5.6-terra-openrouter-azure-eu",
+      "disposition": "advance-to-repeat-2",
+      "rationale": "Repeat 1 passed every precommitted gate.",
+      "repeats": [
+        {
+          "repetition": 1,
+          "completed_requests": 60,
+          "mechanically_accepted_requests": 60,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 32,
+          "regressed_sections": 5,
+          "locale_quality": [
+            {
+              "locale": "de-DE",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.13910778442345406,
+              "macro_mean_strict_or_raw_wer": 0.0905047051176006,
+              "relative_error_change": -0.3493915132592595,
+              "regressed": false
+            },
+            {
+              "locale": "en-US",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.03375245807780697,
+              "macro_mean_strict_or_raw_wer": 0.028862455439211454,
+              "relative_error_change": -0.14487841529416803,
+              "regressed": false
+            },
+            {
+              "locale": "es-419",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.039326762762187745,
+              "macro_mean_strict_or_raw_wer": 0.03468872833194239,
+              "relative_error_change": -0.117935830576545,
+              "regressed": false
+            },
+            {
+              "locale": "fr-FR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.04857978699475532,
+              "macro_mean_strict_or_raw_wer": 0.03518254196162258,
+              "relative_error_change": -0.2757781756963881,
+              "regressed": false
+            },
+            {
+              "locale": "pt-BR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.06710500679074409,
+              "macro_mean_strict_or_raw_wer": 0.05298026130016461,
+              "relative_error_change": -0.21048720752871947,
+              "regressed": false
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "completed_requests": 0,
+          "mechanically_accepted_requests": 0,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 0,
+          "regressed_sections": 0,
+          "locale_quality": []
+        }
+      ],
+      "combined": {
+        "completed_requests": 60,
+        "mechanically_accepted_requests": 60,
+        "invalid_requests": 0,
+        "token_limit_failures": 0,
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "locale_macro_wer_regressions": 0,
+        "changed_correct_input_to_error": 0,
+        "improved_sections": 32,
+        "regressed_sections": 5,
+        "locale_quality": [
+          {
+            "locale": "de-DE",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.13910778442345406,
+            "macro_mean_strict_or_raw_wer": 0.0905047051176006,
+            "relative_error_change": -0.3493915132592595,
+            "regressed": false
+          },
+          {
+            "locale": "en-US",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.03375245807780697,
+            "macro_mean_strict_or_raw_wer": 0.028862455439211454,
+            "relative_error_change": -0.14487841529416803,
+            "regressed": false
+          },
+          {
+            "locale": "es-419",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.039326762762187745,
+            "macro_mean_strict_or_raw_wer": 0.03468872833194239,
+            "relative_error_change": -0.117935830576545,
+            "regressed": false
+          },
+          {
+            "locale": "fr-FR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.04857978699475532,
+            "macro_mean_strict_or_raw_wer": 0.03518254196162258,
+            "relative_error_change": -0.2757781756963881,
+            "regressed": false
+          },
+          {
+            "locale": "pt-BR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.06710500679074409,
+            "macro_mean_strict_or_raw_wer": 0.05298026130016461,
+            "relative_error_change": -0.21048720752871947,
+            "regressed": false
+          }
+        ]
+      },
+      "repeat_stability": {
+        "complete_pairs": 0,
+        "byte_identical_raw_output_pairs": 0,
+        "non_identical_raw_output_pairs": 0,
+        "requirement": "observation-only-for-remote-services"
+      },
+      "observed": {
+        "total_cost_usd": 0.50952,
+        "served_models": [
+          "openai/gpt-5.6-terra"
+        ],
+        "served_providers": [
+          "Azure"
+        ],
+        "explicit_unbilled_429_deferrals": 0
+      }
+    },
+    {
+      "candidate": "kimi-k3-openrouter-moonshot-int4",
+      "disposition": "continue-repeat-1",
+      "rationale": "Repeat 1 is incomplete and no irreversible gate has failed.",
+      "repeats": [
+        {
+          "repetition": 1,
+          "completed_requests": 4,
+          "mechanically_accepted_requests": 4,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 2,
+          "regressed_sections": 0,
+          "locale_quality": [
+            {
+              "locale": "de-DE",
+              "observations": 1,
+              "macro_mean_raw_wer": 0.051094890510948905,
+              "macro_mean_strict_or_raw_wer": 0.043795620437956206,
+              "relative_error_change": -0.14285714285714282,
+              "regressed": false
+            },
+            {
+              "locale": "en-US",
+              "observations": 1,
+              "macro_mean_raw_wer": 0,
+              "macro_mean_strict_or_raw_wer": 0,
+              "relative_error_change": null,
+              "regressed": false
+            },
+            {
+              "locale": "fr-FR",
+              "observations": 1,
+              "macro_mean_raw_wer": 0.06806282722513089,
+              "macro_mean_strict_or_raw_wer": 0.03664921465968586,
+              "relative_error_change": -0.4615384615384616,
+              "regressed": false
+            },
+            {
+              "locale": "pt-BR",
+              "observations": 1,
+              "macro_mean_raw_wer": 0,
+              "macro_mean_strict_or_raw_wer": 0,
+              "relative_error_change": null,
+              "regressed": false
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "completed_requests": 0,
+          "mechanically_accepted_requests": 0,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 0,
+          "regressed_sections": 0,
+          "locale_quality": []
+        }
+      ],
+      "combined": {
+        "completed_requests": 4,
+        "mechanically_accepted_requests": 4,
+        "invalid_requests": 0,
+        "token_limit_failures": 0,
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "locale_macro_wer_regressions": 0,
+        "changed_correct_input_to_error": 0,
+        "improved_sections": 2,
+        "regressed_sections": 0,
+        "locale_quality": [
+          {
+            "locale": "de-DE",
+            "observations": 1,
+            "macro_mean_raw_wer": 0.051094890510948905,
+            "macro_mean_strict_or_raw_wer": 0.043795620437956206,
+            "relative_error_change": -0.14285714285714282,
+            "regressed": false
+          },
+          {
+            "locale": "en-US",
+            "observations": 1,
+            "macro_mean_raw_wer": 0,
+            "macro_mean_strict_or_raw_wer": 0,
+            "relative_error_change": null,
+            "regressed": false
+          },
+          {
+            "locale": "fr-FR",
+            "observations": 1,
+            "macro_mean_raw_wer": 0.06806282722513089,
+            "macro_mean_strict_or_raw_wer": 0.03664921465968586,
+            "relative_error_change": -0.4615384615384616,
+            "regressed": false
+          },
+          {
+            "locale": "pt-BR",
+            "observations": 1,
+            "macro_mean_raw_wer": 0,
+            "macro_mean_strict_or_raw_wer": 0,
+            "relative_error_change": null,
+            "regressed": false
+          }
+        ]
+      },
+      "repeat_stability": {
+        "complete_pairs": 0,
+        "byte_identical_raw_output_pairs": 0,
+        "non_identical_raw_output_pairs": 0,
+        "requirement": "observation-only-for-remote-services"
+      },
+      "observed": {
+        "total_cost_usd": 0.0434466,
+        "served_models": [
+          "moonshotai/kimi-k3"
+        ],
+        "served_providers": [
+          "Moonshot AI"
+        ],
+        "explicit_unbilled_429_deferrals": 0
+      }
+    },
+    {
+      "candidate": "claude-sonnet-5-openrouter-azure-us-east-2",
+      "disposition": "advance-to-repeat-2",
+      "rationale": "Repeat 1 passed every precommitted gate.",
+      "repeats": [
+        {
+          "repetition": 1,
+          "completed_requests": 60,
+          "mechanically_accepted_requests": 60,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 40,
+          "regressed_sections": 2,
+          "locale_quality": [
+            {
+              "locale": "de-DE",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.13910778442345406,
+              "macro_mean_strict_or_raw_wer": 0.11189523085800611,
+              "relative_error_change": -0.19562207591928135,
+              "regressed": false
+            },
+            {
+              "locale": "en-US",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.03375245807780697,
+              "macro_mean_strict_or_raw_wer": 0.029058454978550585,
+              "relative_error_change": -0.13907144446889336,
+              "regressed": false
+            },
+            {
+              "locale": "es-419",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.039326762762187745,
+              "macro_mean_strict_or_raw_wer": 0.030731277759048364,
+              "relative_error_change": -0.21856579081062444,
+              "regressed": false
+            },
+            {
+              "locale": "fr-FR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.04857978699475532,
+              "macro_mean_strict_or_raw_wer": 0.03870894812720622,
+              "relative_error_change": -0.20318818747835923,
+              "regressed": false
+            },
+            {
+              "locale": "pt-BR",
+              "observations": 12,
+              "macro_mean_raw_wer": 0.06710500679074409,
+              "macro_mean_strict_or_raw_wer": 0.04453837638769146,
+              "relative_error_change": -0.33628832604730896,
+              "regressed": false
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "completed_requests": 0,
+          "mechanically_accepted_requests": 0,
+          "invalid_requests": 0,
+          "token_limit_failures": 0,
+          "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+          "locale_macro_wer_regressions": 0,
+          "changed_correct_input_to_error": 0,
+          "improved_sections": 0,
+          "regressed_sections": 0,
+          "locale_quality": []
+        }
+      ],
+      "combined": {
+        "completed_requests": 60,
+        "mechanically_accepted_requests": 60,
+        "invalid_requests": 0,
+        "token_limit_failures": 0,
+        "accepted_sections_above_30_percent_input_output_word_edit_rate": 0,
+        "locale_macro_wer_regressions": 0,
+        "changed_correct_input_to_error": 0,
+        "improved_sections": 40,
+        "regressed_sections": 2,
+        "locale_quality": [
+          {
+            "locale": "de-DE",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.13910778442345406,
+            "macro_mean_strict_or_raw_wer": 0.11189523085800611,
+            "relative_error_change": -0.19562207591928135,
+            "regressed": false
+          },
+          {
+            "locale": "en-US",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.03375245807780697,
+            "macro_mean_strict_or_raw_wer": 0.029058454978550585,
+            "relative_error_change": -0.13907144446889336,
+            "regressed": false
+          },
+          {
+            "locale": "es-419",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.039326762762187745,
+            "macro_mean_strict_or_raw_wer": 0.030731277759048364,
+            "relative_error_change": -0.21856579081062444,
+            "regressed": false
+          },
+          {
+            "locale": "fr-FR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.04857978699475532,
+            "macro_mean_strict_or_raw_wer": 0.03870894812720622,
+            "relative_error_change": -0.20318818747835923,
+            "regressed": false
+          },
+          {
+            "locale": "pt-BR",
+            "observations": 12,
+            "macro_mean_raw_wer": 0.06710500679074409,
+            "macro_mean_strict_or_raw_wer": 0.04453837638769146,
+            "relative_error_change": -0.33628832604730896,
+            "regressed": false
+          }
+        ]
+      },
+      "repeat_stability": {
+        "complete_pairs": 0,
+        "byte_identical_raw_output_pairs": 0,
+        "non_identical_raw_output_pairs": 0,
+        "requirement": "observation-only-for-remote-services"
+      },
+      "observed": {
+        "total_cost_usd": 0.7164320000000003,
+        "served_models": [
+          "anthropic/claude-sonnet-5"
+        ],
+        "served_providers": [
+          "Azure"
+        ],
+        "explicit_unbilled_429_deferrals": 0
+      }
+    }
+  ],
+  "decision_boundary": "A promoted development survivor may enter the broader factorial or held-out evaluation; it is not a product-quality selection."
+}

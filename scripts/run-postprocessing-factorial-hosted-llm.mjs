@@ -119,7 +119,7 @@ async function loadContract() {
 async function validateContract(screen, plan, ledger) {
   if (
     screen.id !== 'postprocessing-factorial-hosted-target-complete-preflight-2' ||
-    plan.id !== 'postprocessing-factorial-hosted-target-complete-plan-2' ||
+    plan.id !== 'postprocessing-factorial-hosted-target-complete-plan-3' ||
     screen.plan_id !== ledger.plan_id ||
     screen.plan_revision !== ledger.plan_revision ||
     plan.plan_id !== screen.plan_id ||
@@ -478,12 +478,39 @@ async function runStage() {
           `${requestEnvelope.toFixed(6)}, budget ${budget.toFixed(6)}`,
         );
       }
-      const response = await requestCorrection(
-        candidate.manifest,
-        screen,
-        renderedPrompt,
-        apiKey,
-      );
+      const rateLimitDeferrals = [];
+      let response;
+      while (response === undefined) {
+        try {
+          response = await requestCorrection(
+            candidate.manifest,
+            screen,
+            renderedPrompt,
+            apiKey,
+          );
+        } catch (error) {
+          const maximumDeferrals =
+            screen.execution_policy
+              .maximum_explicit_unbilled_429_deferrals_per_logical_request;
+          if (
+            error.code !== 'OPENROUTER_UNBILLED_RATE_LIMIT' ||
+            rateLimitDeferrals.length >= maximumDeferrals
+          ) {
+            throw error;
+          }
+          rateLimitDeferrals.push({
+            retry_after_ms: error.retryAfterMs,
+            provider: error.provider,
+          });
+          process.stderr.write(
+            `hosted llm: ${candidate.id} explicit unbilled 429; ` +
+            `deferring ${error.retryAfterMs} ms ` +
+            `(${rateLimitDeferrals.length}/${maximumDeferrals})\n`,
+          );
+          await delay(error.retryAfterMs);
+        }
+      }
+      response.rateLimitDeferrals = rateLimitDeferrals;
       const parsed = parseTargetOutput(response.text);
       const reachedLimit = response.finishReason === 'length';
       const result = buildResult({
@@ -563,6 +590,30 @@ async function requestCorrection(manifest, screen, prompt, apiKey) {
   const durationMs = performance.now() - started;
   const responseText = await response.text();
   if (!response.ok) {
+    if (response.status === 429) {
+      let metadata = {};
+      try {
+        metadata = JSON.parse(responseText).error?.metadata ?? {};
+      } catch {
+        // The Retry-After header remains the bounded fallback.
+      }
+      const retryAfterSeconds = Number(
+        metadata.retry_after_seconds ??
+        response.headers.get('retry-after') ??
+        1,
+      );
+      const error = new Error(
+        `OpenRouter explicit unbilled HTTP 429 from ` +
+        `${metadata.provider_name ?? '<unknown provider>'}`,
+      );
+      error.code = 'OPENROUTER_UNBILLED_RATE_LIMIT';
+      error.provider = metadata.provider_name ?? null;
+      error.retryAfterMs = Math.min(
+        60_000,
+        Math.max(1_000, Math.ceil(retryAfterSeconds * 1000)) + 250,
+      );
+      throw error;
+    }
     throw new Error(
       `OpenRouter HTTP ${response.status}: ${responseText.slice(0, 800)}`,
     );
@@ -726,6 +777,8 @@ function buildResult({
       served_provider: response.servedProvider,
       total_tokens: response.totalTokens,
       is_byok: response.isByok,
+      rate_limit_deferrals_before_response:
+        response.rateLimitDeferrals ?? [],
     },
     output: {
       raw_text: response.text,
@@ -980,6 +1033,8 @@ function evaluateCandidate(summary, plan, candidateId) {
         request.served_model).filter(Boolean))].sort(),
       served_providers: [...new Set(requests.map((request) =>
         request.served_provider).filter(Boolean))].sort(),
+      explicit_unbilled_429_deferrals: sum(requests.map((request) =>
+        request.rate_limit_deferrals_before_response?.length ?? 0)),
     },
   };
 }
@@ -1276,6 +1331,10 @@ function roundUpCents(value) {
 
 function formatUsd(value) {
   return Number(value).toFixed(8);
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve_) => setTimeout(resolve_, milliseconds));
 }
 
 function sha256(bytes) {
