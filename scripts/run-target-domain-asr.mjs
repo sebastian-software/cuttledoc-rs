@@ -10,7 +10,7 @@ import {
   stat,
   writeFile,
 } from 'node:fs/promises';
-import { totalmem } from 'node:os';
+import { cpus, totalmem } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -706,7 +706,10 @@ function orderResults(record, expectedBackends) {
 function hostMetadata() {
   return {
     id: 'mac-studio-m1-ultra-local',
-    chip: commandOutput('sysctl', ['-n', 'machdep.cpu.brand_string']).trim(),
+    chip:
+      optionalCommandOutput('sysctl', ['-n', 'machdep.cpu.brand_string']) ??
+      cpus()[0]?.model ??
+      'unknown',
     memory_bytes: totalmem(),
     os:
       `${commandOutput('sw_vers', ['-productName']).trim()} ` +
@@ -715,6 +718,14 @@ function hostMetadata() {
     architecture: process.arch,
     power_state: 'unknown',
   };
+}
+
+function optionalCommandOutput(command, arguments_) {
+  try {
+    return commandOutput(command, arguments_).trim() || null;
+  } catch {
+    return null;
+  }
 }
 
 function timedCommand(command, arguments_, environment = process.env) {
