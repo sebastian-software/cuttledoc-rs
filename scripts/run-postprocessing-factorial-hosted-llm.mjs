@@ -488,6 +488,7 @@ async function runStage() {
       }
       const rateLimitDeferrals = [];
       let response;
+      let terminalResponseFailure;
       while (response === undefined) {
         try {
           response = await requestCorrection(
@@ -497,6 +498,10 @@ async function runStage() {
             apiKey,
           );
         } catch (error) {
+          if (error.code === 'OPENROUTER_TERMINAL_RESPONSE') {
+            terminalResponseFailure = error;
+            break;
+          }
           const maximumDeferrals =
             screen.execution_policy
               .maximum_explicit_unbilled_429_deferrals_per_logical_request;
@@ -517,6 +522,30 @@ async function runStage() {
           );
           await delay(error.retryAfterMs);
         }
+      }
+      if (terminalResponseFailure !== undefined) {
+        const result = buildTerminalResponseFailureResult({
+          screen,
+          candidate,
+          job,
+          sourceRevision,
+          renderedPrompt,
+          failure: terminalResponseFailure,
+          rateLimitDeferrals,
+        });
+        await atomicJson(output, result);
+        const failureCost = terminalResponseFailure.costUsd ??
+          terminalResponseFailure.estimatedCostUsd;
+        if (Number.isFinite(failureCost)) chargedThisInvocation += failureCost;
+        completed += 1;
+        process.stdout.write(
+          `hosted llm: ${candidate.id} ${job.requestId} repeat ${repetition} ` +
+          `(${completed + resumed}/${jobs.length}) parser=terminal-invalid ` +
+          `cost=${Number.isFinite(failureCost)
+            ? `$${formatUsd(failureCost)}`
+            : 'unknown'}\n`,
+        );
+        continue;
       }
       response.rateLimitDeferrals = rateLimitDeferrals;
       const parsed = parseTargetOutput(response.text);
@@ -629,10 +658,33 @@ async function requestCorrection(manifest, screen, prompt, apiKey) {
   const envelope = JSON.parse(responseText);
   const choice = envelope.choices?.[0];
   const content = choice?.message?.content;
+  const usage = envelope.usage ?? {};
+  const costUsd = Number.isFinite(usage.cost) ? usage.cost : null;
+  const pricing = manifest.gateway.pricing_snapshot_usd_per_token;
+  const estimatedCostUsd =
+    (usage.prompt_tokens ?? 0) * Number(pricing.prompt) +
+    (usage.completion_tokens ?? 0) * Number(pricing.completion);
   if (typeof content !== 'string') {
-    throw new Error(
+    const error = new Error(
       `OpenRouter response ${envelope.id ?? '<unknown>'} has no string content`,
     );
+    error.code = 'OPENROUTER_TERMINAL_RESPONSE';
+    error.responseBodySha256 = sha256(Buffer.from(responseText));
+    error.responseId = envelope.id ?? null;
+    error.servedModel = envelope.model ?? null;
+    error.servedProvider = envelope.provider ?? null;
+    error.finishReason = choice?.finish_reason ?? null;
+    error.durationMs = durationMs;
+    error.promptTokens = usage.prompt_tokens ?? null;
+    error.completionTokens = usage.completion_tokens ?? null;
+    error.totalTokens = usage.total_tokens ?? null;
+    error.costUsd = costUsd;
+    error.estimatedCostUsd =
+      usage.prompt_tokens === undefined && usage.completion_tokens === undefined
+        ? null
+        : estimatedCostUsd;
+    error.isByok = usage.is_byok ?? false;
+    throw error;
   }
   if (envelope.provider !== manifest.gateway.provider_name) {
     throw new Error(
@@ -645,12 +697,6 @@ async function requestCorrection(manifest, screen, prompt, apiKey) {
       `model identity drift: received ${envelope.model ?? '<missing>'}`,
     );
   }
-  const usage = envelope.usage ?? {};
-  const costUsd = Number.isFinite(usage.cost) ? usage.cost : null;
-  const pricing = manifest.gateway.pricing_snapshot_usd_per_token;
-  const estimatedCostUsd =
-    (usage.prompt_tokens ?? 0) * Number(pricing.prompt) +
-    (usage.completion_tokens ?? 0) * Number(pricing.completion);
   return {
     text: content.trim(),
     responseId: envelope.id ?? null,
@@ -802,6 +848,109 @@ function buildResult({
         : [],
       patches: null,
       mechanically_accepted: parsed.valid && !reachedLimit,
+    },
+    environment: {
+      node: process.version,
+      service: 'OpenRouter',
+    },
+  };
+}
+
+function buildTerminalResponseFailureResult({
+  screen,
+  candidate,
+  job,
+  sourceRevision,
+  renderedPrompt,
+  failure,
+  rateLimitDeferrals,
+}) {
+  const target = job.document.model_input.sections[job.targetIndex];
+  return {
+    schema_version: '1.0.0',
+    id: `${candidate.id}--${job.requestId}--repeat-${job.repetition}`,
+    screen_id: screen.id,
+    plan_id: screen.plan_id,
+    plan_revision: screen.plan_revision,
+    source_revision: sourceRevision,
+    captured_at: new Date().toISOString(),
+    candidate: {
+      manifest_id: candidate.id,
+      role: candidate.role,
+      model: candidate.manifest.model,
+      gateway: {
+        name: candidate.manifest.gateway.name,
+        provider_slug: candidate.manifest.gateway.provider_slug,
+        provider_name: candidate.manifest.gateway.provider_name,
+        request_policy: candidate.manifest.gateway.request_policy,
+      },
+      runtime: 'OpenRouter chat completions API',
+    },
+    document: {
+      id: job.document.id,
+      path: repositoryPath(job.documentPath),
+      sha256: job.documentSha256,
+      locale: job.document.model_input.locale,
+      tts_engine: job.document.dimensions.tts_engine,
+      voice_slot_id: job.document.dimensions.voice_slot_id,
+      realization_id: job.document.dimensions.realization_id,
+      stt_model: job.document.dimensions.stt_model,
+      target_index: job.targetIndex,
+      target_section_id: target.id,
+    },
+    prompt: {
+      id: screen.generation.prompt_id,
+      sha256: screen.generation.prompt_sha256,
+      rendered_sha256: sha256(Buffer.from(renderedPrompt)),
+      reference_visible_to_model: false,
+    },
+    repetition: job.repetition,
+    generation: {
+      seed: candidate.manifest.request_defaults.seed,
+      temperature: candidate.manifest.request_defaults.temperature,
+      reasoning: candidate.manifest.request_defaults.reasoning,
+      max_tokens: screen.generation.max_tokens,
+      finish_reason: failure.finishReason,
+      reached_token_limit: failure.finishReason === 'length',
+    },
+    measurements: {
+      model_load_ms: null,
+      first_token_ms: null,
+      complete_generation_ms: failure.durationMs,
+      prompt_tokens: failure.promptTokens,
+      generation_tokens: failure.completionTokens,
+      prompt_tokens_per_second: null,
+      generation_tokens_per_second: null,
+      cost_usd: failure.costUsd,
+      pricing_estimated_cost_usd: failure.estimatedCostUsd,
+    },
+    response: {
+      id: failure.responseId,
+      served_model: failure.servedModel,
+      served_provider: failure.servedProvider,
+      total_tokens: failure.totalTokens,
+      is_byok: failure.isByok,
+      body_sha256: failure.responseBodySha256,
+      rate_limit_deferrals_before_response: rateLimitDeferrals,
+    },
+    output: {
+      raw_text: '',
+      raw_text_sha256: sha256(Buffer.from('')),
+      token_ids: null,
+      parser: {
+        valid: false,
+        error: failure.message,
+        transport_envelope: 'missing-content',
+      },
+      sections: [],
+      patches: null,
+      mechanically_accepted: false,
+    },
+    terminal_failure: {
+      retry_disposition:
+        'not-retried-because-the-success-response-may-have-been-charged',
+      evidence_limit:
+        'The raw API envelope is represented only by its SHA-256 digest.',
     },
     environment: {
       node: process.version,
