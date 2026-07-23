@@ -118,8 +118,8 @@ async function loadContract() {
 
 async function validateContract(screen, plan, ledger) {
   if (
-    screen.id !== 'postprocessing-factorial-hosted-target-complete-preflight-1' ||
-    plan.id !== 'postprocessing-factorial-hosted-target-complete-plan-1' ||
+    screen.id !== 'postprocessing-factorial-hosted-target-complete-preflight-2' ||
+    plan.id !== 'postprocessing-factorial-hosted-target-complete-plan-2' ||
     screen.plan_id !== ledger.plan_id ||
     screen.plan_revision !== ledger.plan_revision ||
     plan.plan_id !== screen.plan_id ||
@@ -132,7 +132,7 @@ async function validateContract(screen, plan, ledger) {
     new Set(screen.scope.document_ids).size !== 10 ||
     screen.candidates.length !== 5 ||
     screen.generation.repetitions !== 2 ||
-    screen.generation.max_tokens !== 768 ||
+    screen.generation.max_tokens !== 2048 ||
     screen.expected_counts.documents !== 10 ||
     screen.expected_counts.document_model_pairs !== 50 ||
     screen.expected_counts.target_model_pairs !== 300 ||
@@ -303,7 +303,12 @@ async function estimateCost() {
     const likelyInputTokens = Math.ceil(hardInputTokens / 4);
     const hardOutputTokens =
       promptCodePoints.length * screen.generation.max_tokens;
-    const likelyOutputTokens = Math.ceil(sum(targetCodePoints) / 3);
+    const likelyReasoningTokensPerRequest =
+      ['low'].includes(candidate.manifest.request_defaults.reasoning?.effort)
+        ? 768
+        : 0;
+    const likelyOutputTokens = Math.ceil(sum(targetCodePoints) / 3) +
+      promptCodePoints.length * likelyReasoningTokensPerRequest;
     const cost = (inputTokens, outputTokens) =>
       inputTokens * Number(pricing.prompt) +
       outputTokens * Number(pricing.completion);
@@ -319,6 +324,7 @@ async function estimateCost() {
       rendered_prompt_code_points_per_repeat: hardInputTokens,
       likely_input_tokens_per_repeat: likelyInputTokens,
       maximum_configured_completion_tokens_per_repeat: hardOutputTokens,
+      likely_reasoning_tokens_per_request: likelyReasoningTokensPerRequest,
       likely_output_tokens_per_repeat: likelyOutputTokens,
       likely_cost_per_repeat_usd: cost(likelyInputTokens, likelyOutputTokens),
       conservative_planning_envelope_per_repeat_usd:
@@ -345,7 +351,7 @@ async function estimateCost() {
       hard_output_envelope:
         'Every request consumes the configured completion-token maximum.',
       likely_output_estimate:
-        'One output token per three Unicode code points in the raw target JSON.',
+        'One output token per three Unicode code points in the raw target JSON, plus 768 hidden reasoning tokens per request for low-reasoning routes.',
       limitation:
         'Only provider-reported usage and cost are authoritative after execution.',
     },
@@ -1152,6 +1158,7 @@ async function validExisting(path, screen, candidate, job) {
       result.document.sha256 === job.documentSha256 &&
       result.document.target_index === job.targetIndex &&
       result.prompt.sha256 === screen.generation.prompt_sha256 &&
+      result.generation.max_tokens === screen.generation.max_tokens &&
       result.repetition === job.repetition
     );
   } catch {

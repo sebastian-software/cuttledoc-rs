@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-hosted-target-complete-plan-1-cost-estimate-1",
-  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-1",
-  "plan_sha256": "1ba5db3af2e611083e0cfbcc2fbe99bee8e073bc441faa715652a5b10f132840",
-  "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-1",
-  "screen_sha256": "91bcb41c7cdc6fc42859471bc4107c7f0db9e3e5615f2544fb0f64ea53816b05",
-  "captured_at": "2026-07-23T15:26:46.116Z",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-2-cost-estimate-1",
+  "plan_id": "postprocessing-factorial-hosted-target-complete-plan-2",
+  "plan_sha256": "e6124ec3e79c0375e93b0b24365c8150c2aa1b0a3b16518b6e7f7254e91cc0fd",
+  "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-2",
+  "screen_sha256": "b4db256f44b0382cbfffa09f9e667e6bb4801000199d7c6469b77479b193e93d",
+  "captured_at": "2026-07-23T15:31:42.982Z",
   "method": {
     "hard_input_envelope": "One input token per rendered Unicode code point.",
     "likely_input_estimate": "One input token per four rendered Unicode code points.",
     "hard_output_envelope": "Every request consumes the configured completion-token maximum.",
-    "likely_output_estimate": "One output token per three Unicode code points in the raw target JSON.",
+    "likely_output_estimate": "One output token per three Unicode code points in the raw target JSON, plus 768 hidden reasoning tokens per request for low-reasoning routes.",
     "limitation": "Only provider-reported usage and cost are authoritative after execution."
   },
   "scope": {
@@ -38,11 +38,12 @@
       "requests_per_repeat": 60,
       "rendered_prompt_code_points_per_repeat": 502182,
       "likely_input_tokens_per_repeat": 125546,
-      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "maximum_configured_completion_tokens_per_repeat": 122880,
+      "likely_reasoning_tokens_per_request": 0,
       "likely_output_tokens_per_repeat": 19022,
       "likely_cost_per_repeat_usd": 1.318229,
-      "conservative_planning_envelope_per_repeat_usd": 4.282641,
-      "recommended_runner_budget_per_repeat_usd": 4.29
+      "conservative_planning_envelope_per_repeat_usd": 6.817041,
+      "recommended_runner_budget_per_repeat_usd": 6.82
     },
     {
       "candidate": "gemini-3.6-flash-openrouter-google-vertex-global",
@@ -55,11 +56,12 @@
       "requests_per_repeat": 60,
       "rendered_prompt_code_points_per_repeat": 502182,
       "likely_input_tokens_per_repeat": 125546,
-      "maximum_configured_completion_tokens_per_repeat": 46080,
-      "likely_output_tokens_per_repeat": 19022,
-      "likely_cost_per_repeat_usd": 0.33098400000000006,
-      "conservative_planning_envelope_per_repeat_usd": 1.098873,
-      "recommended_runner_budget_per_repeat_usd": 1.1
+      "maximum_configured_completion_tokens_per_repeat": 122880,
+      "likely_reasoning_tokens_per_request": 768,
+      "likely_output_tokens_per_repeat": 65102,
+      "likely_cost_per_repeat_usd": 0.6765840000000001,
+      "conservative_planning_envelope_per_repeat_usd": 1.6748729999999998,
+      "recommended_runner_budget_per_repeat_usd": 1.68
     },
     {
       "candidate": "gpt-5.6-terra-openrouter-azure-eu",
@@ -72,11 +74,12 @@
       "requests_per_repeat": 60,
       "rendered_prompt_code_points_per_repeat": 502182,
       "likely_input_tokens_per_repeat": 125546,
-      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "maximum_configured_completion_tokens_per_repeat": 122880,
+      "likely_reasoning_tokens_per_request": 0,
       "likely_output_tokens_per_repeat": 19022,
       "likely_cost_per_repeat_usd": 0.6591145,
-      "conservative_planning_envelope_per_repeat_usd": 2.1413205,
-      "recommended_runner_budget_per_repeat_usd": 2.15
+      "conservative_planning_envelope_per_repeat_usd": 3.4085205,
+      "recommended_runner_budget_per_repeat_usd": 3.41
     },
     {
       "candidate": "kimi-k3-openrouter-moonshot-int4",
@@ -89,11 +92,12 @@
       "requests_per_repeat": 60,
       "rendered_prompt_code_points_per_repeat": 502182,
       "likely_input_tokens_per_repeat": 125546,
-      "maximum_configured_completion_tokens_per_repeat": 46080,
+      "maximum_configured_completion_tokens_per_repeat": 122880,
+      "likely_reasoning_tokens_per_request": 0,
       "likely_output_tokens_per_repeat": 19022,
       "likely_cost_per_repeat_usd": 0.6619680000000001,
-      "conservative_planning_envelope_per_repeat_usd": 2.197746,
-      "recommended_runner_budget_per_repeat_usd": 2.2
+      "conservative_planning_envelope_per_repeat_usd": 3.3497459999999997,
+      "recommended_runner_budget_per_repeat_usd": 3.35
     },
     {
       "candidate": "claude-sonnet-5-openrouter-azure-us-east-2",
@@ -106,19 +110,20 @@
       "requests_per_repeat": 60,
       "rendered_prompt_code_points_per_repeat": 502182,
       "likely_input_tokens_per_repeat": 125546,
-      "maximum_configured_completion_tokens_per_repeat": 46080,
-      "likely_output_tokens_per_repeat": 19022,
-      "likely_cost_per_repeat_usd": 0.44131200000000004,
-      "conservative_planning_envelope_per_repeat_usd": 1.4651640000000001,
-      "recommended_runner_budget_per_repeat_usd": 1.47
+      "maximum_configured_completion_tokens_per_repeat": 122880,
+      "likely_reasoning_tokens_per_request": 768,
+      "likely_output_tokens_per_repeat": 65102,
+      "likely_cost_per_repeat_usd": 0.902112,
+      "conservative_planning_envelope_per_repeat_usd": 2.2331640000000004,
+      "recommended_runner_budget_per_repeat_usd": 2.24
     }
   ],
   "aggregate": {
-    "likely_cost_repeat_1_all_candidates_usd": 3.4116074999999997,
-    "conservative_planning_envelope_repeat_1_all_candidates_usd": 11.1857445,
-    "conservative_planning_envelope_two_repeats_all_candidates_usd": 22.371489,
-    "recommended_runner_budget_repeat_1_all_candidates_usd": 11.210000000000003,
-    "recommended_runner_budget_two_repeats_all_candidates_usd": 22.420000000000005
+    "likely_cost_repeat_1_all_candidates_usd": 4.2180075,
+    "conservative_planning_envelope_repeat_1_all_candidates_usd": 17.4833445,
+    "conservative_planning_envelope_two_repeats_all_candidates_usd": 34.966689,
+    "recommended_runner_budget_repeat_1_all_candidates_usd": 17.5,
+    "recommended_runner_budget_two_repeats_all_candidates_usd": 35
   },
   "authorization_boundary": "The estimate does not authorize requests. The runner additionally requires an explicit per-invocation USD budget."
 }

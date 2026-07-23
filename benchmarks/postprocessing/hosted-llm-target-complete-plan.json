@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-hosted-target-complete-plan-1",
+  "id": "postprocessing-factorial-hosted-target-complete-plan-2",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
   "plan_revision": "postprocessing-factorial-plan-6",
   "screen_path": "benchmarks/postprocessing/hosted-llm-target-complete-screen.json",
@@ -88,10 +88,11 @@
   "cost_policy": {
     "currency": "USD",
     "estimate_path": "benchmarks/postprocessing/hosted-llm-target-complete-estimate.json",
+    "calibration_path": "benchmarks/postprocessing/hosted-llm-target-complete-calibration.json",
     "estimate_required_before_execution": true,
     "runner_budget_required": true,
     "automatic_request_retry": false,
-    "maximum_configured_completion_tokens_per_request": 768,
+    "maximum_configured_completion_tokens_per_request": 2048,
     "conservative_input_accounting": "Count each rendered Unicode code point as one input token for the hard planning envelope; this deliberately overstates normal tokenizer usage."
   },
   "decision_rule": "Only candidates that pass repeat one receive repeat two. Only candidates that pass the complete two-repeat gates may be considered for the full factorial matrix or later held-out professional-audio evaluation.",

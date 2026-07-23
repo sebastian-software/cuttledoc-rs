@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-hosted-target-complete-token-cap-calibration-1",
+  "screen_id": "postprocessing-factorial-hosted-target-complete-preflight-1",
+  "source_revision": "a74b87a71ed284782d1546ffaf175d7cfb9ec95d",
+  "captured_at": "2026-07-23T15:29:34.793Z",
+  "candidate": "gemini-3.6-flash-openrouter-google-vertex-global",
+  "request": {
+    "response_id": "gen-1784820569-YK6gT7yK4ZYT6sldwTYb",
+    "served_model": "google/gemini-3.6-flash",
+    "served_provider": "Google",
+    "document_id": "document--pt-BR--qwen-pt-clear--repeat-1--parakeet-tdt-0.6b-v3-coreml",
+    "target_index": 4,
+    "target_section_id": "pt-dialogue-a",
+    "rendered_prompt_sha256": "f936eefb7586589e62e00651c5e7596f6cca3d03813f94eec94d554520a08f9f",
+    "raw_output_sha256": "b9d8720809e0d5302ad38d5f7c0147d62b44ce30556b30c21ac2717a48c58657",
+    "prompt_tokens": 1956,
+    "completion_tokens": 750,
+    "configured_completion_token_limit": 768,
+    "finish_reason": "length",
+    "parser_error": "Unterminated string in JSON at position 39 (line 2 column 38)",
+    "provider_reported_cost_usd": 0.008559
+  },
+  "finding": "The initial cap was a runner calibration error, not candidate-quality evidence. Gemini low reasoning consumed nearly the entire completion allowance before its truncated 39-character JSON content.",
+  "decision": {
+    "candidate_rejected": false,
+    "preflight_request_counted": false,
+    "replacement_screen_id": "postprocessing-factorial-hosted-target-complete-preflight-2",
+    "replacement_plan_id": "postprocessing-factorial-hosted-target-complete-plan-2",
+    "replacement_completion_token_limit": 2048,
+    "restart_required": true,
+    "rationale": "The 222-word maximum target plus hidden low-reasoning use requires materially more headroom. The replacement matches the already exercised local target screen and remains budget-bounded."
+  },
+  "privacy": {
+    "zdr": true,
+    "provider_fallback": false,
+    "data_collection": "deny"
+  },
+  "claim_limit": "This single paid calibration request establishes only that the original completion cap was too small for this routed reasoning configuration."
+}

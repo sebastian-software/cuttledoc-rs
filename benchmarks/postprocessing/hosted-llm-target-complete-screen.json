@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "id": "postprocessing-factorial-hosted-target-complete-preflight-1",
+  "id": "postprocessing-factorial-hosted-target-complete-preflight-2",
   "plan_id": "postprocessing-factorial-primary-languages-v1",
   "plan_revision": "postprocessing-factorial-plan-6",
   "purpose": "Preflight the five pinned hosted quality ceilings on the same frozen 60-target challenge set that rejected the local Gemma candidate.",
@@ -76,7 +76,7 @@
     "prompt_id": "conservative-target-complete-v5",
     "prompt_path": "benchmarks/postprocessing/prompts/conservative-target-complete-v5.txt",
     "prompt_sha256": "bb135e4a70be705daf94e25a96ac6170916e397fdd2b7751f4fbdd87e1730585",
-    "max_tokens": 768,
+    "max_tokens": 2048,
     "timeout_ms": 300000,
     "repetitions": 2,
     "output_contract": "bounded-transcript-target-complete-v5",

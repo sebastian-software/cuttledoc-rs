@@ -604,12 +604,20 @@ Execution is deliberately staged:
    both repeats must still pass the contract and quality gates.
 
 The conservative cost envelope counts every rendered Unicode code point as an
-input token and assumes every response consumes all 768 configured completion
-tokens. On the materialized slice it is `$11.19` for repeat one across all five
-models and `$22.38` if every model survives into repeat two. The more realistic
-pre-run estimate for repeat one is `$3.42`. Actual provider-reported request
-cost remains authoritative. The runner refuses to start without an explicit
+input token and assumes every response consumes all 2,048 configured completion
+tokens. On the materialized slice it is `$17.49` for repeat one across all five
+models and `$34.97` if every model survives into repeat two. The more realistic
+pre-run estimate for repeat one is `$4.22`, including a 768-token reasoning
+allowance for each low-reasoning route. Actual provider-reported request cost
+remains authoritative. The runner refuses to start without an explicit
 per-invocation USD budget and never retries a paid request automatically.
+
+The original 768-token cap was retired after one `$0.008559` Gemini calibration
+request spent 750 completion tokens and reached `finish_reason=length` after
+only 39 content characters. That request is not candidate-quality evidence and
+is excluded from the preflight; its redacted
+[calibration record](../benchmarks/postprocessing/hosted-llm-target-complete-calibration.json)
+preserves the cost, response identity, digests, and corrective decision.
 
 Prepare and validate the run without a network request:
 
@@ -626,7 +634,7 @@ node --env-file=.env.local \
   scripts/run-postprocessing-factorial-hosted-llm.mjs run \
   --repetition 1 \
   --candidate gemini-3.6-flash-openrouter-google-vertex-global \
-  --budget-usd 1.10
+  --budget-usd 1.68
 node scripts/run-postprocessing-factorial-hosted-llm.mjs summarize
 ```
 
