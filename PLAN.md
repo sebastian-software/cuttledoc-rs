@@ -85,7 +85,7 @@ Evidence snapshot: 2026-07-23.
 | Synthetic TTS roundtrip (#13) | In progress | The required Apple, Qwen VoiceDesign, and Voxtral BF16 factorial slices are complete: 370 digest-pinned audio artifacts, 1,110 three-receiver transcripts, and 180 six-section LLM documents across DE/EN/ES/FR/PT. Voxtral passed all ten technical voice gates, completed 120 primary documents without a retry or token cap, and produced 10/10 identical same-seed audio plus 30/30 identical transcript controls. Hosted TTS ceilings and held-out human professional audio remain optional comparison/final-quality work. |
 | Thin Node/npm boundary (#9) | Complete | Node 22/24 CI builds, packs, compiler-free installs, and tests the same macOS arm64 tarball through ESM and CommonJS, including streaming fields, background work, progress, errors, cancellation, and missing-artifact diagnostics. |
 | Local text-generation runtime (#7) | Complete | The pinned Qwen3 0.6B MLX reference proves load, deterministic streaming, cancellation, and external lexical rejection. It is explicitly a runtime/negative control, not quality selection. |
-| Transcript-enhancement model/runtime bakeoff (#20) | In progress | The first 120-document local MLX screen rejects Qwen 3.5 0.8B and SmolLM3 while retaining Gemma 4 E2B as the only positive but contract-weak survivor. A pinned 180-document Gemma follow-up replaces mutable string ids with strictly validated integer positions and passed its first real request; the full 360-request run remains. Hosted Qwen/GPT/Claude controls remain development ceilings, and human-verified professional-audio gold is still required before product selection or an official-MLX/Core ML port. |
+| Transcript-enhancement model/runtime bakeoff (#20) | In progress | The 180-document Gemma follow-up is complete: integer positions raise strict compliance to 354/360 with 180/180 byte-identical repeat pairs, but accepted macro WER rises from 5.97% to 10.73% because Spanish and French responses sometimes copy neighboring sections. Gemma remains a local runtime/prompt-development candidate, not an unconditional postprocessor. A bounded-patch or single-target-section contract must remove cross-section replacement on frozen development data before hosted ceilings, held-out professional audio, or an official-MLX/Core ML port can select a product model. |
 
 The open issue list is a work queue, not a second architecture plan. Completed
 foundation issues should close with links to their evidence. Productization
@@ -315,13 +315,16 @@ Performance comparisons must use the same machines, fixtures, model versions, an
    retain the 80 ms backpressure stress gate, and add long-audio cache/memory
    coverage. ADR-0012 completed the C/MPS comparison and rejects both the
    reference runtime's unbounded queue and the pure-C path as product boundaries.
-4. Continue #20 with human-verified German professional-audio gold. Run the
-   embedded-size candidates and the pinned hosted Qwen/GPT/Claude ceilings on
-   identical real raw ASR outputs. Use the remote controls to measure available
-   quality, not local latency; freeze the held-out surface and bounded lexical
-   comparison before selecting or porting a survivor through official MLX and
-   Core ML. Keep corrected text separate from raw ASR ranking and reject
-   critical semantic regressions.
+4. Continue #20 with a bounded-patch or single-target-section Gemma contract
+   on a frozen multilingual development slice, retaining neighboring passages
+   only as read-only context. Reject cross-section replacement and validate any
+   input/output edit-rate guard on different data from the data used to choose
+   it. Then run surviving embedded candidates and pinned hosted Qwen/GPT/Claude
+   ceilings on identical human-verified professional-audio raw ASR outputs,
+   German first. Use remote controls to measure available quality, not local
+   latency; keep corrected text separate from raw ASR ranking and reject
+   critical semantic regressions before selecting or porting a survivor through
+   official MLX and Core ML.
 5. Resolve the exact remaining acceptance gaps in #5 and close or explicitly
    rescope the prior-art audit in #3.
 6. Finish #9 with Node 22 plus packed-artifact CI gates.

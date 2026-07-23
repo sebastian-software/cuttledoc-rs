@@ -463,6 +463,7 @@ async function summarizeResults() {
             diagnostic_output_available: output !== null,
             format_violation_with_recoverable_sections: formatViolation,
             reference_word_count: referenceWords.length,
+            input_word_count: inputWords.length,
             raw_word_edit_distance: rawDistance,
             raw_wer: rawDistance / referenceWords.length,
             post_word_edit_distance: postDistance,
@@ -473,6 +474,9 @@ async function summarizeResults() {
               ? null
               : postDistance / referenceWords.length,
             input_output_word_edit_distance: inputOutputDistance,
+            input_output_word_edit_rate: inputOutputDistance === null
+              ? null
+              : inputOutputDistance / Math.max(1, inputWords.length),
             exact_text_unchanged: output === input.text,
             presentation_only_change: output !== null &&
               output !== input.text && inputOutputDistance === 0,
@@ -545,6 +549,10 @@ async function summarizeResults() {
       complete_pairs: completePairs,
       byte_identical_raw_output_pairs: identicalPairs,
     },
+    exploratory_safety_gate_sensitivity: buildSafetyGateSensitivity(
+      observations,
+      [0.02, 0.05, 0.1, 0.2, 0.3],
+    ),
     aggregates: {
       by_candidate: aggregateObservations(observations, ['candidate'], requests),
       by_candidate_and_locale: aggregateObservations(
@@ -575,9 +583,11 @@ async function summarizeResults() {
       screen.claim_limit,
       'Strict contract failures are excluded from canonical postprocessed WER.',
       'Diagnostic WER for structurally recoverable fenced JSON remains noncompliant evidence and is never promoted to an accepted result.',
+      'The edit-rate safety-gate sweep is evaluated on the same synthetic development observations and must not be treated as a selected product threshold.',
       'Synthetic references can identify restoration and regressions but do not replace held-out human-verified professional audio.',
     ],
   };
+  validateSummaryReport(report, screen);
   const output = resolve(values['summary-output']);
   await atomicJson(output, report);
   process.stdout.write(
@@ -632,6 +642,145 @@ function diagnosticSections(rawText, expectedIds) {
     }
   }
   return { valid: false, sections: [], recovery: null };
+}
+
+function buildSafetyGateSensitivity(observations, thresholds) {
+  const summarize = (group, threshold) => {
+    const usePostprocessed = (item) =>
+      item.mechanically_accepted &&
+      item.post_word_edit_distance !== null &&
+      item.input_output_word_edit_rate !== null &&
+      item.input_output_word_edit_rate <= threshold;
+    const referenceWords = group.reduce(
+      (sum, item) => sum + item.reference_word_count,
+      0,
+    );
+    const rawDistance = group.reduce(
+      (sum, item) => sum + item.raw_word_edit_distance,
+      0,
+    );
+    const gatedDistance = group.reduce(
+      (sum, item) => sum + (
+        usePostprocessed(item)
+          ? item.post_word_edit_distance
+          : item.raw_word_edit_distance
+      ),
+      0,
+    );
+    const postprocessed = group.filter(usePostprocessed);
+    return {
+      section_count: group.length,
+      postprocessed_section_count: postprocessed.length,
+      raw_fallback_section_count: group.length - postprocessed.length,
+      micro_raw_wer: rawDistance / referenceWords,
+      micro_gated_wer: gatedDistance / referenceWords,
+      relative_error_change: rawDistance === 0
+        ? null
+        : (gatedDistance - rawDistance) / rawDistance,
+      applied_improvement_count: postprocessed.filter((item) =>
+        item.improved).length,
+      applied_regression_count: postprocessed.filter((item) =>
+        item.regressed).length,
+      applied_correct_input_to_error_count: postprocessed.filter((item) =>
+        item.changed_correct_input_to_error).length,
+    };
+  };
+  return {
+    policy:
+      'Use postprocessed text only for a strictly valid request whose ' +
+      'normalized input-to-output word edit rate is at or below the threshold; ' +
+      'otherwise retain the raw section.',
+    selection_status: 'exploratory-development-sensitivity-only',
+    thresholds: thresholds.map((threshold) => {
+      const byLocale = new Map();
+      for (const observation of observations) {
+        if (!byLocale.has(observation.locale)) {
+          byLocale.set(observation.locale, []);
+        }
+        byLocale.get(observation.locale).push(observation);
+      }
+      return {
+        maximum_input_output_word_edit_rate: threshold,
+        overall: summarize(observations, threshold),
+        by_locale: [...byLocale.entries()].map(([locale, group]) => ({
+          locale,
+          ...summarize(group, threshold),
+        })).sort((left, right) => left.locale.localeCompare(right.locale)),
+      };
+    }),
+  };
+}
+
+function validateSummaryReport(report, screen) {
+  const errors = [];
+  if (
+    report.screen_id !== screen.id ||
+    report.plan_id !== screen.plan_id ||
+    report.plan_revision !== screen.plan_revision
+  ) {
+    errors.push('report identity differs from the screen');
+  }
+  if (
+    report.status !== 'complete' ||
+    report.scope.expected_documents !== screen.expected_counts.documents ||
+    report.scope.expected_requests !== screen.expected_counts.requests ||
+    report.scope.completed_requests !== screen.expected_counts.requests ||
+    report.scope.missing_requests !== 0 ||
+    report.scope.section_observations !==
+      screen.expected_counts.section_outputs ||
+    report.requests.length !== screen.expected_counts.requests ||
+    report.observations.length !== screen.expected_counts.section_outputs ||
+    report.missing.length !== 0
+  ) {
+    errors.push('complete report counts differ from the screen');
+  }
+  const acceptedRequests = report.requests.filter((request) =>
+    request.mechanically_accepted).length;
+  if (
+    report.contract_compliance.mechanically_accepted_requests !==
+      acceptedRequests ||
+    report.contract_compliance.invalid_requests !==
+      report.requests.length - acceptedRequests ||
+    report.repeat_stability.expected_pairs !==
+      screen.expected_counts.document_model_pairs ||
+    report.repeat_stability.complete_pairs !==
+      screen.expected_counts.document_model_pairs
+  ) {
+    errors.push('contract or repeat counts differ from request evidence');
+  }
+  for (const observation of report.observations) {
+    const expectedRate = observation.input_output_word_edit_distance === null
+      ? null
+      : observation.input_output_word_edit_distance /
+        Math.max(1, observation.input_word_count);
+    if (
+      observation.input_word_count < 1 ||
+      (expectedRate === null
+        ? observation.input_output_word_edit_rate !== null
+        : Math.abs(
+          expectedRate - observation.input_output_word_edit_rate,
+        ) > 1e-15)
+    ) {
+      errors.push(`${observation.document_id}: invalid input/output edit rate`);
+      break;
+    }
+  }
+  const thresholds =
+    report.exploratory_safety_gate_sensitivity?.thresholds?.map((entry) =>
+      entry.maximum_input_output_word_edit_rate);
+  const expectedSensitivity = Array.isArray(thresholds)
+    ? buildSafetyGateSensitivity(report.observations, thresholds)
+    : null;
+  if (
+    expectedSensitivity === null ||
+    JSON.stringify(report.exploratory_safety_gate_sensitivity) !==
+      JSON.stringify(expectedSensitivity)
+  ) {
+    errors.push('safety-gate sensitivity differs from section observations');
+  }
+  if (errors.length > 0) {
+    throw new Error(`invalid local LLM summary: ${errors.join('; ')}`);
+  }
 }
 
 function aggregateObservations(observations, fields, requests) {
@@ -893,7 +1042,20 @@ async function selfTest() {
     parsePositiveInteger(undefined, '--limit') !== null ||
     parsePositiveInteger('2', '--limit') !== 2 ||
     editDistance(['one', 'two'], ['one', 'too']) !== 1 ||
-    normalizedWords('Über—Test').join('|') !== 'über|test'
+    normalizedWords('Über—Test').join('|') !== 'über|test' ||
+    buildSafetyGateSensitivity([
+      {
+        locale: 'en-US',
+        mechanically_accepted: true,
+        reference_word_count: 2,
+        raw_word_edit_distance: 1,
+        post_word_edit_distance: 0,
+        input_output_word_edit_rate: 0.5,
+        improved: true,
+        regressed: false,
+        changed_correct_input_to_error: false,
+      },
+    ], [0.3]).thresholds[0].overall.raw_fallback_section_count !== 1
   ) {
     throw new Error('local LLM runner self-test failed');
   }
@@ -907,5 +1069,16 @@ async function selfTest() {
   ]) {
     await validatePlan(ledger, await readJson(join(repoRoot, screenPath)));
   }
+  const contractScreen = await readJson(join(
+    repoRoot,
+    'benchmarks/postprocessing/local-llm-gemma-contract-screen.json',
+  ));
+  validateSummaryReport(
+    await readJson(join(
+      repoRoot,
+      'benchmarks/postprocessing/local-llm-gemma-contract-results.json',
+    )),
+    contractScreen,
+  );
   process.stdout.write('factorial local LLM runner: self-test passed\n');
 }

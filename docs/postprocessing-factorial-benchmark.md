@@ -1,7 +1,7 @@
 # Factorial transcript-postprocessing benchmark
 
-**Status:** all three local TTS/STT slices complete; the hardened Gemma
-contract screen is in progress.
+**Status:** all three local TTS/STT slices and the hardened Gemma contract
+screen are complete.
 
 **Evidence date:** 2026-07-23.
 
@@ -451,6 +451,46 @@ node scripts/run-postprocessing-factorial-local-llm.mjs summarize \
   --results-subdir llm-gemma-contract-results \
   --summary-output benchmarks/postprocessing/local-llm-gemma-contract-results.json
 ```
+
+The completed report is
+[`local-llm-gemma-contract-results.json`](../benchmarks/postprocessing/local-llm-gemma-contract-results.json).
+Gemma returned all 360 responses without a token cap. The strict positional
+parser accepted 354 (98.3%); the remaining six responses represent two
+input-dependent output patterns repeated deterministically and omit the final
+JSON array closure. All 180 document-level repeat pairs were byte-identical, so
+the failures and quality behavior are systematic rather than sampling noise.
+
+The positional contract fixes the earlier hyphen-to-underscore id mutation,
+but contract validity alone is not a quality gate. Accepted responses have the
+following macro mean WER:
+
+| Locale | Strictly valid | Matched raw → post WER | Relative error change | Improved / regressed section observations | Correct input changed to error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| German | 68/72 | 5.73% → 5.70% | 0.52% reduction | 40 / 34 | 4 |
+| English | 72/72 | 4.88% → 4.72% | 3.27% reduction | 60 / 30 | 0 |
+| Spanish | 72/72 | 5.81% → 19.43% | 234.45% increase | 106 / 104 | 22 |
+| French | 72/72 | 5.12% → 15.61% | 204.90% increase | 92 / 74 | 8 |
+| Portuguese | 70/72 | 8.37% → 7.83% | 6.43% reduction | 142 / 10 | 0 |
+| Overall | 354/360 | 5.97% → 10.73% | 79.70% increase | 440 / 252 | 34 |
+
+The severe Spanish and French regressions are section cross-talk, not a scoring
+artifact: in 112 accepted repeat observations Gemma changes more than 80% of
+the normalized words, usually by copying a neighboring passage into the
+current position. A caller-side input/output edit-rate guard detects these
+gross rewrites without seeing the hidden reference. The report therefore
+records an exploratory threshold sweep with invalid responses always falling
+back to raw text. At a 30% maximum edit rate, micro-WER changes from 6.38% to
+5.96% and all five locale aggregates improve, but 128 applied section
+observations still regress and eight correct inputs still acquire an error.
+That sweep is same-data development evidence, not a selected product threshold.
+
+Gemma 4 E2B is therefore retained as a local runtime and prompt-development
+candidate, but rejected as an unconditional six-section postprocessor. The
+next prompt experiment should return bounded patches or process one target
+section at a time while supplying neighboring text as read-only context. It
+must first eliminate cross-section replacement on a frozen development slice,
+then pass held-out human professional audio before any local model or edit-rate
+threshold becomes a product default.
 
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.
