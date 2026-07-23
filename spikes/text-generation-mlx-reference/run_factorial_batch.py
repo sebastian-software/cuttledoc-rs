@@ -62,8 +62,24 @@ def verify_inputs(screen: dict, manifest: dict, model_dir: Path, prompt: Path) -
         raise ValueError("Prompt SHA-256 drift")
 
 
-def render_prompt(template: str, document: dict) -> str:
+def render_prompt(
+    template: str, document: dict, target_index: int | None
+) -> str:
     model_input = document["model_input"]
+    target_section = None
+    context_sections = []
+    if target_index is not None:
+        if not 0 <= target_index < len(model_input["sections"]):
+            raise ValueError(f"Target index out of range: {target_index}")
+        target_section = {
+            "position": target_index,
+            "text": model_input["sections"][target_index]["text"],
+        }
+        context_sections = [
+            {"position": index, "text": section["text"]}
+            for index, section in enumerate(model_input["sections"])
+            if index != target_index
+        ]
     replacements = {
         "{{language}}": model_input["language"],
         "{{locale}}": model_input["locale"],
@@ -73,6 +89,12 @@ def render_prompt(template: str, document: dict) -> str:
         "{{glossary}}": json.dumps(model_input["glossary"], ensure_ascii=False),
         "{{sections}}": json.dumps(
             model_input["sections"], ensure_ascii=False, indent=2
+        ),
+        "{{target_section}}": json.dumps(
+            target_section, ensure_ascii=False, indent=2
+        ),
+        "{{context_sections}}": json.dumps(
+            context_sections, ensure_ascii=False, indent=2
         ),
     }
     rendered = template
@@ -127,12 +149,124 @@ def generate(model, tokenizer, prompt: str, generation: dict) -> dict:
 
 
 def parse_sections(
-    raw_text: str, expected_ids: list[str], output_contract: str
+    raw_text: str,
+    input_sections: list[dict],
+    generation: dict,
+    target_index: int | None,
 ) -> dict:
     try:
         value = json.loads(raw_text)
     except json.JSONDecodeError as error:
         return {"valid": False, "error": str(error), "sections": []}
+    expected_ids = [section["id"] for section in input_sections]
+    output_contract = generation["output_contract"]
+    if output_contract == "bounded-transcript-target-complete-v4":
+        if (
+            target_index is None
+            or not isinstance(value, dict)
+            or set(value) != {"text"}
+            or not isinstance(value["text"], str)
+            or not value["text"].strip()
+        ):
+            return {
+                "valid": False,
+                "error": "Output must contain exactly one non-empty text field",
+                "sections": [],
+            }
+        return {
+            "valid": True,
+            "error": None,
+            "sections": [
+                {"id": expected_ids[target_index], "text": value["text"]}
+            ],
+            "patches": None,
+        }
+    if output_contract == "bounded-transcript-target-patches-v4":
+        if (
+            target_index is None
+            or not isinstance(value, dict)
+            or set(value) != {"patches"}
+            or not isinstance(value["patches"], list)
+        ):
+            return {
+                "valid": False,
+                "error": "Output must contain exactly one patches array",
+                "sections": [],
+            }
+        limits = generation["patch_limits"]
+        patches = value["patches"]
+        if len(patches) > limits["maximum_patches"]:
+            return {
+                "valid": False,
+                "error": "Patch count exceeds the configured maximum",
+                "sections": [],
+            }
+        target = input_sections[target_index]["text"]
+        ranges = []
+        total_source_characters = 0
+        for patch in patches:
+            if (
+                not isinstance(patch, dict)
+                or set(patch) != {"old", "new"}
+                or not isinstance(patch["old"], str)
+                or not patch["old"]
+                or not isinstance(patch["new"], str)
+                or patch["old"] == patch["new"]
+            ):
+                return {
+                    "valid": False,
+                    "error": "Every patch must contain distinct old and new strings",
+                    "sections": [],
+                }
+            if (
+                len(patch["old"]) > limits["maximum_source_characters_per_patch"]
+                or len(patch["new"])
+                > limits["maximum_replacement_characters_per_patch"]
+            ):
+                return {
+                    "valid": False,
+                    "error": "Patch span exceeds the configured character limit",
+                    "sections": [],
+                }
+            if target.count(patch["old"]) != 1:
+                return {
+                    "valid": False,
+                    "error": "Every old patch span must occur exactly once in the target",
+                    "sections": [],
+                }
+            start = target.index(patch["old"])
+            ranges.append((start, start + len(patch["old"]), patch))
+            total_source_characters += len(patch["old"])
+        if total_source_characters > limits["maximum_total_source_characters"]:
+            return {
+                "valid": False,
+                "error": "Total patched source text exceeds the configured maximum",
+                "sections": [],
+            }
+        ranges.sort(key=lambda item: item[0])
+        if any(
+            current[0] < previous[1]
+            for previous, current in zip(ranges, ranges[1:])
+        ):
+            return {
+                "valid": False,
+                "error": "Patch spans must not overlap",
+                "sections": [],
+            }
+        pieces = []
+        cursor = 0
+        for start, end, patch in ranges:
+            pieces.extend([target[cursor:start], patch["new"]])
+            cursor = end
+        pieces.append(target[cursor:])
+        return {
+            "valid": True,
+            "error": None,
+            "sections": [
+                {"id": expected_ids[target_index], "text": "".join(pieces)}
+            ],
+            "patches": patches,
+        }
     sections = value.get("sections") if isinstance(value, dict) else None
     if not isinstance(sections, list):
         return {
@@ -205,15 +339,24 @@ def parse_sections(
     return {"valid": True, "error": None, "sections": sections}
 
 
-def valid_existing(path: Path, candidate_id: str, document_sha256: str,
-                   prompt_sha256: str, repetition: int) -> bool:
+def valid_existing(
+    path: Path,
+    candidate_id: str,
+    document_sha256: str,
+    prompt_sha256: str,
+    repetition: int,
+    screen_id: str,
+    target_index: int | None,
+) -> bool:
     try:
         result = json.loads(path.read_text(encoding="utf-8"))
         return (
             result["candidate"]["manifest_id"] == candidate_id
             and result["document"]["sha256"] == document_sha256
+            and result["document"].get("target_index") == target_index
             and result["prompt"]["sha256"] == prompt_sha256
             and result["repetition"] == repetition
+            and result["screen_id"] == screen_id
         )
     except (FileNotFoundError, KeyError, json.JSONDecodeError):
         return False
@@ -261,10 +404,17 @@ def main() -> None:
         document_path = Path(job["document_path"])
         document_bytes = document_path.read_bytes()
         document_sha256 = sha256_bytes(document_bytes)
+        request_id = job.get("request_id", job["document_id"])
         for repetition in range(1, repetitions + 1):
-            output = args.output_dir / job["document_id"] / f"repeat-{repetition}.json"
+            output = args.output_dir / request_id / f"repeat-{repetition}.json"
             if not args.force and valid_existing(
-                output, manifest["id"], document_sha256, prompt_sha256, repetition
+                output,
+                manifest["id"],
+                document_sha256,
+                prompt_sha256,
+                repetition,
+                screen["id"],
+                job.get("target_index"),
             ):
                 resumed += 1
             else:
@@ -292,20 +442,23 @@ def main() -> None:
     completed = 0
     for job, document_path, document_sha256, repetition, output in pending:
         document = json.loads(document_path.read_text(encoding="utf-8"))
-        rendered_prompt = render_prompt(prompt_template, document)
+        target_index = job.get("target_index")
+        rendered_prompt = render_prompt(prompt_template, document, target_index)
         generation_result = generate(model, tokenizer, rendered_prompt, generation)
-        expected_ids = [
-            section["id"] for section in document["model_input"]["sections"]
-        ]
         parsed = parse_sections(
             generation_result["text"],
-            expected_ids,
-            generation["output_contract"],
+            document["model_input"]["sections"],
+            generation,
+            target_index,
         )
         reached_limit = generation_result["generation_tokens"] >= generation["max_tokens"]
         result = {
             "schema_version": "1.0.0",
-            "id": f"{manifest['id']}--{job['document_id']}--repeat-{repetition}",
+            "id": (
+                f"{manifest['id']}--"
+                f"{job.get('request_id', job['document_id'])}--"
+                f"repeat-{repetition}"
+            ),
             "screen_id": screen["id"],
             "plan_id": screen["plan_id"],
             "plan_revision": screen["plan_revision"],
@@ -326,6 +479,12 @@ def main() -> None:
                 "voice_slot_id": document["dimensions"]["voice_slot_id"],
                 "realization_id": document["dimensions"]["realization_id"],
                 "stt_model": document["dimensions"]["stt_model"],
+                "target_index": target_index,
+                "target_section_id": (
+                    None
+                    if target_index is None
+                    else document["model_input"]["sections"][target_index]["id"]
+                ),
             },
             "prompt": {
                 "id": generation["prompt_id"],
@@ -366,6 +525,7 @@ def main() -> None:
                 "token_ids": generation_result["token_ids"],
                 "parser": {"valid": parsed["valid"], "error": parsed["error"]},
                 "sections": parsed["sections"],
+                "patches": parsed.get("patches"),
                 "mechanically_accepted": parsed["valid"] and not reached_limit,
             },
             "environment": {
@@ -379,7 +539,8 @@ def main() -> None:
         atomic_json(output, result)
         completed += 1
         print(
-            f"local llm: {manifest['id']} {job['document_id']} "
+            f"local llm: {manifest['id']} "
+            f"{job.get('request_id', job['document_id'])} "
             f"repeat {repetition} ({completed + resumed}/{len(jobs) * repetitions}) "
             f"parser={'ok' if parsed['valid'] else 'invalid'} "
             f"tokens={generation_result['generation_tokens']}",

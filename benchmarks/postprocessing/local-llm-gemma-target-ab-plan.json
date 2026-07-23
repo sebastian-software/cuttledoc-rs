@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-local-gemma-target-ab-plan-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "purpose": "Compare two contracts that make cross-section replacement structurally impossible or locally detectable before another full Gemma screen.",
+  "selection": {
+    "disposition": "frozen-challenging-development-slice",
+    "languages": [
+      "de-DE",
+      "en-US",
+      "es-419",
+      "fr-FR",
+      "pt-BR"
+    ],
+    "documents_per_language": 2,
+    "documents": 10,
+    "target_sections_per_document": 6,
+    "target_sections": 60,
+    "rationale": "The slice contains both prior malformed-JSON patterns, the strongest observed Spanish and French section-copying cases, and English, German, and Portuguese controls across Apple, Qwen, and Voxtral TTS plus all three STT backends.",
+    "source_report": {
+      "path": "benchmarks/postprocessing/local-llm-gemma-contract-results.json",
+      "sha256": "c575f6db16e32408b14f57844ac39b44706c525d77e97408a69ad923172ab0b3"
+    }
+  },
+  "variants": [
+    {
+      "id": "single-target-complete-text",
+      "screen_path": "benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json",
+      "results_subdir": "llm-gemma-target-complete-results",
+      "summary_path": "benchmarks/postprocessing/local-llm-gemma-target-complete-results.json"
+    },
+    {
+      "id": "single-target-bounded-patches",
+      "screen_path": "benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json",
+      "results_subdir": "llm-gemma-target-patches-results",
+      "summary_path": "benchmarks/postprocessing/local-llm-gemma-target-patches-results.json"
+    }
+  ],
+  "execution": {
+    "candidate": "gemma-4-e2b-it-4bit-mlx",
+    "repetitions": 2,
+    "requests_per_variant": 120,
+    "section_observations_per_variant": 120,
+    "randomness": "temperature zero and seed zero; repeated output remains an explicit determinism check"
+  },
+  "promotion_gates": {
+    "mechanically_accepted_requests_minimum": 118,
+    "token_limit_failures_maximum": 0,
+    "non_identical_repeat_pairs_maximum": 0,
+    "accepted_sections_above_30_percent_input_output_word_edit_rate_maximum": 0,
+    "locale_macro_wer_regressions_maximum": 0,
+    "changed_correct_input_to_error_maximum": 0,
+    "section_regressions_must_not_exceed_improvements": true
+  },
+  "decision_rule": "Promote a variant to the 180-document factorial screen only if every gate passes. If neither passes, retain raw ASR output and continue with stronger local or hosted candidates rather than weakening the gates.",
+  "claim_limit": "This is a deliberately selected development challenge set. It can reject unsafe prompt and contract variants but cannot estimate release quality, select a safety threshold, or replace held-out human podcast and audiobook evidence."
+}

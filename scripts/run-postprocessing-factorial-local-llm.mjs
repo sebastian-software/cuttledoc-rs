@@ -246,7 +246,14 @@ async function runCandidates() {
     if (!await validDocument(documentPath, document)) {
       throw new Error(`${document.id}: materialize valid LLM documents first`);
     }
-    jobs.push({ document_id: document.id, document_path: documentPath });
+    for (const targetIndex of targetIndices(screen)) {
+      jobs.push({
+        request_id: resultRequestId(document.id, targetIndex),
+        document_id: document.id,
+        document_path: documentPath,
+        target_index: targetIndex,
+      });
+    }
   }
   await atomicJson(paths.jobs, { schema_version: '1.0.0', jobs });
   const candidates = values.candidate === 'all'
@@ -303,34 +310,41 @@ async function printStatus() {
     let accepted = 0;
     let invalid = 0;
     for (const document of ready) {
-      for (let repetition = 1;
-        repetition <= screen.generation.repetitions;
-        repetition += 1) {
-        const path = join(
-          paths.results,
-          candidate.id,
-          document.id,
-          `repeat-${repetition}.json`,
-        );
-        try {
-          const result = await readJson(path);
-          if (
-            result.candidate.manifest_id === candidate.id &&
-            result.document.id === document.id &&
-            result.repetition === repetition
-          ) {
-            completed += 1;
-            if (result.output.mechanically_accepted) accepted += 1;
-            else invalid += 1;
+      for (const targetIndex of targetIndices(screen)) {
+        for (let repetition = 1;
+          repetition <= screen.generation.repetitions;
+          repetition += 1) {
+          const path = resultFilePath(
+            candidate.id,
+            document.id,
+            targetIndex,
+            repetition,
+          );
+          try {
+            const result = await readJson(path);
+            if (
+              result.candidate.manifest_id === candidate.id &&
+              result.document.id === document.id &&
+              (result.document.target_index ?? null) === targetIndex &&
+              result.repetition === repetition &&
+              result.screen_id === screen.id
+            ) {
+              completed += 1;
+              if (result.output.mechanically_accepted) accepted += 1;
+              else invalid += 1;
+            }
+          } catch (error) {
+            if (error.code !== 'ENOENT') throw error;
           }
-        } catch (error) {
-          if (error.code !== 'ENOENT') throw error;
         }
       }
     }
     candidateResults.push({
       candidate: candidate.id,
-      expected_requests: ready.length * screen.generation.repetitions,
+      expected_requests:
+        ready.length *
+        targetIndices(screen).length *
+        screen.generation.repetitions,
       completed_requests: completed,
       mechanically_accepted: accepted,
       invalid_or_capped: invalid,
@@ -341,7 +355,9 @@ async function printStatus() {
     plan_revision: screen.plan_revision,
     ready_documents: ready.length,
     materialized_documents: materialized,
-    blocked_documents: ledger.llm_documents.length - ready.length,
+    qualification_unblocked_documents: ready.filter((document) =>
+      document.status !== 'ready').length,
+    out_of_scope_documents: ledger.llm_documents.length - ready.length,
     candidate_results: candidateResults,
   }, null, 2)}\n`);
 }
@@ -366,15 +382,16 @@ async function summarizeResults() {
         throw new Error(`${expectedDocument.id}: invalid materialized document`);
       }
       const document = await readJson(documentPath);
-      for (let repetition = 1;
-        repetition <= screen.generation.repetitions;
-        repetition += 1) {
-        const resultPath = join(
-          paths.results,
-          candidate.id,
-          expectedDocument.id,
-          `repeat-${repetition}.json`,
-        );
+      for (const targetIndex of targetIndices(screen)) {
+        for (let repetition = 1;
+          repetition <= screen.generation.repetitions;
+          repetition += 1) {
+          const resultPath = resultFilePath(
+            candidate.id,
+            expectedDocument.id,
+            targetIndex,
+            repetition,
+          );
         let result;
         try {
           result = await readJson(resultPath);
@@ -383,6 +400,7 @@ async function summarizeResults() {
             missing.push({
               candidate: candidate.id,
               document_id: expectedDocument.id,
+              target_index: targetIndex,
               repetition,
             });
             continue;
@@ -392,6 +410,7 @@ async function summarizeResults() {
         if (
           result.candidate.manifest_id !== candidate.id ||
           result.document.id !== expectedDocument.id ||
+          (result.document.target_index ?? null) !== targetIndex ||
           result.repetition !== repetition ||
           result.screen_id !== screen.id
         ) {
@@ -401,10 +420,12 @@ async function summarizeResults() {
         capturedAt.push(result.captured_at);
         const strictValid = result.output.parser.valid === true &&
           result.output.mechanically_accepted === true;
-        const diagnostic = diagnosticSections(
-          result.output.raw_text,
-          document.model_input.sections.map((section) => section.id),
-        );
+        const diagnostic = targetIndex === null
+          ? diagnosticSections(
+            result.output.raw_text,
+            document.model_input.sections.map((section) => section.id),
+          )
+          : { valid: false, sections: [], recovery: null };
         const outputSections = strictValid
           ? result.output.sections
           : diagnostic.sections;
@@ -412,6 +433,10 @@ async function summarizeResults() {
         requests.push({
           candidate: candidate.id,
           document_id: expectedDocument.id,
+          target_index: targetIndex,
+          target_section_id: targetIndex === null
+            ? null
+            : document.model_input.sections[targetIndex].id,
           locale: document.dimensions.locale,
           tts_engine: document.dimensions.tts_engine,
           voice_slot_id: document.dimensions.voice_slot_id,
@@ -430,12 +455,17 @@ async function summarizeResults() {
           generation_tokens_per_second:
             result.measurements.generation_tokens_per_second,
         });
-        for (let index = 0;
-          index < document.model_input.sections.length;
-          index += 1) {
+        const observationIndices = targetIndex === null
+          ? Array.from(
+            { length: document.model_input.sections.length },
+            (_, index) => index,
+          )
+          : [targetIndex];
+        for (const index of observationIndices) {
           const input = document.model_input.sections[index];
           const evaluation = document.evaluation.sections[index];
-          const output = outputSections[index]?.text ?? null;
+          const output = outputSections.find((section) =>
+            section.id === input.id)?.text ?? null;
           const referenceWords = normalizedWords(evaluation.reference);
           const inputWords = normalizedWords(input.text);
           const rawDistance = editDistance(referenceWords, inputWords);
@@ -449,6 +479,7 @@ async function summarizeResults() {
           observations.push({
             candidate: candidate.id,
             document_id: expectedDocument.id,
+            target_index: targetIndex,
             repetition,
             locale: document.dimensions.locale,
             tts_engine: document.dimensions.tts_engine,
@@ -489,6 +520,7 @@ async function summarizeResults() {
       }
     }
   }
+  }
   if (missing.length > 0 && !values['allow-partial']) {
     throw new Error(
       `${missing.length} local LLM request(s) are missing; ` +
@@ -497,7 +529,8 @@ async function summarizeResults() {
   }
   const repeatGroups = new Map();
   for (const request of requests) {
-    const key = `${request.candidate}|${request.document_id}`;
+    const key =
+      `${request.candidate}|${request.document_id}|${request.target_index}`;
     if (!repeatGroups.has(key)) repeatGroups.set(key, []);
     repeatGroups.get(key).push(request);
   }
@@ -545,7 +578,7 @@ async function summarizeResults() {
         request.reached_token_limit).length,
     },
     repeat_stability: {
-      expected_pairs: documents.length * screen.candidates.length,
+      expected_pairs: expectedRepeatPairs(screen),
       complete_pairs: completePairs,
       byte_identical_raw_output_pairs: identicalPairs,
     },
@@ -742,9 +775,9 @@ function validateSummaryReport(report, screen) {
     report.contract_compliance.invalid_requests !==
       report.requests.length - acceptedRequests ||
     report.repeat_stability.expected_pairs !==
-      screen.expected_counts.document_model_pairs ||
+      expectedRepeatPairs(screen) ||
     report.repeat_stability.complete_pairs !==
-      screen.expected_counts.document_model_pairs
+      expectedRepeatPairs(screen)
   ) {
     errors.push('contract or repeat counts differ from request evidence');
   }
@@ -798,7 +831,8 @@ function aggregateObservations(observations, fields, requests) {
     const accepted = group.filter((item) => item.post_wer !== null);
     const diagnostic = group.filter((item) => item.diagnostic_post_wer !== null);
     const requestKey = (item) =>
-      `${item.candidate}|${item.document_id}|${item.repetition}`;
+      `${item.candidate}|${item.document_id}|${item.target_index}|` +
+      `${item.repetition}`;
     const requestKeys = new Set(group.map(requestKey));
     const acceptedRequestKeys = new Set(group.filter((item) =>
       item.mechanically_accepted).map(requestKey));
@@ -852,17 +886,55 @@ function screenDocumentStatuses(screen) {
 
 function screenIncludesDocument(screen, document) {
   return screenDocumentStatuses(screen).includes(document.status) &&
-    screen.scope.tts_engines.includes(document.tts_engine);
+    screen.scope.tts_engines.includes(document.tts_engine) &&
+    (
+      !Array.isArray(screen.scope.document_ids) ||
+      screen.scope.document_ids.includes(document.id)
+    );
+}
+
+function targetIndices(screen) {
+  if (screen.scope.request_mode === 'single-target-section') {
+    return Array.from(
+      { length: screen.scope.sections_per_document },
+      (_, index) => index,
+    );
+  }
+  return [null];
+}
+
+function resultRequestId(documentId, targetIndex) {
+  return targetIndex === null
+    ? documentId
+    : `${documentId}--target-${targetIndex}`;
+}
+
+function resultFilePath(candidateId, documentId, targetIndex, repetition) {
+  return join(
+    paths.results,
+    candidateId,
+    resultRequestId(documentId, targetIndex),
+    `repeat-${repetition}.json`,
+  );
+}
+
+function expectedRepeatPairs(screen) {
+  return screen.expected_counts.target_model_pairs ??
+    screen.expected_counts.document_model_pairs;
 }
 
 async function validatePlan(ledger, screen) {
   const statuses = screenDocumentStatuses(screen);
   const documents = ledger.llm_documents.filter((document) =>
     screenIncludesDocument(screen, document));
-  const expectedPairs = documents.length * screen.candidates.length;
-  const expectedRequests = expectedPairs * screen.generation.repetitions;
-  const expectedSections =
-    expectedRequests * screen.scope.sections_per_document;
+  const expectedDocumentPairs = documents.length * screen.candidates.length;
+  const targetsPerDocument = targetIndices(screen).length;
+  const expectedTargetPairs = expectedDocumentPairs * targetsPerDocument;
+  const expectedRequests =
+    expectedTargetPairs * screen.generation.repetitions;
+  const expectedSections = screen.scope.request_mode === 'single-target-section'
+    ? expectedRequests
+    : expectedRequests * screen.scope.sections_per_document;
   if (
     ledger.plan_id !== screen.plan_id ||
     ledger.plan_revision !== screen.plan_revision ||
@@ -871,9 +943,26 @@ async function validatePlan(ledger, screen) {
     new Set(statuses).size !== statuses.length ||
     !Array.isArray(screen.scope.tts_engines) ||
     screen.scope.tts_engines.length === 0 ||
+    (
+      screen.scope.request_mode !== undefined &&
+      screen.scope.request_mode !== 'single-target-section'
+    ) ||
+    (
+      screen.scope.document_ids !== undefined &&
+      (
+        !Array.isArray(screen.scope.document_ids) ||
+        screen.scope.document_ids.length !== documents.length ||
+        new Set(screen.scope.document_ids).size !==
+          screen.scope.document_ids.length
+      )
+    ) ||
     screen.scope.document_count !== documents.length ||
     screen.expected_counts.documents !== documents.length ||
-    screen.expected_counts.document_model_pairs !== expectedPairs ||
+    screen.expected_counts.document_model_pairs !== expectedDocumentPairs ||
+    (
+      screen.scope.request_mode === 'single-target-section' &&
+      screen.expected_counts.target_model_pairs !== expectedTargetPairs
+    ) ||
     screen.expected_counts.requests !== expectedRequests ||
     screen.expected_counts.section_outputs !== expectedSections
   ) {
@@ -918,6 +1007,70 @@ async function validatePlan(ledger, screen) {
         `${document.id}: blocked document lacks a pinned qualification report`,
       );
     }
+  }
+}
+
+async function validateTargetAbPlan(ledger) {
+  const plan = await readJson(join(
+    repoRoot,
+    'benchmarks/postprocessing/local-llm-gemma-target-ab-plan.json',
+  ));
+  if (
+    plan.plan_id !== ledger.plan_id ||
+    plan.plan_revision !== ledger.plan_revision ||
+    plan.selection.disposition !== 'frozen-challenging-development-slice' ||
+    plan.selection.languages.length !== 5 ||
+    plan.selection.documents !== 10 ||
+    plan.selection.target_sections !== 60 ||
+    plan.execution.requests_per_variant !== 120 ||
+    plan.execution.section_observations_per_variant !== 120 ||
+    plan.variants.length !== 2
+  ) {
+    throw new Error('Local Gemma target A/B plan counts or identity drifted');
+  }
+  const sourceBytes = await readFile(join(
+    repoRoot,
+    plan.selection.source_report.path,
+  ));
+  if (sha256(sourceBytes) !== plan.selection.source_report.sha256) {
+    throw new Error('Local Gemma target A/B source report digest drifted');
+  }
+  let selectedDocumentIds = null;
+  for (const variant of plan.variants) {
+    const screen = await readJson(join(repoRoot, variant.screen_path));
+    await validatePlan(ledger, screen);
+    if (
+      screen.expected_counts.requests !== plan.execution.requests_per_variant ||
+      screen.expected_counts.section_outputs !==
+        plan.execution.section_observations_per_variant ||
+      screen.result_path !== variant.summary_path ||
+      screen.candidates.length !== 1 ||
+      screen.candidates[0].id !== plan.execution.candidate
+    ) {
+      throw new Error(`${variant.id}: A/B screen differs from the plan`);
+    }
+    const documentIds = screen.scope.document_ids;
+    if (
+      selectedDocumentIds !== null &&
+      JSON.stringify(documentIds) !== JSON.stringify(selectedDocumentIds)
+    ) {
+      throw new Error(`${variant.id}: A/B document selection differs`);
+    }
+    selectedDocumentIds = documentIds;
+  }
+  const gates = plan.promotion_gates;
+  if (
+    gates.mechanically_accepted_requests_minimum !== 118 ||
+    gates.token_limit_failures_maximum !== 0 ||
+    gates.non_identical_repeat_pairs_maximum !== 0 ||
+    gates
+      .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum !==
+      0 ||
+    gates.locale_macro_wer_regressions_maximum !== 0 ||
+    gates.changed_correct_input_to_error_maximum !== 0 ||
+    gates.section_regressions_must_not_exceed_improvements !== true
+  ) {
+    throw new Error('Local Gemma target A/B promotion gates drifted');
   }
 }
 
@@ -1066,9 +1219,12 @@ async function selfTest() {
   for (const screenPath of [
     'benchmarks/postprocessing/local-llm-screen.json',
     'benchmarks/postprocessing/local-llm-gemma-contract-screen.json',
+    'benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json',
+    'benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json',
   ]) {
     await validatePlan(ledger, await readJson(join(repoRoot, screenPath)));
   }
+  await validateTargetAbPlan(ledger);
   const contractScreen = await readJson(join(
     repoRoot,
     'benchmarks/postprocessing/local-llm-gemma-contract-screen.json',

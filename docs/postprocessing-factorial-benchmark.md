@@ -492,5 +492,55 @@ must first eliminate cross-section replacement on a frozen development slice,
 then pass held-out human professional audio before any local model or edit-rate
 threshold becomes a product default.
 
+### Frozen single-target A/B screen
+
+The follow-up is frozen in
+[`local-llm-gemma-target-ab-plan.json`](../benchmarks/postprocessing/local-llm-gemma-target-ab-plan.json).
+It selects ten deliberately challenging development documents: two per
+language, including both malformed-JSON patterns, the strongest observed
+Spanish and French section-copying cases, and German, English, and Portuguese
+controls. This is rejection-oriented development evidence, not a held-out
+quality estimate.
+
+Both variants issue one request for each of the six target sections while
+providing the other five passages as explicitly read-only context:
+
+- `single-target-complete-text` returns exactly one complete corrected target;
+- `single-target-bounded-patches` returns at most eight exact, unique,
+  non-overlapping target-only old/new patches within fixed character budgets.
+
+Each variant runs 60 target sections twice for 120 requests. Promotion to the
+180-document screen requires at least 118 mechanically valid requests, no token
+cap, byte-identical repeat pairs, no accepted edit above a 30% normalized word
+edit rate, no locale-level macro-WER regression, no newly damaged correct
+input, and no more regressed than improved section observations. Failure does
+not justify weakening a gate.
+
+Run and summarize the complete-text variant:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs run \
+  --screen benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json \
+  --results-subdir llm-gemma-target-complete-results \
+  --candidate gemma-4-e2b-it-4bit-mlx
+node scripts/run-postprocessing-factorial-local-llm.mjs summarize \
+  --screen benchmarks/postprocessing/local-llm-gemma-target-complete-screen.json \
+  --results-subdir llm-gemma-target-complete-results \
+  --summary-output benchmarks/postprocessing/local-llm-gemma-target-complete-results.json
+```
+
+Run and summarize the bounded-patch variant:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs run \
+  --screen benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json \
+  --results-subdir llm-gemma-target-patches-results \
+  --candidate gemma-4-e2b-it-4bit-mlx
+node scripts/run-postprocessing-factorial-local-llm.mjs summarize \
+  --screen benchmarks/postprocessing/local-llm-gemma-target-patches-screen.json \
+  --results-subdir llm-gemma-target-patches-results \
+  --summary-output benchmarks/postprocessing/local-llm-gemma-target-patches-results.json
+```
+
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.
