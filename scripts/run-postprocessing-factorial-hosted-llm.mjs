@@ -771,7 +771,14 @@ async function irreversibleStop(
           `repeat-${currentRepeat}.json`,
         );
         try {
-          results.push(JSON.parse(await readFile(path, 'utf8')));
+          const result = JSON.parse(await readFile(path, 'utf8'));
+          if (
+            result.screen_id === screen.id &&
+            result.candidate.manifest_id === candidateId &&
+            result.generation.max_tokens === screen.generation.max_tokens
+          ) {
+            results.push(result);
+          }
         } catch (error) {
           if (error.code !== 'ENOENT') throw error;
         }
@@ -1127,6 +1134,13 @@ async function printStatus() {
           );
           try {
             const result = JSON.parse(await readFile(path, 'utf8'));
+            if (
+              result.screen_id !== screen.id ||
+              result.candidate.manifest_id !== candidate.id ||
+              result.generation.max_tokens !== screen.generation.max_tokens
+            ) {
+              continue;
+            }
             completed += 1;
             if (result.output.mechanically_accepted) accepted += 1;
             cost += result.measurements.cost_usd ??
