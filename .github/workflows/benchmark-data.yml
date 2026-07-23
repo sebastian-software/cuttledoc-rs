@@ -8,6 +8,7 @@ on:
       - "scripts/import-target-domain-source.mjs"
       - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/prepare-target-domain-review.mjs"
+      - "scripts/run-target-domain-asr.mjs"
       - "scripts/materialize-synthetic-roundtrip.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
@@ -43,6 +44,7 @@ on:
       - "scripts/import-target-domain-source.mjs"
       - "scripts/materialize-target-domain-corpus.mjs"
       - "scripts/prepare-target-domain-review.mjs"
+      - "scripts/run-target-domain-asr.mjs"
       - "scripts/materialize-synthetic-roundtrip.mjs"
       - "scripts/import-asr-aggregate.mjs"
       - "scripts/analyze-asr-errors.mjs"
@@ -120,6 +122,8 @@ jobs:
         run: node scripts/materialize-target-domain-corpus.mjs --self-test
       - name: Verify target-domain review preparation
         run: node scripts/prepare-target-domain-review.mjs self-test
+      - name: Verify target-domain ASR draft runner
+        run: node scripts/run-target-domain-asr.mjs self-test
       - name: Verify synthetic roundtrip materializer
         run: node scripts/materialize-synthetic-roundtrip.mjs --self-test
       - name: Verify deterministic ASR error analysis

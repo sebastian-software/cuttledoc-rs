@@ -44,18 +44,27 @@ attribution, and output name are pinned in
 
    Test sources remain closed unless the command receives both `--split test`
    and `--allow-test`.
-3. Prepare one JSON transcript per passage using
+3. Generate the five validation ASR drafts against the identical PCM. The
+   resumable runner checkpoints each completed backend and records no quality
+   score while human gold is pending:
+
+   ```sh
+   node scripts/run-target-domain-asr.mjs run \
+     --output artifacts/target-domain/review/validation-asr-drafts.json
+   ```
+
+4. Prepare one JSON transcript per passage using
    [`target-domain-transcript.schema.json`](../benchmarks/schema/target-domain-transcript.schema.json).
    The publisher PDF and raw ASR outputs may seed this draft.
-4. A reviewer other than the draft preparer listens to the complete 10-minute PCM
+5. A reviewer other than the draft preparer listens to the complete 10-minute PCM
    and corrects every speaker turn against that exact digest.
-5. Preserve verbatim wording, disfluencies, uncertainty, punctuation,
+6. Preserve verbatim wording, disfluencies, uncertainty, punctuation,
    capitalization, numbers, and speaker changes. Label names/terms,
    numbers/dates/units, negation, and uncertain spans.
-6. Record the reviewer identity, UTC review time, exact-audio comparison, and all
+7. Record the reviewer identity, UTC review time, exact-audio comparison, and all
    preserved fields in the transcript. Produce a separate review record or signed
    review export and record its SHA-256.
-7. Set the corpus entry to `human-verified`, add transcript byte/digest metadata,
+8. Set the corpus entry to `human-verified`, add transcript byte/digest metadata,
    and advance the cell only after all three entries validate.
 
 The validator fails closed: pending entries must not contain reviewer or transcript

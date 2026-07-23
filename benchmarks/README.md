@@ -120,6 +120,18 @@ machine-readable review manifest. Test material requires an explicit
 `--split test --allow-test` invocation after the validation configuration is
 frozen.
 
+Generate resumable, unscored drafts from the five frozen ASR backends:
+
+```sh
+node scripts/run-target-domain-asr.mjs run \
+  --output artifacts/target-domain/review/validation-asr-drafts.json
+```
+
+The runner verifies the normalized digest before every staged run and writes no
+WER or semantic score while human gold is pending. It refuses test sources by
+default and refuses to write explicitly opened test drafts into committed
+benchmark evidence.
+
 The primary clean-speech decision-support contract is
 [`synthetic-roundtrip-plan.json`](fixtures/synthetic-roundtrip-plan.json)
 under issue #13. It keeps German primary and reports `de-DE`, `en-US`,
