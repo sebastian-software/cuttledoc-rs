@@ -644,7 +644,7 @@ The machine-readable
 and [cost estimate](../benchmarks/postprocessing/hosted-llm-target-complete-estimate.json)
 freeze this boundary before the first paid request.
 
-The first committed execution checkpoint contains 235 quality requests:
+Repeat one completes with 291 quality requests:
 
 | Candidate | Repeat-one progress | Contract | Improved / regressed | Cost | Disposition |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -652,9 +652,9 @@ The first committed execution checkpoint contains 235 quality requests:
 | Gemini 3.6 Flash | 60/60 | 60/60 valid | 40 / 1 | `$0.517721` | Advance to repeat two |
 | GPT-5.6 Terra | 60/60 | 60/60 valid | 32 / 5 | `$0.509520` | Advance to repeat two |
 | Claude Sonnet 5 | 60/60 | 60/60 valid | 40 / 2 | `$0.716432` | Advance to repeat two |
-| Kimi K3 | 4/60 | 4/4 valid | Pending complete repeat | `$0.043447` | Continue repeat one after provider cooldown |
+| Kimi K3 | 60/60 | 60/60 valid | 35 / 3 | `$0.603317` | Advance to repeat two |
 
-Every complete survivor improves all five locale macro-WER values and has no
+All four survivors improve all five locale macro-WER values and have no
 gross edit, token cap, or correct-input regression. Sol also improved every
 captured locale aggregate, but its single unsupported edit on an already exact
 English target triggers the intentionally stricter safety gate.
@@ -664,6 +664,9 @@ allows at most five server-directed deferrals per logical request only when the
 429 arrives before any response id, content, usage, or charge. This is not an
 automatic paid retry: successful, ambiguous, disconnected, timed-out, or
 malformed requests are never replayed, and provider fallback remains disabled.
+Kimi required five such unbilled deferrals across its 60 successful requests.
+Repeat-one quality requests cost `$3.213130` in total, plus the separately
+excluded `$0.008559` token-cap calibration.
 
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.
