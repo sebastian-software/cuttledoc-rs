@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "id": "deepseek-v4-flash-openrouter-parasail-fp8",
+  "task": "text-generation",
+  "candidate_role": "natural-language-ranking-challenger",
+  "model": {
+    "requested_id": "deepseek/deepseek-v4-flash",
+    "allowed_response_ids": [
+      "deepseek/deepseek-v4-flash",
+      "deepseek/deepseek-v4-flash-20260423"
+    ],
+    "upstream_identity": "deepseek-ai/DeepSeek-V4-Flash",
+    "provider_model_identity": "deepseek/deepseek-v4-flash-20260423",
+    "release": "2026-04-23",
+    "weights": "open",
+    "license": "MIT",
+    "context_tokens": 1048576,
+    "identity_limit": "Parasail exposes the named upstream model through an FP8 endpoint, but the exact hosted artifact and serving implementation remain opaque to this repository."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-24",
+    "provider_slug": "parasail",
+    "provider_name": "Parasail",
+    "endpoint_tag": "parasail/fp8",
+    "endpoint_identity": "Parasail FP8 | deepseek/deepseek-v4-flash-20260423",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "temperature",
+      "top_p",
+      "frequency_penalty",
+      "presence_penalty",
+      "repetition_penalty",
+      "seed",
+      "stop",
+      "top_k",
+      "logit_bias",
+      "tools",
+      "tool_choice",
+      "structured_outputs",
+      "response_format",
+      "logprobs",
+      "top_logprobs",
+      "reasoning_effort"
+    ],
+    "request_policy": {
+      "only": [
+        "parasail"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.00000014",
+      "completion": "0.00000028",
+      "input_cache_read": "0.00000007"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": true,
+    "temperature": 0,
+    "seed": 0,
+    "reasoning": {
+      "effort": "none",
+      "exclude": true
+    },
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote open-weight quality challenger only. OpenRouter task rank is a spend-share discovery signal, not quality evidence, and hosted FP8 behavior is not local-runtime evidence."
+}

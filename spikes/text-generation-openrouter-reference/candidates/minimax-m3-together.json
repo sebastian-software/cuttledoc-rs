@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "id": "minimax-m3-openrouter-together",
+  "task": "text-generation",
+  "candidate_role": "natural-language-ranking-challenger",
+  "model": {
+    "requested_id": "minimax/minimax-m3",
+    "allowed_response_ids": [
+      "minimax/minimax-m3",
+      "minimax/minimax-m3-20260531"
+    ],
+    "upstream_identity": "MiniMaxAI/MiniMax-M3",
+    "provider_model_identity": "minimax/minimax-m3-20260531",
+    "release": "2026-05-31",
+    "weights": "open",
+    "license": "MiniMax Community License",
+    "context_tokens": 524288,
+    "identity_limit": "Together exposes the named upstream model with a 524,288-token endpoint, but the exact hosted precision, artifact, and serving implementation remain opaque to this repository."
+  },
+  "gateway": {
+    "name": "OpenRouter",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "catalog_captured_at": "2026-07-24",
+    "provider_slug": "together",
+    "provider_name": "Together",
+    "endpoint_tag": "together",
+    "endpoint_identity": "Together | minimax/minimax-m3-20260531",
+    "supported_parameters": [
+      "reasoning",
+      "include_reasoning",
+      "max_tokens",
+      "temperature",
+      "top_p",
+      "stop",
+      "frequency_penalty",
+      "presence_penalty",
+      "top_k",
+      "repetition_penalty",
+      "logit_bias",
+      "min_p",
+      "response_format",
+      "structured_outputs",
+      "tools",
+      "tool_choice"
+    ],
+    "request_policy": {
+      "only": [
+        "together"
+      ],
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "data_collection": "deny",
+      "zdr": true
+    },
+    "pricing_snapshot_usd_per_token": {
+      "prompt": "0.0000003",
+      "completion": "0.0000012",
+      "input_cache_read": "0.00000006"
+    }
+  },
+  "request_defaults": {
+    "token_limit_field": "max_tokens",
+    "json_schema_numeric_bounds": true,
+    "temperature": 0,
+    "seed": null,
+    "reasoning": null,
+    "response_format": {
+      "type": "json_schema",
+      "schema_id": "bounded-transcript-correction-v1",
+      "strict": true
+    }
+  },
+  "claim_limit": "Remote open-weight quality challenger only. OpenRouter task rank is a spend-share discovery signal, not quality evidence, and the provider's undisclosed hosted precision is not local-runtime evidence."
+}

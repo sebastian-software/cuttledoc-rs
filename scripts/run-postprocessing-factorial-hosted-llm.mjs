@@ -117,9 +117,14 @@ async function loadContract() {
 }
 
 async function validateContract(screen, plan, ledger) {
+  const candidateCount = screen.candidates.length;
+  const targetCount =
+    screen.scope.document_count * screen.scope.sections_per_document;
+  const targetModelPairs = targetCount * candidateCount;
+  const requestCount = targetModelPairs * screen.generation.repetitions;
   if (
-    screen.id !== 'postprocessing-factorial-hosted-target-complete-preflight-2' ||
-    plan.id !== 'postprocessing-factorial-hosted-target-complete-plan-3' ||
+    typeof screen.id !== 'string' ||
+    typeof plan.id !== 'string' ||
     screen.plan_id !== ledger.plan_id ||
     screen.plan_revision !== ledger.plan_revision ||
     plan.plan_id !== screen.plan_id ||
@@ -130,14 +135,17 @@ async function validateContract(screen, plan, ledger) {
     screen.scope.sections_per_document !== 6 ||
     screen.scope.document_ids.length !== 10 ||
     new Set(screen.scope.document_ids).size !== 10 ||
-    screen.candidates.length !== 5 ||
+    candidateCount < 1 ||
+    new Set(screen.candidates.map((candidate) => candidate.id)).size !==
+      candidateCount ||
     screen.generation.repetitions !== 2 ||
     screen.generation.max_tokens !== 2048 ||
-    screen.expected_counts.documents !== 10 ||
-    screen.expected_counts.document_model_pairs !== 50 ||
-    screen.expected_counts.target_model_pairs !== 300 ||
-    screen.expected_counts.requests !== 600 ||
-    screen.expected_counts.section_outputs !== 600 ||
+    screen.expected_counts.documents !== screen.scope.document_count ||
+    screen.expected_counts.document_model_pairs !==
+      screen.scope.document_count * candidateCount ||
+    screen.expected_counts.target_model_pairs !== targetModelPairs ||
+    screen.expected_counts.requests !== requestCount ||
+    screen.expected_counts.section_outputs !== requestCount ||
     JSON.stringify(plan.candidates) !==
       JSON.stringify(screen.candidates.map((candidate) => candidate.id))
   ) {
@@ -848,9 +856,18 @@ async function irreversibleStop(
   const totalExpected = requestsPerRepeat * repetition;
   const remaining = totalExpected - results.length;
   if (accepted + remaining < required) return 'mechanical gate is unreachable';
-  if (results.some((result) => result.generation.reached_token_limit)) {
+  const gates = repetition === 1
+    ? plan.first_repeat_gates
+    : plan.two_repeat_gates;
+  if (
+    Number.isFinite(gates.token_limit_failures_maximum) &&
+    results.filter((result) => result.generation.reached_token_limit).length >
+      gates.token_limit_failures_maximum
+  ) {
     return 'token-limit failure';
   }
+  let grossEdits = 0;
+  let correctInputRegressions = 0;
   for (const result of activeResults) {
     if (!result.output.mechanically_accepted) continue;
     const document = JSON.parse(await readFile(
@@ -869,11 +886,28 @@ async function irreversibleStop(
     );
     const changeDistance = editDistance(inputWords, normalizedWords(output));
     if (changeDistance / Math.max(1, inputWords.length) > 0.3) {
-      return 'accepted target exceeds the 30 percent edit boundary';
+      grossEdits += 1;
     }
     if (rawDistance === 0 && postDistance > 0) {
-      return 'previously correct target gained a word error';
+      correctInputRegressions += 1;
     }
+  }
+  if (
+    Number.isFinite(
+      gates
+        .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum,
+    ) &&
+    grossEdits >
+      gates
+        .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum
+  ) {
+    return 'accepted target exceeds the 30 percent edit boundary';
+  }
+  if (
+    Number.isFinite(gates.changed_correct_input_to_error_maximum) &&
+    correctInputRegressions > gates.changed_correct_input_to_error_maximum
+  ) {
+    return 'previously correct target gained a word error';
   }
   return null;
 }
@@ -945,6 +979,7 @@ function evaluateCandidate(summary, plan, candidateId) {
     observations.filter((observation) => observation.repetition === repetition),
   ));
   const combined = evaluateSlice(requests, observations);
+  const requestsPerRepeat = plan.first_repeat_gates.completed_requests_required;
   let disposition = 'continue-repeat-1';
   let rationale = 'Repeat 1 is incomplete and no irreversible gate has failed.';
   const firstIrreversible = irreversibleEvaluationFailure(
@@ -954,7 +989,7 @@ function evaluateCandidate(summary, plan, candidateId) {
   if (firstIrreversible !== null) {
     disposition = 'reject';
     rationale = firstIrreversible;
-  } else if (repeats[0].completed_requests === 60) {
+  } else if (repeats[0].completed_requests === requestsPerRepeat) {
     const firstFailures = gateFailures(
       repeats[0],
       plan.first_repeat_gates,
@@ -973,7 +1008,7 @@ function evaluateCandidate(summary, plan, candidateId) {
       if (secondIrreversible !== null) {
         disposition = 'reject';
         rationale = secondIrreversible;
-      } else if (repeats[1].completed_requests < 60) {
+      } else if (repeats[1].completed_requests < requestsPerRepeat) {
         disposition = 'continue-repeat-2';
         rationale =
           'Repeat 2 is incomplete and no irreversible gate has failed.';
@@ -1060,6 +1095,11 @@ function evaluateSlice(requests, observations) {
       regressed: strictOrRaw > raw + 1e-12,
     };
   }).sort((left, right) => left.locale.localeCompare(right.locale));
+  const raw = mean(observations.map((entry) => entry.raw_wer));
+  const strictOrRaw = mean(observations.map((entry) =>
+    entry.mechanically_accepted && entry.post_wer !== null
+      ? entry.post_wer
+      : entry.raw_wer));
   return {
     completed_requests: requests.length,
     mechanically_accepted_requests: requests.filter((request) =>
@@ -1081,6 +1121,12 @@ function evaluateSlice(requests, observations) {
       observation.mechanically_accepted && observation.improved).length,
     regressed_sections: observations.filter((observation) =>
       observation.mechanically_accepted && observation.regressed).length,
+    macro_mean_raw_wer: raw,
+    macro_mean_strict_or_raw_wer: strictOrRaw,
+    relative_error_change:
+      raw === null || raw === 0 || strictOrRaw === null
+        ? null
+        : (strictOrRaw - raw) / raw,
     locale_quality: localeQuality,
   };
 }
@@ -1094,11 +1140,17 @@ function irreversibleEvaluationFailure(observed, gates) {
   ) {
     return 'Mechanical acceptance minimum is mathematically unreachable.';
   }
-  if (observed.token_limit_failures >
-      gates.token_limit_failures_maximum) {
+  if (
+    Number.isFinite(gates.token_limit_failures_maximum) &&
+    observed.token_limit_failures > gates.token_limit_failures_maximum
+  ) {
     return 'A token-limit failure irreversibly violates the gate.';
   }
   if (
+    Number.isFinite(
+      gates
+        .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum,
+    ) &&
     observed
       .accepted_sections_above_30_percent_input_output_word_edit_rate >
     gates
@@ -1107,6 +1159,7 @@ function irreversibleEvaluationFailure(observed, gates) {
     return 'A gross accepted edit irreversibly violates the safety gate.';
   }
   if (
+    Number.isFinite(gates.changed_correct_input_to_error_maximum) &&
     observed.changed_correct_input_to_error >
     gates.changed_correct_input_to_error_maximum
   ) {
@@ -1132,10 +1185,17 @@ function gateFailures(observed, gates) {
       `${gates.mechanically_accepted_requests_minimum}`,
     );
   }
-  if (observed.token_limit_failures > gates.token_limit_failures_maximum) {
+  if (
+    Number.isFinite(gates.token_limit_failures_maximum) &&
+    observed.token_limit_failures > gates.token_limit_failures_maximum
+  ) {
     failures.push(`${observed.token_limit_failures} token-limit failures`);
   }
   if (
+    Number.isFinite(
+      gates
+        .accepted_sections_above_30_percent_input_output_word_edit_rate_maximum,
+    ) &&
     observed
       .accepted_sections_above_30_percent_input_output_word_edit_rate >
     gates
@@ -1144,6 +1204,7 @@ function gateFailures(observed, gates) {
     failures.push('gross accepted edits exceed the maximum');
   }
   if (
+    Number.isFinite(gates.locale_macro_wer_regressions_maximum) &&
     observed.locale_macro_wer_regressions >
     gates.locale_macro_wer_regressions_maximum
   ) {
@@ -1152,6 +1213,7 @@ function gateFailures(observed, gates) {
     );
   }
   if (
+    Number.isFinite(gates.changed_correct_input_to_error_maximum) &&
     observed.changed_correct_input_to_error >
     gates.changed_correct_input_to_error_maximum
   ) {
@@ -1164,6 +1226,22 @@ function gateFailures(observed, gates) {
     failures.push(
       `${observed.regressed_sections} regressions exceed ` +
       `${observed.improved_sections} improvements`,
+    );
+  }
+  if (
+    Number.isFinite(gates.overall_relative_error_change_maximum) &&
+    (
+      observed.relative_error_change === null ||
+      observed.relative_error_change >
+        gates.overall_relative_error_change_maximum
+    )
+  ) {
+    failures.push(
+      `overall relative error change ${
+        observed.relative_error_change === null
+          ? 'is unavailable'
+          : observed.relative_error_change
+      } exceeds ${gates.overall_relative_error_change_maximum}`,
     );
   }
   return failures;
@@ -1359,6 +1437,8 @@ async function exists(path) {
 
 async function selfTest() {
   const { screen, plan, screenBytes, planBytes } = await loadContract();
+  const requestsPerRepeat =
+    screen.scope.document_count * screen.scope.sections_per_document;
   if (
     parseTargetOutput('{"text":"ok"}').text !== 'ok' ||
     parseTargetOutput('```json\n{"text":"ok"}\n```').transportEnvelope !==
@@ -1375,6 +1455,7 @@ async function selfTest() {
       changed_correct_input_to_error: 0,
       improved_sections: 1,
       regressed_sections: 1,
+      relative_error_change: -0.1,
     }, plan.first_repeat_gates).length !== 0 ||
     irreversibleEvaluationFailure({
       completed_requests: 2,
@@ -1397,8 +1478,8 @@ async function selfTest() {
       estimate.plan_sha256 !== sha256(planBytes) ||
       estimate.screen_id !== screen.id ||
       estimate.screen_sha256 !== sha256(screenBytes) ||
-      estimate.scope.requests_per_candidate_per_repeat !== 60 ||
-      estimate.candidates.length !== 5
+      estimate.scope.requests_per_candidate_per_repeat !== requestsPerRepeat ||
+      estimate.candidates.length !== screen.candidates.length
     ) {
       throw new Error('hosted cost estimate differs from the active contract');
     }
