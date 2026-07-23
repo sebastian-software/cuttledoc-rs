@@ -1,8 +1,9 @@
 # Factorial transcript-postprocessing benchmark
 
-**Status:** design locked; voice qualification blocks execution.
+**Status:** all three local TTS/STT slices complete; the hardened Gemma
+contract screen is in progress.
 
-**Evidence date:** 2026-07-22.
+**Evidence date:** 2026-07-23.
 
 This benchmark compares transcript postprocessing under controlled variation in
 language, source text, speech synthesis, voice, generation, speech recognition,
@@ -107,7 +108,8 @@ The primary matrix cannot start until all of the following are true:
 1. All 30 passage slots remain materialized, revision- and digest-pinned,
    rights-reviewed, and appropriate for their declared content type.
 2. Every Apple host voice identifier is resolved and every Qwen/Voxtral voice
-   slot passes calibration and listening review.
+   slot passes the digest-pinned catastrophic technical gate. Listening remains
+   a useful optional diagnostic, not a blocker for the synthetic baseline.
 3. Each generated master is retained losslessly, digest-pinned, and normalized
    once. All three STT models receive exactly the same normalized PCM.
 4. All raw STT transcripts and LLM responses have durable paths before remote
@@ -286,6 +288,17 @@ node scripts/run-postprocessing-factorial-local.mjs summarize-qualification \
   --output-dir artifacts/postprocessing-factorial-local-plan-6
 ```
 
+All ten Voxtral presets passed this screen with no non-finite samples, token
+caps, or adaptive retries. The ten qualification recordings total 598.18
+seconds. Mean channel WER is 4.38% for Whisper, 5.59% for direct Qwen3-ASR, and
+11.97% for Parakeet. The all-receiver locale means are 6.80% German, 6.70%
+English, 7.32% Spanish, 6.40% French, and 9.35% Portuguese. The Spanish female
+cell exposes useful receiver disagreement—1.91% Whisper versus 14.01% Qwen and
+18.47% Parakeet—but passes because the gate requires at least one intelligible
+receiver and deliberately does not convert disagreement into a TTS rejection.
+These figures qualify the presets for expansion; they are not an engine
+ranking.
+
 After all 120 audio and 360 STT artifacts for one engine are present, create a
 compact repository report while leaving raw PCM and transcripts ignored:
 
@@ -301,9 +314,9 @@ generation repeats produced identical audio and transcripts.
 
 ## Current complete local slices
 
-Plan revision 6 has complete Apple and Qwen VoiceDesign slices. The values
-below are macro mean channel WER percentages: they measure the complete
-TTS-to-STT path and must not be presented as isolated STT accuracy.
+Plan revision 6 has complete Apple, Qwen VoiceDesign, and Voxtral BF16 slices.
+The values below are macro mean channel WER percentages: they measure the
+complete TTS-to-STT path and must not be presented as isolated STT accuracy.
 
 | TTS source | STT receiver | Overall | German | English | Spanish | French | Portuguese |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -313,14 +326,23 @@ TTS-to-STT path and must not be presented as isolated STT accuracy.
 | Qwen VoiceDesign | Whisper | 2.18 | 1.91 | 2.22 | 1.29 | 2.58 | 2.92 |
 | Qwen VoiceDesign | Qwen3-ASR | 7.59 | 7.59 | 5.71 | 7.28 | 4.67 | 12.69 |
 | Qwen VoiceDesign | Parakeet | 7.91 | 4.65 | 5.10 | 10.63 | 7.17 | 12.02 |
+| Voxtral BF16 | Whisper | 3.14 | 3.08 | 4.36 | 2.10 | 2.81 | 3.34 |
+| Voxtral BF16 | Qwen3-ASR | 7.76 | 8.64 | 6.55 | 8.47 | 5.55 | 9.58 |
+| Voxtral BF16 | Parakeet | 9.83 | 7.95 | 10.27 | 12.77 | 10.15 | 8.00 |
 
-Across all three receivers, Apple has 6.49% macro mean WER and Qwen has
-5.89%. That aggregate hides material reversals by language and receiver, so the
-language strata remain the selection evidence. Both slices produced 60/60
-identical normalized repeat pairs and 180/180 identical transcript pairs.
+Across all three receivers, Apple has 6.49% macro mean WER, Qwen has 5.89%,
+and Voxtral has 6.91%. That aggregate hides material reversals by language and
+receiver, so the language strata remain the selection evidence. The Apple and
+Qwen slices produced 60/60 identical normalized repeat pairs and 180/180
+identical transcript pairs. Voxtral's separate same-seed control produced
+10/10 identical normalized audio pairs and 30/30 identical transcript pairs.
+
 Qwen emitted 418 successful chunks across 120 documents; two documents needed
 one deterministic adaptive retry each, no document remained capped, and the
-largest successful chunk used 441 of the allowed 1,200 tokens.
+largest successful chunk used 441 of the allowed 1,200 tokens. Voxtral emitted
+416 successful chunks across its 120 primary documents with no retry or cap;
+its largest successful chunk used 450 tokens. The three local slices now
+provide all 180 six-section documents required by the downstream LLM matrix.
 
 The runner retains both the engine-native mono `f32le` master and one derived
 16 kHz mono `f32le` normalization. The normalized digest is the single input
@@ -404,9 +426,31 @@ and introduced errors into 12 previously correct section observations.
 | Portuguese | 8/48 | 48/48 | 8.83% → 8.30% | 6.05% |
 
 The accepted-only WER is not used to rank models because contract failures are
-input-dependent and would create survivorship bias. The next local prompt
-iteration should target Gemma only, remove the ambiguous example-id behavior,
-and test whether constrained or positional structured output reaches full
-contract compliance without changing the measured correction behavior. Even
-then, release acceptance still requires held-out human podcast or audiobook
-audio.
+input-dependent and would create survivorship bias. The follow-up is now
+pinned as
+[`local-llm-gemma-contract-screen.json`](../benchmarks/postprocessing/local-llm-gemma-contract-screen.json).
+It keeps Gemma's correction policy but replaces model-visible immutable string
+ids with exact integer positions `0…5`. The caller validates all six positions
+and maps them back to the original ids locally. This removes the known
+hyphen/underscore ambiguity without weakening missing, duplicate, or
+reordered-section detection.
+
+The screen covers all 180 Apple, Qwen, and technically qualified Voxtral
+documents, twice, for 360 requests and 2,160 section observations:
+
+```sh
+node scripts/run-postprocessing-factorial-local-llm.mjs materialize \
+  --screen benchmarks/postprocessing/local-llm-gemma-contract-screen.json \
+  --results-subdir llm-gemma-contract-results
+node scripts/run-postprocessing-factorial-local-llm.mjs run \
+  --screen benchmarks/postprocessing/local-llm-gemma-contract-screen.json \
+  --results-subdir llm-gemma-contract-results \
+  --candidate gemma-4-e2b-it-4bit-mlx
+node scripts/run-postprocessing-factorial-local-llm.mjs summarize \
+  --screen benchmarks/postprocessing/local-llm-gemma-contract-screen.json \
+  --results-subdir llm-gemma-contract-results \
+  --summary-output benchmarks/postprocessing/local-llm-gemma-contract-results.json
+```
+
+This remains a development contract/quality screen. Release acceptance still
+requires held-out human podcast or audiobook audio.

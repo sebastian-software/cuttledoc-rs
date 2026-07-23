@@ -344,6 +344,7 @@ async function initializeState() {
   state.updated_at = now;
   state.inputs = input;
   state.capabilities = await capabilities();
+  resolvePinnedModelVoices(state, plan);
   state.progress = await progress(ledger);
   return state;
 }

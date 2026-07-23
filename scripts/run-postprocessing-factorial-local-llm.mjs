@@ -50,6 +50,10 @@ const { positionals, values } = parseArgs({
         'benchmarks/postprocessing/local-llm-screen-results.json',
       ),
     },
+    'results-subdir': {
+      type: 'string',
+      default: 'llm-local-results',
+    },
     'allow-partial': { type: 'boolean', default: false },
     force: { type: 'boolean', default: false },
   },
@@ -75,11 +79,11 @@ const paths = {
 paths.stt = join(paths.output, 'stt');
 paths.audio = join(paths.output, 'audio');
 paths.documents = join(paths.output, 'llm-documents');
-paths.results = join(paths.output, 'llm-local-results');
-paths.jobs = join(paths.output, 'llm-local-jobs.json');
+paths.results = join(paths.output, values['results-subdir']);
+paths.jobs = join(paths.output, `${values['results-subdir']}-jobs.json`);
 
 if (command === 'self-test') {
-  selfTest();
+  await selfTest();
 } else if (command === 'materialize') {
   await materializeDocuments();
   await printStatus();
@@ -98,15 +102,14 @@ async function materializeDocuments() {
     readJson(paths.selection),
     readJson(paths.screen),
   ]);
-  validatePlan(ledger, screen);
+  await validatePlan(ledger, screen);
   const selected = new Map(selection.sources.flatMap((source) =>
     source.passages.map((passage) => [passage.id, { source, passage }])));
   const sttUnits = new Map(ledger.stt_units.map((unit) => [unit.id, unit]));
   let completed = 0;
   let resumed = 0;
   const documents = ledger.llm_documents.filter((document) =>
-    document.status === screen.scope.document_status &&
-    screen.scope.tts_engines.includes(document.tts_engine) &&
+    screenIncludesDocument(screen, document) &&
     (!values.locale || document.locale === values.locale));
   const limit = parsePositiveInteger(values.limit, '--limit');
   const selectedDocuments = limit === null ? documents : documents.slice(0, limit);
@@ -230,12 +233,11 @@ async function runCandidates() {
     readJson(paths.ledger),
     readJson(paths.screen),
   ]);
-  validatePlan(ledger, screen);
+  await validatePlan(ledger, screen);
   const limit = parsePositiveInteger(values.limit, '--limit');
   const repetitions = parsePositiveInteger(values.repetitions, '--repetitions');
   let documents = ledger.llm_documents.filter((document) =>
-    document.status === screen.scope.document_status &&
-    screen.scope.tts_engines.includes(document.tts_engine) &&
+    screenIncludesDocument(screen, document) &&
     (!values.locale || document.locale === values.locale));
   if (limit !== null) documents = documents.slice(0, limit);
   const jobs = [];
@@ -273,6 +275,7 @@ async function runCandidates() {
     if (repetitions !== null) {
       arguments_.push('--repetitions', String(repetitions));
     }
+    if (values.force) arguments_.push('--force');
     commandOutput(paths.python, arguments_, {
       env: { ...process.env, PYTHONUNBUFFERED: '1' },
       stdio: 'inherit',
@@ -285,10 +288,9 @@ async function printStatus() {
     readJson(paths.ledger),
     readJson(paths.screen),
   ]);
-  validatePlan(ledger, screen);
+  await validatePlan(ledger, screen);
   const ready = ledger.llm_documents.filter((document) =>
-    document.status === screen.scope.document_status &&
-    screen.scope.tts_engines.includes(document.tts_engine));
+    screenIncludesDocument(screen, document));
   let materialized = 0;
   for (const document of ready) {
     if (await validDocument(join(paths.documents, `${document.id}.json`), document)) {
@@ -349,10 +351,9 @@ async function summarizeResults() {
     readJson(paths.ledger),
     readJson(paths.screen),
   ]);
-  validatePlan(ledger, screen);
+  await validatePlan(ledger, screen);
   const documents = ledger.llm_documents.filter((document) =>
-    document.status === screen.scope.document_status &&
-    screen.scope.tts_engines.includes(document.tts_engine));
+    screenIncludesDocument(screen, document));
   const requests = [];
   const observations = [];
   const missing = [];
@@ -695,15 +696,79 @@ function aggregateObservations(observations, fields, requests) {
     .localeCompare(fields.map((field) => right[field]).join('|')));
 }
 
-function validatePlan(ledger, screen) {
+function screenDocumentStatuses(screen) {
+  return screen.scope.document_statuses ??
+    [screen.scope.document_status];
+}
+
+function screenIncludesDocument(screen, document) {
+  return screenDocumentStatuses(screen).includes(document.status) &&
+    screen.scope.tts_engines.includes(document.tts_engine);
+}
+
+async function validatePlan(ledger, screen) {
+  const statuses = screenDocumentStatuses(screen);
+  const documents = ledger.llm_documents.filter((document) =>
+    screenIncludesDocument(screen, document));
+  const expectedPairs = documents.length * screen.candidates.length;
+  const expectedRequests = expectedPairs * screen.generation.repetitions;
+  const expectedSections =
+    expectedRequests * screen.scope.sections_per_document;
   if (
     ledger.plan_id !== screen.plan_id ||
     ledger.plan_revision !== screen.plan_revision ||
-    screen.scope.document_count !== 120 ||
-    screen.expected_counts.documents !== 120 ||
-    screen.expected_counts.requests !== 720
+    !Array.isArray(statuses) ||
+    statuses.length === 0 ||
+    new Set(statuses).size !== statuses.length ||
+    !Array.isArray(screen.scope.tts_engines) ||
+    screen.scope.tts_engines.length === 0 ||
+    screen.scope.document_count !== documents.length ||
+    screen.expected_counts.documents !== documents.length ||
+    screen.expected_counts.document_model_pairs !== expectedPairs ||
+    screen.expected_counts.requests !== expectedRequests ||
+    screen.expected_counts.section_outputs !== expectedSections
   ) {
     throw new Error('Local LLM screen differs from the pinned factorial ledger');
+  }
+  const promptBytes = await readFile(join(repoRoot, screen.generation.prompt_path));
+  if (sha256(promptBytes) !== screen.generation.prompt_sha256) {
+    throw new Error(`${screen.generation.prompt_path}: prompt digest drift`);
+  }
+  if (
+    new Set(screen.candidates.map((candidate) => candidate.id)).size !==
+      screen.candidates.length
+  ) {
+    throw new Error('Local LLM candidate ids must be unique');
+  }
+  const qualificationReports = new Map();
+  for (const qualification of screen.scope.qualification_reports ?? []) {
+    const path = join(repoRoot, qualification.path);
+    const bytes = await readFile(path);
+    if (sha256(bytes) !== qualification.sha256) {
+      throw new Error(`${qualification.path}: qualification digest drift`);
+    }
+    const report = JSON.parse(bytes);
+    if (
+      report.plan_id !== screen.plan_id ||
+      report.plan_revision !== screen.plan_revision ||
+      report.qualification_slice?.tts_engine !== qualification.tts_engine ||
+      report.disposition !== qualification.required_disposition
+    ) {
+      throw new Error(
+        `${qualification.path}: qualification contract differs from screen`,
+      );
+    }
+    qualificationReports.set(qualification.tts_engine, report);
+  }
+  for (const document of documents) {
+    if (
+      document.status !== 'ready' &&
+      !qualificationReports.has(document.tts_engine)
+    ) {
+      throw new Error(
+        `${document.id}: blocked document lacks a pinned qualification report`,
+      );
+    }
   }
 }
 
@@ -822,7 +887,7 @@ function mean(values_) {
   return values_.reduce((sum, value) => sum + value, 0) / values_.length;
 }
 
-function selfTest() {
+async function selfTest() {
   if (
     languageName('pt-BR') !== 'Portuguese' ||
     parsePositiveInteger(undefined, '--limit') !== null ||
@@ -831,6 +896,16 @@ function selfTest() {
     normalizedWords('Über—Test').join('|') !== 'über|test'
   ) {
     throw new Error('local LLM runner self-test failed');
+  }
+  const ledger = await readJson(join(
+    repoRoot,
+    'benchmarks/postprocessing/factorial-cells.json',
+  ));
+  for (const screenPath of [
+    'benchmarks/postprocessing/local-llm-screen.json',
+    'benchmarks/postprocessing/local-llm-gemma-contract-screen.json',
+  ]) {
+    await validatePlan(ledger, await readJson(join(repoRoot, screenPath)));
   }
   process.stdout.write('factorial local LLM runner: self-test passed\n');
 }

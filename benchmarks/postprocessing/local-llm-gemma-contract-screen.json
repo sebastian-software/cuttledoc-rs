@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "id": "postprocessing-factorial-local-gemma-contract-screen-2",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "purpose": "Retest the only positive local MLX survivor with an unambiguous positional output contract across all three qualified TTS engines.",
+  "scope": {
+    "document_statuses": [
+      "ready",
+      "blocked"
+    ],
+    "tts_engines": [
+      "apple-avspeechsynthesizer",
+      "qwen3-tts-1.7b-voicedesign-mlx-audio",
+      "voxtral-tts-4b-bf16-mlx-audio"
+    ],
+    "document_count": 180,
+    "sections_per_document": 6,
+    "hidden_reference_visible_to_model": false,
+    "qualification_reports": [
+      {
+        "tts_engine": "voxtral-tts-4b-bf16-mlx-audio",
+        "path": "benchmarks/postprocessing/qualifications/voxtral-tts-4b-bf16.technical-a-1.json",
+        "sha256": "934783817093e344136037238b9fae41197f9436f8f167d88f748833eb58ff4f",
+        "required_disposition": "technical-gate-passed"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "id": "gemma-4-e2b-it-4bit-mlx",
+      "role": "contract-hardening-quality-candidate",
+      "model_manifest_path": "spikes/text-generation-mlx-reference/candidates/gemma-4-e2b-it-4bit-mlx.json",
+      "model_directory_name": "gemma-4-e2b-it-4bit-mlx",
+      "rights_disposition": "evaluation-only-pending-explicit-product-review"
+    }
+  ],
+  "generation": {
+    "runtime": "pinned mlx-lm reference over official Apple MLX",
+    "prompt_id": "conservative-sections-positional-v3",
+    "prompt_path": "benchmarks/postprocessing/prompts/conservative-sections-positional-v3.txt",
+    "prompt_sha256": "cc3fe71abc80cb66ee073c8cc15411c1802963ebc37a362907832fd4c319e4e5",
+    "seed": 0,
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "repetitions": 2,
+    "chat_template_options": {
+      "enable_thinking": false
+    },
+    "output_contract": "bounded-transcript-sections-positional-v3"
+  },
+  "expected_counts": {
+    "documents": 180,
+    "document_model_pairs": 180,
+    "requests": 360,
+    "section_outputs": 2160
+  },
+  "result_path": "benchmarks/postprocessing/local-llm-gemma-contract-results.json",
+  "execution_policy": {
+    "resume_valid_results": true,
+    "load_model_once_per_batch": true,
+    "retain_every_raw_response": true,
+    "reject_missing_reordered_or_duplicate_positions": true,
+    "map_positions_to_immutable_section_ids_locally": true,
+    "derive_authoritative_diffs_locally": true
+  },
+  "claim_limit": "This local synthetic clean-speech screen tests output-contract compliance and development quality only. It cannot establish release quality on human podcasts or audiobooks, and mlx-lm remains a reference runtime rather than the accepted product boundary."
+}

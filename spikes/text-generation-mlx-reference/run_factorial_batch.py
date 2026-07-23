@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--source-revision", required=True)
     parser.add_argument("--repetitions", type=int)
+    parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
 
@@ -125,7 +126,9 @@ def generate(model, tokenizer, prompt: str, generation: dict) -> dict:
     }
 
 
-def parse_sections(raw_text: str, expected_ids: list[str]) -> dict:
+def parse_sections(
+    raw_text: str, expected_ids: list[str], output_contract: str
+) -> dict:
     try:
         value = json.loads(raw_text)
     except json.JSONDecodeError as error:
@@ -135,6 +138,47 @@ def parse_sections(raw_text: str, expected_ids: list[str]) -> dict:
         return {
             "valid": False,
             "error": "Output must be an object with a sections array",
+            "sections": [],
+        }
+    if output_contract == "bounded-transcript-sections-positional-v3":
+        positions = []
+        normalized = []
+        for section in sections:
+            if (
+                not isinstance(section, dict)
+                or not isinstance(section.get("index"), int)
+                or isinstance(section.get("index"), bool)
+            ):
+                return {
+                    "valid": False,
+                    "error": "Every section must have an integer index",
+                    "sections": [],
+                }
+            if not isinstance(section.get("text"), str):
+                return {
+                    "valid": False,
+                    "error": "Every section must have a string text",
+                    "sections": [],
+                }
+            positions.append(section["index"])
+            if 0 <= section["index"] < len(expected_ids):
+                normalized.append(
+                    {
+                        "id": expected_ids[section["index"]],
+                        "text": section["text"],
+                    }
+                )
+        if positions != list(range(len(expected_ids))):
+            return {
+                "valid": False,
+                "error": "Section indices or order differ from the input contract",
+                "sections": normalized,
+            }
+        return {"valid": True, "error": None, "sections": normalized}
+    if output_contract != "bounded-transcript-sections-local-diff-v2":
+        return {
+            "valid": False,
+            "error": f"Unsupported output contract: {output_contract}",
             "sections": [],
         }
     ids = []
@@ -219,7 +263,7 @@ def main() -> None:
         document_sha256 = sha256_bytes(document_bytes)
         for repetition in range(1, repetitions + 1):
             output = args.output_dir / job["document_id"] / f"repeat-{repetition}.json"
-            if valid_existing(
+            if not args.force and valid_existing(
                 output, manifest["id"], document_sha256, prompt_sha256, repetition
             ):
                 resumed += 1
@@ -253,7 +297,11 @@ def main() -> None:
         expected_ids = [
             section["id"] for section in document["model_input"]["sections"]
         ]
-        parsed = parse_sections(generation_result["text"], expected_ids)
+        parsed = parse_sections(
+            generation_result["text"],
+            expected_ids,
+            generation["output_contract"],
+        )
         reached_limit = generation_result["generation_tokens"] >= generation["max_tokens"]
         result = {
             "schema_version": "1.0.0",

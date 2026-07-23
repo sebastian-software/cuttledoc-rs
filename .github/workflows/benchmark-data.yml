@@ -27,6 +27,7 @@ on:
       - "scripts/generate-postprocessing-factorial-matrix.mjs"
       - "scripts/validate-postprocessing-factorial-plan.mjs"
       - "scripts/run-postprocessing-factorial-local.mjs"
+      - "scripts/run-postprocessing-factorial-local-llm.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/text-generation-openrouter-reference/**"
       - "spikes/tts-calibration/**"
@@ -59,6 +60,7 @@ on:
       - "scripts/generate-postprocessing-factorial-matrix.mjs"
       - "scripts/validate-postprocessing-factorial-plan.mjs"
       - "scripts/run-postprocessing-factorial-local.mjs"
+      - "scripts/run-postprocessing-factorial-local-llm.mjs"
       - "spikes/text-generation-mlx-reference/**"
       - "spikes/text-generation-openrouter-reference/**"
       - "spikes/tts-calibration/**"
@@ -95,6 +97,8 @@ jobs:
           node scripts/generate-postprocessing-factorial-matrix.mjs --check
           node scripts/validate-postprocessing-factorial-plan.mjs --self-test
           node scripts/run-postprocessing-factorial-local.mjs self-test
+          node scripts/run-postprocessing-factorial-local-llm.mjs self-test
+          python -m py_compile spikes/text-generation-mlx-reference/run_factorial_batch.py
       - name: Check TTS calibration runners
         run: |
           node --check scripts/archive-qwen-tts-calibration.mjs

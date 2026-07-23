@@ -1,0 +1,657 @@
+{
+  "schema_version": "1.0.0",
+  "id": "voxtral-tts-4b-bf16-technical-a-qualification-1",
+  "plan_id": "postprocessing-factorial-primary-languages-v1",
+  "plan_revision": "postprocessing-factorial-plan-6",
+  "source_selection_revision": "synthetic-roundtrip-passages-4",
+  "evidence_source_revision": "7e30c6163207ea3f3163ed8d860843c14c106198",
+  "evidence_captured_through": "2026-07-23T08:25:56.554Z",
+  "qualification_slice": {
+    "tts_engine": "voxtral-tts-4b-bf16-mlx-audio",
+    "passage_selector": "*-technical-a",
+    "generation_repeat": 1,
+    "voice_count": 10,
+    "audio_count": 10,
+    "stt_count": 30
+  },
+  "policy": {
+    "purpose": "catastrophic technical screen before factorial expansion",
+    "minimum_master_rms": 0.01,
+    "maximum_non_finite_samples": 0,
+    "generation_must_finish_before_max_tokens": true,
+    "required_stt_models_per_voice": 3,
+    "maximum_best_receiver_wer": 0.2,
+    "receiver_rule": "At least one locked STT receiver must meet the WER threshold; receiver disagreement is retained as evidence, not used to reject an otherwise intelligible voice."
+  },
+  "aggregates": {
+    "by_stt_model": [
+      {
+        "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+        "observation_count": 10,
+        "mean_wer": 0.11971753288885675,
+        "minimum_wer": 0.057971014492753624,
+        "maximum_wer": 0.18471337579617833,
+        "mean_cer": 0.056645122837252704
+      },
+      {
+        "stt_model": "qwen3-asr-0.6b-mlx-direct",
+        "observation_count": 10,
+        "mean_wer": 0.055863041061354424,
+        "minimum_wer": 0.01910828025477707,
+        "maximum_wer": 0.14012738853503184,
+        "mean_cer": 0.024204844629726913
+      },
+      {
+        "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+        "observation_count": 10,
+        "mean_wer": 0.04384435591688357,
+        "minimum_wer": 0.012738853503184714,
+        "maximum_wer": 0.06796116504854369,
+        "mean_cer": 0.015492233992498942
+      }
+    ],
+    "by_locale": [
+      {
+        "locale": "de-DE",
+        "observation_count": 6,
+        "mean_wer": 0.06796116504854367,
+        "minimum_wer": 0.02912621359223301,
+        "maximum_wer": 0.1262135922330097,
+        "mean_cer": 0.031069364161849713
+      },
+      {
+        "locale": "en-US",
+        "observation_count": 6,
+        "mean_wer": 0.06695156695156695,
+        "minimum_wer": 0.03418803418803419,
+        "maximum_wer": 0.11965811965811966,
+        "mean_cer": 0.03608007448789572
+      },
+      {
+        "locale": "es-419",
+        "observation_count": 6,
+        "mean_wer": 0.0732484076433121,
+        "minimum_wer": 0.012738853503184714,
+        "maximum_wer": 0.18471337579617833,
+        "mean_cer": 0.036129266521423384
+      },
+      {
+        "locale": "fr-FR",
+        "observation_count": 6,
+        "mean_wer": 0.0640096618357488,
+        "minimum_wer": 0.021739130434782608,
+        "maximum_wer": 0.15217391304347827,
+        "mean_cer": 0.02936206168145332
+      },
+      {
+        "locale": "pt-BR",
+        "observation_count": 6,
+        "mean_wer": 0.09353741496598639,
+        "minimum_wer": 0.05102040816326531,
+        "maximum_wer": 0.16326530612244897,
+        "mean_cer": 0.027929568913175468
+      }
+    ],
+    "passing_voices_only": {
+      "voice_count": 10,
+      "by_stt_model": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "observation_count": 10,
+          "mean_wer": 0.11971753288885675,
+          "minimum_wer": 0.057971014492753624,
+          "maximum_wer": 0.18471337579617833,
+          "mean_cer": 0.056645122837252704
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "observation_count": 10,
+          "mean_wer": 0.055863041061354424,
+          "minimum_wer": 0.01910828025477707,
+          "maximum_wer": 0.14012738853503184,
+          "mean_cer": 0.024204844629726913
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "observation_count": 10,
+          "mean_wer": 0.04384435591688357,
+          "minimum_wer": 0.012738853503184714,
+          "maximum_wer": 0.06796116504854369,
+          "mean_cer": 0.015492233992498942
+        }
+      ],
+      "by_locale": [
+        {
+          "locale": "de-DE",
+          "observation_count": 6,
+          "mean_wer": 0.06796116504854367,
+          "minimum_wer": 0.02912621359223301,
+          "maximum_wer": 0.1262135922330097,
+          "mean_cer": 0.031069364161849713
+        },
+        {
+          "locale": "en-US",
+          "observation_count": 6,
+          "mean_wer": 0.06695156695156695,
+          "minimum_wer": 0.03418803418803419,
+          "maximum_wer": 0.11965811965811966,
+          "mean_cer": 0.03608007448789572
+        },
+        {
+          "locale": "es-419",
+          "observation_count": 6,
+          "mean_wer": 0.0732484076433121,
+          "minimum_wer": 0.012738853503184714,
+          "maximum_wer": 0.18471337579617833,
+          "mean_cer": 0.036129266521423384
+        },
+        {
+          "locale": "fr-FR",
+          "observation_count": 6,
+          "mean_wer": 0.0640096618357488,
+          "minimum_wer": 0.021739130434782608,
+          "maximum_wer": 0.15217391304347827,
+          "mean_cer": 0.02936206168145332
+        },
+        {
+          "locale": "pt-BR",
+          "observation_count": 6,
+          "mean_wer": 0.09353741496598639,
+          "minimum_wer": 0.05102040816326531,
+          "maximum_wer": 0.16326530612244897,
+          "mean_cer": 0.027929568913175468
+        }
+      ]
+    }
+  },
+  "voices": [
+    {
+      "voice_slot_id": "voxtral-de-female",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "de_female",
+      "resolved_locale": "de-DE",
+      "name": "voxtral-de-female",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--de-technical-a--voxtral-de-female--seed-0-repeat-1",
+      "master_sha256": "e7b1425cd4da87b0331815dac2b8e9618483216c8137ec6200b662e44cb8a214",
+      "normalized_sha256": "3267cc9ff53012957c4a2f4855915fe507cc226a228d0cbf7c0a1e89d19816ce",
+      "duration_ms": 51300,
+      "sample_rate_hz": 24000,
+      "rms": 0.034091619927415606,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.038834951456310676,
+      "worst_wer": 0.1262135922330097,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "aa666fbe136752e85738c8abe28019763b4d9323ec6a4fe0a47b2aa98ecae445",
+          "transcript_word_count": 100,
+          "wer": 0.1262135922330097,
+          "cer": 0.0708092485549133,
+          "inference_ms": 941.3769580000007
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "c47b0df0047e5715f00c2fed187190263a0f45f7f8786bfc9eb718c73ff58728",
+          "transcript_word_count": 102,
+          "wer": 0.038834951456310676,
+          "cer": 0.015895953757225433,
+          "inference_ms": 1877.055833
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "4f1c6a8716b96a83803b210fc424c2d47cd7debb683f1e5b1c105af7b3462001",
+          "transcript_word_count": 102,
+          "wer": 0.06796116504854369,
+          "cer": 0.01878612716763006,
+          "inference_ms": 1829.553167
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-de-male",
+      "locale": "de-DE",
+      "passage_slot_id": "de-technical-a",
+      "passage_id": "synthetic-de-origin",
+      "identifier": "de_male",
+      "resolved_locale": "de-DE",
+      "name": "voxtral-de-male",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--de-technical-a--voxtral-de-male--seed-0-repeat-1",
+      "master_sha256": "40a0868c63db639d62d1db2fdd199c407def3c14495c6c99434188bf4adfd306",
+      "normalized_sha256": "b853d885ee5367198852b41a59adb6ef969b697b1654fea5a93215e009c92de1",
+      "duration_ms": 53620,
+      "sample_rate_hz": 24000,
+      "rms": 0.03645808606323126,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.02912621359223301,
+      "worst_wer": 0.08737864077669903,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "b77fa78b7642bd3bdfc57c2a5153d7ab3b6290ecab5601435dee300e59faa385",
+          "transcript_word_count": 105,
+          "wer": 0.08737864077669903,
+          "cer": 0.0476878612716763,
+          "inference_ms": 1289.187417000001
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "f3d93e6385f8289ca76b0ee3ff3299cb7d8eab3bcc5bde61f9182b813cc4ada9",
+          "transcript_word_count": 103,
+          "wer": 0.02912621359223301,
+          "cer": 0.01300578034682081,
+          "inference_ms": 1868.70775
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "d6aac7e6babf1f62951460ca4dae59b92ff48e544e85382a3f6eb156f0dfaf58",
+          "transcript_word_count": 106,
+          "wer": 0.05825242718446602,
+          "cer": 0.02023121387283237,
+          "inference_ms": 2590.193709
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-en-female",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "casual_female",
+      "resolved_locale": "en-US",
+      "name": "voxtral-en-female",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--en-technical-a--voxtral-en-female--seed-0-repeat-1",
+      "master_sha256": "e25ccb56251057bea6c3475ee3151191640fee46b6337c466101ce083820d0e9",
+      "normalized_sha256": "f912ba04848e29a9b22c0e52889d2de0f93ccd21b8773e979ba429227dbfe51b",
+      "duration_ms": 60020,
+      "sample_rate_hz": 24000,
+      "rms": 0.016878847729148758,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.03418803418803419,
+      "worst_wer": 0.11965811965811966,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "13094ea72502e61d76f683e0a82d825ef7d30a1c2b884301c437d37da5d88aae",
+          "transcript_word_count": 126,
+          "wer": 0.11965811965811966,
+          "cer": 0.0712290502793296,
+          "inference_ms": 1068.847167
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "76ddbcb43f9505896ee226afe40179d13fb6efec3291c9fa6193ee9fbf32a986",
+          "transcript_word_count": 120,
+          "wer": 0.03418803418803419,
+          "cer": 0.006983240223463687,
+          "inference_ms": 1426.590084
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "9bb97e1458730cd546f4edfa4b7d177840be5a217f000a10d171aed83dfbe88f",
+          "transcript_word_count": 120,
+          "wer": 0.03418803418803419,
+          "cer": 0.006983240223463687,
+          "inference_ms": 2462.5475000000006
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-en-male",
+      "locale": "en-US",
+      "passage_slot_id": "en-technical-a",
+      "passage_id": "synthetic-en-reasoning",
+      "identifier": "casual_male",
+      "resolved_locale": "en-US",
+      "name": "voxtral-en-male",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--en-technical-a--voxtral-en-male--seed-0-repeat-1",
+      "master_sha256": "5e09b0c1173279f35e71e964b1d3b6c9f309755a6243c3c6a3adcfa5d5d3b2be",
+      "normalized_sha256": "33eec57b902ab70d5ff7b66ec8742ec5939955e65939fd46a5381f4ccf627798",
+      "duration_ms": 53460,
+      "sample_rate_hz": 24000,
+      "rms": 0.013230810829952946,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.042735042735042736,
+      "worst_wer": 0.11965811965811966,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "b3efe3239afb89c2270c017eee1bee26128be7a4c16202adf4a96fd38fabd13a",
+          "transcript_word_count": 124,
+          "wer": 0.11965811965811966,
+          "cer": 0.09497206703910614,
+          "inference_ms": 969.0303750000021
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "a68d5c5a538dc81faee2241b0823bd72dec0bbe2dbf2f06d4619b14b7313b260",
+          "transcript_word_count": 121,
+          "wer": 0.042735042735042736,
+          "cer": 0.01675977653631285,
+          "inference_ms": 1433.72175
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "58b69fb1f29ecc2d62bc2c459e521be6ab461dc0e38a4c8bda3ac3ca018bf8ad",
+          "transcript_word_count": 120,
+          "wer": 0.05128205128205128,
+          "cer": 0.019553072625698324,
+          "inference_ms": 1599.8661250000005
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-es-female",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "es_female",
+      "resolved_locale": "es-ES",
+      "name": "voxtral-es-female",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--es-technical-a--voxtral-es-female--seed-0-repeat-1",
+      "master_sha256": "91af177cb6a6eaf7e65885dd338ec52d029aacb756266faab0260b6b6c07f053",
+      "normalized_sha256": "080679b833b68b19f27a79b23f7f6245f752de70defc7a7dda98089284a91619",
+      "duration_ms": 90660,
+      "sample_rate_hz": 24000,
+      "rms": 0.02815958995952613,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.01910828025477707,
+      "worst_wer": 0.18471337579617833,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "edd229d3262e8fa6f8d547dee9040cbe038910a8d449b0dab1af3963ac963eca",
+          "transcript_word_count": 161,
+          "wer": 0.18471337579617833,
+          "cer": 0.05773420479302832,
+          "inference_ms": 1897.999917000001
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "e3e30e58c419555431f6dfd37f33fb3a0d8a3c8345d28c08e84ef181e388d8a6",
+          "transcript_word_count": 155,
+          "wer": 0.14012738853503184,
+          "cer": 0.09912854030501089,
+          "inference_ms": 2167.245333
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "b19e159e4878f863a2d13de4df8e814459985e5939845ddfe6913b288df2d3ba",
+          "transcript_word_count": 160,
+          "wer": 0.01910828025477707,
+          "cer": 0.020697167755991286,
+          "inference_ms": 4187.288375000004
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-es-male",
+      "locale": "es-419",
+      "passage_slot_id": "es-technical-a",
+      "passage_id": "synthetic-es-technical",
+      "identifier": "es_male",
+      "resolved_locale": "es-ES",
+      "name": "voxtral-es-male",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--es-technical-a--voxtral-es-male--seed-0-repeat-1",
+      "master_sha256": "11217e12129b680865451884e76383a6124c412094cba46297c56dc620962631",
+      "normalized_sha256": "841788dbb35c9e8bd4855286c4d73d47be31a9c3bf32eee845e14356e97ac671",
+      "duration_ms": 78020,
+      "sample_rate_hz": 24000,
+      "rms": 0.045628957010383185,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.012738853503184714,
+      "worst_wer": 0.06369426751592357,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "7bc05a09dab2ce518033d9ce8b6b77f91f9093c9363dc70b77cd1ac394f8e2a7",
+          "transcript_word_count": 154,
+          "wer": 0.06369426751592357,
+          "cer": 0.020697167755991286,
+          "inference_ms": 2062.9409579999992
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "6802a40ff4c22c1619941d5156366f3e57b9da3892126d0991f8f2a60c360ede",
+          "transcript_word_count": 155,
+          "wer": 0.01910828025477707,
+          "cer": 0.00980392156862745,
+          "inference_ms": 1901.546291
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "982566ec7c5b21d62af1df78608427bb2a4f6319776eed4e3cbf76496db0ee24",
+          "transcript_word_count": 155,
+          "wer": 0.012738853503184714,
+          "cer": 0.008714596949891068,
+          "inference_ms": 3305.38904200001
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-fr-female",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "fr_female",
+      "resolved_locale": "fr-FR",
+      "name": "voxtral-fr-female",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--fr-technical-a--voxtral-fr-female--seed-0-repeat-1",
+      "master_sha256": "2e910d95fbc507daf860deaef74f1f93ec20a4c281974e9dfc97e01cd805d2db",
+      "normalized_sha256": "894b8cf2cbf5b6b2bcab266157786fc8d944896cbc9ef1d9ccaa4b508c377d80",
+      "duration_ms": 57380,
+      "sample_rate_hz": 24000,
+      "rms": 0.0428978473219885,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.050724637681159424,
+      "worst_wer": 0.057971014492753624,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "feaef1fa4217976fa4fe31bf625e281a4acbac244b005a49c65f7ab422b2acc7",
+          "transcript_word_count": 138,
+          "wer": 0.057971014492753624,
+          "cer": 0.036755386565272496,
+          "inference_ms": 1621.8253750000003
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "42bac25048b20aa45de6387d406e4f2b861a59c24fee29c60b9fef072b87de39",
+          "transcript_word_count": 140,
+          "wer": 0.057971014492753624,
+          "cer": 0.026615969581749048,
+          "inference_ms": 1826.542125
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "ac82c2b86d8e3839df2557e35b5facbcd86933875d14303bb593fd6e9ac2f030",
+          "transcript_word_count": 140,
+          "wer": 0.050724637681159424,
+          "cer": 0.021546261089987327,
+          "inference_ms": 2005.9690839999967
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-fr-male",
+      "locale": "fr-FR",
+      "passage_slot_id": "fr-technical-a",
+      "passage_id": "synthetic-fr-technical",
+      "identifier": "fr_male",
+      "resolved_locale": "fr-FR",
+      "name": "voxtral-fr-male",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--fr-technical-a--voxtral-fr-male--seed-0-repeat-1",
+      "master_sha256": "0383a35dc8712b0a3eec17e5a4d68e50bb40b2e66a24b2523f97856618d15436",
+      "normalized_sha256": "f9762f3fb1a7608cc7f07f25c9b0e58e7b1c6abcf2187658abf72b3b3b72e247",
+      "duration_ms": 62500,
+      "sample_rate_hz": 24000,
+      "rms": 0.06002386339726183,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.021739130434782608,
+      "worst_wer": 0.15217391304347827,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "4cc18567d2d6c8713686a80f1936cdb0040c4ebafa5563461615ebc0ed1b009e",
+          "transcript_word_count": 136,
+          "wer": 0.15217391304347827,
+          "cer": 0.07731305449936629,
+          "inference_ms": 1173.6413749999992
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "b9a8946b48ec4e5d3531baa83f69b57a3ce10f8b755e36e8e82b271a5a700532",
+          "transcript_word_count": 137,
+          "wer": 0.043478260869565216,
+          "cer": 0.010139416983523447,
+          "inference_ms": 1842.915625
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "1a521b2c255173857554ba806423002e48ef199b885738be253c76ab486dde7d",
+          "transcript_word_count": 138,
+          "wer": 0.021739130434782608,
+          "cer": 0.0038022813688212928,
+          "inference_ms": 2662.908958
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-pt-female",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "pt_female",
+      "resolved_locale": "pt-PT",
+      "name": "voxtral-pt-female",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--pt-technical-a--voxtral-pt-female--seed-0-repeat-1",
+      "master_sha256": "f2c4c7c9e417c1d0ad9450ba48cace2473df9019c643bbd11b25ca1f385ab84c",
+      "normalized_sha256": "4160e873989dbaf334421a446ef5f6376a61fbc3995379cd2c77b126fb186a30",
+      "duration_ms": 46250,
+      "sample_rate_hz": 24000,
+      "rms": 0.05158726489045391,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.05102040816326531,
+      "worst_wer": 0.12244897959183673,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "52cc15dbda0d0e3f4acd40dddf38139bde20011977f95f23d1135c4e66445165",
+          "transcript_word_count": 97,
+          "wer": 0.12244897959183673,
+          "cer": 0.03460837887067395,
+          "inference_ms": 957.9071250000052
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "d8d0b5222c5682589a3559f20a8cc1ca507bf235d69fafa0f2c6e9475ecbc5f7",
+          "transcript_word_count": 98,
+          "wer": 0.05102040816326531,
+          "cer": 0.014571948998178506,
+          "inference_ms": 1489.246417
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "c3bf1b1eb3b2eaf670b07623aa76f28d9cd63e90744812301f4ce21578bdd525",
+          "transcript_word_count": 98,
+          "wer": 0.061224489795918366,
+          "cer": 0.01092896174863388,
+          "inference_ms": 1885.8489169999957
+        }
+      ],
+      "technical_gate": "passed"
+    },
+    {
+      "voice_slot_id": "voxtral-pt-male",
+      "locale": "pt-BR",
+      "passage_slot_id": "pt-technical-a",
+      "passage_id": "synthetic-pt-technical",
+      "identifier": "pt_male",
+      "resolved_locale": "pt-PT",
+      "name": "voxtral-pt-male",
+      "voice_description": null,
+      "voice_identity_seed": null,
+      "audio_unit_id": "audio--pt-technical-a--voxtral-pt-male--seed-0-repeat-1",
+      "master_sha256": "5efa1fff97a43c1f466fd5b23f080ab58c337440a0776c2d5312f62c66f193f5",
+      "normalized_sha256": "3b4955073dcb1db48cc0d9a868afbd179f0e184f3ba4c67af018cff527e9f9f7",
+      "duration_ms": 44970,
+      "sample_rate_hz": 24000,
+      "rms": 0.05266405036513152,
+      "non_finite_sample_count": 0,
+      "generation_reached_max_tokens": false,
+      "best_wer": 0.061224489795918366,
+      "worst_wer": 0.16326530612244897,
+      "observations": [
+        {
+          "stt_model": "parakeet-tdt-0.6b-v3-coreml",
+          "transcript_sha256": "c92e6ad971474042d379256972e1b05ba91cfc68db954585d4e038bcff0ad95c",
+          "transcript_word_count": 94,
+          "wer": 0.16326530612244897,
+          "cer": 0.0546448087431694,
+          "inference_ms": 1207.2095419999969
+        },
+        {
+          "stt_model": "qwen3-asr-0.6b-mlx-direct",
+          "transcript_sha256": "bccc9a339fb3a8825423977d6bea895ebbd30321ca6592cdef8f1ad9687a056f",
+          "transcript_word_count": 96,
+          "wer": 0.10204081632653061,
+          "cer": 0.029143897996357013,
+          "inference_ms": 1396.435625
+        },
+        {
+          "stt_model": "whisper-large-v3-turbo-coreml-whispercpp",
+          "transcript_sha256": "ca01c0d01e595b84db9910a4212ad4201d19b80c6a1f8989baab3a4117fce866",
+          "transcript_word_count": 96,
+          "wer": 0.061224489795918366,
+          "cer": 0.023679417122040074,
+          "inference_ms": 1749.884459000008
+        }
+      ],
+      "technical_gate": "passed"
+    }
+  ],
+  "disposition": "technical-gate-passed",
+  "limitations": [
+    "This is one technical passage per voice, not the factorial benchmark.",
+    "Synthetic clean speech cannot establish quality on human podcasts or audiobooks.",
+    "WER measures the complete TTS-to-STT channel and is receiver-specific.",
+    "Overall aggregates retain failed generations; passing_voices_only excludes them.",
+    "The technical gate does not replace optional perceptual listening review."
+  ]
+}

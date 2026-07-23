@@ -3756,6 +3756,301 @@ function mean(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+function qualificationAggregates(observations, field) {
+  const groups = new Map();
+  for (const observation of observations) {
+    const key = observation[field];
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(observation);
+  }
+  return [...groups].sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, group]) => ({
+      [field]: key,
+      observation_count: group.length,
+      mean_wer: mean(group.map((item) => item.wer)),
+      minimum_wer: Math.min(...group.map((item) => item.wer)),
+      maximum_wer: Math.max(...group.map((item) => item.wer)),
+      mean_cer: mean(group.map((item) => item.cer)),
+    }));
+}
+
+function validateQualificationAggregates(actual, expected, field, label) {
+  const errors = [];
+  if (!Array.isArray(actual) || actual.length !== expected.length) {
+    return [`${label} must contain ${expected.length} ${field} aggregates`];
+  }
+  const byKey = new Map(actual.map((item) => [item[field], item]));
+  for (const expectedItem of expected) {
+    const actualItem = byKey.get(expectedItem[field]);
+    if (!actualItem) {
+      errors.push(`${label} is missing ${field} ${expectedItem[field]}`);
+      continue;
+    }
+    if (actualItem.observation_count !== expectedItem.observation_count) {
+      errors.push(
+        `${label}/${expectedItem[field]} observation_count does not reconcile`,
+      );
+    }
+    for (const metric of [
+      'mean_wer',
+      'minimum_wer',
+      'maximum_wer',
+      'mean_cer',
+    ]) {
+      if (
+        typeof actualItem[metric] !== 'number' ||
+        Math.abs(actualItem[metric] - expectedItem[metric]) > 1e-12
+      ) {
+        errors.push(
+          `${label}/${expectedItem[field]} ${metric} does not reconcile`,
+        );
+      }
+    }
+  }
+  return errors;
+}
+
+function validateLocalQualification(report) {
+  const errors = [];
+  const requiredStrings = [
+    'id',
+    'plan_id',
+    'plan_revision',
+    'source_selection_revision',
+    'evidence_captured_through',
+    'qualification_slice.tts_engine',
+    'qualification_slice.passage_selector',
+    'policy.purpose',
+    'policy.receiver_rule',
+  ];
+  for (const path of requiredStrings) {
+    if (
+      typeof at(report, path) !== 'string' ||
+      at(report, path).length === 0
+    ) {
+      errors.push(`${path} must be a non-empty string`);
+    }
+  }
+  if (report.schema_version !== schemaVersion) {
+    errors.push(`schema_version must be ${schemaVersion}`);
+  }
+  if (!/^[0-9a-f]{40}$/.test(report.evidence_source_revision ?? '')) {
+    errors.push('evidence_source_revision must be a 40-character Git SHA');
+  }
+  if (!Number.isFinite(Date.parse(report.evidence_captured_through ?? ''))) {
+    errors.push('evidence_captured_through must be an ISO date-time');
+  }
+
+  const slice = report.qualification_slice ?? {};
+  const policy = report.policy ?? {};
+  const voices = report.voices ?? [];
+  if (!Array.isArray(voices) || voices.length === 0) {
+    errors.push('voices must be a non-empty array');
+    return errors;
+  }
+  if (
+    !Number.isInteger(slice.generation_repeat) ||
+    slice.generation_repeat < 1
+  ) {
+    errors.push('qualification_slice.generation_repeat must be positive');
+  }
+  if (
+    !Number.isFinite(policy.minimum_master_rms) ||
+    policy.minimum_master_rms < 0 ||
+    !Number.isInteger(policy.maximum_non_finite_samples) ||
+    policy.maximum_non_finite_samples < 0 ||
+    !Number.isInteger(policy.required_stt_models_per_voice) ||
+    policy.required_stt_models_per_voice < 1 ||
+    !Number.isFinite(policy.maximum_best_receiver_wer) ||
+    policy.maximum_best_receiver_wer < 0 ||
+    typeof policy.generation_must_finish_before_max_tokens !== 'boolean'
+  ) {
+    errors.push('qualification policy thresholds are invalid');
+  }
+
+  const voiceIds = new Set();
+  const observations = [];
+  for (const voice of voices) {
+    const label = voice.voice_slot_id ?? '<unknown-voice>';
+    if (!(label.length > 0)) errors.push('voice_slot_id is required');
+    if (voiceIds.has(label)) errors.push(`duplicate voice_slot_id: ${label}`);
+    voiceIds.add(label);
+    for (const field of [
+      'locale',
+      'passage_slot_id',
+      'passage_id',
+      'identifier',
+      'resolved_locale',
+      'name',
+      'audio_unit_id',
+    ]) {
+      if (!(voice[field]?.length > 0)) {
+        errors.push(`${label}: ${field} must be a non-empty string`);
+      }
+    }
+    for (const field of ['master_sha256', 'normalized_sha256']) {
+      if (!/^[0-9a-f]{64}$/.test(voice[field] ?? '')) {
+        errors.push(`${label}: ${field} must be a SHA-256 digest`);
+      }
+    }
+    for (const field of [
+      'duration_ms',
+      'sample_rate_hz',
+      'rms',
+      'non_finite_sample_count',
+      'best_wer',
+      'worst_wer',
+    ]) {
+      const integer = [
+        'sample_rate_hz',
+        'non_finite_sample_count',
+      ].includes(field);
+      if (
+        typeof voice[field] !== 'number' ||
+        !Number.isFinite(voice[field]) ||
+        voice[field] < 0 ||
+        (integer && !Number.isInteger(voice[field]))
+      ) {
+        errors.push(`${label}: ${field} must be a non-negative metric`);
+      }
+    }
+    if (typeof voice.generation_reached_max_tokens !== 'boolean') {
+      errors.push(
+        `${label}: generation_reached_max_tokens must be a boolean`,
+      );
+    }
+    if (!['passed', 'failed'].includes(voice.technical_gate)) {
+      errors.push(`${label}: technical_gate is invalid`);
+    }
+    if (
+      !Array.isArray(voice.observations) ||
+      voice.observations.length !== policy.required_stt_models_per_voice
+    ) {
+      errors.push(
+        `${label}: observations must match required_stt_models_per_voice`,
+      );
+      continue;
+    }
+    const sttModels = new Set();
+    for (const observation of voice.observations) {
+      if (!(observation.stt_model?.length > 0)) {
+        errors.push(`${label}: observation stt_model is required`);
+      }
+      if (sttModels.has(observation.stt_model)) {
+        errors.push(`${label}: duplicate STT model ${observation.stt_model}`);
+      }
+      sttModels.add(observation.stt_model);
+      if (!/^[0-9a-f]{64}$/.test(observation.transcript_sha256 ?? '')) {
+        errors.push(`${label}: observation transcript digest is invalid`);
+      }
+      for (const field of [
+        'transcript_word_count',
+        'wer',
+        'cer',
+        'inference_ms',
+      ]) {
+        if (
+          typeof observation[field] !== 'number' ||
+          !Number.isFinite(observation[field]) ||
+          observation[field] < 0 ||
+          (
+            field === 'transcript_word_count' &&
+            !Number.isInteger(observation[field])
+          )
+        ) {
+          errors.push(`${label}: observation ${field} is invalid`);
+        }
+      }
+      observations.push({
+        ...observation,
+        locale: voice.locale,
+        technical_gate: voice.technical_gate,
+      });
+    }
+    const wers = voice.observations.map((item) => item.wer);
+    const bestWer = Math.min(...wers);
+    const worstWer = Math.max(...wers);
+    if (Math.abs(voice.best_wer - bestWer) > 1e-12) {
+      errors.push(`${label}: best_wer does not reconcile`);
+    }
+    if (Math.abs(voice.worst_wer - worstWer) > 1e-12) {
+      errors.push(`${label}: worst_wer does not reconcile`);
+    }
+    const passes =
+      voice.non_finite_sample_count <= policy.maximum_non_finite_samples &&
+      voice.rms >= policy.minimum_master_rms &&
+      bestWer <= policy.maximum_best_receiver_wer &&
+      (
+        !policy.generation_must_finish_before_max_tokens ||
+        !voice.generation_reached_max_tokens
+      );
+    if (voice.technical_gate !== (passes ? 'passed' : 'failed')) {
+      errors.push(`${label}: technical_gate does not match the policy`);
+    }
+  }
+
+  if (
+    slice.voice_count !== voices.length ||
+    slice.audio_count !== voices.length ||
+    slice.stt_count !== observations.length
+  ) {
+    errors.push('qualification_slice counts do not reconcile');
+  }
+  const expectedDisposition = voices.every((voice) =>
+    voice.technical_gate === 'passed')
+    ? 'technical-gate-passed'
+    : 'technical-gate-failed';
+  if (report.disposition !== expectedDisposition) {
+    errors.push('disposition does not reconcile with voice gates');
+  }
+  if (
+    !Array.isArray(report.limitations) ||
+    report.limitations.length === 0 ||
+    report.limitations.some((item) => !(item?.length > 0))
+  ) {
+    errors.push('limitations must be a non-empty string array');
+  }
+
+  const passingObservations = observations.filter((observation) =>
+    observation.technical_gate === 'passed');
+  errors.push(
+    ...validateQualificationAggregates(
+      report.aggregates?.by_stt_model,
+      qualificationAggregates(observations, 'stt_model'),
+      'stt_model',
+      'aggregates.by_stt_model',
+    ),
+    ...validateQualificationAggregates(
+      report.aggregates?.by_locale,
+      qualificationAggregates(observations, 'locale'),
+      'locale',
+      'aggregates.by_locale',
+    ),
+  );
+  const passing = report.aggregates?.passing_voices_only;
+  if (
+    passing?.voice_count !==
+    voices.filter((voice) => voice.technical_gate === 'passed').length
+  ) {
+    errors.push('aggregates.passing_voices_only.voice_count does not reconcile');
+  }
+  errors.push(
+    ...validateQualificationAggregates(
+      passing?.by_stt_model,
+      qualificationAggregates(passingObservations, 'stt_model'),
+      'stt_model',
+      'aggregates.passing_voices_only.by_stt_model',
+    ),
+    ...validateQualificationAggregates(
+      passing?.by_locale,
+      qualificationAggregates(passingObservations, 'locale'),
+      'locale',
+      'aggregates.passing_voices_only.by_locale',
+    ),
+  );
+  return errors;
+}
+
 function nonNullMaximum(values) {
   const present = values.filter((value) => value !== null);
   return present.length === 0 ? null : Math.max(...present);
@@ -4145,6 +4440,10 @@ const promptManifestPath = join(
   repoRoot,
   'benchmarks/postprocessing/prompts/manifest.json',
 );
+const localQualificationDirectory = join(
+  repoRoot,
+  'benchmarks/postprocessing/qualifications',
+);
 const schemaPaths = [
   join(repoRoot, 'benchmarks/schema/run.schema.json'),
   join(repoRoot, 'benchmarks/schema/fixture-manifest.schema.json'),
@@ -4307,6 +4606,15 @@ const aggregateManifests = new Map([
 ]);
 const postprocessingSnapshot = await readJson(postprocessingSnapshotPath);
 const promptManifest = await readJson(promptManifestPath);
+const localQualificationPaths = (
+  await readdir(localQualificationDirectory)
+)
+  .filter((name) => /\.technical-a-\d+\.json$/.test(name))
+  .sort()
+  .map((name) => join(localQualificationDirectory, name));
+const localQualifications = await Promise.all(
+  localQualificationPaths.map((path) => readJson(path)),
+);
 const requestedRun = process.argv.indexOf('--run');
 const runPaths = requestedRun >= 0
   ? [resolve(process.cwd(), process.argv[requestedRun + 1])]
@@ -4598,6 +4906,13 @@ failures.push(
     (error) => `${promptManifestPath}: ${error}`,
   ),
 );
+for (const [index, qualification] of localQualifications.entries()) {
+  failures.push(
+    ...validateLocalQualification(qualification).map(
+      (error) => `${localQualificationPaths[index]}: ${error}`,
+    ),
+  );
+}
 const runs = [];
 for (const path of runPaths) {
   const run = await readJson(path);
@@ -4678,6 +4993,13 @@ if (process.argv.includes('--self-test')) {
   );
   if (validateSourceCandidates(invalidSourceCandidates).length === 0) {
     failures.push('validator self-test failed to reject duplicate source ids');
+  }
+  const invalidQualification = structuredClone(localQualifications.at(-1));
+  invalidQualification.aggregates.by_stt_model[0].mean_wer += 1;
+  if (validateLocalQualification(invalidQualification).length === 0) {
+    failures.push(
+      'validator self-test failed to reject a divergent qualification aggregate',
+    );
   }
   const invalidTargetDomainPlan = structuredClone(targetDomainPlan);
   invalidTargetDomainPlan.cells[0].source_candidate_ids = ['fleurs'];
@@ -4988,6 +5310,7 @@ console.log(
   `1 direct Voxtral multilingual live control, ` +
   `1 Voxtral C/MPS boundary control, ` +
   `1 postprocessing snapshot with ${postprocessingSnapshot.experiments.length} experiment(s), ` +
+  `${localQualifications.length} local TTS qualification report(s), ` +
   `${promptManifest.prompts.length} prompt candidate(s), ` +
   `schema ${schemaVersion}`,
 );
