@@ -142,3 +142,14 @@ raw responses only under ignored `artifacts/`. Its checked-in summary and
 decision retain response ids, served model/provider identities, token use,
 cost, contract results, and section-level quality evidence without retaining
 the API key.
+
+The later pragmatic extension adds DeepSeek V4 Flash on Parasail FP8 and
+MiniMax M3 on Together, both through pinned ZDR structured-output routes. It
+also reruns GPT-5.6 Sol and Claude Sonnet 5 under an expected-utility gate.
+DeepSeek becomes the primary value candidate at 20.4% aggregate relative WER
+reduction for `$0.038513`; Sol remains the 37.2% quality ceiling. MiniMax passes
+the mechanical gate but is not shortlisted because it is weaker and more
+semantically risky than DeepSeek. The pinned Claude route is rejected after
+three HTTP-200 responses without usable content made its response minimum
+unreachable. Full results and the semantic audit are in
+[`postprocessing-factorial-benchmark.md`](../../docs/postprocessing-factorial-benchmark.md).

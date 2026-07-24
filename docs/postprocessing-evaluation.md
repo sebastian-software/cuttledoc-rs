@@ -133,6 +133,17 @@ then Terra, while explicitly retaining date, clause-reconstruction, and
 technical-term risks. The full protocol and evidence are in the
 [`factorial benchmark`](postprocessing-factorial-benchmark.md).
 
+A subsequent pragmatic extension keeps the same 60-target challenge but treats
+small semantic regressions as reviewable expected-utility evidence rather than
+automatic rejection. GPT-5.6 Sol then completes both repeats with 37.2%
+aggregate relative WER reduction, while DeepSeek V4 Flash reaches 20.4% at
+`$0.038513` for 120 requests. MiniMax M3 reaches 10.0% but is dominated by
+DeepSeek on both quality and cost. Claude's accepted outputs remain strong, but
+three HTTP-200 responses without usable text make the pinned route fail its
+mechanical contract. The operational shortlist is Sol as the opt-in quality
+ceiling and DeepSeek as the primary value candidate; protected fact-bearing
+spans and raw-transcript fallback remain required.
+
 Prompt behavior is evaluated independently from model identity. The versioned
 historical, surface-only, error-profile, and targeted-span candidates plus
 their source-grouped development/validation/test discipline are defined in

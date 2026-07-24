@@ -709,3 +709,76 @@ technical terms separately from punctuation, casing, and aggregate WER.
 
 This remains a development contract/quality screen. Release acceptance still
 requires held-out human podcast or audiobook audio.
+
+## Pragmatic current-model extension
+
+The strict preflight above answered whether a candidate could pass a
+zero-regression safety contract. It did not answer the product question that
+motivated postprocessing: whether a model produces materially more useful
+transcripts overall while the raw transcript remains available. The
+[pragmatic extension plan](../benchmarks/postprocessing/hosted-llm-pragmatic-extension-plan.json)
+therefore keeps the same frozen 60 targets and prompt but changes the gate:
+
+- one correct-input regression is recorded for semantic review rather than
+  stopping the run;
+- a token-limit response, a gross edit above 30%, or an unreachable mechanical
+  minimum remains a hard failure;
+- a candidate needs at least 5% aggregate relative WER reduction and at least
+  as many improved as regressed sections in each repeat;
+- language aggregates remain separate and may support language-specific
+  selection;
+- every numeric WER regression still receives a semantic review before a model
+  enters the product shortlist.
+
+OpenRouter's Natural Languages task ranking was used only to discover
+DeepSeek V4 Flash and MiniMax M3. The ranking is based on spend share, not a
+controlled quality score. The captured endpoint catalog provided ZDR routes
+with structured outputs: Parasail FP8 for DeepSeek and Together for MiniMax.
+The extension also reran GPT-5.6 Sol and Claude Sonnet 5 from the beginning so
+their results use the same pragmatic gate rather than merging truncated
+strict-gate tails.
+
+The runner completed 445 of the planned 480 requests. The 35 unissued requests
+are Claude's intentional tail after its mechanical minimum became unreachable.
+All other candidates completed both repeats:
+
+| Candidate | Completed / accepted | Improved / regressed | Relative WER reduction | Recorded cost | Decision |
+| --- | ---: | ---: | ---: | ---: | --- |
+| GPT-5.6 Sol | 120 / 120 | 75 / 11 | 37.2% | `$2.047320` | Quality ceiling; semantic safeguards required |
+| DeepSeek V4 Flash | 120 / 120 | 68 / 7 | 20.4% | `$0.038513` | Primary value candidate |
+| MiniMax M3 | 120 / 120 | 46 / 3 | 10.0% | `$0.077541` | Passes gate; not product-shortlisted |
+| Claude Sonnet 5 | 85 / 82 | 49 / 0 | 20.7% on captured requests | `$0.984290` plus one unknown request | Reject pinned route |
+
+The complete survivors differ substantially by language:
+
+| Candidate | DE | EN | ES | FR | PT |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| GPT-5.6 Sol | 43.4% | 18.1% | 29.2% | 29.3% | 44.2% |
+| DeepSeek V4 Flash | 21.3% | 7.9% | 24.5% | 16.2% | 25.5% |
+| MiniMax M3 | 6.4% | 1.6% | 20.8% | 9.9% | 15.6% |
+
+The [semantic review](../benchmarks/postprocessing/hosted-llm-pragmatic-extension-semantic-review.json)
+audits all 21 regressed observations across 13 unique cases. Sol remains the
+quality ceiling but repeatedly performs an unsupported English tense rewrite
+and a plausible-but-unfaithful Spanish date reconstruction. DeepSeek has one
+material dialogue-perspective rewrite, never changes a correct target into an
+error, and is about 53 times cheaper than Sol on this run. MiniMax's three
+unique regressions are all material and its aggregate gain is lower than
+DeepSeek's, so it adds benchmark evidence but not another product option.
+
+Claude's accepted outputs are unusually clean, but the pinned Azure route
+returned HTTP 200 without usable text three times among the first 25
+repeat-two logical requests. Those requests were not blindly retried because
+they may have been charged. The route fails the product contract even though
+the accepted-output quality signal remains promising.
+
+The practical shortlist from this extension is therefore:
+
+1. GPT-5.6 Sol as an opt-in hosted quality ceiling after protected fact-bearing
+   spans are implemented.
+2. DeepSeek V4 Flash as the primary hosted value candidate and next adapter
+   target.
+
+Enhancement remains optional, the raw transcript remains authoritative
+fallback evidence, and neither candidate becomes an unconditional default from
+this synthetic development slice.
