@@ -747,7 +747,7 @@ All other candidates completed both repeats:
 | GPT-5.6 Sol | 120 / 120 | 75 / 11 | 37.2% | `$2.047320` | Quality ceiling; semantic safeguards required |
 | DeepSeek V4 Flash | 120 / 120 | 68 / 7 | 20.4% | `$0.038513` | Primary value candidate |
 | MiniMax M3 | 120 / 120 | 46 / 3 | 10.0% | `$0.077541` | Passes gate; not product-shortlisted |
-| Claude Sonnet 5 | 85 / 82 | 49 / 0 | 20.7% on captured requests | `$0.984290` plus one unknown request | Reject pinned route |
+| Claude Sonnet 5 | 85 / 82 | 49 / 0 | 20.7% on captured requests | `$0.984290` known plus three unknown terminal responses | Reject pinned route |
 
 The complete survivors differ substantially by language:
 
